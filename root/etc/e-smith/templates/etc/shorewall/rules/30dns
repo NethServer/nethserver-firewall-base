@@ -1,0 +1,4 @@
+#
+#       Accept DNS connections from the firewall to the Internet
+#
+DNS/ACCEPT      $FW             net

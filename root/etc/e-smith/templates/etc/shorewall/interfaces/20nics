@@ -1,0 +1,11 @@
+{
+    use esmith::NetworksDB;
+    my $ndb = esmith::NetworksDB->open_ro();
+    $OUT.="loc\t".$ndb->green->key."\ttcpflags,nosmurfs\n";
+
+    my $red = $ndb->get_by_role('red') || '';
+    if ($red ne '') {
+        $OUT.="net\t".$red->key."\ttcpflags,dhcp,routefilter,nosmurfs,logmartians";
+    }
+
+}

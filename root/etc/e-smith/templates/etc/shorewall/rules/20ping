@@ -1,0 +1,10 @@
+#
+# Drop Ping from the "bad" net zone.
+#
+Ping/DROP     net             $FW
+#
+#  Make ping work bi-directionally between the dmz, net, Firewall and local zone
+#  (assumes that the loc-> net policy is ACCEPT).
+#
+Ping/ACCEPT     loc             $FW
+

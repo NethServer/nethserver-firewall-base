@@ -1,0 +1,23 @@
+{
+    use NethServer::Service;
+    use esmith::ConfigDB;
+    my $confDb = esmith::ConfigDB->open();
+
+    foreach my $serviceRecord ($confDb->get_all_by_prop('type' => 'service')) {
+
+	my $tcpPorts = $serviceRecord->prop('TCPPorts') || $serviceRecord->prop('TCPPort') || '';
+	my $udpPorts = $serviceRecord->prop('UDPPorts') || $serviceRecord->prop('UDPPort') || '';
+        if($tcpPorts || $udpPorts) {
+            if( ! NethServer::Service::is_enabled($serviceRecord->key) ) {
+	        next;
+            }
+            $OUT.="#\n#\tService: ".$serviceRecord->key."\n#\n"; 
+            foreach my $port (split(',', $tcpPorts)) {
+                $OUT.="ACCEPT\tloc\t\$FW\ttcp\t$port\n";
+            }
+            foreach my $port (split(',', $udpPorts)) {
+                $OUT.="ACCEPT\tloc\t\$FW\tudp\t$port\n";
+            }
+        }
+    }
+}

@@ -1,0 +1,10 @@
+{
+    use esmith::util;
+    use esmith::NetworksDB;
+    my $ndb = esmith::NetworksDB->open_ro();
+    my $red = $ndb->get_by_role('red') || '';
+    my $green = $ndb->green;
+    if ($red ne '') {
+        $OUT= $red->key."\t".esmith::util::computeLocalNetworkShortSpec($green->prop('ipaddr'),$green->prop('netmask'));
+    }
+}
