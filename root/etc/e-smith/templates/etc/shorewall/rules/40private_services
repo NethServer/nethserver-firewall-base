@@ -12,6 +12,7 @@
 	        next;
             }
             $OUT.="#\n#\tService: ".$serviceRecord->key."\n#\n"; 
+            $OUT.="COMMENT ".$serviceRecord->key."\n"; 
             foreach my $port (split(',', $tcpPorts)) {
                 $OUT.="ACCEPT\tloc\t\$FW\ttcp\t$port\n";
             }
