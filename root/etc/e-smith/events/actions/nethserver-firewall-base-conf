@@ -20,3 +20,12 @@
 #
 
 use strict;
+my $event = shift;
+
+my $DB = esmith::ConfigDB->open();
+
+#
+# Force use of shorewall, no matter what is already configured
+# 
+$DB->set_prop('firewall', 'event', 'nethserver-firewall-base-save');
+
