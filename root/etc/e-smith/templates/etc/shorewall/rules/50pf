@@ -10,18 +10,22 @@
             $status = $pf->prop('status') || "disabled";
             next unless ($status eq "enabled");
             $src = $pf->prop('src') || next;
-            $host = $pf->prop('host') || next;
+            $dstHost = $pf->prop('dstHost') || next;
+            $srcHost = $pf->prop('srcHost') || "";
+            if ($srcHost ne "") {
+                $srcHost = "\t-\t$srcHost";
+            }
             $dst = $pf->prop('dst') || $src;
+            $description = $pf->prop('description') || $description;
             $allow = $pf->prop('allow') || "";
             $allow_cmt = "";
             if ($allow ne "") {
                 $allow_cmt = "from $allow";
                 $allow=":$allow";
             }
-            #TODO: range
-            $OUT.="#\n# PF $src -> $host:$dst $allow_cmt \n#\n";
-            $OUT.="COMMENT ".$pf->key."\n";
-            $OUT.="DNAT\tnet$allow\tloc:$host:$dst\t$protocol\t$src\n"
+            $OUT.="#\n# PF $src -> $dstHost:$dst $allow_cmt \n#\n";
+            $OUT.="COMMENT $description\n";
+            $OUT.="DNAT\tnet$allow\tloc:$dstHost:$dst\t$protocol\t$src$srcHost\n"
         }
 
     }
