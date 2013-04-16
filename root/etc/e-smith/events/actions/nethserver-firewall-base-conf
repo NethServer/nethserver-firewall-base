@@ -20,12 +20,17 @@
 #
 
 use strict;
-my $event = shift;
+use esmith::ConfigDB;
 
+my $event = shift;
 my $DB = esmith::ConfigDB->open();
 
 #
-# Force use of shorewall, no matter what is already configured
-# 
-$DB->set_prop('firewall', 'event', 'nethserver-firewall-base-save');
+# Force use of shorewall
+#
+my $event = $DB->get_prop('firewall', 'event') || "";
+
+if ($event eq '' || $event eq 'lokkit-save') {
+    $DB->set_prop('firewall', 'event', 'nethserver-firewall-base-save');
+}
 
