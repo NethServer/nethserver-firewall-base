@@ -57,11 +57,3 @@ event_templates($event,
 event_services($event, 'shorewall' => 'restart');
 
 
-#--------------------------------------------------
-# actions for nethserver-firewall-base-uninstall event
-#--------------------------------------------------
-
-$event = "nethserver-firewall-base-uninstall";
-
-event_actions($event, 'nethserver-firewall-base-uninstall' => '02');
-
