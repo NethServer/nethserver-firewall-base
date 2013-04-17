@@ -1,0 +1,3 @@
+#!/bin/bash
+
+/sbin/shorewall check 2>&1
