@@ -5,30 +5,26 @@
 
 {
     $db = esmith::ConfigDB->open("portforward") || die "Can't open portforward database: $!\n";
-    foreach my $protocol (qw(tcp udp)) {
-        foreach my $pf ( $db->get_all_by_prop('type' => $protocol) ) {
-            $status = $pf->prop('status') || "disabled";
-            next unless ($status eq "enabled");
-            $src = $pf->prop('src') || next;
-            $dstHost = $pf->prop('dstHost') || next;
-            $srcHost = $pf->prop('srcHost') || "";
-            if ($srcHost ne "") {
-                $srcHost = "\t-\t$srcHost";
-            }
-            $dst = $pf->prop('dst') || $src;
-            $description = $pf->prop('description') || $description;
-            $allow = $pf->prop('allow') || "";
-            $allow_cmt = "";
-            if ($allow ne "") {
-                $allow_cmt = "from $allow";
-                $allow=":$allow";
-            }
-            $OUT.="#\n# PF $src -> $dstHost:$dst $allow_cmt \n#\n";
-            $OUT.="COMMENT $description\n";
-            $OUT.="DNAT\tnet$allow\tloc:$dstHost:$dst\t$protocol\t$src$srcHost\n"
+    foreach my $pf ( $db->get_all_by_prop('type' => 'pf') ) {
+        $proto = $pf->prop('proto') || next;
+        $status = $pf->prop('status') || "disabled";
+        next unless ($status eq "enabled");
+        $src = $pf->prop('src') || next;
+        $dstHost = $pf->prop('dstHost') || next;
+        $srcHost = $pf->prop('srcHost') || "";
+        if ($srcHost ne "") {
+            $srcHost = "\t-\t$srcHost";
         }
-
+        $dst = $pf->prop('dst') || $src;
+        $description = $pf->prop('description') || "";
+        $allow = $pf->prop('allow') || "";
+        $allow_cmt = "";
+        if ($allow ne "") {
+            $allow_cmt = "from $allow";
+            $allow=":$allow";
+        }
+        $OUT.="#\n# PF $src -> $dstHost:$dst $allow_cmt \n#\n";
+        $OUT.="COMMENT $description\n";
+        $OUT.="DNAT\tnet$allow\tloc:$dstHost:$dst\t$proto\t$src$srcHost\n"
     }
-
-
 }
