@@ -62,6 +62,7 @@ class ToggleEnable extends \Nethgui\Controller\Table\RowAbstractAction
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
+        $view['pf'] = '';
 
         if ($this->exitCode != 0) {
             $view->getCommandList('/Notification')->showMessage($view->translate('shorewall_check_error'), \Nethgui\Module\Notification\AbstractNotification::NOTIFY_ERROR);

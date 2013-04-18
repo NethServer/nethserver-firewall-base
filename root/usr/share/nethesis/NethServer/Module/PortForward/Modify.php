@@ -56,17 +56,26 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('dst', Validate::PORTNUMBER, \Nethgui\Controller\Table\Modify::FIELD),
             array('dstHost', Validate::IPv4, \Nethgui\Controller\Table\Modify::FIELD),
             array('srcHost', Validate::IPv4_OR_EMPTY, \Nethgui\Controller\Table\Modify::FIELD),
-            array('allow', $this->createValidator(Validate::ANYTHING)->platform('shorewall-check'), \Nethgui\Controller\Table\Modify::FIELD),
             array('status', Validate::SERVICESTATUS, \Nethgui\Controller\Table\Modify::FIELD),
+            array('allow', $this->createValidator(Validate::ANYTHING)->platform('shorewall-check'), \Nethgui\Controller\Table\Modify::FIELD),
             array('description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
         );
 
 
         $this->setSchema($parameterSchema);
-        $this->setDefaultValue('status', 'enabled');
         $this->setDefaultValue('proto', 'tcp');
+        $this->setDefaultValue('status', 'enabled');
 
         parent::initialize();
+    }
+
+
+    public function bind(\Nethgui\Controller\RequestInterface $request)
+    {
+        parent::bind($request);
+        if ($this->getRequest()->isMutation()) {
+            $this->parameters['status'] = 'enabled';
+        }
     }
 
  
@@ -86,8 +95,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
         
-        $view['statusDatasource'] = array(array('enabled','enabled_label'),array('disabled','disabled_label'));
-        $view['protoDatasource'] = array(array('tcp','tcp_label'),array('udp','udp_label'));
+        $view['protoDatasource'] = array(array('tcp',$view->translate('tcp_label')),array('udp',$view->translate('udp_label')));
  
         if ($this->exitCode != 0) {
             $view->getCommandList('/Notification')->showMessage($view->translate('shorewall_check_error'), \Nethgui\Module\Notification\AbstractNotification::NOTIFY_ERROR);

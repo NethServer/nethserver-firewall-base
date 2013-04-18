@@ -10,7 +10,7 @@ if ($view->getModule()->getIdentifier() == 'disable') {
 }
 
 echo $view->panel()
-    ->insert($view->header('pf')->setAttribute('template', $headerText))
+    ->insert($view->header()->setAttribute('template', $view->translate($headerText)))
     ->insert($view->textLabel('pf')->setAttribute('template', $view->translate($panelText)))
 ;
 

@@ -9,7 +9,6 @@ if ($view->getModule()->getIdentifier() == 'update') {
 echo $view->header()->setAttribute('template',$T($headerText));
 
 echo $view->panel()
-    ->insert($view->selector('status'))
     ->insert($view->selector('proto'))
     ->insert($view->textInput('src'))
     ->insert($view->textInput('dst'))
