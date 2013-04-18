@@ -48,10 +48,8 @@ class NetworkAdapter extends \Nethgui\Controller\TableController
         );
 
         $this
-            ->setTableAdapter($this->getPlatform()->getTableAdapter('networks',NULL))
-            #->setTableAdapter(new \NethServer\Module\NetworkAdapter\NetworkTableAdapter($this->getPlatform()))
+            ->setTableAdapter($this->getPlatform()->getTableAdapter('networks','ethernet'))
             ->setColumns($columns)
-            #->addTableAction(new \NethServer\Module\NetworkAdapter\Modify('create'))            
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->addRowAction(new \NethServer\Module\NetworkAdapter\Modify('update'))
             ->addRowAction(new \NethServer\Module\NetworkAdapter\Modify('delete'))
