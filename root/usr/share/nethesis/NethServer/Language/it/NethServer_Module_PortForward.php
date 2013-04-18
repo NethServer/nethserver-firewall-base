@@ -20,6 +20,6 @@ $L['Proceed with port forward enable?'] = 'Abilitare il port forward?';
 $L['proto_label'] = 'Protocollo';
 $L['shorewall_check_error'] = 'Shorewall ha ritornato un errore. Usare il pulsante "Controlla firewall" per maggiori informazioni.';
 $L['src_label'] = 'Porta di origine';
-$L['update_header_label'] = 'Modifica port forward';
 $L['tcp_label'] = 'TCP';
+$L['update_header_label'] = 'Modifica port forward';
 $L['udp_label'] = 'UDP';
