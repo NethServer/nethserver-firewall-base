@@ -29,7 +29,7 @@ class NetworkAdapter extends \Nethgui\Controller\TableController
 {
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
     {
-        return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Configuration', 20);
+        return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Gateway', 10);
     }
 
     public function initialize()

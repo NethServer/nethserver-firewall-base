@@ -29,7 +29,7 @@ class TrafficShaping extends \Nethgui\Controller\TabsController
 
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
     {
-        return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Configuration', 30);
+        return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Gateway', 40);
     }
 
     public function initialize()
