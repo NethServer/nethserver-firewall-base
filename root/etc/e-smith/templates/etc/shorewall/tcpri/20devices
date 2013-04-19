@@ -1,0 +1,10 @@
+{
+    $db = esmith::ConfigDB->open("tc") || die "Can't open tc database: $!\n";
+    foreach my $interface ( $db->get_all_by_prop('type', 'device') ) {
+        $priority = $interface->prop('priority') || "2";
+        $description =  $interface->prop('description') || "";
+        $OUT .= "# Device: ".$interface->key. " - $description\n";
+        $OUT .= "$priority\t-\t-\t-\t".$interface->key."\n";
+    }
+
+}

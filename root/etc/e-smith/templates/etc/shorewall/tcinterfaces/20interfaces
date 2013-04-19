@@ -1,0 +1,10 @@
+{
+    $db = esmith::ConfigDB->open("tc") || die "Can't open tc database: $!\n";
+    foreach my $interface ( $db->get_all_by_prop('type' => 'device') ) {
+        $in = $interface->prop('in') || next;
+        $out = $interface->prop('out') || next;
+        $dtype = $interface->prop('dtype') || 'External';
+        $OUT = $interface->key."\t$dtype\t$in\t$out\n"
+    }
+
+}

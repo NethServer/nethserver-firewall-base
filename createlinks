@@ -53,6 +53,8 @@ event_templates($event,
                 '/etc/shorewall/masq',
                 '/etc/shorewall/policy',
                 '/etc/shorewall/rules',
+                '/etc/shorewall/tcinterfaces',
+                '/etc/shorewall/tcpri',
                 '/etc/shorewall/zones');
 event_services($event, 'shorewall' => 'restart');
 
