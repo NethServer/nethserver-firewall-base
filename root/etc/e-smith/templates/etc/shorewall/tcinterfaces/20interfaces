@@ -4,7 +4,7 @@
         $in = $interface->prop('in') || next;
         $out = $interface->prop('out') || next;
         $dtype = $interface->prop('dtype') || 'External';
-        $OUT = $interface->key."\t$dtype\t$in\t$out\n"
+        $OUT = $interface->key."\t$dtype\t".$in."kbps\t".$out."kbps\n"
     }
 
 }
