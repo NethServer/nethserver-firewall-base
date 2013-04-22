@@ -79,7 +79,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     protected function onParametersSaved($changedParameters)
     {
-        $this->exitCode = $this->getPlatform()->signalEvent('firewall-base-save@post-process');
+        $this->getPlatform()->signalEvent('firewall-adjust@post-process');
     }
 
 }
