@@ -5,6 +5,7 @@
 $L['1_label'] = 'Basso';
 $L['2_label'] = 'Medio';
 $L['3_label'] = 'Alto';
+$L['address_label'] = 'Indirizzo IP o MAC';
 $L['description_label'] = 'Descrizione';
 $L['device_label'] = 'Interfaccia';
 $L['Devices_Title'] = 'Interfaccia';
