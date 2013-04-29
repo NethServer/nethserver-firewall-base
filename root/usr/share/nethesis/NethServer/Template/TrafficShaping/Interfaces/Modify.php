@@ -8,8 +8,13 @@ if ($view->getModule()->getIdentifier() == 'update') {
 
 echo $view->header()->setAttribute('template',$T($headerText));
 
+if ($view->getModule()->getIdentifier() == 'update') {
+    $device = $view->textInput('device', $view::STATE_DISABLED | $view::STATE_READONLY);
+} else {
+    $device = $view->selector('device', $view::SELECTOR_DROPDOWN);
+}
 echo $view->panel()
-    ->insert($view->selector('device', $view::SELECTOR_DROPDOWN))
+    ->insert($device)
     ->insert($view->textInput('in'))
     ->insert($view->textInput('out'))
     ->insert($view->selector('priority', $view::SELECTOR_DROPDOWN))
