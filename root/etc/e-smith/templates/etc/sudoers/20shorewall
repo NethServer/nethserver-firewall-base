@@ -1,0 +1,10 @@
+{
+    #
+    # 20shorewall
+    #
+    push @cmnd_alias_httpd_admin, qw(
+        /usr/libexec/nethserver/shorewall-check
+    );
+    '';
+}
+

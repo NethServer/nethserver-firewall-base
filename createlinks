@@ -33,7 +33,8 @@ event_templates($event,
                 '/etc/shorewall/masq',
                 '/etc/shorewall/policy',
                 '/etc/shorewall/rules',
-                '/etc/shorewall/zones');
+                '/etc/shorewall/zones',
+                '/etc/sudoers');
 
 event_actions($event,
               'initialize-default-databases' => '00',
