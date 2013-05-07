@@ -106,7 +106,10 @@ class Modify extends \Nethgui\Controller\Table\Modify
     public function validate(\Nethgui\Controller\ValidationReportInterface $report)
     {
         parent::validate($report);
-        if (strpos($this->parameters['role'],'red') === FALSE && $this->parameters['bootproto'] === 'dhcp') {
+        $role = $this->getRequest()->getParameter('role');
+        $bootproto = $this->getRequest()->getParameter('bootproto');
+
+        if (strpos(is_string($role) ? $role : '','red') === FALSE && $bootproto === 'dhcp') {
                 $report->addValidationErrorMessage($this, 'bootproto', 'valid_bootproto_combination');
         }
     }
