@@ -34,6 +34,8 @@ event_templates($event,
                 '/etc/shorewall/policy',
                 '/etc/shorewall/rules',
                 '/etc/shorewall/zones',
+                '/etc/shorewall/providers',
+                '/etc/shorewall/tcrules',
                 '/etc/sudoers');
 
 event_actions($event,
@@ -56,6 +58,8 @@ event_templates($event,
                 '/etc/shorewall/rules',
                 '/etc/shorewall/tcinterfaces',
                 '/etc/shorewall/tcpri',
+                '/etc/shorewall/providers',
+                '/etc/shorewall/tcrules',
                 '/etc/shorewall/zones');
 event_services($event, 'shorewall' => 'restart');
 
