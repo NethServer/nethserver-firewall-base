@@ -55,16 +55,20 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('ipaddr', Validate::IPv4_OR_EMPTY, \Nethgui\Controller\Table\Modify::FIELD),
             array('netmask', Validate::NETMASK_OR_EMPTY, \Nethgui\Controller\Table\Modify::FIELD),
             array('gateway', Validate::IPv4_OR_EMPTY, \Nethgui\Controller\Table\Modify::FIELD),
+            array('persistent_dhclient', '/y|n/', \Nethgui\Controller\Table\Modify::FIELD),
+            array('peer_dns', '/y|n/', \Nethgui\Controller\Table\Modify::FIELD),
         );
 
 
         $this->setSchema($parameterSchema);
         $this->setDefaultValue('bootproto', 'static');
+        $this->setDefaultValue('peer_dns', 'n');
+        $this->setDefaultValue('persistent_dhclient', 'n');
 
         parent::initialize();
     }
 
- 
+
     public function process()
     {
         if($this->getIdentifier() === 'update') {
@@ -72,6 +76,28 @@ class Modify extends \Nethgui\Controller\Table\Modify
                 $this->nicInfo = str_getcsv($this->getPlatform()->exec('/usr/bin/sudo /usr/libexec/nethserver/nic-info '.$this->parameters['device'])->getOutput());
             }
         }
+        if ($this->getRequest()->isMutation()) { 
+            if ($this->getRequest()->isMutation() && strpos($this->parameters["role"],'red') !== false) { # interface is redX (external)
+                if($this->parameters["bootproto"] === "dhcp") {
+                    $this->parameters["ipaddr"] = '';  # unset ipaddr
+                    $this->parameters["netmask"] = ''; # unset netmask
+                    $this->parameters["gateway"] = ''; # unset gateway
+                    # force infinite lease for red interface
+                    $this->parameters["persistent_dhclient"] = 'y'; # always renew dhcp lease
+                    $this->parameters["peer_dns"] = 'n'; # do not overwrite /etc/resolv.conf
+                } else {
+                    $this->parameters["persistent_dhclient"]= 'n';
+                    $this->parameters["peer_dns"] = 'n';
+                }
+                # remove gateway from green device's
+                foreach ($this->getPlatform()->getDatabase('networks')->getAll('ethernet') as $key => $device) {
+                    if (strpos($device['role'], 'green') !== false) { # check all greenX interfaces
+                       $this->getPlatform()->getDatabase('networks')->delProp($key,array('gateway'));
+                    }
+                }
+            }
+        }
+
         parent::process();
     }
 
