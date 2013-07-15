@@ -38,6 +38,9 @@ class Modify extends \Nethgui\Controller\Table\Modify
     protected function calculateKeyFromRequest(\Nethgui\Controller\RequestInterface $request)
     {
          $rules = $this->getPlatform()->getDatabase('portforward')->getAll('pf');
+         if (!$rules) {
+             return 1;
+         }
          return (int)max(array_keys($rules))+1;
     }
 
