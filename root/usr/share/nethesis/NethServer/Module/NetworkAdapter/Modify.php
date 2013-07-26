@@ -62,7 +62,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
         $this->setSchema($parameterSchema);
         $this->setDefaultValue('bootproto', 'static');
-        $this->setDefaultValue('peer_dns', 'n');
+        $this->setDefaultValue('peerdns', 'n');
         $this->setDefaultValue('persistent_dhclient', 'n');
 
         parent::initialize();
@@ -84,10 +84,10 @@ class Modify extends \Nethgui\Controller\Table\Modify
                     $this->parameters["gateway"] = ''; # unset gateway
                     # force infinite lease for red interface
                     $this->parameters["persistent_dhclient"] = 'y'; # always renew dhcp lease
-                    $this->parameters["peer_dns"] = 'n'; # do not overwrite /etc/resolv.conf
+                    $this->parameters["peerdns"] = 'n'; # do not overwrite /etc/resolv.conf
                 } else {
                     $this->parameters["persistent_dhclient"]= 'n';
-                    $this->parameters["peer_dns"] = 'n';
+                    $this->parameters["peerdns"] = 'n';
                 }
                 # remove gateway from green device's
                 foreach ($this->getPlatform()->getDatabase('networks')->getAll('ethernet') as $key => $device) {
