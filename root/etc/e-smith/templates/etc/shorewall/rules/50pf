@@ -24,7 +24,7 @@
             $allow=":$allow";
         }
         $OUT.="#\n# PF $src -> $dstHost:$dst $allow_cmt \n#\n";
-        $OUT.="COMMENT $description\n";
+        $OUT.="?COMMENT $description\n";
         $OUT.="DNAT\tnet$allow\tloc:$dstHost:$dst\t$proto\t$src$srcHost\n"
     }
 }
