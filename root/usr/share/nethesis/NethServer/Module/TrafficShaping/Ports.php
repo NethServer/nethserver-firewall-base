@@ -50,6 +50,9 @@ class Ports extends \Nethgui\Controller\TableController
         parent::initialize();
     }
 
-
+    public function prepareViewForColumnPriority(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        return $view->translate($values['priority']."_label");
+    }
 }
 

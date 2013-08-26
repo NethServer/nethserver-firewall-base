@@ -2,9 +2,9 @@
 
 /* NethServer_Module_TrafficShaping translation, language: en */
 
-$L['1_label'] = 'Low';
+$L['1_label'] = 'High';
 $L['2_label'] = 'Medium';
-$L['3_label'] = 'High';
+$L['3_label'] = 'Low';
 $L['address_label'] = 'IP or MAC address';
 $L['description_label'] = 'Description';
 $L['device_label'] = 'Interface';

@@ -34,7 +34,6 @@ class Interfaces extends \Nethgui\Controller\TableController
             'Key',
             'in',
             'out',
-            'priority',
             'description',
             'Actions'
         );

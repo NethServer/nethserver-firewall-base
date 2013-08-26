@@ -40,7 +40,6 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('device', $this->createValidator()->memberOf(array_keys($interfaces)), \Nethgui\Controller\Table\Modify::KEY),
             array('in', Validate::POSITIVE_INTEGER, \Nethgui\Controller\Table\Modify::FIELD),
             array('out', Validate::POSITIVE_INTEGER, \Nethgui\Controller\Table\Modify::FIELD),
-            array('priority', $this->createValidator()->memberOf(array("1","2","3")), \Nethgui\Controller\Table\Modify::FIELD),
             array('description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
         );
 
@@ -61,7 +60,6 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
         
-        $view['priorityDatasource'] = array(array('1',$view->translate('1_label')),array('2',$view->translate('2_label')),array('3',$view->translate('3_label')));
         if ($this->getIdentifier() == 'create') {
             $interfaces = $this->getPlatform()->getDatabase('networks')->getAll('ethernet');
             $configured = $this->getPlatform()->getDatabase('tc')->getAll('device');
