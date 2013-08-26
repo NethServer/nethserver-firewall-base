@@ -29,6 +29,7 @@ use File::Path;
 $event = "nethserver-firewall-base-update";
 
 event_templates($event, 
+                '/etc/shorewall/shorewall.conf',
                 '/etc/shorewall/interfaces',
                 '/etc/shorewall/masq',
                 '/etc/shorewall/policy',
@@ -52,6 +53,7 @@ event_services($event, 'shorewall' => 'restart');
 $event = "nethserver-firewall-base-save";
 
 event_templates($event, 
+                '/etc/shorewall/shorewall.conf',
                 '/etc/shorewall/interfaces',
                 '/etc/shorewall/masq',
                 '/etc/shorewall/policy',
