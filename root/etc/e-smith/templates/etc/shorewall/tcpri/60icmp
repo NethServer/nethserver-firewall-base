@@ -1,0 +1,2 @@
+?COMMENT high priority ping to avoid false line-down reports
+1	icmp	8
