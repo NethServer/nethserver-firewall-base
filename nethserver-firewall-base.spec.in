@@ -42,6 +42,10 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 28 2013 Davide Principi <davide.principi@nethesis.it> - 1.0.5-1.ns6
+- Traffic shaping: refactor templates to correctly handle traffic priorities - Enhancement #2112 [NethServer]
+- Update NetworksDB on udev events - Enhancement #2075 [NethServer]
+
 * Mon Jul 29 2013 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.0.4-1.ns6
 - Fix peerdns options usage #2057
 - Use new shorewall syntax for COMMENT and FORMAT 
