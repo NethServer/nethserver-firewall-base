@@ -1,34 +1,17 @@
-{
-
-   my $level = $firewall{'level'} || 'high';
-
-   if ($level eq 'high') {
-       $OUT = <<EOF
-# Policies for traffic originating from the local LAN (loc)
 #
-# If you want to force clients to access the Internet via a proxy server
-# in your DMZ, change the following policy to REJECT info.
+# 20levelHigh
+#
+
 loc		net		ACCEPT
-loc		\$FW		REJECT		info
+loc		$FW		REJECT		info
 loc		all		REJECT		info
-#
-# Policies for traffic originating from the firewall (\$FW)
-#
-# If you want open access to the Internet from your firewall, change the
-# \$FW to net policy to ACCEPT and remove the 'info' LOG LEVEL.
-\$FW		net		ACCEPT		info
-\$FW		loc		ACCEPT
-#
-# Policies for traffic originating from the Internet zone (net)
-#
-net		\$FW		DROP		info
+
+$FW		net		ACCEPT		info
+$FW		loc		ACCEPT
+
+net		$FW		DROP		info
 net		loc		DROP		info
 net		all		DROP		info
-# THE FOLLOWING POLICY MUST BE LAST
-all		all		REJECT		info
-#LAST LINE -- ADD YOUR ENTRIES ABOVE THIS LINE -- DO NOT REMOVE
 
-EOF
 
-   }
-}
+

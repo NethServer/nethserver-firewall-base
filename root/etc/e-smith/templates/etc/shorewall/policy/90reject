@@ -1,0 +1,7 @@
+#
+# 90reject all
+#
+
+# THE FOLLOWING POLICY MUST BE LAST
+all		all		REJECT		info
+
