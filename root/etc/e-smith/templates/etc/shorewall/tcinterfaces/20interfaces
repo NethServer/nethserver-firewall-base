@@ -1,6 +1,12 @@
 {
+    use esmith::NetworksDB;
+    my $idb = esmith::NetworksDB->open_ro();
     $db = esmith::ConfigDB->open("tc") || die "Can't open tc database: $!\n";
     foreach my $interface ( $db->get_all_by_prop('type' => 'device') ) {
+        my $i = $idb->get($interface->key) || next;
+        if ( ($i->prop('role') || "") eq "") {
+            next;
+        }
         $in = $interface->prop('in') || next;
         $out = $interface->prop('out') || next;
         $dtype = $interface->prop('dtype') || 'External';
