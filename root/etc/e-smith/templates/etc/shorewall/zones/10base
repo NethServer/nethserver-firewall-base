@@ -9,4 +9,9 @@
 ###############################################################################
 #ZONE	TYPE		OPTIONS		IN			OUT
 #					OPTIONS			OPTIONS
+
+#
+# 10base
+#
 fw	firewall
+
