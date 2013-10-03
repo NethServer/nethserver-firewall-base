@@ -1,0 +1,5 @@
+#
+# 40ppp -- optional PPP interfaces: define zone composition in hosts file
+#
+-      ppp+    optional
+

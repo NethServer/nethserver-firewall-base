@@ -1,3 +1,6 @@
+#
+# 20nics
+#
 {
     use esmith::NetworksDB;
     my $ndb = esmith::NetworksDB->open_ro();
@@ -12,5 +15,6 @@
     if ($red ne '') {
         $OUT.="net\t".$red->key."\ttcpflags,dhcp,routefilter,nosmurfs,logmartians";
     }
-
 }
+
+
