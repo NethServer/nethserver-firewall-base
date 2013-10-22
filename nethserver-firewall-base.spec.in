@@ -42,6 +42,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Tue Oct 22 2013 Davide Principi <davide.principi@nethesis.it> - 1.0.6-1.ns6
+- VPN: support IPsec/L2TP - Feature #1957 [NethServer]
+
 * Wed Aug 28 2013 Davide Principi <davide.principi@nethesis.it> - 1.0.5-1.ns6
 - Traffic shaping: refactor templates to correctly handle traffic priorities - Enhancement #2112 [NethServer]
 - Update NetworksDB on udev events - Enhancement #2075 [NethServer]
