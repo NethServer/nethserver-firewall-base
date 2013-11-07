@@ -11,10 +11,7 @@
 
     $OUT.="loc\t".$ndb->green->key."\ttcpflags,nosmurfs$bridge\n";
 
-    my $red = $ndb->get_by_role('red') || '';
-    if ($red ne '') {
-        $OUT.="net\t".$red->key."\ttcpflags,dhcp,routefilter,nosmurfs,logmartians";
+    foreach ($ndb->get_by_role('red')) {
+        $OUT.="net\t".$_->key."\ttcpflags,dhcp,nosmurfs,logmartians,optional\n";
     }
 }
-
-

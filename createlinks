@@ -36,16 +36,21 @@ event_templates($event,
                 '/etc/shorewall/rules',
                 '/etc/shorewall/zones',
                 '/etc/shorewall/providers',
+                '/etc/shorewall/rtrules',
                 '/etc/shorewall/tcrules',
                 '/etc/shorewall/tunnels',
                 '/etc/shorewall/hosts',
                 '/etc/sudoers');
 
+event_templates($event, '/etc/lsm/lsm.conf');
+
 event_actions($event,
               'initialize-default-databases' => '00',
               'nethserver-firewall-base-conf' => '02');
 
-event_services($event, 'shorewall' => 'restart');
+event_services($event, 
+                     'shorewall' => 'restart',
+                     'lsm' => 'restart' );
 
 
 #--------------------------------------------------
@@ -63,11 +68,17 @@ event_templates($event,
                 '/etc/shorewall/tcinterfaces',
                 '/etc/shorewall/tcpri',
                 '/etc/shorewall/providers',
+                '/etc/shorewall/rtrules',
                 '/etc/shorewall/tcrules',
                 '/etc/shorewall/tunnels',
                 '/etc/shorewall/hosts',
                 '/etc/shorewall/zones');
-event_services($event, 'shorewall' => 'restart');
+
+event_templates($event, '/etc/lsm/lsm.conf');
+
+event_services($event, 
+                     'shorewall' => 'restart',
+                     'lsm' => 'restart' );
 
 
 #--------------------------------------------------

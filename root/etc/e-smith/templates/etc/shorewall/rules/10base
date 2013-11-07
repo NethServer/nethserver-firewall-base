@@ -10,7 +10,25 @@
 #ACTION		SOURCE		DEST		PROTO	DEST	SOURCE		ORIGINAL	RATE		USER/	MARK	CONNLIMIT	TIME         HEADERS         SWITCH
 #							PORT	PORT(S)		DEST		LIMIT		GROUP
 #SECTION ALL
-#SECTION ESTABLISHED
-#SECTION RELATED
-SECTION NEW
+{
+    my $nfqueue = $firewall{'nfqueue'} || 'disabled';
+    if ($nfqueue eq 'enabled') {
+$OUT = <<EOF
 
+#
+# Filter all traffic with Snort
+#
+SECTION ESTABLISHED
+NFQUEUE loc  net
+NFQUEUE net  loc
+NFQUEUE net  fw
+
+SECTION RELATED
+NFQUEUE loc  net
+NFQUEUE net  loc
+NFQUEUE net  fw
+
+EOF
+    }
+}
+SECTION NEW

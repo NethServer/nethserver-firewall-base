@@ -1,0 +1,24 @@
+#
+# 20providers
+#
+{
+    my $mode = $firewall{'WanMode'} || 'balance';
+    if ($mode eq 'balance') {
+        return "# MultiWANMode: balance mode enabled";
+    }
+    use esmith::NetworksDB;
+    my $ndb = esmith::NetworksDB->open_ro();
+
+    sub sort_by_weight {
+         ($a->prop('weight') || '1') cmp ($b->prop('weight') || '1');
+    }
+
+    my @providers = sort sort_by_weight $ndb->get_all_by_prop('type' => 'provider');
+    # From shorewall-rtrules -> 11000- 11999 After 'MARK' rules but before Shorewall-generated rules for ISP interfaces.
+    my $priority = 11900; 
+    foreach my $provider ( reverse(@providers) ) { # descending order: more weight, more priority
+        my $name = $provider->key;
+        $OUT .= "-\t\t0.0.0.0/0\t$name\t$priority\n";
+        $priority++;
+    }
+}

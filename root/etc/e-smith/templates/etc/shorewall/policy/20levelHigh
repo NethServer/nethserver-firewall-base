@@ -6,7 +6,7 @@ loc		net		ACCEPT
 loc		$FW		REJECT		info
 loc		all		REJECT		info
 
-$FW		net		ACCEPT		info
+$FW		net		ACCEPT		
 $FW		loc		ACCEPT
 
 net		$FW		DROP		info

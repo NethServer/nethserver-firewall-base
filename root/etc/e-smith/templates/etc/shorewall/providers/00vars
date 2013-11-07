@@ -1,0 +1,4 @@
+{
+   our $number = 1;
+   return "";
+}
