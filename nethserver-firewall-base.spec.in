@@ -9,6 +9,7 @@ Packager: Giacomo Sanchietti <giacomo@nethesis.it>
 
 BuildArch: noarch
 Requires: nethserver-shorewall
+Requires: nethserver-lsm
 
 BuildRequires: nethserver-devtools
 AutoReq: no
