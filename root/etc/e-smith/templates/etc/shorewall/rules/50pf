@@ -31,8 +31,14 @@
         } else {
             $oriDst = "\t-";
         }
+        $action = uc($pf->prop('action')) || 'ACCEPT';
         $OUT.="#\n# PF $src -> $dstHost:$dst $allow_cmt \n#\n";
         $OUT.="?COMMENT $description\n";
-        $OUT.="DNAT\tnet$allow\tloc:$dstHost:$dst\t$proto\t$src$srcHost$oriDst\n";
+        if (uc($action) eq 'NFQUEUE') {
+            $OUT.="DNAT-\tnet$allow\t$dstHost:$dst\t$proto\t$src$srcHost$oriDst\n";
+            $OUT.="NFQUEUE\tnet$allow\tloc\t$proto\t$dst$srcHost$oriDst\n";
+        } else {
+            $OUT.="DNAT\tnet$allow\tloc:$dstHost:$dst\t$proto\t$src$srcHost$oriDst\n";
+        }
     }
 }
