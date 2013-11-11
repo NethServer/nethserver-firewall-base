@@ -4,13 +4,15 @@
 {
     use esmith::NetworksDB;
     my $ndb = esmith::NetworksDB->open_ro();
+    my $number = 1;
     foreach my $provider ( $ndb->get_all_by_prop('type' => 'provider') ) {
         my $name = $provider->key;
         my $interface_name = $provider->prop('interface') || next;
         my $interface = $ndb->get($interface_name);
         my $gateway = $interface->prop('gateway') || 'detect';
         my $weight = $provider->prop('weight') || "1";
-        $OUT .= "$name\t$number\t$number\t-\t$interface_name\t$gateway\ttrack,balance=$weight\t-\n";
+        my $mask = "0x" . $number . "0000";
+        $OUT .= "$name\t$number\t$mask\t-\t$interface_name\t$gateway\ttrack,balance=$weight\t-\n";
         $number++;
     }
 
