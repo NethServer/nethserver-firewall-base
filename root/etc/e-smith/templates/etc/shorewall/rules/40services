@@ -11,7 +11,7 @@
         $OUT .= "?COMMENT always accept sshd from loc\n";
         $OUT.="ACCEPT\tloc\t\$FW\ttcp\t".$sshd{'TCPPort'}."\n";
         $OUT .= "?COMMENT always accept httpd-admin from loc\n";
-        $OUT.="ACCEPT\tloc\t\$FW\ttcp\t".$httpd-admin{'TCPPort'}."\n";
+        $OUT.="ACCEPT\tloc\t\$FW\ttcp\t".${'httpd-admin'}{'TCPPort'}."\n";
     }
 
     foreach my $serviceRecord ($confDb->get_all_by_prop('type' => 'service')) {
