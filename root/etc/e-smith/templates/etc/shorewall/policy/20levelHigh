@@ -1,8 +1,14 @@
 #
 # 20levelHigh
 #
-
-loc		net		ACCEPT
+{
+    my $nfqueue = $firewall{'nfqueue'} || 'disabled';
+    if ($nfqueue eq 'enabled') {
+        $OUT.="loc		net		NFQUEUE";
+    } else {
+        $OUT.="loc		net		ACCEPT";
+    }
+}
 loc		$FW		REJECT		info
 loc		all		REJECT		info
 
