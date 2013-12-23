@@ -43,6 +43,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Mon Dec 23 2013 Davide Principi <davide.principi@nethesis.it> - 1.0.7-1.ns6
+- Shorewall not configured, fails to start - Bug #2338 [NethServer]
+
 * Tue Oct 22 2013 Davide Principi <davide.principi@nethesis.it> - 1.0.6-1.ns6
 - VPN: support IPsec/L2TP - Feature #1957 [NethServer]
 
