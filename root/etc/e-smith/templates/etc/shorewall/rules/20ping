@@ -1,10 +1,24 @@
+{
+    my $extping = $firewall{'ExternalPing'} || 'enabled';
+    if ($extping eq 'disabled') {
+$OUT = <<EOF
 #
 # Drop Ping from the "bad" net zone.
 #
-Ping/DROP     net             $FW
+Ping/DROP     net             \$FW
+EOF
+    } else {
+$OUT = <<EOF
+#
+# Accept Ping from the "bad" net zone.
+#
+Ping/ACCEPT   net             \$FW
+EOF
+    }
+}
 #
 #  Make ping work bi-directionally between the dmz, net, Firewall and local zone
 #  (assumes that the loc-> net policy is ACCEPT).
 #
-Ping/ACCEPT     loc             $FW
+Ping/ACCEPT     loc            $FW
 
