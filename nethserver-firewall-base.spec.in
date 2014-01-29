@@ -22,6 +22,7 @@ NethServer simple firewall
 %setup -q
 
 %build
+%{makedocs}
 perl createlinks
 
 %install
@@ -43,6 +44,12 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Wed Jan 15 2014 Davide Principi <davide.principi@nethesis.it> - 1.0.8-1.ns6
+- Firewall ping response - Enhancement #2571 [NethServer]
+
+* Mon Dec 23 2013 Davide Principi <davide.principi@nethesis.it> - 1.0.7-1.ns6
+- Shorewall not configured, fails to start - Bug #2338 [NethServer]
+
 * Tue Oct 22 2013 Davide Principi <davide.principi@nethesis.it> - 1.0.6-1.ns6
 - VPN: support IPsec/L2TP - Feature #1957 [NethServer]
 

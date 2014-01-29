@@ -32,5 +32,6 @@ my $event = $DB->get_prop('firewall', 'event') || "";
 
 if ($event eq '' || $event eq 'lokkit-save') {
     $DB->set_prop('firewall', 'event', 'nethserver-firewall-base-save');
+    $DB->set_prop('shorewall', 'status', 'enabled');
 }
 
