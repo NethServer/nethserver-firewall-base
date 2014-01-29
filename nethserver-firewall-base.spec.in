@@ -22,6 +22,7 @@ NethServer simple firewall
 %setup -q
 
 %build
+%{makedocs}
 perl createlinks
 
 %install
