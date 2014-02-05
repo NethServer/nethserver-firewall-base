@@ -44,6 +44,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Wed Feb 05 2014 Davide Principi <davide.principi@nethesis.it> - 1.0.9-1.ns6
+- Update all inline help documentation - Task #1780 [NethServer]
+
 * Wed Jan 15 2014 Davide Principi <davide.principi@nethesis.it> - 1.0.8-1.ns6
 - Firewall ping response - Enhancement #2571 [NethServer]
 
