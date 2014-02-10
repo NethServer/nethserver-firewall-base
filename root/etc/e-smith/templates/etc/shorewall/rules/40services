@@ -13,18 +13,41 @@
             }
             $OUT.="#\n#\tService: ".$serviceRecord->key." Access: $access\n#\n"; 
             $OUT.="?COMMENT ".$serviceRecord->key."\n"; 
-            foreach my $port (split(',', $tcpPorts)) {
-                $OUT.="ACCEPT\tloc\t\$FW\ttcp\t$port\n";
-                if ($access eq 'public') {
-                    $OUT.="ACCEPT\tnet\t\$FW\ttcp\t$port\n";
+
+            if ($tcpPorts =~ '-') {
+                my @range = split('-', $tcpPorts);
+                for (my $k = $range[0]; $k<=$range[1]; $k++) {
+                    $OUT.="ACCEPT\tnet\t\$FW\ttcp\t$k\n";
+                    if ($access eq 'public') {
+                        $OUT.="ACCEPT\tnet\t\$FW\ttcp\t$k\n";
+                    }
+                }
+            } else {
+                foreach my $port (split(',', $tcpPorts)) {
+                    $OUT.="ACCEPT\tloc\t\$FW\ttcp\t$port\n";
+                    if ($access eq 'public') {
+                        $OUT.="ACCEPT\tnet\t\$FW\ttcp\t$port\n";
+                    }
                 }
             }
-            foreach my $port (split(',', $udpPorts)) {
-                $OUT.="ACCEPT\tloc\t\$FW\tudp\t$port\n";
-                if ($access eq 'public') {
-                    $OUT.="ACCEPT\tnet\t\$FW\tudp\t$port\n";
+
+            if ($udpPorts =~ '-') {
+                my @range = split('-', $udpPorts);
+                for (my $k = $range[0]; $k<=$range[1]; $k++) {
+                    $OUT.="ACCEPT\tnet\t\$FW\tudp\t$k\n";
+                    if ($access eq 'public') {
+                        $OUT.="ACCEPT\tnet\t\$FW\tudp\t$k\n";
+                    }
+                }
+            } else {
+                foreach my $port (split(',', $udpPorts)) {
+                    $OUT.="ACCEPT\tloc\t\$FW\tudp\t$port\n";
+                    if ($access eq 'public') {
+                        $OUT.="ACCEPT\tnet\t\$FW\tudp\t$port\n";
+                    }
                 }
             }
+
         }
     }
 }
