@@ -1,0 +1,116 @@
+<?php
+namespace NethServer\Module\FirewallObjects\HostGroups;
+
+/*
+ * Copyright (C) 2012 Nethesis S.r.l.
+ *
+ * This script is part of NethServer.
+ *
+ * NethServer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * NethServer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+use Nethgui\System\PlatformInterface as Validate;
+use Nethgui\Controller\Table\Modify as Table;
+
+/**
+ * Group modify actions
+ *
+ * @author Giacomo Sanchietti <giacomo.sanchietti@nethesis.it>
+ * @since 1.0
+ */
+class Modify extends \Nethgui\Controller\Table\Modify
+{
+
+    public function initialize()
+    {
+        // The group name must satisfy the USERNAME generic grammar:
+        if ($this->getIdentifier() === 'create') {
+            $groupNameValidator = $this->createValidator(Validate::HOSTNAME);
+        } else {
+            $groupNameValidator = FALSE;
+        }
+
+        $parameterSchema = array(
+            array('groupname', $groupNameValidator, Table::KEY),
+            array('Description', Validate::ANYTHING, Table::FIELD, 'Description'),
+            array('Members', Validate::USERNAME_COLLECTION, Table::FIELD, 'Members', ','),
+            array('MembersDatasource', FALSE, array($this, 'provideMembersDatasource')), // this parameter will never be submitted: set an always-failing validator
+        );
+        
+        $this->setSchema($parameterSchema);
+
+        parent::initialize();
+    }
+
+    public function provideMembersDatasource()
+    {
+        $platform = $this->getPlatform();
+        if (is_null($platform)) {
+            return array();
+        }
+
+        $hosts = $platform->getDatabase('hosts')->getAll();
+        $values = array();
+
+        // Build the datasource rows couples <key, label>
+        foreach ($hosts as $key => $row) {
+            if (!isset($row['IpAddress']) && !isset($row['MacAddress'])) {
+                continue;
+            }
+            $values[] = array($key, sprintf('%s (%s)', $key, $row['IpAddress']?$row['IpAddress']:$row['MacAddress']));
+        }
+        return $values;
+    }
+
+
+    /**
+     * Delete the record after the event has been successfully completed
+     * @param string $key
+     */
+/*    protected function processDelete($key)
+    {
+        $accountDb = $this->getPlatform()->getDatabase('accounts');
+        $accountDb->setType($key, 'group-deleted');
+        $deleteProcess = $this->getPlatform()->signalEvent('group-delete', array($key));
+        if ($deleteProcess->getExitCode() === 0) {
+            parent::processDelete($key);
+        }
+    }
+
+    protected function onParametersSaved($changedParameters)
+    {
+        if ($this->getIdentifier() === 'delete') {
+            // delete case is handled in "processDelete()" method:
+            // signalEvent() is invoked there.
+            return;
+        } elseif ($this->getIdentifier() === 'update') {
+            $event = 'modify';
+        } else {
+            $event = $this->getIdentifier();
+        }
+        $this->getPlatform()->signalEvent(sprintf('group-%s@post-process', $event), array($this->parameters['groupname']));
+    }
+*/
+    public function prepareView(\Nethgui\View\ViewInterface $view)
+    {
+        parent::prepareView($view);
+        $templates = array(
+            'create' => 'NethServer\Template\FirewallObjects\HostGroups\Modify',
+            'update' => 'NethServer\Template\FirewallObjects\HostGroups\Modify',
+            'delete' => 'Nethgui\Template\Table\Delete',
+        );
+        $view->setTemplate($templates[$this->getIdentifier()]);
+    }
+
+}
