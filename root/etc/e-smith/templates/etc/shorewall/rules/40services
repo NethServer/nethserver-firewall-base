@@ -2,6 +2,17 @@
     use NethServer::Service;
     use esmith::ConfigDB;
     my $confDb = esmith::ConfigDB->open();
+    my $accept = 'ACCEPT';
+    my $nfqueue = $firewall{'nfqueue'} || 'disabled';
+    if ($nfqueue eq 'enabled') {
+        $accept = 'NFQUEUE';
+        # SSH and HTTPD-ADMIN exeception: do not filter ssh from local network
+        $OUT.="#\n#\tAllow administration from local network\n#\n";
+        $OUT .= "?COMMENT always accept sshd from loc\n";
+        $OUT.="ACCEPT\tloc\t\$FW\ttcp\t".$sshd{'TCPPort'}."\n";
+        $OUT .= "?COMMENT always accept httpd-admin from loc\n";
+        $OUT.="ACCEPT\tloc\t\$FW\ttcp\t".${'httpd-admin'}{'TCPPort'}."\n";
+    }
 
     foreach my $serviceRecord ($confDb->get_all_by_prop('type' => 'service')) {
         my $access = $serviceRecord->prop('access') || 'private';
@@ -17,14 +28,14 @@
                 $port =~ s/\-/:/g;
                 $OUT.="ACCEPT\tloc\t\$FW\ttcp\t$port\n";
                 if ($access eq 'public') {
-                    $OUT.="ACCEPT\tnet\t\$FW\ttcp\t$port\n";
+                    $OUT.="$accept\tnet\t\$FW\ttcp\t$port\n";
                 }
             }
             foreach my $port (split(',', $udpPorts)) {
                 $port =~ s/\-/:/g;
                 $OUT.="ACCEPT\tloc\t\$FW\tudp\t$port\n";
                 if ($access eq 'public') {
-                    $OUT.="ACCEPT\tnet\t\$FW\tudp\t$port\n";
+                    $OUT.="$accept\tnet\t\$FW\tudp\t$port\n";
                 }
             }
         }
