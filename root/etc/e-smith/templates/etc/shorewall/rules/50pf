@@ -4,6 +4,8 @@
 #
 
 {
+    my $nfqueue = $firewall{'nfqueue'} || 'disabled';
+
     $db = esmith::ConfigDB->open("portforward") || die "Can't open portforward database: $!\n";
     foreach my $pf ( $db->get_all_by_prop('type' => 'pf') ) {
         $proto = $pf->prop('proto') || next;
@@ -31,10 +33,9 @@
         } else {
             $oriDst = "\t-";
         }
-        $action = uc($pf->prop('action')) || 'ACCEPT';
         $OUT.="#\n# PF $src -> $dstHost:$dst $allow_cmt \n#\n";
         $OUT.="?COMMENT $description\n";
-        if (uc($action) eq 'NFQUEUE') {
+        if ($nfqueue eq 'enabled') {
             $OUT.="DNAT-\tnet$allow\t$dstHost:$dst\t$proto\t$src$srcHost$oriDst\n";
             $OUT.="NFQUEUE\tnet$allow\tloc\t$proto\t$dst$srcHost$oriDst\n";
         } else {
