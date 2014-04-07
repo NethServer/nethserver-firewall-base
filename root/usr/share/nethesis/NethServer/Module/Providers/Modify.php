@@ -63,7 +63,14 @@ class Modify extends \Nethgui\Controller\Table\Modify
     }
 
     private function readInterfaces() {
-        return array_keys($this->getPlatform()->getDatabase('networks')->getAll('ethernet'));
+        $ret = array();
+        $interfaces = $this->getPlatform()->getDatabase('networks')->getAll('ethernet');
+        foreach ($interfaces as $key => $props) {
+           if (stripos($props['role'],'red') !== false) {
+               $ret[] = $key;
+           }
+        }
+        return $ret;
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
