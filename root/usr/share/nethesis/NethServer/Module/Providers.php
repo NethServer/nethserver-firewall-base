@@ -54,7 +54,7 @@ class Providers extends \Nethgui\Controller\TableController
         );
 
         $this
-            ->setTableAdapter($this->getPlatform()->getTableAdapter('hosts', 'provider'))
+            ->setTableAdapter($this->getPlatform()->getTableAdapter('networks', 'provider'))
             ->setColumns($columns)
             ->addRowAction(new \Nethgui\Controller\Table\Modify('update', $parameterSchema, 'NethServer\Template\Providers\Modify'))
             ->addRowAction(new \Nethgui\Controller\Table\Modify('delete', $parameterSchema, 'Nethgui\Template\Table\Delete')) // Standard DELETE template
