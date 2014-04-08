@@ -95,3 +95,15 @@ event_templates($event,
 
 event_services($event, 'shorewall' => 'restart');
 
+
+#--------------------------------------------------
+# actions for firewall-objects-modify event
+#--------------------------------------------------
+
+$event = "firewall-objects-modify";
+
+event_actions($event,
+              'nethserver-firewall-base-save' => '90'
+);
+
+
