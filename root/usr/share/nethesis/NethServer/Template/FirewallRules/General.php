@@ -3,6 +3,7 @@
 echo $view->header()->setAttribute('template', $T('general_header'));
 
 echo $view->panel()
-    ->insert($view->selector('Policy'));
+    ->insert($view->selector('Policy'))
+    ->insert($view->selector('ExternalPing'));
 
 echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_HELP);

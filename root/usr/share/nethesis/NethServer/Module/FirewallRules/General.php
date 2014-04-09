@@ -36,6 +36,7 @@ class General extends \Nethgui\Controller\AbstractController
     {
         parent::initialize();
         $this->declareParameter('Policy', $this->createValidator()->memberOf($this->policies), array('configuration', 'firewall', 'Policy'));
+        $this->declareParameter('ExternalPing', Validate::SERVICESTATUS, array('configuration', 'firewall', 'ExternalPing'));
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
@@ -44,6 +45,10 @@ class General extends \Nethgui\Controller\AbstractController
         $view['PolicyDatasource'] = array_map(function($fmt) use ($view) {
                                 return array($fmt, $view->translate($fmt . '_label'));
         }, $this->policies);
+        $view['ExternalPingDatasource'] = array_map(function($fmt) use ($view) {
+                                return array($fmt, $view->translate($fmt . '_label'));
+        }, array('enabled','disabled'));
+
     }
 
 
