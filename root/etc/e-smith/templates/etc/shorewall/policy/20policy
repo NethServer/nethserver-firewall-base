@@ -1,0 +1,28 @@
+#
+# 20policy
+#
+{
+    my $policy = $firewall{'Policy'} || 'permissive';
+    if ( $policy eq 'permissive') {
+        my $nfqueue = $firewall{'nfqueue'} || 'disabled';
+        if ($nfqueue eq 'enabled') {
+            $OUT.="loc		net		NFQUEUE";
+        } else {
+            $OUT.="loc		net		ACCEPT";
+        }
+    } else {
+        $OUT.="loc		net		REJECT";
+        
+    }
+}
+loc		$FW		REJECT		info
+
+$FW		net		ACCEPT		
+$FW		loc		ACCEPT
+
+net		$FW		DROP		info
+net		loc		DROP		info
+net		all		DROP		info
+
+
+
