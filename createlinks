@@ -40,6 +40,7 @@ event_templates($event,
                 '/etc/shorewall/tcrules',
                 '/etc/shorewall/tunnels',
                 '/etc/shorewall/hosts',
+                '/etc/shorewall/findgw',
                 '/etc/sudoers');
 
 event_templates($event, '/etc/lsm/lsm.conf');

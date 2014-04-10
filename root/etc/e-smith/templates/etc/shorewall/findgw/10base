@@ -1,0 +1,17 @@
+#
+# Shorewall version 4 - Findgw File
+#
+# /etc/shorewall/findgw
+#
+#    The code in this file is executed when Shorewall is trying to detect the
+#    gateway through an interface in /etc/shorewall/providers that has GATEWAY
+#    specified as 'detect'.
+#
+#    The function should echo the IP address of the gateway if it knows what
+#    it is; the name of the interface is in $1.
+#
+# See http://shorewall.net/shorewall_extension_scripts.htm for additional
+# information.
+#
+###############################################################################
+
