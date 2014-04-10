@@ -17,3 +17,4 @@ $L['provider_update_header'] = 'Update new provider';
 $L['WanMode_header'] = 'Multi WAN mode';
 $L['WanMode_label'] = 'Mode';
 $L['weight_label'] = 'Weight';
+$L['Configure_header'] = 'Configure multi WAN mode';
