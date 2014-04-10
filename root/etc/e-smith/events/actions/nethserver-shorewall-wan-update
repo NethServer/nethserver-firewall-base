@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+# Copyright (C) 2014 Nethesis S.r.l.
+# http://www.nethesis.it - support@nethesis.it
+# 
+# This script is part of NethServer.
+# 
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+# 
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# Original work
+# (C) 2009,2013 Mika Ilmaranta <ilmis@nullnet.fi>
+# Copyright © 2009-2010 Tuomo Soini <tis@foobar.fi>
+#
+
+#
+# event handling script for use with shorewall multi-isp setup
+# To be able to utilize this script you must have shorewall >= 4.4.23.3
+#
+
+# Skip event name
+shift;
+
+STATE=${1}
+NAME=${2}
+CHECKIP=${3}
+DEVICE=${4}
+WARN_EMAIL=${5}
+REPLIED=${6}
+WAITING=${7}
+TIMEOUT=${8}
+REPLY_LATE=${9}
+CONS_RCVD=${10}
+CONS_WAIT=${11}
+CONS_MISS=${12}
+AVG_RTT=${13}
+SRCIP=${14}
+PREVSTATE=${15}
+TIMESTAMP=${16}
+
+# skip connection events
+if [ ${DEVICE} != "NA" ]; then 
+   exit 0
+fi
+  
+DEVICE=`/sbin/e-smith/db networks getprop $NAME interface`
+
+if [ ${STATE} = up ]; then
+  logger -i -p kern.info -t Shorewall Enabling device ${DEVICE}
+  /sbin/shorewall enable ${DEVICE} 2>>/var/log/firewall.log
+else
+  logger -i -p kern.info -t Shorewall Disabling device ${DEVICE}
+  /sbin/shorewall enable ${DEVICE} 2>>/var/log/firewall.log
+fi
+
+exit 0;

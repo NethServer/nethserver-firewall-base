@@ -107,4 +107,14 @@ event_actions($event,
               'nethserver-firewall-base-save' => '90'
 );
 
+#--------------------------------------------------
+# actions for wan-uplink-update event
+#--------------------------------------------------
+
+$event = "wan-uplink-update";
+
+event_actions($event,
+              'nethserver-shorewall-wan-update' => '50'
+);
+
 
