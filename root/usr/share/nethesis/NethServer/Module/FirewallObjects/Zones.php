@@ -42,16 +42,15 @@ class Zones extends \Nethgui\Controller\TableController
 
         $parameterSchema = array(
             array('name', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::KEY),
-            array('Interface', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
             array('Network', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
         );
 
 
         $this
             ->setTableAdapter($this->getPlatform()->getTableAdapter('networks', 'zone'))
-            ->addRowAction(new \NethServer\Module\FirewallObjects\Zones\Modify('update'))
+            ->addRowAction(new \Nethgui\Controller\Table\Modify('update', $parameterSchema, 'NethServer\Template\FirewallObjects\Zones'))
             ->addRowAction(new \Nethgui\Controller\Table\Modify('delete', $parameterSchema, 'Nethgui\Template\Table\Delete')) // Standard DELETE template
-            ->addTableAction(new \NethServer\Module\FirewallObjects\Zones\Modify('create'))
+            ->addTableAction(new \Nethgui\Controller\Table\Modify('create', $parameterSchema, 'NethServer\Template\FirewallObjects\Zones'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->setColumns($columns)
         ;
