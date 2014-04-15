@@ -42,13 +42,15 @@ class General extends \Nethgui\Controller\AbstractController
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
-        $view['PolicyDatasource'] = array_map(function($fmt) use ($view) {
-                                return array($fmt, $view->translate($fmt . '_label'));
-        }, $this->policies);
-        $view['ExternalPingDatasource'] = array_map(function($fmt) use ($view) {
-                                return array($fmt, $view->translate($fmt . '_label'));
-        }, array('enabled','disabled'));
-
+        if($this->getRequest()->isValidated()) {
+            $view['PolicyDatasource'] = array_map(function($fmt) use ($view) {
+                                    return array($fmt, $view->translate($fmt . '_label'));
+            }, $this->policies);
+            $view['ExternalPingDatasource'] = array_map(function($fmt) use ($view) {
+                                    return array($fmt, $view->translate($fmt . '_label'));
+            }, array('enabled','disabled'));
+            $view->getCommandList()->show();
+        }
     }
 
 

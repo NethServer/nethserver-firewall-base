@@ -1,4 +1,5 @@
 <?php
+
 namespace NethServer\Module;
 
 /*
@@ -24,7 +25,7 @@ namespace NethServer\Module;
  * FirewallRules with plugin behaviour
  * All tabs can be plugins.
  */
-class FirewallRules extends \Nethgui\Controller\TabsController
+class FirewallRules extends \Nethgui\Controller\CollectionController
 {
 
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
@@ -32,11 +33,24 @@ class FirewallRules extends \Nethgui\Controller\TabsController
         return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Gateway', 10);
     }
 
-    public function bind(\Nethgui\Controller\RequestInterface $request)
+    public function initialize()
     {
-        $this->loadChildrenDirectory($this, 'FirewallRules');
-
-        parent::bind($request);
+        $this
+            ->setAdapter($this->getPlatform()->getTableAdapter('fwrules', 'rule'))
+            ->setIndexAction(new \NethServer\Module\FirewallRules\Index())
+        ;       
+        $this
+            ->addChild(new \NethServer\Module\FirewallRules\Create())
+            ->addChild(new \NethServer\Module\FirewallRules\Edit())
+            ->addChild(new \NethServer\Module\FirewallRules\PickObject())
+            ->addChild(new \NethServer\Module\FirewallRules\Delete())
+            ->addChild(new \NethServer\Module\FirewallRules\General())
+            ->addChild(new \NethServer\Module\FirewallObjects\HostGroups())
+            ->addChild(new \NethServer\Module\FirewallObjects\Zones())
+            ->addChild(new \NethServer\Module\FirewallObjects\Hosts())
+            ->addChild(new \NethServer\Module\FirewallObjects\Services())
+        ;
+        parent::initialize();
     }
 
 }

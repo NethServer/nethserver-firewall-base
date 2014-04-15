@@ -49,7 +49,7 @@ class Services extends \Nethgui\Controller\TableController
         );
 
         $this
-            ->setTableAdapter($this->getPlatform()->getTableAdapter('configuration', 'fservice'))
+            ->setTableAdapter($this->getPlatform()->getTableAdapter('fwservices', 'fwservice'))
             ->addRowAction(new \NethServer\Module\FirewallObjects\Services\Modify('update'))
             ->addRowAction(new \Nethgui\Controller\Table\Modify('delete', $parameterSchema, 'Nethgui\Template\Table\Delete')) // Standard DELETE template
             ->addTableAction(new \NethServer\Module\FirewallObjects\Services\Modify('create'))

@@ -34,10 +34,7 @@ class FirewallObjects extends \Nethgui\Controller\TabsController
 
     public function bind(\Nethgui\Controller\RequestInterface $request)
     {
-        $user = $request->getUser();
-
         $this->loadChildrenDirectory($this, 'FirewallObjects');
-
         parent::bind($request);
     }
 
