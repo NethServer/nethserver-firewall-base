@@ -61,7 +61,7 @@ if [ ${STATE} = up ]; then
   /sbin/shorewall enable ${DEVICE} 2>>/var/log/firewall.log
 else
   logger -i -p kern.info -t Shorewall Disabling device ${DEVICE}
-  /sbin/shorewall enable ${DEVICE} 2>>/var/log/firewall.log
+  /sbin/shorewall disable ${DEVICE} 2>>/var/log/firewall.log
 fi
 
 exit 0;
