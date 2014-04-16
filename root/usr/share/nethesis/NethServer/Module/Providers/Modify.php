@@ -43,9 +43,6 @@ class Modify extends \Nethgui\Controller\Table\Modify
             'Description',
         );
 
-        if(!$this->interfaces) {
-            $this->interfaces = $this->readInterfaces();
-        }
 
         $p = $this->getPlatform();
         $nv = $p->createValidator()->maxLength(5)->minLength(1);
@@ -64,9 +61,10 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     private function readInterfaces() {
         $ret = array();
-        $interfaces = $this->getPlatform()->getDatabase('networks')->getAll('ethernet');
+        $types = array('bridge', 'bond', 'vlan', 'ethernet');
+        $interfaces = $this->getPlatform()->getDatabase('networks')->getAll();
         foreach ($interfaces as $key => $props) {
-           if (stripos($props['role'],'red') !== false) {
+           if (in_array($props['type'], $types) && stripos($props['role'],'red') !== false) {
                $ret[] = $key;
            }
         }
