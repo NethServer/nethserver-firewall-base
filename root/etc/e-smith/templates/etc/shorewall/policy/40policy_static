@@ -1,0 +1,17 @@
+#
+# 40policy_static
+#
+
+loc		$FW		REJECT		info
+
+# Traffic from firewall is always allowed
+$FW		net		ACCEPT		
+$FW		loc		ACCEPT
+
+# Drop traffic from external interface to firewall and local network
+net		$FW		DROP		info
+net		loc		DROP		info
+
+# Drop all other traffic from external interface
+net		all		DROP		info
+

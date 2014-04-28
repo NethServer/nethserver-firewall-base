@@ -2,27 +2,31 @@
 # 20policy
 #
 {
+
+    use esmith::NetworksDB;
+    my $ndb = esmith::NetworksDB->open_ro();
     my $policy = $firewall{'Policy'} || 'permissive';
+    my $nfqueue = $firewall{'nfqueue'} || 'disabled';
+    my $action = '';
     if ( $policy eq 'permissive') {
-        my $nfqueue = $firewall{'nfqueue'} || 'disabled';
         if ($nfqueue eq 'enabled') {
-            $OUT.="loc		net		NFQUEUE";
+            $action = 'NFQUEUE';
         } else {
-            $OUT.="loc		net		ACCEPT";
+            $action = 'ACCEPT';
         }
     } else {
-        $OUT.="loc		net		REJECT";
-        
+        $action = 'REJECT';
     }
+
+    # generate policy for all zones
+    foreach my $i ($ndb->interfaces) {
+        my $role = $i->prop('role') || '';
+        next if ($role eq '' || $role eq 'red' || $role eq 'slave' || $role eq 'bridged');
+        my $zone = $role;
+        if ($role eq 'green') { # rename green to loc
+            $zone = 'loc';
+        }
+        $OUT .= "$zone\t\tnet\t\t$action\n";
+    }
+ 
 }
-loc		$FW		REJECT		info
-
-$FW		net		ACCEPT		
-$FW		loc		ACCEPT
-
-net		$FW		DROP		info
-net		loc		DROP		info
-net		all		DROP		info
-
-
-

@@ -1,0 +1,15 @@
+#
+# 30extras
+#
+{
+    use esmith::NetworksDB;
+    my $ndb = esmith::NetworksDB->open_ro();
+
+    if ($ndb->blue) {
+        $OUT .="blue     ipv4\n";
+    }
+    if ($ndb->orange) {
+        $OUT .="orange     ipv4\n";
+    }
+}
+

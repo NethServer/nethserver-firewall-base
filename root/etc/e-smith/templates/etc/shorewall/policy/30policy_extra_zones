@@ -1,0 +1,37 @@
+#
+# 30policy_extra_zones
+#
+{
+    use esmith::NetworksDB;
+    my $ndb = esmith::NetworksDB->open_ro();
+    my $nfqueue = $firewall{'nfqueue'} || 'disabled';
+    my $action = '';
+    if ($nfqueue eq 'enabled') {
+        $action = 'NFQUEUE';
+    } else {
+        $action = 'ACCEPT';
+    }
+
+    # generate policy for blue zone
+    if ($ndb->blue) {
+        $OUT .= "\n# Zone: blue\n\n";
+        $OUT .= "blue\t\tloc\t\tREJECT\n";
+        $OUT .= "blue\t\t\$FW\t\tREJECT\t\tinfo\n";
+        $OUT .= "\$FW\t\tblue\t\tACCEPT\n";
+        if ($ndb->orange) {
+            $OUT .= "blue\t\torange\t\t$action\n";
+        }
+    }
+
+    # generate policy for orange zone
+    if ($ndb->orange) {
+        $OUT .= "\n# Zone: orange\n\n";
+        $OUT .= "orange\t\tloc\t\tREJECT\n";
+        $OUT .= "orange\t\t\$FW\t\tREJECT\t\tinfo\n";
+        $OUT .= "\$FW\t\torange\t\tACCEPT\n";
+        if ($ndb->blue) {
+            $OUT .= "orange\t\tblue\t\tREJECT\t\tinfo\n";
+        }
+    }
+}
+
