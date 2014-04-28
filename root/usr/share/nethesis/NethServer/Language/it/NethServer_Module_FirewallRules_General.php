@@ -5,8 +5,8 @@
 $L['ExternalPing_label'] = 'Ping da Internet';
 $L['general_header'] = 'Generale';
 $L['General_Title'] = 'Opzioni generali';
-$L['permissive_label'] = 'Permissiva';
-$L['Policy_label'] = 'Policy di default';
-$L['strict_label'] = 'Rigorosa';
+$L['permissive_label'] = 'Permesso';
+$L['Policy_label'] = 'Traffico verso Internet (interfaccia red)';
+$L['strict_label'] = 'Bloccato';
 $L['enabled_label'] = 'Abilitato';
 $L['disabled_label'] = 'Disabilitato';
