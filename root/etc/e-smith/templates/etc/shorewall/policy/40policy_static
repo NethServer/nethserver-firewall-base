@@ -4,8 +4,7 @@
 
 loc		$FW		REJECT		info
 
-# Traffic from firewall is always allowed
-$FW		net		ACCEPT		
+# Traffic from firewall to local network is always allowed
 $FW		loc		ACCEPT
 
 # Drop traffic from external interface to firewall and local network

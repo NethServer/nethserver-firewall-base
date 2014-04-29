@@ -28,5 +28,6 @@
         }
         $OUT .= "$zone\t\tnet\t\t$action\n";
     }
- 
+
+    $OUT .= "\$FW\t\tnet\t\t$action\n";	
 }

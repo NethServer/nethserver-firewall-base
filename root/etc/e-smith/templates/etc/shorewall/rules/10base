@@ -10,25 +10,35 @@
 #ACTION		SOURCE		DEST		PROTO	DEST	SOURCE		ORIGINAL	RATE		USER/	MARK	CONNLIMIT	TIME         HEADERS         SWITCH
 #							PORT	PORT(S)		DEST		LIMIT		GROUP
 #SECTION ALL
+#
+
 {
+    use esmith::NetworksDB;
     my $nfqueue = $firewall{'nfqueue'} || 'disabled';
     if ($nfqueue eq 'enabled') {
-$OUT = <<EOF
 
-#
-# Filter all traffic with Snort
-#
-SECTION ESTABLISHED
-NFQUEUE loc  net
-NFQUEUE net  loc
-NFQUEUE net  fw
+        foreach my $section (qw(ESTABLISHED RELATED)) {
+            $OUT .= "\n# Enable NFQ for $section connections\n\n";
+            $OUT .= "SECTION $section\n";
+            $OUT .= "NFQUEUE\tloc\tnet\n";
+            $OUT .= "NFQUEUE\tnet\tloc\n";
+            $OUT .= "NFQUEUE\tnet\tfw\n";
+            $OUT .= "NFQUEUE\tfw\tnet\n";
+            
+            my $ndb = esmith::NetworksDB->open_ro();
+            if ($ndb->blue) {
+                $OUT .= "NFQUEUE\tblue\tnet\n";
+            }
+            if ($ndb->orange) {
+                $OUT .= "NFQUEUE\torange\tnet\n";
+            }
+            if ($ndb->blue && $ndb->orange) {
+                $OUT .= "NFQUEUE\tblue\torange\n";
+            }
+        }
 
-SECTION RELATED
-NFQUEUE loc  net
-NFQUEUE net  loc
-NFQUEUE net  fw
-
-EOF
     }
 }
+
+
 SECTION NEW
