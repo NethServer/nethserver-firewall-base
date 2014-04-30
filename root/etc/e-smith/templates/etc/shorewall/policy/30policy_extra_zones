@@ -19,18 +19,18 @@
         $OUT .= "blue\t\t\$FW\t\tREJECT\t\tinfo\n";
         $OUT .= "\$FW\t\tblue\t\tACCEPT\n";
         if ($ndb->orange) {
-            $OUT .= "blue\t\torange\t\t$action\n";
+            $OUT .= "blue\t\torang\t\t$action\n"; #truncate zone name to 5 chars
         }
     }
 
     # generate policy for orange zone
     if ($ndb->orange) {
         $OUT .= "\n# Zone: orange\n\n";
-        $OUT .= "orange\t\tloc\t\tREJECT\n";
-        $OUT .= "orange\t\t\$FW\t\tREJECT\t\tinfo\n";
-        $OUT .= "\$FW\t\torange\t\tACCEPT\n";
+        $OUT .= "orang\t\tloc\t\tREJECT\n"; #truncate zone name to 5 chars
+        $OUT .= "orang\t\t\$FW\t\tREJECT\t\tinfo\n"; #truncate zone name to 5 chars
+        $OUT .= "\$FW\t\torang\t\tACCEPT\n"; #truncate zone name to 5 chars
         if ($ndb->blue) {
-            $OUT .= "orange\t\tblue\t\tREJECT\t\tinfo\n";
+            $OUT .= "orang\t\tblue\t\tREJECT\t\tinfo\n"; #truncate zone name to 5 chars
         }
     }
 }

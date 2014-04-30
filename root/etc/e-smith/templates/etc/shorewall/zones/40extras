@@ -9,7 +9,7 @@
         $OUT .="blue     ipv4\n";
     }
     if ($ndb->orange) {
-        $OUT .="orange     ipv4\n";
+        $OUT .="orang     ipv4\n"; #truncate zone name to 5 chars
     }
 }
 
