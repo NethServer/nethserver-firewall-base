@@ -1,0 +1,41 @@
+#
+# 40providers
+#
+{
+    use NethServer::Firewall;
+    use esmith::NetworksDB;
+
+    my $db = esmith::ConfigDB->open_ro("tc") || die "Can't open tc database: $!\n";
+    my $fw = new NethServer::Firewall();
+    my %providers = $fw->getProviders();
+    foreach my $rule ( $db->get_all_by_prop('type' => 'rule') ) {
+        my $status = $rule->prop("status") || "disabled";
+        next unless ($status eq 'enabled');
+ 
+        my $src = $rule->prop("Src") || next; 
+        my $dst = $rule->prop("Dst") || next;
+        my $provider = $rule->prop("Provider") || next;
+        my $service = $rule->prop("Service") || '';
+        my $description = $rule->prop('Description') || '';
+        
+        # retrieve provider object
+        my ($type, $provider_key) = split(';', $provider);
+        my $mask = $providers{$provider_key} || next;
+
+        # src and dst can be: host, ip address or CIDR
+        my $src_addr = $fw->getAddress($src);
+        my $dst_addr = $fw->getAddress($dst);
+        
+        my $comment = "\n#\n# DIVERT $src_addr -> $dst_addr to $provider_key \n#\n";
+        my $lines = "?COMMENT $description\n";
+        $lines .= $mask.":P\t".$src_addr."\t".$dst_addr;
+        if ($service ne '') {
+            my %ports = $fw->getPorts($service);
+            foreach my $protocol (keys %ports) {
+              $OUT .= $comment.$lines."\t$protocol\t$ports{$protocol}\n";
+            }
+        } else {
+            $OUT .= $comment.$lines."\n";
+        }
+    }
+}
