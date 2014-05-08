@@ -83,21 +83,6 @@ event_services($event,
 
 
 #--------------------------------------------------
-# actions for interface-update event
-#--------------------------------------------------
-
-$event = "interface-update";
-
-event_templates($event,
-                '/etc/shorewall/interfaces',
-                '/etc/shorewall/masq',
-                '/etc/shorewall/providers',
-                );
-
-event_services($event, 'shorewall' => 'restart');
-
-
-#--------------------------------------------------
 # actions for firewall-objects-modify event
 #--------------------------------------------------
 
