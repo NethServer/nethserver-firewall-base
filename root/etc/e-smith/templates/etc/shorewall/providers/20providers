@@ -2,23 +2,23 @@
 # 20providers
 #
 {
-    sub sort_by_weight {
-         ($b->prop('weight') || '1') <=> ($a->prop('weight') || '1');
-    }
+    use NethServer::Firewall;
 
     use esmith::NetworksDB;
     my $ndb = esmith::NetworksDB->open_ro();
-    my $number = 1;
-    my @providers = sort sort_by_weight $ndb->get_all_by_prop('type' => 'provider'); # descending sort
-    foreach my $provider ( @providers ) {
-        my $name = $provider->key;
-        my $interface_name = $provider->prop('interface') || next;
+    my $fw = new NethServer::Firewall();
+    my @providers = $fw->getProviders();
+
+    foreach my $p ( @providers ) {
+        my $name = $p->{'name'};
+        my $weight = $p->{'weight'};
+        my $number = $p->{'number'};
+        my $interface_name = $p->{'interface'} || next;
         my $interface = $ndb->get($interface_name);
+        next if (!$interface);
         my $gateway = $interface->prop('gateway') || 'detect';
-        my $weight = $provider->prop('weight') || "1";
-        my $mask = "0x" . $number . "0000";
+        my $mask = $p->{'mask'};
         $OUT .= "$name\t$number\t$mask\t-\t$interface_name\t$gateway\ttrack,balance=$weight\t-\n";
-        $number++;
     }
 
 }

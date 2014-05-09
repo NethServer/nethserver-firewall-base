@@ -7,7 +7,20 @@
 
     my $db = esmith::ConfigDB->open_ro("tc") || die "Can't open tc database: $!\n";
     my $fw = new NethServer::Firewall();
-    my %providers = $fw->getProviders();
+    our @providers = $fw->getProviders();
+
+    sub getProvider
+    {
+        my $needle = shift;
+
+        foreach my $p (@providers) {
+            if ($p->{'name'} eq $needle) {
+                return $p;
+            }
+        }   
+        return undef;
+    }
+
     foreach my $rule ( $db->get_all_by_prop('type' => 'rule') ) {
         my $status = $rule->prop("status") || "disabled";
         next unless ($status eq 'enabled');
@@ -20,7 +33,8 @@
         
         # retrieve provider object
         my ($type, $provider_key) = split(';', $provider);
-        my $mask = $providers{$provider_key} || next;
+        my $p = getProvider($provider_key);
+        my $mask = $p->{'mask'} || next;
 
         # src and dst can be: host, ip address or CIDR
         my $src_addr = $fw->getAddress($src);

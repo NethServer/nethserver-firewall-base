@@ -81,11 +81,11 @@ sub getAddress($)
         } elsif ( $db eq 'host-group' ) {
             return $self->_getHostGroupAddresses($key);
         } elsif ( $db eq 'zone' ) {
-            if ($zone eq 'red') {
+            if ($key eq 'red') {
                 return "net";
-            } elsif ($zone eq 'green') {
+            } elsif ($key eq 'green') {
                 return "loc";
-            } else 
+            } else { 
                 return substr($key, 0, 5); # truncate zone name to 5 chars
             }
         }
@@ -211,11 +211,19 @@ sub getZone($)
 
     
 
+=head2 getProviders
 
+Return the provider list ordered by weight (descending order).
+Each record has all database properties plus mask, number and name fields.
+The mask field is ready to be used inside Shorewall configuration. 
+
+Each entry is a reference to hash of properties.
+
+=cut
 sub getProviders
-{ 
+{
     my $ndb = esmith::NetworksDB->open_ro();
-    my %providers;
+    my @providers;
     my $number = 1;
     my @list = sort _sort_by_weight $ndb->get_all_by_prop('type' => 'provider'); # descending sort
     foreach my $provider ( @list ) {
@@ -223,10 +231,15 @@ sub getProviders
         my $interface_name = $provider->prop('interface') || next;
         my $weight = $provider->prop('weight') || "1";
         my $mask = "0x" . $number . "0000";
-        $providers{$name} = $mask;
+        my @mask_array = ('mask', $mask);
+        my %props = $provider->props;
+        $props{'mask'} = $mask;
+        $props{'number'} = $number;
+        $props{'name'} = $name;
+        push(@providers, \%props);
         $number++;
     }
-    return %providers;
+    return @providers;
 }
 
 sub _sort_by_weight 
