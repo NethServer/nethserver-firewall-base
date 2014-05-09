@@ -102,4 +102,13 @@ event_actions($event,
               'nethserver-shorewall-wan-update' => '50'
 );
 
+#--------------------------------------------------
+# actions for static-routes-save event
+#--------------------------------------------------
+
+$event = "static-routes-save";
+
+event_actions($event,
+              'providers-static-routes' => '20'
+);
 
