@@ -190,7 +190,7 @@ sub getZone($)
     foreach my $i (@interfaces) {
         my $bootproto = $i->prop('bootproto') || '';
         my $role = $i->prop('role') || '';
-        next unless ($bootproto eq 'static');
+        next unless ($bootproto eq 'none');
         next unless ($role ne '');
         my $haystack = NetAddr::IP->new($i->prop('ipaddr'),$i->prop('netmask'));
         if ($needle->within($haystack)) {
