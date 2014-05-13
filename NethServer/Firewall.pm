@@ -228,7 +228,7 @@ sub getProviders
     my @list = sort _sort_by_weight $ndb->get_all_by_prop('type' => 'provider'); # descending sort
     foreach my $provider ( @list ) {
         my $status = $provider->prop('status') || 'disabled';
-        next if ($status eq 'enabled');
+        next if ($status eq 'disabled');
         my $name = $provider->key;
         my $interface_name = $provider->prop('interface') || next;
         my $weight = $provider->prop('weight') || "1";
