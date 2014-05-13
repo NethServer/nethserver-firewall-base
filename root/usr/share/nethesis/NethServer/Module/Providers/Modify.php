@@ -43,6 +43,9 @@ class Modify extends \Nethgui\Controller\Table\Modify
             'Description',
         );
 
+        if(!$this->interfaces) {
+            $this->interfaces = $this->readInterfaces();
+        }
 
         $p = $this->getPlatform();
         $nv = $p->createValidator()->maxLength(5)->minLength(1);
@@ -51,10 +54,12 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('interface', $p->createValidator()->memberOf($this->interfaces), \Nethgui\Controller\Table\Modify::FIELD),
             array('weight', Validate::POSITIVE_INTEGER, \Nethgui\Controller\Table\Modify::FIELD),
             array('checkip', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
+            array('status', Validate::SERVICESTATUS, \Nethgui\Controller\Table\Modify::FIELD),
             array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
         );
 
         $this->setSchema($parameterSchema);
+        $this->setDefaultValue('status', 'enabled'); 
 
         parent::initialize();
     }

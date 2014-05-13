@@ -38,7 +38,6 @@ class Providers extends \Nethgui\Controller\TableController
     {
         $columns = array(
             'Key',
-            'checkip',
             'interface',
             'weight',
             'Description',
@@ -50,6 +49,7 @@ class Providers extends \Nethgui\Controller\TableController
             array('checkip', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
             array('interface', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
             array('weight', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
+            array('status', Validate::SERVICESTATUS, \Nethgui\Controller\Table\Modify::FIELD),
             array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
         );
 
@@ -66,8 +66,18 @@ class Providers extends \Nethgui\Controller\TableController
         parent::initialize();
     }
 
+    public function prepareViewForColumnKey(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        if (!isset($values['status']) || ($values['status'] == 'disabled')) {
+            $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-locked');
+        }
+        return strval($key);
+    }
+
+
     public function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
     {
+        $this->getPlatform()->signalEvent('static-routes-save');
         $this->getPlatform()->signalEvent('firewall-adjust');
     }
 

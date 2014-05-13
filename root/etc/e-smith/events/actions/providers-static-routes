@@ -36,6 +36,9 @@ foreach my $r ($rdb->get_all_by_prop('type' => 'provider-static')) {
 foreach my $p ($ndb->get_all_by_prop('type' => 'provider')) {
     my $interface = $p->prop('interface') || '';
     next if ($interface eq '');
+    my $status = $p->prop('status') || 'disabled';
+print $p->key." $status\n" if ($status eq 'disabled');
+    next if ($status eq 'disabled');
     my $checkip = $p->prop('checkip') || '';
     my $red = $ndb->get($interface);
     my $gateway = $red->prop('gateway') || '';

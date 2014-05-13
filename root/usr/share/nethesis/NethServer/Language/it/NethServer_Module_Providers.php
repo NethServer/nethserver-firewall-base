@@ -13,6 +13,7 @@ $L['provider_create_header'] = 'Crea nuovo provider';
 $L['Providers_Description'] = 'Gestione connessioni wan mutiple';
 $L['Providers_Tags'] = 'provider multiwan wan red';
 $L['Providers_Title'] = 'Multi WAN';
+$L['ProviderAdvanced_label'] = 'Avanzate';
 $L['provider_update_header'] = 'Modifica un provider';
 $L['WanMode_header'] = 'Modalità multi WAN';
 $L['WanMode_label'] = 'Modalità';
