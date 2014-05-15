@@ -36,11 +36,12 @@
         my $p = getProvider($provider_key);
         my $mask = $p->{'mask'} || next;
 
-        # src and dst can be: host, ip address or CIDR
-        my $src_addr = $fw->getAddress($src);
-        my $dst_addr = $fw->getAddress($dst);
+        # src and dst can be: zone (not interface), host, ip address or CIDR
+        my $src_addr = $fw->getAddress($src, 1);
+        my $dst_addr = $fw->getAddress($dst, 1);
+        next if ($src_addr eq '' && $dst_addr eq '');
         
-        my $comment = "\n#\n# DIVERT $src_addr -> $dst_addr to $provider_key \n#\n";
+        my $comment = "\n#\n# FORCE traffic [$src_addr -> $dst_addr] to $provider_key \n#\n";
         my $lines = "?COMMENT $description\n";
         $lines .= $mask.":P\t".$src_addr."\t".$dst_addr;
         if ($service ne '') {
