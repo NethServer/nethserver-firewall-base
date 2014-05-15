@@ -38,7 +38,15 @@ Create a NethServer::Firewall instance.
 sub new
 {
     my $class = shift;
-    my $self = {};
+    my $cdb_path = shift || '';
+    my $ndb_path = shift || '';
+    my $hdb_path = shift || '';
+
+    my $self = {
+        cdb_path => $cdb_path,
+        ndb_path => $ndb_path,
+        hdb_path => $hdb_path
+    };
     bless $self, $class;
     $self->_initialize();
     
@@ -49,23 +57,27 @@ sub new
 sub _initialize()
 {
     my $self = shift;
-    $self->{'ndb'} = esmith::NetworksDB->open_ro();
-    $self->{'cdb'} = esmith::ConfigDB->open_ro();
-    $self->{'hdb'} = esmith::HostsDB->open_ro();
+    $self->{'cdb'} = esmith::ConfigDB->open_ro($self->{'cdb_path'});
+    $self->{'ndb'} = esmith::NetworksDB->open_ro($self->{'ndb_path'});
+    $self->{'hdb'} = esmith::HostsDB->open_ro($self->{'hdb_path'});
 }
 
-=head2 getAddress(id)
+=head2 getAddress(id, expand_zone = 0)
 
 Return the address value corresponding to given id.
 If id matches a valid IP or CIDR syntax, simply return it.
 Otherwise lookup for the id inside other databases and return the 
 value of the key.
 
+If expand_zone flag is set to 1, zone name will be replaced
+with CIDR notation or interface name.
+
 =cut
 sub getAddress($)
 {
     my $self = shift;
     my $id = shift;
+    my $expand_zone = shift || 0;
 
     if ( $id =~ m/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/ ) {
         return $id; # IP address
@@ -81,12 +93,16 @@ sub getAddress($)
         } elsif ( $db eq 'host-group' ) {
             return $self->_getHostGroupAddresses($key);
         } elsif ( $db eq 'zone' ) {
-            if ($key eq 'red') {
-                return "net";
-            } elsif ($key eq 'green') {
-                return "loc";
+            if ($expand_zone) {
+                return $self->getZoneCIDR($key);
             } else { 
-                return substr($key, 0, 5); # truncate zone name to 5 chars
+                if ($key eq 'red') {
+                    return "net";
+                } elsif ($key eq 'green') {
+                    return "loc";
+                } else { 
+                    return substr($key, 0, 5); # truncate zone name to 5 chars
+                }
             }
         }
     } 
@@ -94,6 +110,54 @@ sub getAddress($)
     return '';
 }
 
+
+
+=head2 getZoneInterface($zone)
+
+Return a list of interfaces associated with given zone.
+
+=cut
+
+sub getZoneInterface($)
+{
+    my $self = shift;
+    my $zone = shift || '';
+    my @ret;
+
+    if ($zone eq 'net') {
+        $zone = 'red';
+    }
+    if ($zone eq 'loc') {
+        $zone = 'green';
+    }
+    foreach my $i ($self->{'ndb'}->interfaces) {
+        my $role = $i->prop('role') || next;
+        if ($role eq $zone) {
+            push(@ret, $i->key);
+        }
+    }
+
+    return @ret;
+}
+
+=head2 getZoneCIDR($zone)
+
+Return the CIDR rappresentation of given zone.
+
+=cut
+
+sub getZoneCIDR($)
+{
+    my $self = shift;
+    my $zone = shift || '';
+
+    return '' if ($zone eq '');
+
+    my $z = $self->{'ndb'}->get($zone);
+    return '' if (!defined($z));
+
+    return $z->prop('Network');
+}
 
 =head2 getPorts(id)
 
@@ -115,11 +179,10 @@ sub getPorts($)
     my $id = shift;
     my %ports;
     
-    if ( $id =~ m/^\d+$/ ) {
-        return $id; # port 
-    }
-    if ( $id =~ m/^\d+(\-\d+)*$/ ) {
-        return $id; # port range 
+    if ( $id =~ m/^\d+$/  || $id =~ m/^\d+(\-\d+)*$/ ) { # single port or range
+        ($ports{'tcp'} = $id) =~ s/-/:/; # convert port range syntax
+        ($ports{'udp'} = $id) =~ s/-/:/; # convert port range syntax
+        return %ports; 
     }
     
     if ( $id =~ m/;/ ) { # lookup is needed
@@ -140,11 +203,12 @@ sub getPorts($)
                 if ($service->prop('Protocol') eq 'tcpudp') {
                     ($ports{'tcp'} = $service->prop('Ports')) =~ s/-/:/; # convert port range syntax
                     ($ports{'udp'} = $service->prop('Ports')) =~ s/-/:/; # convert port range syntax
-                } else {
+                } elsif ($service->prop('Protocol') eq 'tcp' || $service->prop('Protocol') eq 'udp') {
                     ($ports{$service->prop('Protocol')} = $service->prop('Ports')) =~ s/-/:/; # convert port range syntax
+                } else { # icmp
+                    $ports{$service->prop('Protocol')} = $service->prop('Ports');
                 }
             }
-          
         }
     }
 
@@ -188,10 +252,9 @@ sub getZone($)
     # check interfaces
     my @interfaces = $self->{'ndb'}->interfaces;
     foreach my $i (@interfaces) {
-        my $bootproto = $i->prop('bootproto') || '';
-        my $role = $i->prop('role') || '';
-        next unless ($bootproto eq 'none');
-        next unless ($role ne '');
+        my $role = $i->prop('role') || next;
+        my $bootproto = $i->prop('bootproto') || 'none';
+        next unless ($bootproto eq 'none' || $bootproto eq 'static');
         my $haystack = NetAddr::IP->new($i->prop('ipaddr'),$i->prop('netmask'));
         if ($needle->within($haystack)) {
             if ($i->prop('role') eq 'red') {
@@ -199,7 +262,7 @@ sub getZone($)
             } elsif ($i->prop('role') eq 'green') {
                 return "loc:$value";
             } else {
-                return substr($i->key, 0, 5).":$value"; # truncate zone name to 5 chars
+                return substr($i->prop('role'), 0, 5).":$value"; # truncate zone name to 5 chars
             }
         }
     }
@@ -209,7 +272,53 @@ sub getZone($)
     return "net:$value";
 }
 
+
+=head2 listZones
+
+Return an hash of zones with the following format:
+ zone_name => shorewall_name
+
+=cut
+
+sub listZones($)
+{
+    my $self = shift;
+    my %zones;
+    foreach my $z ($self->{'ndb'}->get_all_by_prop('type' => 'zone')) {
+        $zones{$z->key} = substr($z->key, 0, 5);
+    }
+    foreach my $i ($self->{'ndb'}->interfaces) {
+        my $role = $i->prop('role') || next;
+        my $m = substr($role, 0, 5);
+        if ($role eq 'red') {
+            $m = 'net';
+        }
+        if ($role eq 'green') {
+            $m = 'loc';
+        }
+        $zones{$role} = $m;
+    }
     
+    return %zones;
+}
+
+
+=head2 isZone
+
+Return 1 if the given key is a zone, 0 otherwise
+
+=cut 
+
+sub isZone($)
+{
+    my $self = shift;
+    my $key = shift;
+    my %zones = $self->listZones();
+    my %reverse = reverse %zones;
+    
+    return 1 if (exists $zones{$key} || exists $reverse{$key});
+    return 0;
+}
 
 =head2 getProviders
 
@@ -222,10 +331,10 @@ Each entry is a reference to hash of properties.
 =cut
 sub getProviders
 {
-    my $ndb = esmith::NetworksDB->open_ro();
+    my $self = shift;
     my @providers;
     my $number = 1;
-    my @list = sort _sort_by_weight $ndb->get_all_by_prop('type' => 'provider'); # descending sort
+    my @list = sort _sort_by_weight $self->{'ndb'}->get_all_by_prop('type' => 'provider'); # descending sort
     foreach my $provider ( @list ) {
         my $status = $provider->prop('status') || 'disabled';
         next if ($status eq 'disabled');

@@ -1,0 +1,4 @@
+This script will test NethServer::Firewall libary.
+
+Copy the scripts on a running NethServer, then execute the script:
+  perl firewall-test.pl
