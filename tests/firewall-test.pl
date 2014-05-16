@@ -19,18 +19,15 @@ provider2=provider|Description|Provider1|checkip|1.2.3.5|interface|eth2|status|e
 zone1=zone|Network|192.168.2.0/24
 END
 
-my $cdb = <<"END";
-dns=configuration|NameServers|8.8.8.8|role|resolver
+my $sdb = <<"END";
 firewall=configuration|ExternalPing|enabled|Policy|permissive|WanMode|balance|event|nethserver-firewall-base-save|level|high|nfqueue|enabled|tc|Simple
-https=fservice|Description||Ports|443,446,980|Protocol|tcp
-tcp1=fservice|Description||Ports|25|Protocol|tcp
-udp1=fservice|Description||Ports|1,2,3|Protocol|udp
-udp2=fservice|Description||Ports|10-20|Protocol|udp
-both1=fservice|Description|Both|Ports|10-20|Protocol|tcpudp
-both2=fservice|Description|Both|Ports|10|Protocol|tcpudp
-squid=service|TCPPorts|3128,3129,3130|access|private|status|enabled
-sshd=service|TCPPort|222|access|public|status|enabled
-ping=fservice|Ports||Protocol|icmp
+https=fwservice|Description||Ports|443,446,980|Protocol|tcp
+tcp1=fwservice|Description||Ports|25|Protocol|tcp
+udp1=fwservice|Description||Ports|1,2,3|Protocol|udp
+udp2=fwservice|Description||Ports|10-20|Protocol|udp
+both1=fwservice|Description|Both|Ports|10-20|Protocol|tcpudp
+both2=fwservice|Description|Both|Ports|10|Protocol|tcpudp
+ping=fwservice|Ports||Protocol|icmp
 END
 
 my $hdb = <<"END";
@@ -53,11 +50,11 @@ sub write_db
 }
 
 
-my $cdb_file = write_db($cdb);
+my $sdb_file = write_db($sdb);
 my $ndb_file = write_db($ndb);
 my $hdb_file = write_db($hdb);
 
-my $fw = NethServer::Firewall->new($cdb_file, $ndb_file, $hdb_file);
+my $fw = NethServer::Firewall->new($sdb_file, $ndb_file, $hdb_file);
 ok( defined $fw, 'fw instance' );
 is( $fw->getAddress('192.168.1.2'),  '192.168.1.2', 'IP' );
 is( $fw->getAddress('192.168.'),  '', 'BAD IP' );
@@ -76,9 +73,7 @@ is( $fw->getAddress('host-group;hg2'),  '192.168.1.1', 'host-group;hg2' );
 is( $fw->getAddress('host-group;not-existing'),  '', 'host-group;not-existing' );
 is( $fw->getAddress('zone;zone1',1),  '192.168.2.0/24', 'zone;zone1 to network' ); # address
 
-my %h = ('tcp' => '222');
-is( $fw->getPorts('service;sshd'),  %h, 'service;sshd' );
-%h = ('tcp', '443,446,980');
+my %h = ('tcp', '443,446,980');
 is( $fw->getPorts('service;https'),  %h, 'service;https' );
 %h = ('tcp', '25');
 is( $fw->getPorts('service;tcp1'),  %h, 'service;tcp1' );
@@ -92,8 +87,6 @@ is( $fw->getPorts('10-20'),  %h, 'service;implicit-range' );
 %h = ('udp', '10', 'tcp', '10');
 is( $fw->getPorts('service;both2'),  %h, 'service;both2' );
 is( $fw->getPorts('10'),  %h, 'service;implicit-simple' );
-%h = ('tcp', '3128,3129,3130');
-is( $fw->getPorts('service;squid'),  %h, 'service;squid' );
 %h = ('icmp', '');
 is( $fw->getPorts('service;ping'),  %h, 'service;ping' );
 
@@ -116,6 +109,6 @@ is( $fw->listZones(), %h, 'listZones' );
 is( $fw->isZone('red'), 1, 'isZone(red)' );
 is( $fw->isZone('yellow'), 0, 'isZone(yellow)' );
 
-unlink($cdb_file);
+unlink($sdb_file);
 unlink($ndb_file);
 unlink($hdb_file);

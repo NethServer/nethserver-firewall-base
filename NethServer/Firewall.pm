@@ -38,12 +38,12 @@ Create a NethServer::Firewall instance.
 sub new
 {
     my $class = shift;
-    my $cdb_path = shift || '';
+    my $sdb_path = shift || '';
     my $ndb_path = shift || '';
     my $hdb_path = shift || '';
 
     my $self = {
-        cdb_path => $cdb_path,
+        sdb_path => $sdb_path,
         ndb_path => $ndb_path,
         hdb_path => $hdb_path
     };
@@ -57,7 +57,7 @@ sub new
 sub _initialize()
 {
     my $self = shift;
-    $self->{'cdb'} = esmith::ConfigDB->open_ro($self->{'cdb_path'});
+    $self->{'sdb'} = esmith::ConfigDB->open_ro($self->{'sdb_path'});
     $self->{'ndb'} = esmith::NetworksDB->open_ro($self->{'ndb_path'});
     $self->{'hdb'} = esmith::HostsDB->open_ro($self->{'hdb_path'});
 }
@@ -188,26 +188,15 @@ sub getPorts($)
     if ( $id =~ m/;/ ) { # lookup is needed
         my ($db, $key) = split(';', $id);
         if ( $db eq 'service' ) {
-            my $service = $self->{'cdb'}->get($key);
+            my $service = $self->{'sdb'}->get($key);
             return %ports unless defined($service);
-            if  ($service->prop('type') eq 'service') {
-                my $tcpPorts = $service->prop('TCPPorts') || $service->prop('TCPPort') || '';
-                my $udpPorts = $service->prop('UDPPorts') || $service->prop('UDPPort') || '';
-                if ($tcpPorts ne '') {
-                    ($ports{'tcp'} = $tcpPorts) =~ s/-/:/; # convert port range syntax
-                }
-                if ($udpPorts ne '') {
-                    ($ports{'udp'} = $udpPorts) =~ s/-/:/; # convert port range syntax
-                }
-            } elsif ($service->prop('type') eq 'fservice') {
-                if ($service->prop('Protocol') eq 'tcpudp') {
-                    ($ports{'tcp'} = $service->prop('Ports')) =~ s/-/:/; # convert port range syntax
-                    ($ports{'udp'} = $service->prop('Ports')) =~ s/-/:/; # convert port range syntax
-                } elsif ($service->prop('Protocol') eq 'tcp' || $service->prop('Protocol') eq 'udp') {
-                    ($ports{$service->prop('Protocol')} = $service->prop('Ports')) =~ s/-/:/; # convert port range syntax
-                } else { # icmp
-                    $ports{$service->prop('Protocol')} = $service->prop('Ports');
-                }
+            if ($service->prop('Protocol') eq 'tcpudp') {
+                ($ports{'tcp'} = $service->prop('Ports')) =~ s/-/:/; # convert port range syntax
+                ($ports{'udp'} = $service->prop('Ports')) =~ s/-/:/; # convert port range syntax
+            } elsif ($service->prop('Protocol') eq 'tcp' || $service->prop('Protocol') eq 'udp') {
+                ($ports{$service->prop('Protocol')} = $service->prop('Ports')) =~ s/-/:/; # convert port range syntax
+            } else { # icmp
+                $ports{$service->prop('Protocol')} = $service->prop('Ports');
             }
         }
     }
