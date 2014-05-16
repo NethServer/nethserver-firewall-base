@@ -13,6 +13,7 @@
         my $src = $rule->prop("Src") || next; 
         my $dst = $rule->prop("Dst") || next;
         my $action= $rule->prop("Action") || next;
+        $action = uc($action);
         my $service = $rule->prop("Service") || '';
         my $log = $rule->prop('Log') || "";
         my $description = $rule->prop('Description') || '';
