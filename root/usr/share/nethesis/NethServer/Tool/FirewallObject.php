@@ -68,12 +68,13 @@ class FirewallObject
 
     public function getDetails()
     {
-        return $this->props['Description'];
+        return isset($this->props['Description']) ? $this->props['Description'] : '';
     }
 
     public function getType()
     {
         return $this->type;
     }
+
 
 }

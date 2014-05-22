@@ -31,13 +31,13 @@ class FirewallObjectsFinder implements \IteratorAggregate, \Countable
 {
     /**
      *
-     * @var \IteratorAggregate
+     * @var \ArrayObject
      */
     private $results;
 
-    private function __construct(\IteratorAggregate $results)
+    private function __construct()
     {
-        $this->results = $results;
+        $this->results = new \ArrayObject();
     }
 
     /**
@@ -48,15 +48,22 @@ class FirewallObjectsFinder implements \IteratorAggregate, \Countable
      */
     public static function search(\Nethgui\System\PlatformInterface $platform, $text = '', $where = array())
     {
-        $results = array();
+        $o = new self();
+
+        if (isset($where['ROLES'])) {
+            $o->addSearchRoles($text);
+            unset($where['ROLES']);
+        }
+        $o->addSearchInDb($platform, $text, $where);
+        return $o;
+    }
+
+    private function addSearchInDb(\Nethgui\System\PlatformInterface $platform, $text, $where)
+    {
         $filter = NULL;
 
         if ($text) {
             $filter = function($key, $props) use ($text) {
-                if ($text === '') {
-                    return TRUE;
-                }
-
                 if (strstr(strtolower($key), strtolower($text)) !== FALSE) {
                     return TRUE;
                 }
@@ -79,11 +86,19 @@ class FirewallObjectsFinder implements \IteratorAggregate, \Countable
                 } else {
                     $type = $types[0];
                 }
-                $results[] = new \NethServer\Tool\FirewallObject($key, $type, $props);
+                $this->results->append(new \NethServer\Tool\FirewallObject($key, $type, $props));
             }
         }
+    }
 
-        return new self(new \ArrayObject($results));
+    private function addSearchRoles($text)
+    {
+        $roles = array('green', 'blue', 'red', 'orange');
+        foreach ($roles as $role) {
+            if ( ! $text || strstr($role, strtolower($text)) !== FALSE) {
+                $this->results->append(new \NethServer\Tool\FirewallObject($role, 'role', array()));
+            }
+        }
     }
 
     public function getIterator()
