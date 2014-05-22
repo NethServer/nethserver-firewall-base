@@ -112,12 +112,19 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
             return array();
         }
 
-        return array(
-            array('Create' => array($view->getModuleUrl('../HostGroups/create'), $view->translate('HostGroups_create', array($this->parameters['q'])))),
-            array('Create' => array($view->getModuleUrl('../Zones/create'), $view->translate('Zones_create', array($this->parameters['q'])))),
-            array('Create' => array($view->getModuleUrl('../Hosts/create'), $view->translate('Hosts_create', array($this->parameters['q'])))),
-            array('Create' => array($view->getModuleUrl('../Services/create'), $view->translate('Services_create', array($this->parameters['q'])))),
-        );
+
+
+        if ($this->target === 'Service') {
+            return array(
+                array('Create' => array($view->getModuleUrl('../Services/create'), $view->translate('Services_create', array($this->parameters['q'])))),
+            );
+        } else {
+            return array(
+                array('Create' => array($view->getModuleUrl('../HostGroups/create'), $view->translate('HostGroups_create', array($this->parameters['q'])))),
+                array('Create' => array($view->getModuleUrl('../Zones/create'), $view->translate('Zones_create', array($this->parameters['q'])))),
+                array('Create' => array($view->getModuleUrl('../Hosts/create'), $view->translate('Hosts_create', array($this->parameters['q'])))),
+            );
+        }
     }
 
 }
