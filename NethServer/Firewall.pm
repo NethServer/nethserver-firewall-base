@@ -92,17 +92,20 @@ sub getAddress($)
             return $self->_getHostAddress($key);
         } elsif ( $db eq 'host-group' ) {
             return $self->_getHostGroupAddresses($key);
+        } elsif ( $db eq 'role' ) {
+            if ($key eq 'red') {
+                return "net";
+            } elsif ($key eq 'green') {
+                return "loc";
+            } else { 
+                return substr($key, 0, 5); # truncate zone name to 5 chars
+            }
+
         } elsif ( $db eq 'zone' ) {
             if ($expand_zone) {
                 return $self->getZoneCIDR($key);
             } else { 
-                if ($key eq 'red') {
-                    return "net";
-                } elsif ($key eq 'green') {
-                    return "loc";
-                } else { 
-                    return substr($key, 0, 5); # truncate zone name to 5 chars
-                }
+                return substr($key, 0, 5); # truncate zone name to 5 chars
             }
         }
     } 
