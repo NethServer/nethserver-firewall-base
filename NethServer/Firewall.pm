@@ -245,9 +245,11 @@ sub getZone($)
     my @interfaces = $self->{'ndb'}->interfaces;
     foreach my $i (@interfaces) {
         my $role = $i->prop('role') || next;
+        my $ipaddr = $i->prop('ipaddr') || next;
+        my $netmask = $i->prop('netmask') || next;
         my $bootproto = $i->prop('bootproto') || 'none';
         next unless ($bootproto eq 'none' || $bootproto eq 'static');
-        my $haystack = NetAddr::IP->new($i->prop('ipaddr'),$i->prop('netmask'));
+        my $haystack = NetAddr::IP->new($ipaddr,$netmask);
         if ($needle->within($haystack)) {
             if ($i->prop('role') eq 'red') {
                 return "net:$value";
