@@ -1,6 +1,8 @@
 {
     use NethServer::Service;
+    use NethServer::Firewall;
     use esmith::ConfigDB;
+    my $fw = NethServer::Firewall->new();
     my $confDb = esmith::ConfigDB->open();
     my $accept = 'ACCEPT';
     my $nfqueue = $firewall{'nfqueue'} || 'disabled';
@@ -18,6 +20,10 @@
         my $access = $serviceRecord->prop('access') || 'private';
 	my $tcpPorts = $serviceRecord->prop('TCPPorts') || $serviceRecord->prop('TCPPort') || '';
 	my $udpPorts = $serviceRecord->prop('UDPPorts') || $serviceRecord->prop('UDPPort') || '';
+        if ($access eq 'none') {
+            $OUT.="#\n#\tService: ".$serviceRecord->key." Access: NONE\n#\n";
+            next;
+        }
         if($tcpPorts || $udpPorts) {
             if( ! NethServer::Service::is_enabled($serviceRecord->key) ) {
 	        next;
@@ -25,17 +31,45 @@
             $OUT.="#\n#\tService: ".$serviceRecord->key." Access: $access\n#\n"; 
             $OUT.="?COMMENT ".$serviceRecord->key."\n"; 
             foreach my $port (split(',', $tcpPorts)) {
+                my $allow = $serviceRecord->prop('AllowHosts') || '';
+                my $deny = $serviceRecord->prop('DenyHosts') || '';
                 $port =~ s/\-/:/g;
                 $OUT.="ACCEPT\tloc\t\$FW\ttcp\t$port\n";
                 if ($access eq 'public') {
                     $OUT.="$accept\tnet\t\$FW\ttcp\t$port\n";
                 }
+                # Always accept from hosts listed in AllowHosts
+                foreach my $host (split(/,/,$allow)) {
+                    my $addr = $fw->getAddress($host);
+                    $OUT.="?COMMENT allow ".$serviceRecord->key." access from $host\n"; 
+                    $OUT.="$accept\t".$fw->getZone($host)."\t\$FW\ttcp\t$port\n";
+                }
+                # Always deny from hosts listed in DenyHosts
+                foreach my $host (split(/,/,$deny)) {
+                    my $addr = $fw->getAddress($host);
+                    $OUT.="?COMMENT deny ".$serviceRecord->key." access from $host\n"; 
+                    $OUT.="REJECT\t".$fw->getZone($host)."\t\$FW\ttcp\t$port\n";
+                }
             }
             foreach my $port (split(',', $udpPorts)) {
+                my $allow = $serviceRecord->prop('AllowHosts') || '';
+                my $deny = $serviceRecord->prop('DenyHosts') || '';
                 $port =~ s/\-/:/g;
                 $OUT.="ACCEPT\tloc\t\$FW\tudp\t$port\n";
                 if ($access eq 'public') {
                     $OUT.="$accept\tnet\t\$FW\tudp\t$port\n";
+                }
+                # Always accept from hosts listed in AllowHosts
+                foreach my $host (split(/,/,$allow)) {
+                    my $addr = $fw->getAddress($host);
+                    $OUT.="?COMMENT allow ".$serviceRecord->key." access from $host\n"; 
+                    $OUT.="$accept\t".$fw->getZone($host)."\t\$FW\tudp\t$port\n";
+                }
+                # Always deny from hosts listed in DenyHosts
+                foreach my $host (split(/,/,$deny)) {
+                    my $addr = $fw->getAddress($host);
+                    $OUT.="?COMMENT deny ".$serviceRecord->key." access from $host\n"; 
+                    $OUT.="REJECT\t".$fw->getZone($host)."\t\$FW\tudp\t$port\n";
                 }
             }
         }
