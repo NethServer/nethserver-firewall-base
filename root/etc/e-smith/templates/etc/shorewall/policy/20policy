@@ -18,7 +18,7 @@
         $action = 'REJECT';
     }
 
-    # generate policy for all zones
+    my %zones;
     foreach my $i ($ndb->interfaces) {
         my $role = $i->prop('role') || '';
         next if ($role eq '' || $role eq 'red' || $role eq 'slave' || $role eq 'bridged');
@@ -26,8 +26,12 @@
         if ($role eq 'green') { # rename green to loc
             $zone = 'loc';
         }
-        $OUT .= "$zone\t\tnet\t\t$action\n";
+        $zones{$zone} = ''; # avoid duplicate policies
     }
 
+    # generate policies for all zones
+    foreach my $z (keys %zones) {
+        $OUT .= "$z\t\tnet\t\t$action\n";
+    }
     $OUT .= "\$FW\t\tnet\t\t$action\n";	
 }
