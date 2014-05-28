@@ -17,3 +17,4 @@ $L['service_update_header'] = 'Edit service';
 $L['tcp_label'] = 'TCP';
 $L['tcpudp_label'] = 'TCP and UDP';
 $L['udp_label'] = 'UDP';
+$L['Ports_validator'] = 'Comma separated list of port numbers';

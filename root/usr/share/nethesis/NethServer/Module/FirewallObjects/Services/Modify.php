@@ -38,7 +38,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('name', Validate::USERNAME, \Nethgui\Controller\Table\Modify::KEY),
             array('Protocol', $this->createValidator()->memberOf($this->protocols), \Nethgui\Controller\Table\Modify::FIELD),
             array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
-            array('Ports', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD) //TODO: validator
+            array('Ports', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
         );
 
         $this->setSchema($parameterSchema);
@@ -60,6 +60,20 @@ class Modify extends \Nethgui\Controller\Table\Modify
         }, $this->protocols);
     }
 
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        if ($this->getRequest()->isMutation()) {
+            $ports = explode(',',$this->parameters['Ports']);
+            $v = $this->createValidator(Validate::PORTNUMBER);
+            foreach($ports as $port) {
+                if(!$v->evaluate($port)) {
+                    $report->addValidationErrorMessage($this, 'Ports', 'Ports_validator');
+                }
+            }
+        }
+
+        parent::validate($report);
+    }
 
 
     public function nextPath()
