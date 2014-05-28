@@ -37,13 +37,12 @@ foreach my $p ($ndb->get_all_by_prop('type' => 'provider')) {
     my $interface = $p->prop('interface') || '';
     next if ($interface eq '');
     my $status = $p->prop('status') || 'disabled';
-print $p->key." $status\n" if ($status eq 'disabled');
     next if ($status eq 'disabled');
     my $checkip = $p->prop('checkip') || '';
     my $red = $ndb->get($interface);
     my $gateway = $red->prop('gateway') || '';
     if ($gateway eq '') { # find gateway from dhcp lease
-        $gateway = `/bin/bash /etc/shorewall/findgw $interface 2>/dev/null`;
+        $gateway = `/bin/bash /etc/shorewall/findgw $interface 2>/dev/null | /usr/bin/tr -d '\n' | /usr/bin/tr -d ' '`;
     }
     my $set_routes = 1;
 
