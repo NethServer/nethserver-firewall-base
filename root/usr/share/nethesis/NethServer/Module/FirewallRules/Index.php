@@ -36,34 +36,35 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         $this->declareParameter('Rules', \Nethgui\System\PlatformInterface::ANYTHING_COLLECTION);
     }
 
-    private function sortRules()
-    {
-        $changes = array();
-        if ( ! is_array($this->parameters['Rules'])) {
-            return;
-        }
-        $A = $this->getAdapter();
-        foreach ($this->parameters['Rules'] as $key => $values) {
-            if ($key == $values['position']) {
-                continue;
-            }
-            $changes[$values['position']] = $A[$key];
-        }
-        foreach ($changes as $key => $values) {
-            $A[$key] = $values;
-        }
-
-        if ($A->isModified()) {
-            $A->save();
-            $A->flush();
-        }
-    }
-
     public function process()
     {
         parent::process();
-        if ($this->getRequest()->isMutation()) {
-            $this->sortRules();
+        if ( ! $this->getRequest()->isMutation()) {
+            return;
+        }
+
+        $rules = $this->parameters['Rules'];
+        $A = $this->getAdapter();
+        foreach ($rules as $key => $values) {
+            if ( ! isset($A[$key])) {
+                throw new \RuntimeException("Unexistent fwrule key: $key", 1402062247);
+            }
+            $hasPosition = isset($rules[$key]['Position']) && $rules[$key]['Position'] > 0;
+            if ( ! $hasPosition) {
+                continue;
+            }
+
+            if( ! isset($A[$key]['Position']) || $A[$key]['Position'] != $rules[$key]['Position']) {
+                // array assignment merges with existing props:
+                $A[$key] = array('Position' => $rules[$key]['Position']);
+            }
+        }
+        if($A->isModified()) {
+            $A->save();
+        }
+
+        if( ! $this->getRequest()->hasParameter('sortonly')) {
+            $this->getPlatform()->signalEvent('firewall-adjust');
         }
     }
 
@@ -83,15 +84,14 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         $r = array();
 
         $actionLabels = array(
-            'ACCEPT' => $view->translate('ActionAccept_label'),
-            'REJECT' => $view->translate('ActionReject_label'),
-            'DROP' => $view->translate('ActionDrop_label'),
-            );
+            'accept' => $view->translate('ActionAccept_label'),
+            'reject' => $view->translate('ActionReject_label'),
+            'drop' => $view->translate('ActionDrop_label'),
+        );
 
-        $i = 1;
         foreach ($this->getAdapter() as $key => $values) {
             $values['id'] = (String) $key;
-            $values['position'] = (String) $i;
+            $values['Position'] = isset($values['Position']) ? intval($values['Position']) : 0;
             $values['Action'] = $actionLabels[$values['Action']];
             $values['Edit'] = $view->getModuleUrl('../Edit/' . $key);
             $values['RuleText'] = $view->translate('RuleText_label', array(
@@ -101,14 +101,19 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             ));
             $values['Delete'] = $view->getModuleUrl('../Delete/' . $key);
             $r[] = $values;
-            $i += 1;
         }
         usort($r, function ($a, $b) {
-            return intval($a['id']) > intval($b['id']);
+            return $a['Position'] > $b['Position'];
         });
+
+        $positions = array_map(function ($v) { return $v['Position']; }, $r);        
+        $first = (isset($positions[0]) ? $positions[0]/2 : \NethServer\Module\FirewallRules::RULESTEP);
+        $last = (end($positions) ? end($positions) : 0)  + \NethServer\Module\FirewallRules::RULESTEP;
 
         $view['hasChanges'] = $this->hasChanges();
         $view['Rules'] = $r;
+        $view['Create_last'] = $view->getModuleUrl('../Create/' . intval($last));
+        $view['Create_first'] = $view->getModuleUrl('../Create/' . intval($first));
 
         if ($this->getRequest()->isValidated()) {
             $view->getCommandList()->show();

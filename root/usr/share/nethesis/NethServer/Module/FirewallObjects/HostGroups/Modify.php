@@ -42,7 +42,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         }
 
         $parameterSchema = array(
-            array('groupname', $groupNameValidator, Table::KEY),
+            array('name', $groupNameValidator, Table::KEY),
             array('Description', Validate::ANYTHING, Table::FIELD, 'Description'),
             array('Members', Validate::USERNAME_COLLECTION, Table::FIELD, 'Members', ','),
             array('MembersDatasource', FALSE, array($this, 'provideMembersDatasource')), // this parameter will never be submitted: set an always-failing validator
@@ -73,35 +73,6 @@ class Modify extends \Nethgui\Controller\Table\Modify
         return $values;
     }
 
-
-    /**
-     * Delete the record after the event has been successfully completed
-     * @param string $key
-     */
-/*    protected function processDelete($key)
-    {
-        $accountDb = $this->getPlatform()->getDatabase('accounts');
-        $accountDb->setType($key, 'group-deleted');
-        $deleteProcess = $this->getPlatform()->signalEvent('group-delete', array($key));
-        if ($deleteProcess->getExitCode() === 0) {
-            parent::processDelete($key);
-        }
-    }
-
-    protected function onParametersSaved($changedParameters)
-    {
-        if ($this->getIdentifier() === 'delete') {
-            // delete case is handled in "processDelete()" method:
-            // signalEvent() is invoked there.
-            return;
-        } elseif ($this->getIdentifier() === 'update') {
-            $event = 'modify';
-        } else {
-            $event = $this->getIdentifier();
-        }
-        $this->getPlatform()->signalEvent(sprintf('group-%s@post-process', $event), array($this->parameters['groupname']));
-    }
-*/
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);

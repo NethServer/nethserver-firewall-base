@@ -21,8 +21,6 @@ namespace NethServer\Module\FirewallRules;
  * along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Nethgui\System\PlatformInterface as Validate;
-
 /**
  * Create a new firewall rule object
  *
@@ -31,135 +29,90 @@ use Nethgui\System\PlatformInterface as Validate;
  */
 class Create extends \Nethgui\Controller\Collection\AbstractAction
 {
-    private $ruleId = NULL;
+    /**
+     *
+     * @var \NethServer\Module\FirewallRules\RuleGenericController
+     */
+    private $worker;
+
+    /**
+     *
+     * @var \NethServer\Module\FirewallRules\RuleWorkflow
+     */
+    private $workflow;
 
     public function initialize()
     {
         parent::initialize();
-        $this->setViewTemplate('NethServer\Template\FirewallRules\Edit');
-        $this->declareParameter('Position', $this->createValidator()->memberOf('first', 'last'));
+        /* @var $worker \Nethgui\Controller\AbstractController */
+        $this->worker = new RuleGenericController($this->getIdentifier());
+        $this->worker
+            ->setParent($this->getParent())
+            ->setPlatform($this->getPlatform())
+            ->setPolicyDecisionPoint($this->getPolicyDecisionPoint())
+            ->setLog($this->getLog())
+            ->initialize();
+
+        $this->workflow = new \NethServer\Module\FirewallRules\RuleWorkflow();
     }
 
     public function bind(\Nethgui\Controller\RequestInterface $request)
     {
-        $this->parameters['Position'] = \Nethgui\array_head($request->getPath());
-
-        
-        if ($this->parameters['Position'] === 'first') {
-             $ruleId = 1;
-        } else {
-             $allKeys = array_keys(iterator_to_array($this->getAdapter()));
-             $ruleId = 1 + (count($allKeys) > 0 ? max($allKeys) : 0);
-        }
-
-        $this->ruleId = $ruleId;
-
-        $this->declareParameter('SrcRaw', Validate::ANYTHING);
-        $this->declareParameter('DstRaw', Validate::ANYTHING);
-        $this->declareParameter('ServiceRaw', Validate::ANYTHING);
-        $this->declareParameter('status', Validate::SERVICESTATUS);
-        $this->declareParameter('Description', Validate::ANYTHING);
-        $this->declareParameter('LogType', $this->createValidator()->memberOf('none', 'info'), array('fwrules', $ruleId, 'Log'));
-        $this->declareParameter('Action', $this->createValidator()->memberOf('ACCEPT', 'REJECT', 'DROP'), array('fwrules', $ruleId, 'Action'));
-
-        $this->declareReadonlyParameters();
         parent::bind($request);
-        $this->bindPickObjectParameters($request->hasParameter('picker'));
-    }
-
-    private function declareReadonlyParameters()
-    {
-        $P = $this->parameters;
-        $this->declareParameter('Source', Validate::ANYTHING, function() use ($P) {
-            return ucfirst(strtr($P['SrcRaw'], ';', ' '));
-        });
-        $this->declareParameter('Destination', Validate::ANYTHING, function() use ($P) {
-            return ucfirst(strtr($P['DstRaw'], ';', ' '));
-        });
-        $this->declareParameter('Service', Validate::ANYTHING, function() use ($P) {
-            return ucfirst(strtr($P['ServiceRaw'], ';', ' '));
-        });
-    }
-
-    private function bindPickObjectParameters($hasPicker)
-    {
-        $sessionDb = $this->getPlatform()->getDatabase('SESSION');
-
-        if ( ! $hasPicker) {
-            $sessionDb->deleteKey('FirewallRules.PickObject.Out');
-        } else {
-            $outParams = $sessionDb->getKey('FirewallRules.PickObject.Out');
-            foreach (array('SrcRaw' => 'Source', 'DstRaw' => 'Destination', 'ServiceRaw' => 'Service') as $p => $s) {
-                if (isset($outParams[$s]) && $outParams[$s]) {
-                    $this->parameters[$p] = $outParams[$s];
-                }
-            }
+        $this->position = \Nethgui\array_head($request->getPath());
+        if (intval($this->position) <= 0) {
+            throw new \Nethgui\Exception\HttpException('Not found', 404, 1399992980);
         }
 
-        $sessionDb->setKey('FirewallRules.PickObject.In', 'Create', array('RuleId' => $this->ruleId, 'QueryNext' => '../Create/' . $this->parameters['Position'] . '?FirewallRules[Create][picker]=1'));
+        if ($request->spawnRequest($this->position)->hasParameter('f') || $request->isMutation()) {
+            $this->workflow->resume($this->getParent()->getSession());                       
+        } else {            
+            // start a new workflow generating a random rule key
+            $this->workflow->start($this->getParent()->getSession(), $this->getIdentifier(), 'Create/' . $this->position, $this->generateNextRuleId());                    
+        }
+        $this->worker->ruleId = $this->workflow->getRuleId();
+        $this->worker->bind($request);
+        $this->workflow->copyTo($this->worker->parameters, array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status'));
+
+        if ($request->isMutation()) {
+            $this->worker->parameters['Position'] = $this->position;
+        }
+    }
+
+    public function generateNextRuleId()
+    {
+        $a = iterator_to_array($this->getAdapter());
+        if(count($a) === 0) {
+            return 1;
+        }
+        return intval(max(array_filter(array_keys($a), 'intval'))) + 1;
+    }
+
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        $this->worker->validate($report);
     }
 
     public function process()
     {
         if ($this->getRequest()->isMutation()) {
-            if ($this->parameters['Position'] === 'first') {
-                $this->stepKeysForward();
-            }
-
-            $props = array(
-                'Src' => $this->parameters['SrcRaw'],
-                'Dst' => $this->parameters['DstRaw'],
-                'Description' => $this->parameters['Description'],
-                'Log' => $this->parameters['LogType'],
-                'Action' => $this->parameters['Action'],
-                'Service' => $this->parameters['ServiceRaw'],
-                'status' => $this->parameters['status']
-            );
-
-            $this->getPlatform()->getDatabase('fwrules')->setKey($this->ruleId, 'rule', $props);
+            // create the DB key:
+            $this->getPlatform()->getDatabase('fwrules')->setKey($this->workflow->getRuleId(), 'rule', array());
         }
-        parent::process();
-        if ($this->getRequest()->isMutation()) {
-            $this->getAdapter()->flush();
-        }
-    }
-
-    private function stepKeysForward()
-    {
-        $changes = array();
-        $A = $this->getAdapter();
-        foreach ($A as $key => $values) {
-            $changes[$key + 1] = $values;
-        }
-
-        foreach ($changes as $key => $values) {
-            $A[$key] = $values;
-        }
-        $A->save();
+        $this->worker->process();
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
-        parent::prepareView($view);
-        $view['FormAction'] = $view->getModuleUrl($this->parameters['Position']);
-        $view['RuleId'] = $this->ruleId;
-        
-        if ( ! $this->getRequest()->isValidated()) {
-            return;
-        }
-
-        if ( ! $this->getRequest()->isMutation()) {
-            $view['status'] = 'enabled';
-            $view->getCommandList()->show();
+        $this->worker->prepareView($view);
+        if (isset($this->position)) {
+            $view['FormAction'] = $view->getModuleUrl($this->position);
         }
     }
 
     public function nextPath()
     {
-        if ($this->getRequest()->isMutation()) {
-            return 'Index';
-        }
-        return parent::nextPath();
+        return $this->worker->nextPath();
     }
 
 }

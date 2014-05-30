@@ -1,12 +1,8 @@
 <?php
+/* @var $view \Nethgui\Renderer\Xhtml */
 
-if ($view->getModule()->getIdentifier() === 'create') {
-    $headerTemplate = $T('service_create_header');
-} else {
-    $headerTemplate = $T('service_update_header');
-}
-
-echo $view->header('name')->setAttribute('template', $headerTemplate);
+$headerText = $T(sprintf('Services_%s_label', $view->getModule()->getIdentifier()));
+echo $view->header('name')->setAttribute('template', $headerText);
 
 echo $view->panel()
     ->insert($view->textInput('name', ($view->getModule()->getIdentifier() == 'update' ? $view::STATE_READONLY : 0)))

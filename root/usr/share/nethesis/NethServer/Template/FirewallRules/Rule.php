@@ -6,29 +6,29 @@ echo $view->header('RuleId')->setAttribute('template', $view->getModule()->getId
 
 echo $view->checkbox('status', 'enabled')->setAttribute('uncheckedValue', 'disabled');
 echo $view->selector('Action', $view::SELECTOR_DROPDOWN)->setAttribute('choices', array(
-    array('ACCEPT', $T('ActionAccept_label')),
-    array('REJECT', $T('ActionReject_label')),
-    array('DROP', $T('ActionDrop_label'))
+    array('accept', $T('ActionAccept_label')),
+    array('reject', $T('ActionReject_label')),
+    array('drop', $T('ActionDrop_label'))
 ));
 
 echo $view->panel()->setAttribute('class', 'labeled-control label-above')
     ->insert($view->literal(sprintf('<label for="%s">%s</label>', $view->getUniqueId('Source'), \htmlspecialchars($T('Source_label')))))
     ->insert($view->textInput('Source', $view::STATE_READONLY | $view::LABEL_NONE)->setAttribute('class', 'pencil'))
-    ->insert($view->button('PickSource', $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('../PickObject/Source')))
+    ->insert($view->button('PickSource', $view::BUTTON_LINK))
     ->insert($view->hidden('SrcRaw'))
 ;
 
 echo $view->panel()->setAttribute('class', 'labeled-control label-above')
     ->insert($view->literal(sprintf('<label for="%s">%s</label>', $view->getUniqueId('Destination'), \htmlspecialchars($T('Destination_label')))))
     ->insert($view->textInput('Destination', $view::STATE_READONLY | $view::LABEL_NONE)->setAttribute('class', 'pencil'))
-    ->insert($view->button('PickDestination', $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('../PickObject/Destination')))
+    ->insert($view->button('PickDestination', $view::BUTTON_LINK))
     ->insert($view->hidden('DstRaw'))
 ;
 
 echo $view->panel()->setAttribute('class', 'labeled-control label-above')
     ->insert($view->literal(sprintf('<label for="%s">%s</label>', $view->getUniqueId('Service'), \htmlspecialchars($T('Service_label')))))
     ->insert($view->textInput('Service', $view::STATE_READONLY | $view::LABEL_NONE)->setAttribute('class', 'pencil'))
-    ->insert($view->button('PickService', $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('../PickObject/Service')))
+    ->insert($view->button('PickService', $view::BUTTON_LINK))
     ->insert($view->hidden('ServiceRaw'))
 ;
 

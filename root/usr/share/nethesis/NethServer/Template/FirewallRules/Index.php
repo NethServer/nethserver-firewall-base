@@ -7,8 +7,8 @@ echo $view->buttonList()
     //->insert($view->button('ApplySelection', $view::BUTTON_SUBMIT))    
     ->insert($view->buttonList()
         ->setAttribute('class', 'Buttonset v1 inlineblock')
-        ->insert($view->button('Create_last', $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('../Create/last')))
-        ->insert($view->button('Create_first', $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('../Create/first')))
+        ->insert($view->button('Create_last', $view::BUTTON_LINK))
+        ->insert($view->button('Create_first', $view::BUTTON_LINK))
         ->insert($view->button('Configure', $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('../General')))
     )
     ->insert($view->button('Commit', $view::BUTTON_SUBMIT)->setAttribute('receiver', 'Commit'))
@@ -26,7 +26,7 @@ echo $view->objectsCollection('Rules')
             ->setAttribute('class', 'fwrule')
             //->insert($view->checkbox('selected', '1', $view::LABEL_NONE)->setAttribute('uncheckedValue', FALSE))
             ->insert($view->hidden('metadata', $view::STATE_DISABLED))
-            ->insert($view->textInput('position', $view::LABEL_NONE)->setAttribute('class', 'displaynone'))
+            ->insert($view->textInput('Position', $view::LABEL_NONE))
             ->insert($view->panel()->setAttribute('class', 'actbox')                
                 ->insert($view->textLabel('id')->setAttribute('tag', 'div')->setAttribute('template', $T("RuleId_label")))
 
@@ -51,29 +51,57 @@ $deleteId = $view->getUniqueId('Delete');
 $deleteUrl = $view->getModuleUrl('../Delete');
 $hasChangesTarget = $view->getClientEventTarget('hasChanges');
 
+$ruleStep = \NethServer\Module\FirewallRules::RULESTEP;
+
 $view->includeCss('
 .fwrule {min-height: 50px; border:1px solid #d3d3d3; cursor: move; display: flex; margin-bottom: 1.5em; border-radius: 3px; background: linear-gradient(to bottom, #e6e6e6 0%, #fff 100%);}
 .fwrule .Buttonset {flex-grow: 0; margin-right: 0}
 .fwrule .Buttonset [role=button] {border-top: none}
 .fwrule .actbox {padding: 3px; min-width: 6em; font-size: 120%; background: white; text-transform: uppercase;}
 .fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px}
-.placeholder {height: 50px; background-color: yellow; margin-bottom: 1.5em; background: linear-gradient(to bottom, rgba(234,239,181,1) 0%,rgba(225,233,160,1) 100%);}
-.fwrule .id {color: #bbb}
+.placeholder {background-color: yellow; margin-bottom: 1.5em; background: linear-gradient(to bottom, rgba(234,239,181,1) 0%,rgba(225,233,160,1) 100%);}
+.fwrule .id {color: #bbb; font-size: 0.7em}
+.Position {width: 2em}
 ');
 
 $view->includeJavascript("
 jQuery(function ($) {
-    var refreshPosition = function () {
-        $('#${rulesId}').children().each(function(index, child) {
-             $(child).find('input.position').val(index + 1);
-        });
-        $('#${actionId}').find('form').submit();
-    };    
+    $(window).on('unload beforeunload', function(e) {
+       if($('input.${hasChangesTarget}').val() == '1') {
+            return false;
+       }
+    });
+
     $('#${rulesId}').sortable({
         axis: 'y',
         placeholder: 'placeholder',
-        update: refreshPosition
+        opacity: 0.6,        
+        forcePlaceholderSize: true,
+        update: function(e, ui) {            
+            var prev = Number(ui.item.prev().find('input.Position').val());
+            var next = Number(ui.item.next().find('input.Position').val());
+
+            if( ! prev) {
+                prev = 0;
+            }
+            if( ! next) {
+                next = prev + 2 * $ruleStep;
+            }
+
+            var newpos = prev + Math.floor((next - prev) / 2);          
+            ui.item.find('input.Position').val(newpos);            
+
+            var formElement = $('#${actionId}').find('form');
+            $.Nethgui.Server.ajaxMessage({
+                isMutation: true,
+                url: formElement.prop('action') + '/sortonly',
+                data: formElement.serialize(),
+                freezeElement: $(this)
+            });
+        }
     });
+    var style = '<style type=\"text/css\">.Position {display: none}</style>';
+    $('head').append(style);
     
     $('input.${hasChangesTarget}').on('nethguiupdateview', function (e, val) {
         $('#${commitId}').trigger(val === '1' ? 'nethguienable' : 'nethguidisable');

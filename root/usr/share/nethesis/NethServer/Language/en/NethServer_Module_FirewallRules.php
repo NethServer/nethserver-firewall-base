@@ -29,9 +29,9 @@ $L['PickDestination_label'] = 'Pick one...';
 $L['PickService_label'] = 'Pick one...';
 $L['LogType_label'] = 'Write to log if this rule matches';
 
-$L['PickObject_Source_header'] = 'Choose the packet source for rule #${RuleId}';
-$L['PickObject_Destination_header'] = 'Choose the packet destination for rule #${RuleId}';
-$L['PickObject_Service_header'] = 'Choose the service protocol for rule #${RuleId}';
+$L['PickObject_SrcRaw_header'] = 'Choose the packet source for rule "${RuleId}"';
+$L['PickObject_DstRaw_header'] = 'Choose the packet destination for rule "${RuleId}"';
+$L['PickObject_ServiceRaw_header'] = 'Choose the service protocol for rule "${RuleId}"';
 
 $L['Create_last_label'] = 'Create rule at bottom';
 $L['Create_first_label'] = 'Create rule at top';
@@ -39,7 +39,7 @@ $L['Create_header'] = 'Create a new firewall rule';
 $L['Commit_label'] = 'Apply changes';
 $L['Edit_label'] = 'Edit';
 $L['Delete_label'] = 'Delete';
-$L['Index_header'] = 'Firewall rules';
+$L['Index_header'] = 'Firewall rules [Beta]';
 $L['RuleText_label'] = 'From ${Src} to ${Dst}, service ${Service}';
 $L['RuleId_label'] = '#${0}';
 $L['SearchPlaceholder_label'] = 'Search...';
@@ -50,3 +50,7 @@ $L['HostGroups_create'] = 'Create new host group "${0}"';
 $L['Hosts_create'] = 'Create new host "${0}"';
 $L['Zones_create'] = 'Create new zone"${0}"';
 $L['Services_create'] = 'Create new service "${0}"';
+
+$L['A_new_rule_label'] = "New rule";
+$L['Any_label'] = 'Any';
+$L['NoRulesDefined_label'] = 'No rules are defined. Create the first one now!';

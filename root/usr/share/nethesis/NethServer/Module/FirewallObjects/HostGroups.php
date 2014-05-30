@@ -1,4 +1,5 @@
 <?php
+
 namespace NethServer\Module\FirewallObjects;
 
 /*
@@ -34,9 +35,9 @@ class HostGroups extends \Nethgui\Controller\TableController
     public function initialize()
     {
         $columns = array(
-            'Key',
-            'Description',
-            'Actions'
+                'Key',
+                'Description',
+                'Actions'
         );
 
         $parameterSchema = array(
@@ -47,7 +48,7 @@ class HostGroups extends \Nethgui\Controller\TableController
         $this
             ->setTableAdapter($this->getPlatform()->getTableAdapter('hosts', 'host-group'))
             ->addRowAction(new \NethServer\Module\FirewallObjects\HostGroups\Modify('update'))
-            ->addRowAction(new \Nethgui\Controller\Table\Modify('delete', $parameterSchema, 'Nethgui\Template\Table\Delete')) // Standard DELETE template
+            ->addRowAction(new \NethServer\Module\FirewallObjects\HostGroups\Modify('delete'))
             ->addTableAction(new \NethServer\Module\FirewallObjects\HostGroups\Modify('create'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->setColumns($columns)
@@ -60,4 +61,5 @@ class HostGroups extends \Nethgui\Controller\TableController
     {
         $this->getPlatform()->signalEvent('firewall-objects-modify');
     }
+
 }

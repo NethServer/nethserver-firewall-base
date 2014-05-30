@@ -42,7 +42,7 @@ class Zones extends \Nethgui\Controller\TableController
 
         $parameterSchema = array(
             array('name', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::KEY),
-            array('Network', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
+            array('Network', Validate::CIDR_BLOCK, \Nethgui\Controller\Table\Modify::FIELD)
         );
 
 

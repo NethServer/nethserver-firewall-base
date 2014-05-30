@@ -21,17 +21,38 @@ namespace NethServer\Module\FirewallRules;
  * along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Nethgui\System\PlatformInterface as Validate;
-
 /**
- * Delete firewall rules
+ * Edit existing firewall rules
  *
  * @author Davide Principi <davide.principi@nethesis.it>
  * @since 1.0
  */
 class Edit extends \Nethgui\Controller\Collection\AbstractAction
 {
-    private $ruleId = NULL;
+    /**
+     *
+     * @var \NethServer\Module\FirewallRules\RuleGenericController
+     */
+    private $worker;
+
+   /**
+     *
+     * @var \NethServer\Module\FirewallRules\RuleWorkflow
+     */
+    private $workflow;
+
+    public function initialize()
+    {
+        parent::initialize();
+        /* @var $worker \Nethgui\Controller\AbstractController */
+        $this->worker = new RuleGenericController($this->getIdentifier());
+        $this->worker
+            ->setParent($this->getParent())
+            ->setPlatform($this->getPlatform())
+            ->setPolicyDecisionPoint($this->getPolicyDecisionPoint())
+            ->setLog($this->getLog())
+            ->initialize();
+    }
 
     public function bind(\Nethgui\Controller\RequestInterface $request)
     {
@@ -39,70 +60,36 @@ class Edit extends \Nethgui\Controller\Collection\AbstractAction
         if ( ! $this->getAdapter()->offsetExists($ruleId)) {
             throw new \Nethgui\Exception\HttpException('Not found', 404, 1399992975);
         }
-        $this->ruleId = $ruleId;
+        $this->worker->ruleId = $ruleId;
+        $this->worker->bind($request);
 
-        $this->declareParameter('SrcRaw', Validate::ANYTHING, array('fwrules', $ruleId, 'Src'));
-        $this->declareParameter('DstRaw', Validate::ANYTHING, array('fwrules', $ruleId, 'Dst'));
-        $this->declareParameter('ServiceRaw', Validate::ANYTHING, array('fwrules', $ruleId, 'Service'));
-        $this->declareParameter('status', Validate::SERVICESTATUS, array('fwrules', $ruleId, 'status'));
-        $this->declareParameter('Description', Validate::ANYTHING, array('fwrules', $ruleId, 'Description'));
-        $this->declareParameter('LogType', $this->createValidator()->memberOf('none', 'info'), array('fwrules', $ruleId, 'Log'));
-        $this->declareParameter('Action', $this->createValidator()->memberOf('ACCEPT', 'REJECT', 'DROP'), array('fwrules', $ruleId, 'Action'));
-
-        $this->declareReadonlyParameters();
-        parent::bind($request);
-        $this->bindPickObjectParameters();
-    }
-
-    private function declareReadonlyParameters()
-    {
-        $P = $this->parameters;
-        $this->declareParameter('Source', Validate::ANYTHING, function() use ($P) {
-            return ucfirst(strtr($P['SrcRaw'], ';', ' '));
-        });
-        $this->declareParameter('Destination', Validate::ANYTHING, function() use ($P) {
-            return ucfirst(strtr($P['DstRaw'], ';', ' '));
-        });
-        $this->declareParameter('Service', Validate::ANYTHING, function() use ($P) {
-            return ucfirst(strtr($P['ServiceRaw'], ';', ' '));
-        });
-    }
-
-    private function bindPickObjectParameters()
-    {
-        $sessionParameters = $this->getPlatform()->getDatabase('SESSION')->getKey('FirewallRules.PickObject.Out');
-        foreach (array('SrcRaw' => 'Source', 'DstRaw' => 'Destination', 'ServiceRaw' => 'Service') as $p => $s) {
-            if (isset($sessionParameters[$s]) && $sessionParameters[$s]) {
-                $this->parameters[$p] = $sessionParameters[$s];
-            }
+        $this->workflow = new \NethServer\Module\FirewallRules\RuleWorkflow();
+        if ($request->spawnRequest($ruleId)->hasParameter('f') || $request->isMutation()) {
+            $this->workflow->resume($this->getParent()->getSession())->copyTo($this->worker->parameters, array('SrcRaw', 'DstRaw', 'ServiceRaw'));
+        } else {
+            $this->workflow->start($this->getParent()->getSession(), $this->getIdentifier(), 'Edit/' . $ruleId, $ruleId);
         }
-        $this->getPlatform()->getDatabase('SESSION')->setKey('FirewallRules.PickObject.In', 'Edit', array('RuleId' => $this->ruleId, 'QueryNext' => '../Edit/' . $this->ruleId));
+    }
+
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        $this->worker->validate($report);
     }
 
     public function process()
     {
-        parent::process();
-        if ($this->getRequest()->isMutation()) {
-            $this->getAdapter()->flush();
-        }
+        $this->worker->process();
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
-        parent::prepareView($view);
-        if ( ! $this->getRequest()->isValidated()) {
-            return;
-        }
-        $view['FormAction'] = $view->getModuleUrl($this->ruleId);
-        $view['RuleId'] = $this->ruleId;
-        if ( ! $this->getRequest()->isMutation()) {
-            $view->getCommandList()->show();
-        }
+        $this->worker->prepareView($view);
+        $view['FormAction'] = $view->getModuleUrl($this->worker->ruleId);
     }
 
     public function nextPath()
     {
-        return $this->getRequest()->isMutation() ? 'Index' : parent::nextPath();
+        return $this->worker->nextPath();
     }
 
 }

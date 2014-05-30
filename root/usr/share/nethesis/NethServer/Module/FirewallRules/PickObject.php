@@ -24,44 +24,39 @@ namespace NethServer\Module\FirewallRules;
 use Nethgui\System\PlatformInterface as Validate;
 
 /**
- * Delete firewall rules
+ * Pick a firewall object for a rule field
  *
  * @author Davide Principi <davide.principi@nethesis.it>
  * @since 1.0
  */
 class PickObject extends \Nethgui\Controller\Collection\AbstractAction
 {
-    private $target = NULL;
+    /**
+     *
+     * @var \NethServer\Module\FirewallRules\RuleWorkflow
+     */
+    private $state;
 
     public function initialize()
     {
         parent::initialize();
-        $this->declareParameter('q', Validate::ANYTHING);
+        $this->declareParameter('q', Validate::ANYTHING);  // search query
+        $this->declareParameter('f', $this->createValidator()->memberOf('SrcRaw', 'DstRaw', 'ServiceRaw')); // field to modify
         $this->declareParameter('Result', Validate::ANYTHING);
-        $this->declareParameter('RuleId', FALSE, array('SESSION', 'FirewallRules.PickObject.In', 'RuleId'));
-        $this->declareParameter('QueryNext', FALSE, array('SESSION', 'FirewallRules.PickObject.In', 'QueryNext'));
+        $this->state = new \NethServer\Module\FirewallRules\RuleWorkflow();
     }
 
     public function bind(\Nethgui\Controller\RequestInterface $request)
     {
-        $this->target = \Nethgui\array_head($request->getPath());
-        if ( ! in_array($this->target, array('Source', 'Destination', 'Service'))) {
-            throw new \Nethgui\Exception\HttpException('Not found', 404, 1400233824);
-        }
         parent::bind($request);
+        $this->state->resume($this->getParent()->getSession())->focus($this->parameters['f']);
     }
 
     public function process()
     {
         parent::process();
-        $db = $this->getPlatform()->getDatabase('SESSION');
         if ($this->getRequest()->isMutation()) {
-            if ( ! $db->getKey('FirewallRules.PickObject.Out')) {
-                $db->setKey('FirewallRules.PickObject.Out', 'PickObject', array());
-            }
-            $db->setProp('FirewallRules.PickObject.Out', array($this->target => $this->parameters['Result']));
-        } else {
-            $db->delProp('FirewallRules.PickObject.Out', array($this->target));
+            $this->state->assign($this->parameters['Result']);
         }
     }
 
@@ -69,14 +64,13 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
     {
         parent::prepareView($view);
         if ($this->getRequest()->isMutation()) {
-            $view->getCommandList()->sendQuery($view->getModuleUrl($this->parameters['QueryNext']));
+            $view->getCommandList()->sendQuery($view->getModuleUrl('../' . $this->state->getReturnPath()));
         } elseif ($this->getRequest()->isValidated()) {
-            $view['FormAction'] = $view->getModuleUrl($this->target);
-            $view['CreateLinks'] = $this->getCreateLinks($view);
-            $view['PickObjectHeader'] = $view->translate("PickObject_" . $this->target . "_header", array('RuleId' => $this->parameters['RuleId']));
-            $r = array();
+            $view['CreateLinks'] = $this->getCreateLinks($view, $this->parameters['q']);
+            $view['PickObjectHeader'] = $view->translate("PickObject_" . $this->parameters['f'] . "_header", array('RuleId' => $this->state->getStartIdentifier() === 'Edit' ? '#' . $this->state->getRuleId() : $view->translate('A_new_rule_label')));
+            $results = array(array('any', $view->translate('Any_label')));
 
-            if ($this->target === 'Service') {
+            if ($this->parameters['f'] === 'ServiceRaw') {
                 $where = array('fwservices' => array('fwservice'));
             } else {
                 $where = array('hosts' => array('host', 'host-group'), 'networks' => array('zone'), 'ROLES' => array());
@@ -86,18 +80,20 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
             $i = 0;
             /* @var $result \NethServer\Tool\FirewallObject */
             foreach ($s as $result) {
-                $r[] = array($result->getValue(), $result->getShortTitle());
+                $results[] = array($result->getValue(), $result->getShortTitle());
                 if (++ $i >= 10) {
                     $view['ResultsCount'] = 'Showing 10 results out of ' . count($s);
                     break;
                 }
             }
-            $view['ResultDatasource'] = $r;
+            $view['ResultDatasource'] = $results;
             if ( ! isset($view['ResultsCount'])) {
                 $view['ResultsCount'] = '';
             }
 
-            $view->getCommandList()->show();
+            if( ! $this->parameters['q']) {
+                $view->getCommandList()->show();
+            }
         }
     }
 
@@ -106,23 +102,21 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
         return FALSE;
     }
 
-    public function getCreateLinks(\Nethgui\View\ViewInterface $view)
+    public function getCreateLinks(\Nethgui\View\ViewInterface $view, $hint)
     {
-        if ( ! $this->parameters['q']) {
+        if ( ! $hint) {
             return array();
         }
 
-
-
-        if ($this->target === 'Service') {
+        if ($this->parameters['f'] === 'ServiceRaw') {
             return array(
-                array('Create' => array($view->getModuleUrl('../Services/create'), $view->translate('Services_create', array($this->parameters['q'])))),
+                array('Create' => array($view->getModuleUrl('../CreateService?q=' . $hint), $view->translate('Services_create', array($hint)))),
             );
         } else {
             return array(
-                array('Create' => array($view->getModuleUrl('../HostGroups/create'), $view->translate('HostGroups_create', array($this->parameters['q'])))),
-                array('Create' => array($view->getModuleUrl('../Zones/create'), $view->translate('Zones_create', array($this->parameters['q'])))),
-                array('Create' => array($view->getModuleUrl('../Hosts/create'), $view->translate('Hosts_create', array($this->parameters['q'])))),
+                array('Create' => array($view->getModuleUrl('../CreateHost?q=' . $hint), $view->translate('Hosts_create', array($hint)))),
+                array('Create' => array($view->getModuleUrl('../CreateHostGroup?q=' . $hint), $view->translate('HostGroups_create', array($hint)))),
+                array('Create' => array($view->getModuleUrl('../CreateZone?q=' . $hint), $view->translate('Zones_create', array($hint)))),
             );
         }
     }

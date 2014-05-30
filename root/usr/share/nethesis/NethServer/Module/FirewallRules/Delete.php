@@ -21,8 +21,6 @@ namespace NethServer\Module\FirewallRules;
  * along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Nethgui\System\PlatformInterface as Validate;
-
 /**
  * Delete firewall rules
  *
@@ -31,8 +29,6 @@ use Nethgui\System\PlatformInterface as Validate;
  */
 class Delete extends \Nethgui\Controller\Collection\AbstractAction
 {
-    private $ruleProps = array();
-
     public function initialize()
     {
         parent::initialize();
@@ -47,45 +43,31 @@ class Delete extends \Nethgui\Controller\Collection\AbstractAction
         }
         parent::bind($request);
         $this->parameters['ruleId'] = $ruleId;
-        $this->ruleProps = \iterator_to_array($this->getAdapter()->offsetGet($ruleId));
-        $this->ruleProps['id'] = $ruleId;
     }
 
     public function process()
     {
-        if ($this->getRequest()->isMutation()) {
-            $A = $this->getAdapter();
-
-            $found = FALSE;
-
-            foreach ($A as $key => $values) {
-                if ($key == $this->parameters['ruleId']) {
-                    $found = TRUE;                   
-                }
-
-                if ($found === TRUE && isset($A[$key + 1])) {
-                    $A[$key] = $A[$key + 1];
-                }
-            }
-            unset($A[$key]);
-
-            $A->save();
-            $A->flush();
-        }
         parent::process();
+        if ($this->getRequest()->isMutation()) {
+            $this->getAdapter()->offsetUnset($this->parameters['ruleId']);
+            $this->getAdapter()->save();
+        }
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
-        if ( ! $this->getRequest()->isValidated()) {
+        if ( ! $this->getRequest()->isValidated() || $this->getRequest()->isMutation()) {
             return;
         }
-        $view['FormAction'] = $view->getModuleUrl($this->parameters['ruleId']);
-        $view['message'] = $view->translate('Delete_message', $this->ruleProps);
-        if ( ! $this->getRequest()->isMutation()) {
-            $view->getCommandList()->show();
-        }
+        $view->getCommandList()->show();
+        $view['FormAction'] = $view->getModuleUrl($view['ruleId']);
+
+        $props = \iterator_to_array($this->getAdapter()->offsetGet($view['ruleId']));
+        $props['id'] = $view['ruleId'];
+
+        $view['message'] = $view->translate('Delete_message', $props);
+
     }
 
     public function nextPath()
