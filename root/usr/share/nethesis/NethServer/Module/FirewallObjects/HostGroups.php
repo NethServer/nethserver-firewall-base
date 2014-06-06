@@ -40,11 +40,6 @@ class HostGroups extends \Nethgui\Controller\TableController
                 'Actions'
         );
 
-        $parameterSchema = array(
-            array('name', Validate::USERNAME, \Nethgui\Controller\Table\Modify::KEY)
-        );
-
-
         $this
             ->setTableAdapter($this->getPlatform()->getTableAdapter('hosts', 'host-group'))
             ->addRowAction(new \NethServer\Module\FirewallObjects\HostGroups\Modify('update'))
@@ -59,7 +54,9 @@ class HostGroups extends \Nethgui\Controller\TableController
 
     public function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
     {
-        $this->getPlatform()->signalEvent('firewall-objects-modify');
+        if($currentAction->getIdentifier() !== 'create') {
+            $this->getPlatform()->signalEvent('firewall-objects-modify');
+        }
     }
 
 }

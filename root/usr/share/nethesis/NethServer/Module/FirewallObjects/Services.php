@@ -1,4 +1,5 @@
 <?php
+
 namespace NethServer\Module\FirewallObjects;
 
 /*
@@ -39,7 +40,7 @@ class Services extends \Nethgui\Controller\TableController
             'Ports',
             'Actions'
         );
-        
+
         $p = $this->getPlatform();
         $parameterSchema = array(
             array('name', Validate::USERNAME, \Nethgui\Controller\Table\Modify::KEY),
@@ -62,7 +63,9 @@ class Services extends \Nethgui\Controller\TableController
 
     public function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
     {
-        $this->getPlatform()->signalEvent('firewall-objects-modify');
+        if ($currentAction->getIdentifier() !== 'create') {
+            $this->getPlatform()->signalEvent('firewall-objects-modify');
+        }
     }
-}
 
+}

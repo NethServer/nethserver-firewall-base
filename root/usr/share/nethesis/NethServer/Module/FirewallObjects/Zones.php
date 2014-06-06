@@ -1,4 +1,5 @@
 <?php
+
 namespace NethServer\Module\FirewallObjects;
 
 /*
@@ -60,7 +61,9 @@ class Zones extends \Nethgui\Controller\TableController
 
     public function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
     {
-        $this->getPlatform()->signalEvent('firewall-objects-modify');
+        if ($currentAction->getIdentifier() !== 'create') {
+            $this->getPlatform()->signalEvent('firewall-objects-modify');
+        }
     }
-}
 
+}
