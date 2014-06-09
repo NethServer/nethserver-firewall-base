@@ -43,7 +43,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             return;
         }
 
-        $rules = $this->parameters['Rules'];
+        $rules = is_array($this->parameters['Rules']) ? $this->parameters['Rules'] : array();
         $A = $this->getAdapter();
         foreach ($rules as $key => $values) {
             if ( ! isset($A[$key])) {
