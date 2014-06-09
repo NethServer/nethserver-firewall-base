@@ -39,7 +39,18 @@ remote1.mydomain.tld=remote|Description|Remote1|IpAddress|7.7.4.4|MacAddress|
 alias1.mydomain.tld=self|Description|Alias 1
 END
 
+my $fdb = <<"END";
+222=rule|Action|DROP|Description|rterter|Dst|role;orange|Log|info|Position|640|Service|fwservice;cardbox-http|Src|zone;zone12|status|enabled
+2=rule|Action|ACCEPT|Description||Dst|role;orange|Log|none|Position|64|Service|fwservice;appserv-http|Src|role;red|status|enabled
+57=rule|Action|REJECT|Description||Dst|host-group;MailServers|Log|none|Position|256|Service|fwservice;berknet|Src|host;123|status|enabled
+END
 
+my $tdb = <<"END";
+1=rule|Description|my rule|Dst|.0.0.0/0|Position|100|Provider|provider;myadsl|Service|service;ssh|Src|92.168.1.0/24|status|enabled
+22=port|description|SSH|priority|1|proto|tcp
+5=rule|Description|my rule|Dst|.0.0.0/0|Position|2|Provider|provider;myadsl|Service|service;ssh|Src|92.168.5.0/24|status|enabled
+53=port|description|DNS alta prio|priority|1|proto|udp
+END
 
 sub write_db
 {
@@ -53,8 +64,10 @@ sub write_db
 my $sdb_file = write_db($sdb);
 my $ndb_file = write_db($ndb);
 my $hdb_file = write_db($hdb);
+my $fdb_file = write_db($fdb);
+my $tdb_file = write_db($tdb);
 
-my $fw = NethServer::Firewall->new($sdb_file, $ndb_file, $hdb_file);
+my $fw = NethServer::Firewall->new($sdb_file, $ndb_file, $hdb_file, $fdb_file, $tdb_file);
 ok( defined $fw, 'fw instance' );
 is( $fw->getAddress('192.168.1.2'),  '192.168.1.2', 'IP' );
 is( $fw->getAddress('192.168.'),  '', 'BAD IP' );
@@ -108,6 +121,20 @@ is( $fw->getZone('6.6.6.6'), 'net:6.6.6.6', 'getZone net unknown' );
 is( $fw->listZones(), %h, 'listZones' );
 is( $fw->isZone('red'), 1, 'isZone(red)' );
 is( $fw->isZone('yellow'), 0, 'isZone(yellow)' );
+
+my @list = (2, 57, 22);
+my @tmp;
+foreach ($fw->getRules()) {
+    push(@tmp, $_->key);
+}
+is( @tmp, @list, 'getRules' );
+
+@list = (5,1);
+@tmp = ();
+foreach ($fw->getTcRules()) {
+    push(@tmp, $_->key);
+}
+is( @tmp, @list, 'getTcRules' );
 
 unlink($sdb_file);
 unlink($ndb_file);

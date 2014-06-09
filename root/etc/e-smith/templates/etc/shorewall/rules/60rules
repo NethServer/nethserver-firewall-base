@@ -6,7 +6,7 @@
 
     my $db = esmith::ConfigDB->open_ro("fwrules") || die "Can't open portforward database: $!\n";
     my $fw = new NethServer::Firewall();
-    foreach my $rule ( $db->get_all_by_prop('type' => 'rule') ) {
+    foreach my $rule ( $fw->getRules() ) {
         my $status = $rule->prop("status") || "disabled";
         next unless ($status eq 'enabled');
  

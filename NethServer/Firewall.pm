@@ -41,11 +41,15 @@ sub new
     my $sdb_path = shift || '';
     my $ndb_path = shift || '';
     my $hdb_path = shift || '';
+    my $fdb_path = shift || 'fwrules';
+    my $tdb_path = shift || 'tc';
 
     my $self = {
         sdb_path => $sdb_path,
         ndb_path => $ndb_path,
-        hdb_path => $hdb_path
+        hdb_path => $hdb_path,
+        fdb_path => $fdb_path,
+        tdb_path => $tdb_path
     };
     bless $self, $class;
     $self->_initialize();
@@ -60,6 +64,8 @@ sub _initialize()
     $self->{'sdb'} = esmith::ConfigDB->open_ro($self->{'sdb_path'});
     $self->{'ndb'} = esmith::NetworksDB->open_ro($self->{'ndb_path'});
     $self->{'hdb'} = esmith::HostsDB->open_ro($self->{'hdb_path'});
+    $self->{'fdb'} = esmith::ConfigDB->open_ro($self->{'fdb_path'});
+    $self->{'tdb'} = esmith::ConfigDB->open_ro($self->{'tdb_path'});
 }
 
 =head2 getAddress(id, expand_zone = 0)
@@ -351,6 +357,39 @@ sub _sort_by_weight
 {
      ($b->prop('weight') || '1') <=> ($a->prop('weight') || '1');
 }
+
+
+=head2 getRules
+
+Return the rule list ordered by Position property (ascending order).
+Each record has all database properties.
+
+=cut
+sub getRules
+{
+    my $self = shift;
+    my @list = sort _sort_by_position $self->{'fdb'}->get_all_by_prop('type' => 'rule'); # ascending sort
+    return @list;
+}
+
+=head2 getTcRules
+
+Return the tc rule list ordered by Position property (ascending order).
+Each record has all database properties.
+
+=cut
+sub getTcRules
+{
+    my $self = shift;
+    my @list = sort _sort_by_position $self->{'tdb'}->get_all_by_prop('type' => 'rule'); # ascending sort
+    return @list;
+}
+
+sub _sort_by_position 
+{
+     $a->prop('Position') <=> $b->prop('Position') ;
+}
+
 
 sub _getHostAddress($)
 {

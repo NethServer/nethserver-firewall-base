@@ -21,7 +21,7 @@
         return undef;
     }
 
-    foreach my $rule ( $db->get_all_by_prop('type' => 'rule') ) {
+    foreach my $rule ( $fw->getTcRules() ) {
         my $status = $rule->prop("status") || "disabled";
         next unless ($status eq 'enabled');
  
