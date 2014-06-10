@@ -45,16 +45,13 @@ class RuleWorkflow
      * @param string $ruleId
      * @return \NethServer\Module\FirewallRules\RuleWorkflow
      */
-    public function start(\Nethgui\Utility\SessionInterface $session, $startId, $path, $ruleId)
+    public function start(\Nethgui\Utility\SessionInterface $session, $startId, $path, $ruleId, $defaults = array())
     {
         $session->store(self::SESSION_KEY, $this->state);
+        $this->state->exchangeArray($defaults);
         $this->state['ruleId'] = $ruleId;
         $this->state['startId'] = $startId;
         $this->state['backPath'] = $path;
-        $this->state['SrcRaw'] = 'any';
-        $this->state['DstRaw'] = 'any';
-        $this->state['ServiceRaw'] = 'any';
-        $this->state['status'] = 'enabled';
         return $this;
     }
 

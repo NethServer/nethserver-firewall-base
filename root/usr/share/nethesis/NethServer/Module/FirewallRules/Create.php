@@ -65,10 +65,15 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
         }
 
         if ($request->spawnRequest($this->position)->hasParameter('f') || $request->isMutation()) {
-            $this->workflow->resume($this->getParent()->getSession());                       
-        } else {            
+            $this->workflow->resume($this->getParent()->getSession());
+        } else {
             // start a new workflow generating a random rule key
-            $this->workflow->start($this->getParent()->getSession(), $this->getIdentifier(), 'Create/' . $this->position, $this->generateNextRuleId());                    
+            $defaults = array('SrcRaw' => 'any',
+                'DstRaw' => 'any',
+                'ServiceRaw' => 'any',
+                'status' => 'enabled'
+            );
+            $this->workflow->start($this->getParent()->getSession(), $this->getIdentifier(), 'Create/' . $this->position, $this->generateNextRuleId(), $defaults);
         }
         $this->worker->ruleId = $this->workflow->getRuleId();
         $this->worker->bind($request);
@@ -82,7 +87,7 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
     public function generateNextRuleId()
     {
         $a = iterator_to_array($this->getAdapter());
-        if(count($a) === 0) {
+        if (count($a) === 0) {
             return 1;
         }
         return intval(max(array_filter(array_keys($a), 'intval'))) + 1;
