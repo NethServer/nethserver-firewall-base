@@ -85,6 +85,10 @@ sub getAddress($)
     my $id = shift;
     my $expand_zone = shift || 0;
 
+    if ( lc($id) eq 'any') {
+        return 'any';
+    }
+
     if ( $id =~ m/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/ ) {
         return $id; # IP address
     }
@@ -188,6 +192,11 @@ sub getPorts($)
     my $id = shift;
     my %ports;
     
+    if ( lc($id) eq 'any') {
+        $ports{'all'} = '';
+        return %ports; 
+    }
+    
     if ( $id =~ m/^\d+$/  || $id =~ m/^\d+(\-\d+)*$/ ) { # single port or range
         ($ports{'tcp'} = $id) =~ s/-/:/; # convert port range syntax
         ($ports{'udp'} = $id) =~ s/-/:/; # convert port range syntax
@@ -229,6 +238,10 @@ sub getZone($)
     my $self = shift;
     my $value = shift;
     my $str = $value;
+    
+    if ( lc($value) eq 'any') {
+        return 'any';
+    }
 
     if ( $value =~ m/,/ ) { # host group, pick the first one
         my @tokens = split(/,/, $value);
