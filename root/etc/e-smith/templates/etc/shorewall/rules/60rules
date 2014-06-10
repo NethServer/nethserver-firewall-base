@@ -23,16 +23,16 @@
         my $dst_addr = $fw->getAddress($dst);
         $action .= ":$log" unless ($log eq '');
 
-        my $prefix .= "#\n# RULE $src -> $dst \n#\n";
+        my $prefix .= "\n#\n# RULE $src -> $dst \n#\n";
         $prefix .= "?COMMENT $description\n";
         $prefix .= "$action\t".$fw->getZone($src_addr)."\t".$fw->getZone($dst_addr);
-        if ($service ne '') {
+        if ($service eq 'any' || $service eq '') {
+            $OUT .= $prefix."\tall\n";
+        } else {
             my %ports = $fw->getPorts($service);
             foreach my $protocol (keys %ports) {
               $OUT .= $prefix."\t$protocol\t$ports{$protocol}\n";
             }
-        } else {
-            $OUT .= $prefix."\n";
         }
     }
 }
