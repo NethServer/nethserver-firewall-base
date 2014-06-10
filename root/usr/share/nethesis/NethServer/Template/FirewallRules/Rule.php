@@ -14,21 +14,21 @@ echo $view->selector('Action', $view::SELECTOR_DROPDOWN)->setAttribute('choices'
 echo $view->panel()->setAttribute('class', 'labeled-control label-above')
     ->insert($view->literal(sprintf('<label for="%s">%s</label>', $view->getUniqueId('Source'), \htmlspecialchars($T('Source_label')))))
     ->insert($view->textInput('Source', $view::STATE_READONLY | $view::LABEL_NONE)->setAttribute('class', 'pencil'))
-    ->insert($view->button('PickSource', $view::BUTTON_LINK))
+    ->insert($view->button('PickSource', $view::BUTTON_SUBMIT))
     ->insert($view->hidden('SrcRaw'))
 ;
 
 echo $view->panel()->setAttribute('class', 'labeled-control label-above')
     ->insert($view->literal(sprintf('<label for="%s">%s</label>', $view->getUniqueId('Destination'), \htmlspecialchars($T('Destination_label')))))
     ->insert($view->textInput('Destination', $view::STATE_READONLY | $view::LABEL_NONE)->setAttribute('class', 'pencil'))
-    ->insert($view->button('PickDestination', $view::BUTTON_LINK))
+    ->insert($view->button('PickDestination', $view::BUTTON_SUBMIT))
     ->insert($view->hidden('DstRaw'))
 ;
 
 echo $view->panel()->setAttribute('class', 'labeled-control label-above')
     ->insert($view->literal(sprintf('<label for="%s">%s</label>', $view->getUniqueId('Service'), \htmlspecialchars($T('Service_label')))))
     ->insert($view->textInput('Service', $view::STATE_READONLY | $view::LABEL_NONE)->setAttribute('class', 'pencil'))
-    ->insert($view->button('PickService', $view::BUTTON_LINK))
+    ->insert($view->button('PickService', $view::BUTTON_SUBMIT))
     ->insert($view->hidden('ServiceRaw'))
 ;
 

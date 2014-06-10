@@ -46,12 +46,8 @@ class Edit extends \Nethgui\Controller\Collection\AbstractAction
         parent::initialize();
         /* @var $worker \Nethgui\Controller\AbstractController */
         $this->worker = new RuleGenericController($this->getIdentifier());
-        $this->worker
-            ->setParent($this->getParent())
-            ->setPlatform($this->getPlatform())
-            ->setPolicyDecisionPoint($this->getPolicyDecisionPoint())
-            ->setLog($this->getLog())
-            ->initialize();
+        $this->worker->initializeFromAction($this);
+        $this->workflow = new \NethServer\Module\FirewallRules\RuleWorkflow();
     }
 
     public function bind(\Nethgui\Controller\RequestInterface $request)
@@ -63,11 +59,19 @@ class Edit extends \Nethgui\Controller\Collection\AbstractAction
         $this->worker->ruleId = $ruleId;
         $this->worker->bind($request);
 
-        $this->workflow = new \NethServer\Module\FirewallRules\RuleWorkflow();
-        if ($request->spawnRequest($ruleId)->hasParameter('f') || $request->isMutation()) {
-            $this->workflow->resume($this->getParent()->getSession())->copyTo($this->worker->parameters, array('SrcRaw', 'DstRaw', 'ServiceRaw'));
+        $subrequest = $request->spawnRequest($ruleId);
+        if ($subrequest->hasParameter('f') || $subrequest->hasParameter('Submit')) {
+            // resume values from
+            $this->workflow->resume($this->getParent()->getSession())->copyTo($this->worker->parameters, array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status', 'Description', 'LogType', 'Action'));
         } else {
-            $this->workflow->start($this->getParent()->getSession(), $this->getIdentifier(), 'Edit/' . $ruleId, $ruleId);
+            // start new workflow
+            $defaults = array();
+            foreach(array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status', 'Description', 'LogType', 'Action') as $f) {
+                if($request->hasParameter($f)) {
+                    $defaults[$f] = $request->getParameter($f);
+                }
+            }
+            $this->workflow->start($this->getParent()->getSession(), $this->getIdentifier(), 'Edit/' . $ruleId, $ruleId, $defaults);
         }
     }
 

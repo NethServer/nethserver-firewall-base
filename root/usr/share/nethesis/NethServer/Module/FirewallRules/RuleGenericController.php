@@ -34,6 +34,17 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
 {
     public $ruleId;
 
+    public function initializeFromAction(\Nethgui\Controller\Collection\AbstractAction $action)
+    {
+        $this
+            ->setParent($action->getParent())
+            ->setPlatform($action->getPlatform())
+            ->setPolicyDecisionPoint($action->getPolicyDecisionPoint())
+            ->setLog($action->getLog())
+            ->initialize();
+        return $this;
+    }
+
     public function bind(\Nethgui\Controller\RequestInterface $request)
     {
         $this->declareParameter('SrcRaw', Validate::ANYTHING, array('fwrules', $this->ruleId, 'Src'));
@@ -62,6 +73,13 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
         });
     }
 
+    public function process()
+    {
+        if ($this->getRequest()->isMutation() && $this->getRequest()->hasParameter('Submit')) {
+            parent::process();
+        }
+    }
+
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
@@ -69,18 +87,28 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
         if ( ! $this->getRequest()->isValidated()) {
             return;
         }
-        $view['PickSource'] = $view->getModuleUrl('../PickObject?f=SrcRaw');
-        $view['PickDestination'] = $view->getModuleUrl('../PickObject?f=DstRaw');
-        $view['PickService'] = $view->getModuleUrl('../PickObject?f=ServiceRaw');
         $view['RuleId'] = $this->ruleId;
         if ( ! $this->getRequest()->isMutation()) {
             $view->getCommandList()->show();
+        } else {
+            $view->getCommandList()->sendQuery($view->getModuleUrl($this->getNextRequest()));
         }
     }
 
-    public function nextPath()
+    private function getNextRequest()
     {
-        return $this->getRequest()->isMutation() ? 'Index' : parent::nextPath();
+        $R = $this->getRequest();
+        if ($R->isMutation()) {
+            if ($R->hasParameter('Submit')) {
+                return '../Index';
+            } elseif ($R->hasParameter('PickSource')) {
+                return '../PickObject?f=SrcRaw';
+            } elseif ($R->hasParameter('PickDestination')) {
+                return '../PickObject?f=DstRaw';
+            } elseif ($R->hasParameter('PickService')) {
+                return '../PickObject?f=ServiceRaw';
+            }
+        }        
     }
 
 }

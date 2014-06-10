@@ -46,13 +46,7 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
         parent::initialize();
         /* @var $worker \Nethgui\Controller\AbstractController */
         $this->worker = new RuleGenericController($this->getIdentifier());
-        $this->worker
-            ->setParent($this->getParent())
-            ->setPlatform($this->getPlatform())
-            ->setPolicyDecisionPoint($this->getPolicyDecisionPoint())
-            ->setLog($this->getLog())
-            ->initialize();
-
+        $this->worker->initializeFromAction($this);
         $this->workflow = new \NethServer\Module\FirewallRules\RuleWorkflow();
     }
 
@@ -64,7 +58,8 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
             throw new \Nethgui\Exception\HttpException('Not found', 404, 1399992980);
         }
 
-        if ($request->spawnRequest($this->position)->hasParameter('f') || $request->isMutation()) {
+        $subrequest = $request->spawnRequest($this->position);
+        if ($subrequest->hasParameter('f') || $subrequest->hasParameter('Submit')) {
             $this->workflow->resume($this->getParent()->getSession());
         } else {
             // start a new workflow generating a random rule key
@@ -73,11 +68,16 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
                 'ServiceRaw' => 'any',
                 'status' => 'enabled'
             );
+            foreach(array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status', 'Description', 'LogType', 'Action') as $f) {
+                if($request->hasParameter($f)) {
+                    $defaults[$f] = $request->getParameter($f);
+                }
+            }
             $this->workflow->start($this->getParent()->getSession(), $this->getIdentifier(), 'Create/' . $this->position, $this->generateNextRuleId(), $defaults);
         }
         $this->worker->ruleId = $this->workflow->getRuleId();
         $this->worker->bind($request);
-        $this->workflow->copyTo($this->worker->parameters, array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status'));
+        $this->workflow->copyTo($this->worker->parameters, array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status', 'Description', 'LogType', 'Action'));
 
         if ($request->isMutation()) {
             $this->worker->parameters['Position'] = $this->position;
