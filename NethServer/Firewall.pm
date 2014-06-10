@@ -38,7 +38,7 @@ Create a NethServer::Firewall instance.
 sub new
 {
     my $class = shift;
-    my $sdb_path = shift || '';
+    my $sdb_path = shift || 'fwservices';
     my $ndb_path = shift || '';
     my $hdb_path = shift || '';
     my $fdb_path = shift || 'fwrules';
@@ -205,7 +205,7 @@ sub getPorts($)
     
     if ( $id =~ m/;/ ) { # lookup is needed
         my ($db, $key) = split(';', $id);
-        if ( $db eq 'service' ) {
+        if ( $db eq 'fwservice' ) {
             my $service = $self->{'sdb'}->get($key);
             return %ports unless defined($service);
             if ($service->prop('Protocol') eq 'tcpudp') {
