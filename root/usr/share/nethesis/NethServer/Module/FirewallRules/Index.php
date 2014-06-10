@@ -54,16 +54,17 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
                 continue;
             }
 
-            if( ! isset($A[$key]['Position']) || $A[$key]['Position'] != $rules[$key]['Position']) {
+            if ( ! isset($A[$key]['Position']) || $A[$key]['Position'] != $rules[$key]['Position']) {
                 // array assignment merges with existing props:
                 $A[$key] = array('Position' => $rules[$key]['Position']);
             }
         }
-        if($A->isModified()) {
+        if ($A->isModified()) {
             $A->save();
+            $this->getParent()->fixOrderedSetPositions();
         }
 
-        if( ! $this->getRequest()->hasParameter('sortonly')) {
+        if ( ! $this->getRequest()->hasParameter('sortonly')) {
             $this->getPlatform()->signalEvent('firewall-adjust');
         }
     }
@@ -106,9 +107,11 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             return $a['Position'] > $b['Position'];
         });
 
-        $positions = array_map(function ($v) { return $v['Position']; }, $r);        
-        $first = (isset($positions[0]) ? $positions[0]/2 : \NethServer\Module\FirewallRules::RULESTEP);
-        $last = (end($positions) ? end($positions) : 0)  + \NethServer\Module\FirewallRules::RULESTEP;
+        $positions = array_map(function ($v) {
+            return $v['Position'];
+        }, $r);
+        $first = (isset($positions[0]) ? $positions[0] / 2 : \NethServer\Module\FirewallRules::RULESTEP);
+        $last = (end($positions) ? end($positions) : 0) + \NethServer\Module\FirewallRules::RULESTEP;
 
         $view['hasChanges'] = $this->hasChanges();
         $view['Rules'] = $r;

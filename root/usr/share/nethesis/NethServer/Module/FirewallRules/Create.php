@@ -68,8 +68,8 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
                 'ServiceRaw' => 'any',
                 'status' => 'enabled'
             );
-            foreach(array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status', 'Description', 'LogType', 'Action') as $f) {
-                if($request->hasParameter($f)) {
+            foreach (array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status', 'Description', 'LogType', 'Action') as $f) {
+                if ($request->hasParameter($f)) {
                     $defaults[$f] = $request->getParameter($f);
                 }
             }
@@ -100,11 +100,14 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
 
     public function process()
     {
-        if ($this->getRequest()->isMutation()) {
+        if ($this->getRequest()->isMutation() && $this->getRequest()->hasParameter('Submit')) {
             // create the DB key:
             $this->getPlatform()->getDatabase('fwrules')->setKey($this->workflow->getRuleId(), 'rule', array());
+            $this->worker->process();
+            $this->getParent()->fixOrderedSetPositions();
+        } else {
+            $this->worker->process();
         }
-        $this->worker->process();
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)

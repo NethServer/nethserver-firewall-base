@@ -27,9 +27,8 @@ namespace NethServer\Module;
  */
 class FirewallRules extends \Nethgui\Controller\CollectionController implements \Nethgui\Utility\SessionConsumerInterface
 {
-
     const RULESTEP = 64;
-    
+
     /**
      *
      * @var \Nethgui\Utility\SessionInterface
@@ -67,39 +66,44 @@ class FirewallRules extends \Nethgui\Controller\CollectionController implements 
         parent::process();
         if ($this->getRequest()->isMutation()) {
             $A = $this->getAdapter();
-
-            $H = \iterator_to_array($A);
-           
-            uasort($H, function($a, $b) {
-                $ap = isset($a['Position']) ? $a['Position'] : 0;
-                $bp = isset($b['Position']) ? $b['Position'] : 0;
-                return $ap > $bp;
-            });
-
-            // FIXME: Stupid routine to fix Position on every record.
-            // Could be optimized.
-            // Here we assume every rule must fit exactly a slot of RULESTEP
-            // units width.
-            $adjustPositions = function () use ($H, $A) {
-                $i = 0;
-                foreach(array_keys($H) as $key) {
-                    $A[$key] = array('Position' => ($i+1) * \NethServer\Module\FirewallRules::RULESTEP);
-                    $i++;
-                }
-                $A->save();
-            };
-
-            // Check distances are large enough:
-            $prev = array('Position' => 0);
-            foreach($H as $key => $curr) {
-                if($curr['Position'] - $prev['Position'] < 4) {
-                    $adjustPositions();
-                    break;
-                }
-                $prev = $curr;
-            }
-
             $A->flush();
+        }
+    }
+
+    public function fixOrderedSetPositions()
+    {
+        $A = $this->getAdapter();
+        $A->flush();
+        $H = \iterator_to_array($A);
+
+        uasort($H, function($a, $b) {
+            $ap = isset($a['Position']) ? $a['Position'] : 0;
+            $bp = isset($b['Position']) ? $b['Position'] : 0;
+            return $ap > $bp;
+        });
+
+        // FIXME: Stupid routine to fix Position on every record.
+        // Could be optimized.
+        // Here we assume every rule must fit exactly a slot of RULESTEP
+        // units width.
+        $adjustPositions = function () use ($H, $A) {
+            $i = 0;
+            foreach (array_keys($H) as $key) {
+                $A[$key] = array('Position' => ($i + 1) * \NethServer\Module\FirewallRules::RULESTEP);
+                $i ++;
+            }
+            $A->save();
+            $A->flush();
+        };
+
+        // Check distances are large enough:
+        $prev = array('Position' => 0);
+        foreach ($H as $key => $curr) {
+            if ($curr['Position'] - $prev['Position'] < 4) {
+                $adjustPositions();
+                break;
+            }
+            $prev = $curr;
         }
     }
 
