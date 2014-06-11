@@ -19,7 +19,6 @@ $L['Hosts_Title'] = 'Host';
 $L['icmp_label'] = 'ICMP';
 $L['Interface_label'] = 'Interfaccia';
 $L['IpAddress_label'] = 'Indirizzo IP';
-$L['MacAddress_label'] = 'Indirizzo MAC';
 $L['Members_label'] = 'Membri';
 $L['Members'] = 'Membri';
 $L['Network_label'] = 'Indirizzo di rete';

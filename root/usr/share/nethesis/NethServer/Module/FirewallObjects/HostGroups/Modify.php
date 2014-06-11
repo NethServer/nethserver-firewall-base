@@ -65,10 +65,10 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
         // Build the datasource rows couples <key, label>
         foreach ($hosts as $key => $row) {
-            if (!isset($row['IpAddress']) && !isset($row['MacAddress'])) {
+            if (!isset($row['IpAddress'])) {
                 continue;
             }
-            $values[] = array($key, sprintf('%s (%s)', $key, $row['IpAddress']?$row['IpAddress']:$row['MacAddress']));
+            $values[] = array($key, sprintf('%s (%s)', $key, $row['IpAddress']));
         }
         return $values;
     }

@@ -37,7 +37,6 @@ class Hosts extends \Nethgui\Controller\TableController
         $columns = array(
             'Key',
             'IpAddress',
-            'MacAddress',
             'Actions'
         );
 
@@ -46,7 +45,6 @@ class Hosts extends \Nethgui\Controller\TableController
         $parameterSchema = array(
             array('name', Validate::HOSTNAME, \Nethgui\Controller\Table\Modify::KEY),
             array('IpAddress', Validate::IPv4_OR_EMPTY, \Nethgui\Controller\Table\Modify::FIELD),
-            array('MacAddress', $macv, \Nethgui\Controller\Table\Modify::FIELD),
             array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
         );
 

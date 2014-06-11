@@ -46,10 +46,8 @@ class CreateHost extends \Nethgui\Controller\Collection\AbstractAction
     {
         parent::initialize();
         $this->state = new \NethServer\Module\FirewallRules\RuleWorkflow();
-        $macAddressValidator = $this->getPlatform()->createValidator()->orValidator($this->getPlatform()->createValidator()->macAddress(), $this->getPlatform()->createValidator()->isEmpty());
         $this->declareParameter('name', Validate::HOSTNAME);
         $this->declareParameter('IpAddress', Validate::IPv4_OR_EMPTY);
-        $this->declareParameter('MacAddress', $macAddressValidator);
         $this->declareParameter('Description', Validate::ANYTHING);
         $this->declareParameter('q', Validate::ANYTHING);
     }
@@ -63,7 +61,7 @@ class CreateHost extends \Nethgui\Controller\Collection\AbstractAction
 
         $hint = $request->getParameter('q');
         if ($hint !== NULL) {
-            foreach (array('name', 'IpAddress', 'MacAddress', 'Description') as $key) {
+            foreach (array('name', 'IpAddress', 'Description') as $key) {
                 if ($this->getValidator($key)->evaluate($hint)) {
                     $this->parameters[$key] = $hint;
                 }
@@ -88,7 +86,6 @@ class CreateHost extends \Nethgui\Controller\Collection\AbstractAction
                 ->getDatabase('hosts')->setKey($this->parameters['name'], 'host', array(
                 'Description' => $this->parameters['Description'],
                 'IpAddress' => $this->parameters['IpAddress'],
-                'MacAddress' => $this->parameters['MacAddress'],
             ));
             $this->state->resume($this->getParent()->getSession())->assign(sprintf("host;%s", $this->parameters['name']));
         }
