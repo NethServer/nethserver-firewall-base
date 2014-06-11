@@ -1,0 +1,16 @@
+###############################################################################
+#			P A C K E T   D I S P O S I T I O N
+###############################################################################
+
+BLACKLIST_DISPOSITION=DROP
+
+MACLIST_DISPOSITION=REJECT
+
+RELATED_DISPOSITION=ACCEPT
+
+SMURF_DISPOSITION=DROP
+
+SFILTER_DISPOSITION=DROP
+
+TCP_FLAGS_DISPOSITION=DROP
+

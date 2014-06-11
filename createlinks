@@ -47,9 +47,11 @@ event_templates($event, '/etc/lsm/lsm.conf');
 
 event_actions($event,
               'initialize-default-databases' => '00',
-              'nethserver-firewall-base-conf' => '02');
+              'nethserver-shorewall-conf' => '02',
+              'nethserver-firewall-base-conf' => '03');
 
-event_services($event, 
+event_services($event,
+                     'rsyslog' => 'restart', 
                      'shorewall' => 'restart',
                      'lsm' => 'restart' );
 
@@ -111,4 +113,10 @@ $event = "static-routes-save";
 event_actions($event,
               'providers-static-routes' => '20'
 );
+
+#--------------------------------------------------
+# actions for interface-update event
+#--------------------------------------------------
+
+$event = "interface-update";
 
