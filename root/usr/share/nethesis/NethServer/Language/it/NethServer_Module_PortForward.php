@@ -25,3 +25,4 @@ $L['update_header_label'] = 'Modifica port forward';
 $L['udp_label'] = 'UDP';
 $L['tcp,udp_label'] = 'TCP,UDP';
 $L['OriDst_label'] = "IP WAN (interfaccia red)";
+$L['any_label'] = "Qualsiasi";
