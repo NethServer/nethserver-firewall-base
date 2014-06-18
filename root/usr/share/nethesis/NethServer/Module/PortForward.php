@@ -49,7 +49,6 @@ class PortForward extends \Nethgui\Controller\TableController
             ->setTableAdapter($this->getPlatform()->getTableAdapter('portforward','pf'))
             ->setColumns($columns)
             ->addTableAction(new \NethServer\Module\PortForward\Modify('create'))            
-            ->addTableAction(new \NethServer\Module\PortForward\CheckRules())            
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->addRowAction(new \NethServer\Module\PortForward\ToggleEnable('disable'))
             ->addRowAction(new \NethServer\Module\PortForward\ToggleEnable('enable'))
