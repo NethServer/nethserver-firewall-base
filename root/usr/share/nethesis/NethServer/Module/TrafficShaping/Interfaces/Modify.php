@@ -38,9 +38,9 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $interfaces = $this->getPlatform()->getDatabase('networks')->getAll('ethernet');
         $parameterSchema = array(
             array('device', $this->createValidator()->memberOf(array_keys($interfaces)), \Nethgui\Controller\Table\Modify::KEY),
-            array('in', Validate::POSITIVE_INTEGER, \Nethgui\Controller\Table\Modify::FIELD),
-            array('out', Validate::POSITIVE_INTEGER, \Nethgui\Controller\Table\Modify::FIELD),
-            array('description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
+            array('In', Validate::POSITIVE_INTEGER, \Nethgui\Controller\Table\Modify::FIELD),
+            array('Out', Validate::POSITIVE_INTEGER, \Nethgui\Controller\Table\Modify::FIELD),
+            array('Description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
         );
 
 

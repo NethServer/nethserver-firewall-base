@@ -37,11 +37,11 @@ class PortForward extends \Nethgui\Controller\TableController
 
         $columns = array(
             'Key',
-            'proto',
-            'src',
-            'dstHost',
-            'dst',
-            'description',
+            'Proto',
+            'Src',
+            'DstHost',
+            'Dst',
+            'Description',
             'Actions'
         );
 
@@ -65,8 +65,19 @@ class PortForward extends \Nethgui\Controller\TableController
         if (!isset($values['status']) || ($values['status'] == "disabled")) {
             $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-locked');
         }
-        return $values['proto'];
+        return strtoupper($values['Proto']);
     }
+
+    public function prepareViewForColumnDstHost(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        $tmp = explode(';',$values['DstHost']);
+        if (isset($tmp[1])) {
+            return $tmp[1];
+        } else {
+            return $values['DstHost'];
+        }
+    }
+
 
     /**
      * Override prepareViewForColumnActions to hide/show enable/disable actions

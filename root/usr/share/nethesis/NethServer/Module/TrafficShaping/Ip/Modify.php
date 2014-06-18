@@ -39,8 +39,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $addressValidator = $this->createValidator()->orValidator($this->createValidator(Validate::IPv4),$this->createValidator(Validate::MACADDRESS));
         $parameterSchema = array(
             array('address', $addressValidator, \Nethgui\Controller\Table\Modify::KEY),
-            array('priority', $this->createValidator()->memberOf(array("1","2","3")), \Nethgui\Controller\Table\Modify::FIELD),
-            array('description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
+            array('Priority', $this->createValidator()->memberOf(array("1","2","3")), \Nethgui\Controller\Table\Modify::FIELD),
+            array('Description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
         );
 
 
@@ -60,7 +60,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
         
-        $view['priorityDatasource'] = array(array('1',$view->translate('1_label')),array('2',$view->translate('2_label')),array('3',$view->translate('3_label')));
+        $view['PriorityDatasource'] = array(array('1',$view->translate('1_label')),array('2',$view->translate('2_label')),array('3',$view->translate('3_label')));
  
     }
 

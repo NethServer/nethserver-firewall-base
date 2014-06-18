@@ -15,9 +15,9 @@ if ($view->getModule()->getIdentifier() == 'update') {
 }
 echo $view->panel()
     ->insert($device)
-    ->insert($view->textInput('in'))
-    ->insert($view->textInput('out'))
-    ->insert($view->textInput('description'));
+    ->insert($view->textInput('In'))
+    ->insert($view->textInput('Out'))
+    ->insert($view->textInput('Description'));
 
 echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_CANCEL | $view::BUTTON_HELP);
 

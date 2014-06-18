@@ -32,9 +32,9 @@ class Interfaces extends \Nethgui\Controller\TableController
 
         $columns = array(
             'Key',
-            'in',
-            'out',
-            'description',
+            'In',
+            'Out',
+            'Description',
             'Actions'
         );
 

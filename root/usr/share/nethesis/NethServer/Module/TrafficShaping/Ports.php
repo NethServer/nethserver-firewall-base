@@ -32,9 +32,9 @@ class Ports extends \Nethgui\Controller\TableController
 
         $columns = array(
             'Key',
-            'proto',
-            'priority',
-            'description',
+            'Proto',
+            'Priority',
+            'Description',
             'Actions'
         );
 
@@ -52,7 +52,13 @@ class Ports extends \Nethgui\Controller\TableController
 
     public function prepareViewForColumnPriority(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
     {
-        return $view->translate($values['priority']."_label");
+        return $view->translate($values['Priority']."_label");
     }
+    
+    public function prepareViewForColumnProto(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        return strtoupper($values['Proto']);
+    }
+
 }
 

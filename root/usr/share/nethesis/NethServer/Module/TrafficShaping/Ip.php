@@ -32,8 +32,8 @@ class Ip extends \Nethgui\Controller\TableController
 
         $columns = array(
             'Key',
-            'priority',
-            'description',
+            'Priority',
+            'Description',
             'Actions'
         );
 
@@ -51,7 +51,19 @@ class Ip extends \Nethgui\Controller\TableController
 
     public function prepareViewForColumnPriority(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
     {
-        return $view->translate($values['priority']."_label");
+        return $view->translate($values['Priority']."_label");
     }
+
+    public function prepareViewForColumnKey(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        $tmp = explode(';',$key);
+        if (isset($tmp[1])) {
+            return $tmp[1];
+        } else {
+            return $key;
+        }
+
+    }
+
 }
 

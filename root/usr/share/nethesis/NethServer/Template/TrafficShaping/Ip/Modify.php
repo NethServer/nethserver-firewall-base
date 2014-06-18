@@ -8,10 +8,16 @@ if ($view->getModule()->getIdentifier() == 'update') {
 
 echo $view->header()->setAttribute('template',$T($headerText));
 
+if ($view->getModule()->getIdentifier() == 'update') {
+    $address = $view->textInput('address', $view::STATE_DISABLED | $view::STATE_READONLY);
+} else {
+    $address = $view->textInput('address');
+}
+
 echo $view->panel()
-    ->insert($view->textInput('address'))
-    ->insert($view->selector('priority', $view::SELECTOR_DROPDOWN))
-    ->insert($view->textInput('description'));
+    ->insert($address)
+    ->insert($view->selector('Priority', $view::SELECTOR_DROPDOWN))
+    ->insert($view->textInput('Description'));
 
 echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_CANCEL | $view::BUTTON_HELP);
 

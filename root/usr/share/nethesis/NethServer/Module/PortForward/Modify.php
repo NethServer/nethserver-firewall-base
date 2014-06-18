@@ -34,6 +34,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
 {
 
     private $exitCode = 0;
+    private $protocols = array('tcp','udp','tcp,udp');
 
     protected function calculateKeyFromRequest(\Nethgui\Controller\RequestInterface $request)
     {
@@ -51,22 +52,29 @@ class Modify extends \Nethgui\Controller\Table\Modify
                 $this->createValidator()->integer()->greatThan(0)->lessThan(65535),
                 $this->createValidator()->regexp('/^[0-9]+\:[0-9]+$/') #port range, no check on maximum value
             );
+        $dstValidator = $this->createValidator()
+            ->orValidator(
+                $this->createValidator()->integer()->greatThan(0)->lessThan(65535),
+                $this->createValidator()->isEmpty()
+            );
+
+        $protoValidator = $this->createValidator()->memberOf($this->protocols);
 
         $parameterSchema = array(
             array('id', FALSE, \Nethgui\Controller\Table\Modify::KEY),
-            array('proto', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
-            array('src',  $portRangeValidator, \Nethgui\Controller\Table\Modify::FIELD),
-            array('dst', Validate::PORTNUMBER, \Nethgui\Controller\Table\Modify::FIELD),
-            array('dstHost', Validate::IPv4, \Nethgui\Controller\Table\Modify::FIELD),
-            array('srcHost', Validate::IPv4_OR_EMPTY, \Nethgui\Controller\Table\Modify::FIELD),
+            array('Proto', $protoValidator, \Nethgui\Controller\Table\Modify::FIELD),
+            array('Src',  $portRangeValidator, \Nethgui\Controller\Table\Modify::FIELD),
+            array('Dst', $dstValidator, \Nethgui\Controller\Table\Modify::FIELD),
+            array('DstHost', Validate::IPv4, \Nethgui\Controller\Table\Modify::FIELD),
+            array('SrcHost', Validate::IPv4_OR_EMPTY, \Nethgui\Controller\Table\Modify::FIELD),
             array('status', Validate::SERVICESTATUS, \Nethgui\Controller\Table\Modify::FIELD),
-            array('allow', $this->createValidator(Validate::ANYTHING)->platform('shorewall-check'), \Nethgui\Controller\Table\Modify::FIELD),
-            array('description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
+            array('Allow', $this->createValidator(Validate::ANYTHING)->platform('shorewall-check'), \Nethgui\Controller\Table\Modify::FIELD),
+            array('Description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
         );
 
 
         $this->setSchema($parameterSchema);
-        $this->setDefaultValue('proto', 'tcp');
+        $this->setDefaultValue('Proto', 'tcp');
         $this->setDefaultValue('status', 'enabled');
 
         parent::initialize();
@@ -98,7 +106,10 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
         
-        $view['protoDatasource'] = array(array('tcp',$view->translate('tcp_label')),array('udp',$view->translate('udp_label')));
+        $view['ProtoDatasource'] = array_map(function($fmt) use ($view) {
+                                return array($fmt, $view->translate($fmt . '_label'));
+        }, $this->protocols);
+
  
         if ($this->exitCode != 0) {
             $view->getCommandList('/Notification')->showMessage($view->translate('shorewall_check_error'), \Nethgui\Module\Notification\AbstractNotification::NOTIFY_ERROR);
