@@ -10,10 +10,10 @@ echo $view->header()->setAttribute('template',$T($headerText));
 
 echo $view->panel()
     ->insert($view->selector('Proto'))
+    ->insert($view->selector('OriDst'))
     ->insert($view->textInput('Src'))
     ->insert($view->textInput('Dst'))
     ->insert($view->textInput('DstHost'))
-    #->insert($view->textInput('srcHost'))
     ->insert($view->textInput('Allow'))
     ->insert($view->textInput('Description'));
 
