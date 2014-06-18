@@ -1,10 +1,14 @@
 {
+    use NethServer::Firewall;
+    my $fw = new NethServer::Firewall();
+
     $db = esmith::ConfigDB->open("tc") || die "Can't open tc database: $!\n";
     foreach my $ip ( $db->get_all_by_prop('type' => 'ip') ) {
-        $priority = $ip->prop('priority') || next;
-        $description =  $ip->prop('description') || "";
-        $OUT .= "# IP: ".$ip->key. " - $description\n";
-        $OUT .= "$priority\t-\t-\t".$ip->key."\n";
+        $priority = $ip->prop('Priority') || next;
+        $description =  $ip->prop('Description') || "";
+        $address = $fw->getAddress($ip->key);
+        $OUT .= "# IP: $address - $description\n";
+        $OUT .= "$priority\t-\t-\t$address\n";
     }
 
 }

@@ -4,42 +4,56 @@
 #
 
 {
+    use NethServer::Firewall;
+
     my $nfqueue = $firewall{'nfqueue'} || 'disabled';
 
+    my $fw = new NethServer::Firewall();
     $db = esmith::ConfigDB->open("portforward") || die "Can't open portforward database: $!\n";
     foreach my $pf ( $db->get_all_by_prop('type' => 'pf') ) {
-        $proto = $pf->prop('proto') || next;
+        $proto = $pf->prop('Proto') || 'tcp,udp';
         $status = $pf->prop('status') || "disabled";
         next unless ($status eq "enabled");
-        $src = $pf->prop('src') || next;
-        $dstHost = $pf->prop('dstHost') || next;
-        $srcHost = $pf->prop('srcHost') || "";
+        $src = $pf->prop('Src') || next;
+        $dstHost = $pf->prop('DstHost') || next;
+        $srcHost = $pf->prop('SrcHost') || "";
+        $srcHost = $fw->getAddress($srcHost);
+        $dstHost = $fw->getAddress($dstHost);
         if ($srcHost ne "") {
             $srcHost = "\t-\t$srcHost";
         } else {
             $srcHost = "\t-";
         }
-        $dst = $pf->prop('dst') || $src;
-        $description = $pf->prop('description') || "";
-        $allow = $pf->prop('allow') || "";
+
+        $dst = $pf->prop('Dst') || '';
+        if ($src =~ /:/) { # if src is a range, just use it and discard dst
+            $dst = '';
+        }
+        $description = $pf->prop('Description') || "";
+        $allow = $pf->prop('Allow') || "";
         $allow_cmt = "";
         if ($allow ne "") {
             $allow_cmt = "from $allow";
             $allow=":$allow";
         }
-        $oriDst = $pf->prop('oriDst') || ''; # external IP
+        $oriDst = $pf->prop('OriDst') || ''; # external IP
         if ($oriDst ne '') {
             $oriDst = "\t$oriDst";
         } else {
             $oriDst = "\t-";
         }
-        $OUT.="#\n# PF $src -> $dstHost:$dst $allow_cmt \n#\n";
+        if ($dst eq '') {
+            $dstHost = "$dstHost";
+        } else {
+            $dstHost = "$dstHost:$dst";
+        }
+        $OUT.="#\n# PF $oriDst:$src -> $dstHost $allow_cmt \n#\n";
         $OUT.="?COMMENT $description\n";
         if ($nfqueue eq 'enabled') {
-            $OUT.="DNAT-\tnet$allow\t$dstHost:$dst\t$proto\t$src$srcHost$oriDst\n";
+            $OUT.="DNAT-\tnet$allow\t$dstHost\t$proto\t$src$srcHost$oriDst\n";
             $OUT.="NFQUEUE\tnet$allow\tloc\t$proto\t$dst$srcHost$oriDst\n";
         } else {
-            $OUT.="DNAT\tnet$allow\tloc:$dstHost:$dst\t$proto\t$src$srcHost$oriDst\n";
+            $OUT.="DNAT\tnet$allow\tloc:$dstHost\t$proto\t$src$srcHost$oriDst\n";
         }
     }
 }
