@@ -69,15 +69,58 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         }
     }
 
-    private function resolveEndpoint($ep)
+    private function resolveEndpoint($ep, $view)
     {
-        return strtr($ep, ";", " ");
+        if ($ep == 'any') {
+            return $view->translate("any_src_dst_label");
+        }
+        $tmp = explode(';', $ep);
+        if (isset($tmp[1])) {
+            return $view->translate($tmp[0].'_label')." ".$tmp[1];
+        } else {
+            return $ep;
+        }
     }
 
-    private function resolveService($svc)
+    private function resolveService($ep, $view = null) 
     {
-        return strtr($svc, ";", " ");
+        if ($ep == 'any') {
+            if ($view == null) {
+                return '';
+            }  else {
+                return $view->translate("any_service_label");
+            }
+        }
+        return str_replace("fwservice;", "", $ep);
     }
+
+    private function resolveName($ep,$view) 
+    {
+        $tmp = explode(';', $ep);
+        if ($ep == 'any') {
+            return $view->translate("all_label");
+        }
+        return isset($tmp[1])?$tmp[1]:$ep;
+    }
+
+    private function getObjectIcon($v)
+    {
+        $objectIcons = array(
+            'any' => 'fa-asterisk',
+            'role' => 'fa-square',
+            'host' => 'fa-desktop',
+            'zone' => 'fa-sitemap',
+            'host-group' => 'fa-cubes',
+            'fwservice' => 'fa-sign-in',
+        );
+        $tmp = explode(';', $v);
+        if ( isset($objectIcons[$tmp[0]]) ) {
+            return $objectIcons[$tmp[0]];
+        } else {
+            return $v;
+        }
+    }
+
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
@@ -90,17 +133,37 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             'drop' => $view->translate('ActionDrop_label'),
         );
 
+        $actionIcons = array(
+            'accept' => 'fa-check-circle',
+            'drop' => 'fa-minus-circle',
+            'reject' => 'fa-shield',
+        );
+        
         foreach ($this->getAdapter() as $key => $values) {
             $values['id'] = (String) $key;
             $values['Position'] = isset($values['Position']) ? intval($values['Position']) : 0;
+            $values['rawAction'] = $values['Action'];
+            $values['ActionIcon'] = $actionIcons[$values['Action']];
+            $values['SrcIcon'] = $this->getObjectIcon($values['Src']);
+            $values['DstIcon'] = $this->getObjectIcon($values['Dst']);
+            if ($values['Service'] == 'any') {
+                $values['ServiceIcon'] = '';
+            } else {
+                $values['ServiceIcon'] = $this->getObjectIcon($values['Service']);
+            }
+           
             $values['Action'] = $actionLabels[$values['Action']];
             $values['Edit'] = $view->getModuleUrl('../Edit/' . $key);
             $values['RuleText'] = $view->translate('RuleText_label', array(
-                'Src' => $this->resolveEndpoint($values['Src']),
-                'Dst' => $this->resolveEndpoint($values['Dst']),
-                'Service' => $this->resolveService($values['Service'])
+                'Src' => $this->resolveEndpoint($values['Src'], $view),
+                'Dst' => $this->resolveEndpoint($values['Dst'], $view),
+                'Service' => $this->resolveService($values['Service'], $view)
             ));
+            $values['Src'] = $this->resolveName($values['Src'],$view);
+            $values['Dst'] = $this->resolveName($values['Dst'],$view);
+            $values['Service'] = $this->resolveService($values['Service']);
             $values['Delete'] = $view->getModuleUrl('../Delete/' . $key);
+            $values['LogIcon'] = ($values['Log']!='none')?'fa-book':'';
             $r[] = $values;
         }
         usort($r, function ($a, $b) {

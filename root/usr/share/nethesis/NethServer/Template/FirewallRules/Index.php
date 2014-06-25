@@ -1,5 +1,6 @@
 <?php
 /* @var $view \Nethgui\Renderer\Xhtml */
+$view->useFile('css/font-awesome.css');
 
 echo $view->header()->setAttribute('template', $T('Index_header'));
 
@@ -17,24 +18,38 @@ echo $view->buttonList()
 
 // 'groups' contains an array of views..
 echo $view->objectsCollection('Rules')
+    ->setAttribute('placeholders', array('rawAction','ActionIcon','SrcIcon','DstIcon','ServiceIcon','LogIcon','Src','Dst','Service'))
     ->setAttribute('key', 'id')
     ->setAttribute('ifEmpty', function ($view) use ($T) {
         return $T('NoRulesDefined_label');
     })
     ->setAttribute('template', function ($view) use ($T) {
         return $view->panel()
-            ->setAttribute('class', 'fwrule')
-            //->insert($view->checkbox('selected', '1', $view::LABEL_NONE)->setAttribute('uncheckedValue', FALSE))
+            ->setAttribute('class', 'fwrule ${rawAction}')
             ->insert($view->hidden('metadata', $view::STATE_DISABLED))
             ->insert($view->textInput('Position', $view::LABEL_NONE))
             ->insert($view->panel()->setAttribute('class', 'actbox')                
                 ->insert($view->textLabel('id')->setAttribute('tag', 'div')->setAttribute('template', $T("RuleId_label")))
 
-                ->insert($view->textLabel('Action')->setAttribute('tag', 'div'))
+                ->insert($view->literal('<i class="fwicon fa ${ActionIcon}"></i>'))
+                ->insert($view->textLabel('Action')->setAttribute('tag', 'span'))
                 )
             ->insert($view->panel()->setAttribute('class', 'descbox')
-                ->insert($view->textLabel('RuleText')->setAttribute('tag', 'div'))
-                ->insert($view->textLabel('Description')->setAttribute('tag', 'div')))
+                ->insert($view->panel()->setAttribute('class', 'objbox')
+                    ->insert($view->literal('<i class="fwicon fa ${SrcIcon} ${Src}"></i>'))
+                    ->insert($view->textLabel('Src')->setAttribute('tag', 'span')))
+                ->insert($view->panel()->setAttribute('class', 'objbox')
+                    ->insert($view->literal('<i class="fa fa-long-arrow-right fa-2x"></i>')))
+                ->insert($view->panel()->setAttribute('class', 'objbox')
+                    ->insert($view->literal('<i class="fwicon fa ${DstIcon} ${Dst}"></i>'))
+                    ->insert($view->textLabel('Dst')->setAttribute('tag', 'span')))
+                ->insert($view->panel()->setAttribute('class', 'objbox')
+                    ->insert($view->literal('<i class="fwicon fa ${ServiceIcon} ${Service}"></i>'))
+                    ->insert($view->textLabel('Service')->setAttribute('tag', 'span')))
+                ->insert($view->panel()->setAttribute('class', 'objbox')
+                    ->insert($view->literal('<i class="fwicon fwicon-log fa ${LogIcon} ${Log}"></i>')))
+                ->insert($view->textLabel('Description')->setAttribute('tag', 'div'))
+                ->insert($view->textLabel('RuleText')->setAttribute('tag', 'div')))
             ->insert($view->buttonList()->setAttribute('class', 'Buttonset v1')
                 ->insert($view->button('Edit', $view::BUTTON_LINK))
                 ->insert($view->button('Delete', $view::BUTTON_LINK))
@@ -54,14 +69,26 @@ $hasChangesTarget = $view->getClientEventTarget('hasChanges');
 $ruleStep = \NethServer\Module\FirewallRules::RULESTEP;
 
 $view->includeCss('
-.fwrule {min-height: 50px; border:1px solid #d3d3d3; cursor: move; display: flex; margin-bottom: 1.5em; border-radius: 3px; background: linear-gradient(to bottom, #e6e6e6 0%, #fff 100%);}
+.fwrule {min-height: 50px; border:1px solid #d3d3d3; cursor: move; display: flex; margin-bottom: 1.5em; border-radius: 3px;}
 .fwrule .Buttonset {flex-grow: 0; margin-right: 0}
 .fwrule .Buttonset [role=button] {border-top: none}
-.fwrule .actbox {padding: 3px; min-width: 6em; font-size: 120%; background: white; text-transform: uppercase;}
+.fwrule .actbox {padding: 3px; width: 7em; font-size: 120%; background: white; text-transform: uppercase}
 .fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px}
 .placeholder {background-color: yellow; margin-bottom: 1.5em; background: linear-gradient(to bottom, rgba(234,239,181,1) 0%,rgba(225,233,160,1) 100%);}
 .fwrule .id {color: #bbb; font-size: 0.7em}
 .Position {width: 2em}
+.objbox { float: left; width: 10em; }
+.drop .actbox { color: red; font-weight: bold; }
+.reject .actbox { color: #700000; font-weight: bold;}
+.accept .actbox { color: green; font-weight: bold; }
+.fwicon { margin-right: 5px; margin-left: 5px; font-size: 150%;}
+.fwicon-log { color: gray; };
+.Description { margin-top: 5px; float: right; margin-right: 10px; }
+.RuleText { color: gray;  clear: both; }
+.green {color: green;}
+.red {color: red;}
+.orange {color: orange;}
+.blue {color: blue;}
 ');
 
 $view->includeJavascript("
@@ -111,6 +138,8 @@ jQuery(function ($) {
             $('#${commitId}').trigger(val === '1' ? 'nethguienable' : 'nethguidisable');
         }, 100);
     });
+
+    
 });
 " . '
 /*!

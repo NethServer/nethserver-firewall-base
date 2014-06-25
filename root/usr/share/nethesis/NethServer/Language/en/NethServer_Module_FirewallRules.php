@@ -54,3 +54,11 @@ $L['Services_create'] = 'Create new service "${0}"';
 $L['A_new_rule_label'] = "New rule";
 $L['Any_label'] = 'Any';
 $L['NoRulesDefined_label'] = 'No rules are defined. Create the first one now!';
+
+$L['any_service_label'] = 'any';
+$L['any_src_dst_label'] = 'any host';
+$L['all_label'] = 'all';
+$L['host_label'] = 'host';
+$L['zone_label'] = 'zone';
+$L['host-group_label'] = 'group';
+$L['role_label'] = 'interface';
