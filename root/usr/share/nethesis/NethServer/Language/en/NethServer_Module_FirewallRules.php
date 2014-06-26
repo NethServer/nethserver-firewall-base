@@ -62,3 +62,4 @@ $L['host_label'] = 'host';
 $L['zone_label'] = 'zone';
 $L['host-group_label'] = 'group';
 $L['role_label'] = 'interface';
+$L['confirm_reload_label'] = 'No change has been applied.';
