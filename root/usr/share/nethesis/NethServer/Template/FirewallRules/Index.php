@@ -65,23 +65,24 @@ $commitId = $view->getUniqueId('Commit');
 $deleteId = $view->getUniqueId('Delete');
 $deleteUrl = $view->getModuleUrl('../Delete');
 $hasChangesTarget = $view->getClientEventTarget('hasChanges');
+$confirm_reload = $view->translate('confirm_reload_label');
 
 $ruleStep = \NethServer\Module\FirewallRules::RULESTEP;
 
 $view->includeCss('
-.fwrule {min-height: 50px; border:1px solid #d3d3d3; cursor: move; display: flex; margin-bottom: 1.5em; border-radius: 3px;}
+.fwrule {min-height: 50px; border:1px solid #d3d3d3; display: flex; margin-bottom: 1.5em; border-radius: 3px;}
 .fwrule .Buttonset {flex-grow: 0; margin-right: 0}
 .fwrule .Buttonset [role=button] {border-top: none}
-.fwrule .actbox {padding: 3px; width: 7em; font-size: 120%; background: white; text-transform: uppercase}
+.fwrule .actbox {padding: 3px; width: 7em; font-size: 120%; background: white; text-transform: uppercase; cursor: move;}
 .fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px}
 .placeholder {background-color: yellow; margin-bottom: 1.5em; background: linear-gradient(to bottom, rgba(234,239,181,1) 0%,rgba(225,233,160,1) 100%);}
 .fwrule .id {color: #bbb; font-size: 0.7em}
 .Position {width: 2em}
-.objbox { float: left; width: 10em; }
+.objbox { float: left; display: none }
 .drop .actbox { color: red; font-weight: bold; }
 .reject .actbox { color: #700000; font-weight: bold;}
 .accept .actbox { color: green; font-weight: bold; }
-.fwicon { margin-right: 5px; margin-left: 5px; font-size: 150%;}
+.fwicon { margin-right: 5px; margin-left: 5px; display: none}
 .fwicon-log { color: gray; };
 .Description { margin-top: 5px; float: right; margin-right: 10px; }
 .RuleText { color: gray;  clear: both; }
@@ -89,18 +90,25 @@ $view->includeCss('
 .red {color: red;}
 .orange {color: orange;}
 .blue {color: blue;}
+
+@media screen and (min-width: 40em){
+   .objbox { width: 10em; display: inline }
+   .fwicon { font-size: 150%; display: inline}
+   .Description { margin-top: 5px; float: right; margin-right: 10px; }
+}
 ');
 
 $view->includeJavascript("
 jQuery(function ($) {
     $(window).on('unload beforeunload', function(e) {
        if($('input.${hasChangesTarget}').val() == '1') {
-            return false;
+            return '$confirm_reload';
        }
     });
 
     $('#${rulesId}').sortable({
         axis: 'y',
+        handle: '.actbox',
         placeholder: 'placeholder',
         opacity: 0.6,        
         forcePlaceholderSize: true,
@@ -154,3 +162,4 @@ jQuery(function ($) {
  */
 !function(a){function f(a,b){if(!(a.originalEvent.touches.length>1)){a.preventDefault();var c=a.originalEvent.changedTouches[0],d=document.createEvent("MouseEvents");d.initMouseEvent(b,!0,!0,window,1,c.screenX,c.screenY,c.clientX,c.clientY,!1,!1,!1,!1,0,null),a.target.dispatchEvent(d)}}if(a.support.touch="ontouchend"in document,a.support.touch){var e,b=a.ui.mouse.prototype,c=b._mouseInit,d=b._mouseDestroy;b._touchStart=function(a){var b=this;!e&&b._mouseCapture(a.originalEvent.changedTouches[0])&&(e=!0,b._touchMoved=!1,f(a,"mouseover"),f(a,"mousemove"),f(a,"mousedown"))},b._touchMove=function(a){e&&(this._touchMoved=!0,f(a,"mousemove"))},b._touchEnd=function(a){e&&(f(a,"mouseup"),f(a,"mouseout"),this._touchMoved||f(a,"click"),e=!1)},b._mouseInit=function(){var b=this;b.element.bind({touchstart:a.proxy(b,"_touchStart"),touchmove:a.proxy(b,"_touchMove"),touchend:a.proxy(b,"_touchEnd")}),c.call(b)},b._mouseDestroy=function(){var b=this;b.element.unbind({touchstart:a.proxy(b,"_touchStart"),touchmove:a.proxy(b,"_touchMove"),touchend:a.proxy(b,"_touchEnd")}),d.call(b)}}}(jQuery);
 ');
+
