@@ -51,7 +51,7 @@ class FirewallObjectsFinder implements \IteratorAggregate, \Countable
         $o = new self();
 
         if (isset($where['ROLES'])) {
-            $o->addSearchRoles($text);
+            $o->addSearchRoles($platform, $text);
             unset($where['ROLES']);
         }
         $o->addSearchInDb($platform, $text, $where);
@@ -91,9 +91,15 @@ class FirewallObjectsFinder implements \IteratorAggregate, \Countable
         }
     }
 
-    private function addSearchRoles($text)
+    private function addSearchRoles(\Nethgui\System\PlatformInterface $platform, $text)
     {
-        $roles = array('green', 'blue', 'red', 'orange');
+        $tmp = array();
+        foreach ($platform->getDatabase('networks')->getAll() as $key => $props) {
+            if (isset($props['role'])) {
+                $tmp[$props['role']] = '';
+            }
+        }
+        $roles = array_diff(array_keys($tmp),array('bridged','alias','slave'));
         foreach ($roles as $role) {
             if ( ! $text || strstr($role, strtolower($text)) !== FALSE) {
                 $this->results->append(new \NethServer\Tool\FirewallObject($role, 'role', array()));
