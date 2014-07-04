@@ -42,23 +42,24 @@ class FirewallObject
         } : $translator;
     }
 
-    public function setTranslator($T) {
+    public function setTranslator($T)
+    {
         $this->T = $T;
         return $this;
     }
 
     public function getValue()
     {
-        if ($this->type === 'raw') {
+        if ($this->getType() === 'raw') {
             return $this->key;
         }
-        return sprintf('%s;%s', $this->type, $this->key);
+        return sprintf('%s;%s', $this->getType(), $this->key);
     }
 
     public function getTitle()
     {
         $T = $this->T;
-        return $T("FirewallObject_" . $this->type . "_Title", $this->props);
+        return $T("FirewallObject_" . $this->getType() . "_Title", $this->props);
     }
 
     public function getShortTitle()
@@ -73,8 +74,12 @@ class FirewallObject
 
     public function getType()
     {
+        if ($this->type === 'remote') {
+            return 'host';
+        } elseif ($this->type === 'local') {
+            return 'host';
+        }
         return $this->type;
     }
-
 
 }

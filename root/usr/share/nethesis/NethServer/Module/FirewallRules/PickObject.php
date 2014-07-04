@@ -73,7 +73,7 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
             if ($this->parameters['f'] === 'ServiceRaw') {
                 $where = array('fwservices' => array('fwservice'));
             } else {
-                $where = array('hosts' => array('host', 'host-group'), 'networks' => array('zone'), 'ROLES' => array());
+                $where = array('hosts' => array('host', 'host-group', 'remote', 'local'), 'networks' => array('zone'), 'ROLES' => array());
             }
 
             $s = \NethServer\Tool\FirewallObjectsFinder::search($this->getPlatform(), $this->getRequest()->getParameter('q'), $where);
