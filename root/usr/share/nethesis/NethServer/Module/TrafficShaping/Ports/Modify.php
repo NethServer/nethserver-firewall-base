@@ -46,7 +46,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
 
         $this->setSchema($parameterSchema);
-        $this->setDefaultValue('proto', 'tcp');
+        $this->setDefaultValue('Proto', 'tcp');
 
         parent::initialize();
     }
