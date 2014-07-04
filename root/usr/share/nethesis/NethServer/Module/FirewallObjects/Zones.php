@@ -41,17 +41,18 @@ class Zones extends \Nethgui\Controller\TableController
             'Actions'
         );
 
+        $nameValidator = $this->getPlatform()->createValidator()->maxLength(5)->username();
         $parameterSchema = array(
-            array('name', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::KEY),
-            array('Network', Validate::CIDR_BLOCK, \Nethgui\Controller\Table\Modify::FIELD)
+            array('name', $nameValidator, \Nethgui\Controller\Table\Modify::KEY),
+            array('Network', Validate::CIDR_BLOCK, \Nethgui\Controller\Table\Modify::FIELD),
+            array('Interface', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
         );
-
 
         $this
             ->setTableAdapter($this->getPlatform()->getTableAdapter('networks', 'zone'))
-            ->addRowAction(new \Nethgui\Controller\Table\Modify('update', $parameterSchema, 'NethServer\Template\FirewallObjects\Zones'))
+            ->addRowAction(new \NethServer\Module\FirewallObjects\Zones\Modify('update'))
             ->addRowAction(new \Nethgui\Controller\Table\Modify('delete', $parameterSchema, 'Nethgui\Template\Table\Delete')) // Standard DELETE template
-            ->addTableAction(new \Nethgui\Controller\Table\Modify('create', $parameterSchema, 'NethServer\Template\FirewallObjects\Zones'))
+            ->addTableAction(new \NethServer\Module\FirewallObjects\Zones\Modify('create'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->setColumns($columns)
         ;
@@ -59,11 +60,8 @@ class Zones extends \Nethgui\Controller\TableController
         parent::initialize();
     }
 
-    public function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
+    function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
     {
-        if ($currentAction->getIdentifier() !== 'create') {
-            $this->getPlatform()->signalEvent('firewall-objects-modify');
-        }
+        $this->getPlatform()->signalEvent('firewall-objects-modify');
     }
-
 }

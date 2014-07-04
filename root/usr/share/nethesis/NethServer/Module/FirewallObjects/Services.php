@@ -61,11 +61,8 @@ class Services extends \Nethgui\Controller\TableController
         parent::initialize();
     }
 
-    public function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
+    function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
     {
-        if ($currentAction->getIdentifier() !== 'create') {
-            $this->getPlatform()->signalEvent('firewall-objects-modify');
-        }
+        $this->getPlatform()->signalEvent('firewall-objects-modify');
     }
-
 }

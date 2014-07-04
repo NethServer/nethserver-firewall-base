@@ -36,6 +36,8 @@ class CreateZone extends \Nethgui\Controller\Collection\AbstractAction
      * @var \NethServer\Module\FirewallRules\RuleWorkflow
      */
     private $state;
+    
+    private $interfaces;
 
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $attributes)
     {
@@ -45,9 +47,16 @@ class CreateZone extends \Nethgui\Controller\Collection\AbstractAction
     public function initialize()
     {
         parent::initialize();
+        $nameValidator = $this->getPlatform()->createValidator()->maxLength(5)->username();
+        if (!$this->interfaces) {
+            $this->interfaces = $this->readInterfaces();
+        }
+        $interfaceValidator = $this->getPlatform()->createValidator()->memberOf($this->interfaces);
+
         $this->state = new \NethServer\Module\FirewallRules\RuleWorkflow();
-        $this->declareParameter('name', Validate::HOSTNAME);
+        $this->declareParameter('name', $nameValidator);
         $this->declareParameter('Network', Validate::CIDR_BLOCK);
+        $this->declareParameter('Interface', $interfaceValidator);
         $this->declareParameter('Description', Validate::ANYTHING);
         $this->declareParameter('f', $this->createValidator()->memberOf('d', 's'));
         $this->declareParameter('i', Validate::POSITIVE_INTEGER);
@@ -62,7 +71,7 @@ class CreateZone extends \Nethgui\Controller\Collection\AbstractAction
         }
         $hint = $request->getParameter('q');
         if ($hint !== NULL) {
-            foreach (array('name', 'Network', 'Description') as $key) {
+            foreach (array('name', 'Interface', 'Network', 'Description') as $key) {
                 if ($this->getValidator($key)->evaluate($hint)) {
                     $this->parameters[$key] = $hint;
                 }
@@ -86,16 +95,36 @@ class CreateZone extends \Nethgui\Controller\Collection\AbstractAction
             $this->getPlatform()
                 ->getDatabase('networks')->setKey($this->parameters['name'], 'zone', array(
                 'Description' => $this->parameters['Description'],
+                'Interface' => $this->parameters['Interface'],
                 'Network' => $this->parameters['Network'],
             ));
             $this->state->resume($this->getParent()->getSession())->assign(sprintf("zone;%s", $this->parameters['name']));
         }
     }
 
+    private function readInterfaces() {
+        $ret = array();
+        $types = array('bridge', 'bond', 'vlan', 'ethernet');
+        $interfaces = $this->getPlatform()->getDatabase('networks')->getAll();
+        foreach ($interfaces as $key => $props) {
+           if (in_array($props['type'], $types)) {
+               $ret[] = $key;
+           }
+        }
+        return $ret;
+    }
+
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
-        $view->setTemplate('NethServer/Template/FirewallObjects/Zones');
+        if (!$this->interfaces) {
+            $this->interfaces = $this->readInterfaces();
+        }
+        $view['InterfaceDatasource'] = array_map(function($fmt) use ($view) {
+                                return array($fmt, $fmt);
+        }, $this->interfaces);
+
+        $view->setTemplate('NethServer/Template/FirewallObjects/Zones/Modify');
         if ( ! $this->getRequest()->isValidated()) {
             return;
         }
