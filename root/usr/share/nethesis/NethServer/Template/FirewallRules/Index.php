@@ -18,14 +18,14 @@ echo $view->buttonList()
 
 // 'groups' contains an array of views..
 echo $view->objectsCollection('Rules')
-    ->setAttribute('placeholders', array('rawAction','ActionIcon','SrcIcon','DstIcon','ServiceIcon','LogIcon','Src','Dst','Service'))
+    ->setAttribute('placeholders', array('rawAction','ActionIcon','SrcIcon','DstIcon','ServiceIcon','LogIcon','Src','Dst','Service', 'status'))
     ->setAttribute('key', 'id')
     ->setAttribute('ifEmpty', function ($view) use ($T) {
         return $T('NoRulesDefined_label');
     })
     ->setAttribute('template', function ($view) use ($T) {
         return $view->panel()
-            ->setAttribute('class', 'fwrule ${rawAction}')
+            ->setAttribute('class', 'fwrule ${rawAction} ${status}')
             ->insert($view->hidden('metadata', $view::STATE_DISABLED))
             ->insert($view->textInput('Position', $view::LABEL_NONE))
             ->insert($view->panel()->setAttribute('class', 'actbox')                
@@ -75,6 +75,9 @@ $view->includeCss('
 .fwrule .Buttonset [role=button] {border-top: none}
 .fwrule .actbox {padding: 3px; width: 7em; font-size: 120%; background: white; text-transform: uppercase; cursor: move;}
 .fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px}
+.fwrule.disabled {color: #aaa !important; }
+.fwrule.disabled .actbox {color: #aaa !important; background-color: #eee}
+.fwrule.disabled .Description, .fwrule.disabled .RuleText {color: #aaa !important; }
 .placeholder {background-color: yellow; margin-bottom: 1.5em; background: linear-gradient(to bottom, rgba(234,239,181,1) 0%,rgba(225,233,160,1) 100%);}
 .fwrule .id {color: #bbb; font-size: 0.7em}
 .Position {width: 2em}
