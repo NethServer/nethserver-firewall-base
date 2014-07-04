@@ -1,0 +1,14 @@
+#
+# 50objects
+#
+{
+    use esmith::NetworksDB;
+    my $ndb = esmith::NetworksDB->open_ro();
+
+    foreach ($ndb->zones()) {
+        my $i = $_->prop('Interface') || "";
+        my $n = $_->prop('Network') || "";
+        next if ($i eq '' || $n eq '');
+        $OUT .= substr($_->key, 0, 5)."\t$i:$n\n";;
+    } 
+}
