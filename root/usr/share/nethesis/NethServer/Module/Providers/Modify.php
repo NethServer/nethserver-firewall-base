@@ -69,7 +69,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $types = array('bridge', 'bond', 'vlan', 'ethernet');
         $interfaces = $this->getPlatform()->getDatabase('networks')->getAll();
         foreach ($interfaces as $key => $props) {
-           if (in_array($props['type'], $types) && stripos($props['role'],'red') !== false) {
+           if (in_array($props['type'], $types) && isset($props['role']) && stripos($props['role'],'red') !== false) {
                $ret[] = $key;
            }
         }
