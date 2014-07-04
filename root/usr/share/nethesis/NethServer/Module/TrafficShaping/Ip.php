@@ -25,8 +25,16 @@ use Nethgui\System\PlatformInterface as Validate;
 /**
  * Configure traffic shaping rules of type port
  */
-class Ip extends \Nethgui\Controller\TableController
+class Ip extends \Nethgui\Controller\TableController implements \Nethgui\Utility\SessionConsumerInterface
 {
+    /**
+     *
+     * @var \Nethgui\Utility\SessionInterface
+     */
+    private $session;
+
+    private $myCurrentAction;
+
     public function initialize()
     {
 
@@ -44,9 +52,58 @@ class Ip extends \Nethgui\Controller\TableController
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->addRowAction(new \NethServer\Module\TrafficShaping\Ip\Modify('update'))
             ->addRowAction(new \NethServer\Module\TrafficShaping\Ip\Modify('delete'))
+            ->addChild(new \NethServer\Module\FirewallRules\CreateHost())
+            ->addChild(new \NethServer\Module\FirewallRules\CreateHostGroup())
+            ->addChild(new \NethServer\Module\FirewallRules\CreateZone())
+            ->addChild(new \NethServer\Tool\SaveState())
+            ->addChild(new \NethServer\Tool\PickObject());
         ;
 
         parent::initialize();
+    }
+
+    protected function establishCurrentActionId()
+    {
+        $request = $this->getRequest();
+        $params = array();
+        if ($request->hasParameter('create')) {
+            $params = $request->getParameter('create');
+            $action = 'create';
+        } elseif ($request->hasParameter('update')) {
+            if($request->isMutation()) {
+            $params = $request->getParameter('update');
+            } else {
+               $subRequest = $request->spawnRequest('update');
+               $params = $subRequest->getParameter(\Nethgui\array_head($subRequest->getPath()));
+            }
+            $action = implode('/', $request->getPath());
+        }
+        if (isset($params['PickSource']) && $request->isMutation()) {
+            $this->getAction('SaveState')->setField('SrcRaw')->setReturnPath($action)->setResumeState($params);
+            return 'SaveState';                    
+        }
+
+        $this->myCurrentAction = parent::establishCurrentActionId();
+
+        if(isset($params['f'], $params['h']) && ! $request->isMutation()) {
+            $this->getAction('SaveState')->setResumeCallback(function (\Nethgui\View\ViewInterface $view, $state) {
+                $view['Priority'] = $state['Priority'];
+                $view['Description'] = $state['Description'];
+                $view['SrcRaw'] = $state['SrcRaw'];
+                $view['Source'] = ucfirst(str_replace(';', ' ', $state['SrcRaw']));
+                $view->getCommandList()->show();
+            });
+        }
+
+        return $this->myCurrentAction;
+    }
+
+    public function prepareView(\Nethgui\View\ViewInterface $view)
+    {
+        parent::prepareView($view);
+        if($this->getAction('SaveState')->hasResumeCallback()) {
+            $this->getAction('SaveState')->resumeView($view[$this->myCurrentAction]);
+        }
     }
 
     public function prepareViewForColumnPriority(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
@@ -56,13 +113,18 @@ class Ip extends \Nethgui\Controller\TableController
 
     public function prepareViewForColumnKey(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
     {
-        $tmp = explode(';',$key);
-        if (isset($tmp[1])) {
-            return $tmp[1];
-        } else {
-            return $key;
-        }
+        return ucfirst(str_replace(';', ' ', $key));
+    }
 
+    public function setSession(\Nethgui\Utility\SessionInterface $session)
+    {
+        $this->session = $session;
+        return $this;
+    }
+
+    public function getSession()
+    {
+        return $this->session;
     }
 
 }

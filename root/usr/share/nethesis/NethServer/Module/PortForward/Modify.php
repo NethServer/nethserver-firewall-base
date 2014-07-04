@@ -92,7 +92,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('Proto', $protoValidator, \Nethgui\Controller\Table\Modify::FIELD),
             array('Src',  $portRangeValidator, \Nethgui\Controller\Table\Modify::FIELD),
             array('Dst', $dstValidator, \Nethgui\Controller\Table\Modify::FIELD),
-            array('DstHost', Validate::IPv4, \Nethgui\Controller\Table\Modify::FIELD),
+            array('DstRaw', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD, 'DstHost'),
             array('OriDst', Validate::IPv4_OR_EMPTY, \Nethgui\Controller\Table\Modify::FIELD),
             array('status', Validate::SERVICESTATUS, \Nethgui\Controller\Table\Modify::FIELD),
             array('Allow', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),

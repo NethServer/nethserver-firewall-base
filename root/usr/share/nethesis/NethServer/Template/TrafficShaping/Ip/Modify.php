@@ -9,9 +9,23 @@ if ($view->getModule()->getIdentifier() == 'update') {
 echo $view->header()->setAttribute('template',$T($headerText));
 
 if ($view->getModule()->getIdentifier() == 'update') {
-    $address = $view->textInput('address', $view::STATE_DISABLED | $view::STATE_READONLY);
+    $address = $view->textInput('Source', $view::STATE_DISABLED | $view::STATE_READONLY);
 } else {
-    $address = $view->textInput('address');
+    $address = $view->panel()->setAttribute('class', 'labeled-control label-above')
+    ->insert($view->literal(sprintf('<label for="%s">%s</label>', $view->getUniqueId('address'), \htmlspecialchars($T('Source_label')))))
+    ->insert($view->textInput('Source', $view::STATE_READONLY | $view::LABEL_NONE)->setAttribute('class', 'pencil'))
+    ->insert($view->button('PickSource', $view::BUTTON_SUBMIT))
+    ->insert($view->hidden('SrcRaw'))
+;
+
+$buttonTarget = $view->getClientEventTarget('PickSource');
+$inputTarget = $view->getClientEventTarget('Source');
+$view->includeJavascript("
+jQuery(function ($) {
+    $('.${buttonTarget}').hide();
+    $('.${inputTarget}').css({'background-color': 'white', 'cursor': 'pointer'}).on('click', function(e) { $(this).next().click(); });
+});
+");
 }
 
 echo $view->panel()

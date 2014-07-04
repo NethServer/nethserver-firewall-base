@@ -5,7 +5,7 @@
 $L['Allow_label'] = 'Permetti solo da';
 $L['check-rules_Header'] = 'Controlla regole firewall';
 $L['CheckRules_label'] = 'Controlla firewall';
-$L['create_header_label'] = 'Crea port foward';
+$L['create_header_label'] = 'Crea port forward';
 $L['Description_label'] = 'Descrizione';
 $L['disable_label'] = 'Disabilita';
 $L['DstHost_label'] = 'Host destinazione';
@@ -26,3 +26,5 @@ $L['udp_label'] = 'UDP';
 $L['tcp,udp_label'] = 'TCP,UDP';
 $L['OriDst_label'] = "IP WAN (interfaccia red)";
 $L['any_label'] = "Qualsiasi";
+$L['PickDestination_label'] = 'Scegli destinazione...';
+

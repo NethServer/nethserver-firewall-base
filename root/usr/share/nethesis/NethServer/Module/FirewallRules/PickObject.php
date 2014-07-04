@@ -37,6 +37,11 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
      */
     private $state;
 
+    protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $attributes)
+    {
+        return new \NethServer\Tool\CustomModuleAttributesProvider($attributes, array('languageCatalog' => 'NethServer_Module_FirewallRules'));
+    }
+
     public function initialize()
     {
         parent::initialize();

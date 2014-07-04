@@ -36,15 +36,17 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     public function initialize()
     {
-        $addressValidator = $this->createValidator()->orValidator($this->createValidator(Validate::IPv4),$this->createValidator(Validate::MACADDRESS));
+        $addressValidator = $this->createValidator()->orValidator($this->createValidator(Validate::IPv4),$this->createValidator()->platform('firewall-object-exists'));
         $parameterSchema = array(
-            array('address', $addressValidator, \Nethgui\Controller\Table\Modify::KEY),
+            array('SrcRaw', $addressValidator, \Nethgui\Controller\Table\Modify::KEY),
             array('Priority', $this->createValidator()->memberOf(array("1","2","3")), \Nethgui\Controller\Table\Modify::FIELD),
             array('Description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
         );
 
 
+        $this->setCreateDefaults(array('Priority' => '1', 'Description' => ''));
         $this->setSchema($parameterSchema);
+        
 
         parent::initialize();
     }
@@ -59,7 +61,10 @@ class Modify extends \Nethgui\Controller\Table\Modify
             'delete' => 'Nethgui\Template\Table\Delete',
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
-        
+
+        if(isset($view['SrcRaw'])) {
+            $view['Source'] = ucfirst(str_replace(';', ' ', $view['SrcRaw']));
+        }
         $view['PriorityDatasource'] = array(array('1',$view->translate('1_label')),array('2',$view->translate('2_label')),array('3',$view->translate('3_label')));
  
     }

@@ -26,3 +26,4 @@ $L['udp_label'] = 'UDP';
 $L['tcp,udp_label'] = 'TCP,UDP';
 $L['OriDst_label'] = "WAN IP (red interface)";
 $L['any_label'] = "Any";
+$L['PickDestination_label'] = 'Pick destination...';

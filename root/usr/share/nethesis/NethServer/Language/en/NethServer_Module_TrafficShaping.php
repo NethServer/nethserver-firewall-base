@@ -5,7 +5,7 @@
 $L['1_label'] = 'High';
 $L['2_label'] = 'Medium';
 $L['3_label'] = 'Low';
-$L['address_label'] = 'Source IP address';
+$L['Source_label'] = 'Source IP address';
 $L['Description_label'] = 'Description';
 $L['device_label'] = 'Interface';
 $L['Devices_Title'] = 'Interface';
@@ -36,3 +36,5 @@ $L['TrafficShaping_Description'] = 'Manage Traffic Shaping';
 $L['TrafficShaping_Tags'] = 'tc traffic shaping shape qos';
 $L['TrafficShaping_Title'] = 'Traffic shaping';
 $L['udp_label'] = 'UDP';
+$L['PickSource_label'] = 'Pick source...';
+
