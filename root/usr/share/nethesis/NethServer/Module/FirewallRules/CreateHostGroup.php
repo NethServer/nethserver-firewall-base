@@ -82,7 +82,7 @@ class CreateHostGroup extends \Nethgui\Controller\Collection\AbstractAction
         parent::process();
         if ($this->getRequest()->isMutation()) {
             $this->getPlatform()
-                ->getDatabase('hosts')->setKey($this->parameters['name'], 'host', array(
+                ->getDatabase('hosts')->setKey($this->parameters['name'], 'host-group', array(
                 'Description' => $this->parameters['Description'],
                 'Members' => implode(',', $this->parameters['Members']),
             ));
