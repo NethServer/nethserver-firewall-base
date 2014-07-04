@@ -99,7 +99,7 @@ class FirewallObjectsFinder implements \IteratorAggregate, \Countable
                 $tmp[$props['role']] = '';
             }
         }
-        $roles = array_diff(array_keys($tmp),array('bridged','alias','slave'));
+        $roles = array_filter(array_diff(array_keys($tmp),array('bridged','alias','slave')));
         foreach ($roles as $role) {
             if ( ! $text || strstr($role, strtolower($text)) !== FALSE) {
                 $this->results->append(new \NethServer\Tool\FirewallObject($role, 'role', array()));
