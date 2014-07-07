@@ -115,8 +115,10 @@ event_actions($event,
 );
 
 #--------------------------------------------------
-# actions for interface-update event
+# actions for firewall-object-exists validator
 #--------------------------------------------------
 
-$event = "interface-update";
+validator_actions('firewall-object-exists', qw(
+                  uniq-fwobject 20
+));
 
