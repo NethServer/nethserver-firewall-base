@@ -55,7 +55,7 @@ class Ip extends \Nethgui\Controller\TableController implements \Nethgui\Utility
             ->addChild(new \NethServer\Module\FirewallRules\CreateHost())
             ->addChild(new \NethServer\Module\FirewallRules\CreateHostGroup())
             ->addChild(new \NethServer\Module\FirewallRules\CreateZone())
-            ->addChild(new \NethServer\Tool\SaveState())
+            ->addChild(new \NethServer\Tool\SaveState(NULL, 'ts'))
             ->addChild(new \NethServer\Tool\PickObject());
         ;
 

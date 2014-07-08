@@ -32,6 +32,7 @@ class SaveState extends \Nethgui\Controller\AbstractController
     private $fieldName = '';
     private $returnPath = '';
     private $resumeCallback;
+    private $moduleCode;
 
     /**
      *
@@ -39,9 +40,10 @@ class SaveState extends \Nethgui\Controller\AbstractController
      */
     private $state;
 
-    public function __construct($identifier = NULL)
+    public function __construct($identifier = NULL, $moduleCode)
     {
         parent::__construct($identifier);
+        $this->moduleCode = $moduleCode;
         $this->state = new \NethServer\Module\FirewallRules\RuleWorkflow();
     }
 
@@ -104,23 +106,8 @@ class SaveState extends \Nethgui\Controller\AbstractController
         });
 
         if ($this->fieldName && $this->returnPath && $this->resumeState) {
-            $view->getCommandList()->sendQuery($view->getModuleUrl(sprintf('../PickObject?f=%s', $this->fieldName)));
+            $view->getCommandList()->sendQuery($view->getModuleUrl(sprintf('../PickObject?f=%s&m=%s', $this->fieldName, $this->moduleCode)));
         }
-//        if (is_callable($this->resumeCallback)) {
-//            $state = new \ArrayObject();
-//            $this->state->copyTo($state, iterator_to_array($this->getParent()->getSession()->retrieve(__CLASS__)));
-//            call_user_func($this->resumeCallback, $view, $state);
-//        } else {
-//            $view->setTemplate(FALSE);
-//        }
-    }
-
-    public function nextPath()
-    {
-        if ($this->fieldName && $this->returnPath && $this->resumeState) {
-            return sprintf('PickObject?f=%s', $this->fieldName);
-        }
-        return FALSE;
     }
 
 }

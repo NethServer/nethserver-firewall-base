@@ -47,6 +47,7 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
         parent::initialize();
         $this->declareParameter('q', Validate::ANYTHING);  // search query
         $this->declareParameter('f', $this->createValidator()->memberOf('SrcRaw', 'DstRaw', 'ServiceRaw')); // field to modify
+        $this->declareParameter('m', $this->createValidator()->memberOf('ts', 'pf', 'fr', ''));
         $this->declareParameter('Result', Validate::ANYTHING);
         $this->state = new \NethServer\Module\FirewallRules\RuleWorkflow();
     }
@@ -73,11 +74,19 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
         } elseif ($this->getRequest()->isValidated()) {
             $view['CreateLinks'] = $this->getCreateLinks($view, $this->parameters['q']);
             $view['PickObjectHeader'] = $view->translate("PickObject_" . $this->parameters['f'] . "_header", array('RuleId' => $this->state->getStartIdentifier() === 'Edit' ? '#' . $this->state->getRuleId() : $view->translate('A_new_rule_label')));
-            $results = array(array('any', $view->translate('Any_label')));
+
+            $results = array();
+            $ANY = array('any', $view->translate('Any_label'));
 
             if ($this->parameters['f'] === 'ServiceRaw') {
+                $results[] = $ANY;
                 $where = array('fwservices' => array('fwservice'));
+            } elseif ($this->parameters['m'] === 'ts') {
+                $where = array('hosts' => array('host'), 'networks' => array('zone'));
+            } elseif ($this->parameters['m'] === 'pf') {
+                $where = array('hosts' => array('host'));
             } else {
+                $results[] = $ANY;
                 $where = array('hosts' => array('host', 'host-group'), 'networks' => array('zone'), 'ROLES' => array());
             }
 
@@ -98,7 +107,7 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
             }
 
             if( ! $this->parameters['q']) {
-                $view->getCommandList()->show();
+               $view->getCommandList()->show();
             }
         }
     }
@@ -117,6 +126,15 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
         if ($this->parameters['f'] === 'ServiceRaw') {
             return array(
                 array('Create' => array($view->getModuleUrl('../CreateService?q=' . $hint), $view->translate('Services_create', array($hint)))),
+            );
+        } elseif($this->parameters['m'] === 'pf') {
+            return array(
+                array('Create' => array($view->getModuleUrl('../CreateHost?q=' . $hint), $view->translate('Hosts_create', array($hint)))),
+            );
+        } elseif($this->parameters['m'] === 'ts') {
+            return array(
+                array('Create' => array($view->getModuleUrl('../CreateHost?q=' . $hint), $view->translate('Hosts_create', array($hint)))),
+                array('Create' => array($view->getModuleUrl('../CreateZone?q=' . $hint), $view->translate('Zones_create', array($hint)))),
             );
         } else {
             return array(
