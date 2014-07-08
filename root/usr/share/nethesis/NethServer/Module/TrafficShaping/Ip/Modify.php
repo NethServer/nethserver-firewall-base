@@ -36,9 +36,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     public function initialize()
     {
-        $addressValidator = $this->createValidator()->orValidator($this->createValidator(Validate::IPv4),$this->createValidator()->platform('firewall-object-exists'));
         $parameterSchema = array(
-            array('SrcRaw', $addressValidator, \Nethgui\Controller\Table\Modify::KEY),
+            array('SrcRaw', $this->createValidator()->platform('firewall-object-exists'), \Nethgui\Controller\Table\Modify::KEY),
             array('Priority', $this->createValidator()->memberOf(array("1","2","3")), \Nethgui\Controller\Table\Modify::FIELD),
             array('Description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
         );
