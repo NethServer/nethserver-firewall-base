@@ -81,11 +81,12 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
                 $where = array('hosts' => array('host', 'host-group'), 'networks' => array('zone'), 'ROLES' => array());
             }
 
-            $s = \NethServer\Tool\FirewallObjectsFinder::search($this->getPlatform(), $this->getRequest()->getParameter('q'), $where);
+            $T = array($view->getTranslator(), 'translate');
+            $s = \NethServer\Tool\FirewallObjectsFinder::search($this->getPlatform(), $this->getRequest()->getParameter('q'), $where, $T);
             $i = 0;
             /* @var $result \NethServer\Tool\FirewallObject */
             foreach ($s as $result) {
-                $results[] = array($result->getValue(), $result->getShortTitle());
+                $results[] = array($result->getValue(), $result->getTitle());
                 if (++ $i >= 10) {
                     $view['ResultsCount'] = 'Showing 10 results out of ' . count($s);
                     break;
