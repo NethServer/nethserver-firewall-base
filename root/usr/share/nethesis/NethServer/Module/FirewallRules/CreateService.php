@@ -31,7 +31,7 @@ use Nethgui\System\PlatformInterface as Validate;
  */
 class CreateService extends \Nethgui\Controller\Collection\AbstractAction
 {
-    private $protocols = array('tcp', 'tcpudp', 'udp', 'esp', 'gre', 'icmp');
+    private $protocols = array('tcp', 'tcpudp', 'udp');
 
     /**
      *

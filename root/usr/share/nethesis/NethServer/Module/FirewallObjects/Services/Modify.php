@@ -30,7 +30,7 @@ use Nethgui\Controller\Table\Modify as Table;
  */
 class Modify extends \Nethgui\Controller\Table\Modify
 {
-    private $protocols = array('tcp','tcpudp','udp','gre','icmp');
+    private $protocols = array('tcp', 'tcpudp', 'udp');
 
     public function initialize()
     {
