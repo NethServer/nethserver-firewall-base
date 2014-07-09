@@ -17,10 +17,12 @@ Porta destinazione
     Specifica la porta sul host interno e destinazione del traffico.
 
 Host destinazione
-    E' la macchina interna alla LAN a cui verrà rediretto il traffico.
+    Selezionare la macchina interna alla LAN a cui verrà rediretto il traffico.
 
-Permetti solo da
-    Permette il forward del traffico solo da alcune sorgenti reti/host.
+Permetti solo da 
+    Permette il forward del traffico solo da alcune sorgenti
+    reti/host, secondo le `specifiche di Shorewall per SOURCE
+    <http://shorewall.net/FAQ.htm#PortForwarding>`_.
 
 Descrizione
     Descrizione opzionale della regola di port forwarding.

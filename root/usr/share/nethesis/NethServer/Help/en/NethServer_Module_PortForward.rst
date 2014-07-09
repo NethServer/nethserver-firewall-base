@@ -2,10 +2,10 @@
 Port forward
 ============
 
-Use this panel to change firewall rules
-ie to open a specific port (or a range of ports) on the server
-and forward the traffic from a port to another. Port forwarding rules
-allow access to hosts on the local network from the Internet.
+Use this panel to change firewall rules, i.e. to open a specific port
+(or a range of ports) on the server and forward the traffic from a
+port to another.  Port forwarding rules allow access to hosts on the
+local network from the Internet.
 
 Create / Modify
 ===============
@@ -17,10 +17,12 @@ Destination port
     Insert the port on the internal host which will be destination of the traffic.
 
 Destination host
-    IP address of the internal machine where traffic will be redirected.
+    Select the internal machine where traffic will be redirected.
 
 Allow only
-    Allow traffic forward only from some networks/hosts source.
+    Allow traffic forward only from some networks/hosts, as specified
+    into `Shorewall Port Forwarding FAQ
+    <http://shorewall.net/FAQ.htm#PortForwarding>`_.
 
 Description
     Optional description of port forwarding rule.

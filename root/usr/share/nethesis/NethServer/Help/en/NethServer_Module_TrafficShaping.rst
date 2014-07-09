@@ -44,22 +44,22 @@ Description
 Address rules
 ==============
 
-The table shows the list of network addresses (IP or MAC) that have
-customized priority rules. For example, you may decide
-that traffic from a specific computer on the local network
-have a low priority or high compared to others.
+The table shows the list of hosts or network zones that have
+customized priority rules. For example, you may decide that traffic
+from a specific computer on the local network have a low priority or
+high compared to others.
 
 
 Create / Modify 
 ---------------
 
-IP or MAC address
-    Enter the IP address or MAC address that identifies the computer.
+Source IP address
+     Select an host or network zone.
 
 Description
      An optional description to identify
-     clearly the purpose of the rule. For example: high priority for the
-     boss.
+     clearly the purpose of the rule. For example,
+     *high priority for the boss*.
 
 Port rules 
 ==========
@@ -82,5 +82,5 @@ Protocol
 
 Description
     An optional description that 
-    clearly states the purpose of the rule. For example: background for
-    FTP service.
+    clearly states the purpose of the rule. For example,
+    *background for FTP service*.
