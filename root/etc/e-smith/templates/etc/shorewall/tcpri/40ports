@@ -1,9 +1,9 @@
 {
     $db = esmith::ConfigDB->open("tc") || die "Can't open tc database: $!\n";
     foreach my $port ( $db->get_all_by_prop('type' => 'port') ) {
-        $priority = $port->prop('priority') || next;
-        $proto = $port->prop('proto') || next;
-        $description =  $port->prop('description') || "";
+        $priority = $port->prop('Priority') || next;
+        $proto = $port->prop('Proto') || next;
+        $description =  $port->prop('Description') || "";
         $OUT .= "# Port: ".$port->key. " - $description\n";
         $OUT .= "$priority\t$proto\t".$port->key."\n";
     }

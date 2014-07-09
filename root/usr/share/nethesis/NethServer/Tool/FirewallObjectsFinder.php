@@ -35,6 +35,12 @@ class FirewallObjectsFinder implements \IteratorAggregate, \Countable
      */
     private $results;
 
+    /**
+     *
+     * @var callable
+     */
+    private $translator;
+
     private function __construct()
     {
         $this->results = new \ArrayObject();
@@ -46,7 +52,7 @@ class FirewallObjectsFinder implements \IteratorAggregate, \Countable
      * @param string $where
      * @return \self
      */
-    public static function search(\Nethgui\System\PlatformInterface $platform, $text = '', $where = array())
+    public static function search(\Nethgui\System\PlatformInterface $platform, $text = '', $where = array(), $translator = NULL)
     {
         $o = new self();
 
@@ -55,6 +61,7 @@ class FirewallObjectsFinder implements \IteratorAggregate, \Countable
             unset($where['ROLES']);
         }
         $o->addSearchInDb($platform, $text, $where);
+        $o->translator = $translator;
         return $o;
     }
 
@@ -86,7 +93,7 @@ class FirewallObjectsFinder implements \IteratorAggregate, \Countable
                 } else {
                     $type = $types[0];
                 }
-                $this->results->append(new \NethServer\Tool\FirewallObject($key, $type, $props));
+                $this->results->append(new \NethServer\Tool\FirewallObject($key, $type, $props, $this->translator));
             }
         }
     }

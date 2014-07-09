@@ -1,8 +1,8 @@
 <?php
-namespace NethServer\Module\PortForward;
+namespace NethServer\Tool;
 
 /*
- * Copyright (C) 2012 Nethesis S.r.l.
+ * Copyright (C) 2014  Nethesis S.r.l.
  *
  * This script is part of NethServer.
  *
@@ -21,22 +21,16 @@ namespace NethServer\Module\PortForward;
  */
 
 /**
- * Check shorewall rules
+ * TODO: add component description here
  *
- * @author Giacomo Sanchietti <giacomo.sanchietti@nethesis.it>
+ * @author Davide Principi <davide.principi@nethesis.it>
+ * @since 1.6
  */
-class CheckRules extends \Nethgui\Controller\Table\AbstractAction
+class PickObject extends \NethServer\Module\FirewallRules\PickObject
 {
-    private $output = "";
-
-    public function process()
+    public function __construct($identifier = NULL)
     {
-        $this->output = $this->getPlatform()->exec('/usr/bin/sudo /usr/libexec/nethserver/shorewall-check')->getOutput();
-        parent::process();
-    }
- 
-    public function prepareView(\Nethgui\View\ViewInterface $view)
-    {
-         $view['check-rules'] = $this->output; 
+        parent::__construct($identifier);
+        $this->setViewTemplate('NethServer\Template\FirewallRules\PickObject');
     }
 }

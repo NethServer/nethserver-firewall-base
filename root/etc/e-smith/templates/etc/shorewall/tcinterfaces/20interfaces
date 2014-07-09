@@ -7,10 +7,9 @@
         if ( ($i->prop('role') || "") eq "") {
             next;
         }
-        $in = $interface->prop('in') || next;
-        $out = $interface->prop('out') || next;
-        $dtype = $interface->prop('dtype') || 'External';
-        $OUT .= $interface->key."\t$dtype\t".$in."kbit\t".$out."kbit\n"
+        $in = $interface->prop('In') || next;
+        $out = $interface->prop('Out') || next;
+        $OUT .= $interface->key."\t-\t".$in."kbit\t".$out."kbit\n"
     }
 
 }

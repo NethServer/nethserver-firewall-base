@@ -14,6 +14,7 @@ $searchForm->insert(
         ->insert($view->literal(' '))
         ->insert($view->button('Find'))
         ->insert($view->hidden('f'))
+        ->insert($view->hidden('m'))
 );
 
 $resultsForm = $view->form()->setAttribute('method', 'post');
@@ -23,6 +24,7 @@ $resultsForm
     ->insert($view->selector('Result', $view::LABEL_NONE))
     ->insert($view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_CANCEL))
     ->insert($view->hidden('f'))
+    //->insert($view->hidden('m'))
 ;
 
 $createLinks = $view->objectsCollection('CreateLinks')

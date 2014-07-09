@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+
+use NethServer::Firewall;
+use esmith::NetworksDB;
+
+my $objName = shift || die('Missing account object argument');
+my $fw = new NethServer::Firewall();
+my $val = undef;
+
+my @tmp = split(/;/,$objName);
+if ($tmp[0] eq "zone") {
+    my $ndb = esmith::NetworksDB->open_ro();
+    $val = $ndb->get($tmp[1]);
+} else {
+    $val = $fw->getAddress($objName);
+}
+
+if ($val)
+{
+    exit 0;
+} else {
+    print "The firewall object '$objName' does not exists\n";
+    exit 3;
+}

@@ -21,7 +21,7 @@
     my %zones;
     foreach my $i ($ndb->interfaces) {
         my $role = $i->prop('role') || '';
-        next if ($role eq '' || $role eq 'red' || $role eq 'slave' || $role eq 'bridged');
+        next if ($role eq '' || $role eq 'red' || $role eq 'slave' || $role eq 'bridged' || $role eq 'alias');
         my $zone = substr($role, 0, 5); #truncate zone name to 5 chars
         if ($role eq 'green') { # rename green to loc
             $zone = 'loc';

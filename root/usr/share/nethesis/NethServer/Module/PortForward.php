@@ -25,8 +25,16 @@ use Nethgui\System\PlatformInterface as Validate;
 /**
  * Configure port forward
  */
-class PortForward extends \Nethgui\Controller\TableController
+class PortForward extends \Nethgui\Controller\TableController implements \Nethgui\Utility\SessionConsumerInterface
 {
+    /**
+     *
+     * @var \Nethgui\Utility\SessionInterface
+     */
+    private $session;
+
+    private $myCurrentAction;
+
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
     {
         return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Gateway', 20);
@@ -37,27 +45,80 @@ class PortForward extends \Nethgui\Controller\TableController
 
         $columns = array(
             'Key',
-            'proto',
-            'src',
-            'dstHost',
-            'dst',
-            'description',
+            'Proto',
+            'Src',
+            'DstHost',
+            'Dst',
+            'Description',
             'Actions'
         );
 
         $this
             ->setTableAdapter($this->getPlatform()->getTableAdapter('portforward','pf'))
             ->setColumns($columns)
-            ->addTableAction(new \NethServer\Module\PortForward\Modify('create'))            
-            ->addTableAction(new \NethServer\Module\PortForward\CheckRules())            
+            ->addTableAction(new \NethServer\Module\PortForward\Modify('create'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->addRowAction(new \NethServer\Module\PortForward\ToggleEnable('disable'))
             ->addRowAction(new \NethServer\Module\PortForward\ToggleEnable('enable'))
             ->addRowAction(new \NethServer\Module\PortForward\Modify('update'))
             ->addRowAction(new \NethServer\Module\PortForward\Modify('delete'))
+            ->addChild(new \NethServer\Module\FirewallRules\CreateHost())
+            ->addChild(new \NethServer\Module\FirewallRules\CreateHostGroup())
+            ->addChild(new \NethServer\Module\FirewallRules\CreateZone())
+            ->addChild(new \NethServer\Tool\SaveState(NULL, 'pf'))
+            ->addChild(new \NethServer\Tool\PickObject());
         ;
 
         parent::initialize();
+    }
+
+    protected function establishCurrentActionId()
+    {
+        $request = $this->getRequest();
+        $params = array();
+        if ($request->hasParameter('create')) {
+            $params = $request->getParameter('create');
+            $action = 'create';
+        } elseif ($request->hasParameter('update')) {
+            if($request->isMutation()) {
+            $params = $request->getParameter('update');
+            } else {
+               $subRequest = $request->spawnRequest('update');
+               $params = $subRequest->getParameter(\Nethgui\array_head($subRequest->getPath()));
+            }
+            $action = implode('/', $request->getPath());
+        }
+        if (isset($params['PickDestination']) && $request->isMutation()) {
+            $this->getAction('SaveState')->setField('DstRaw')->setReturnPath($action)->setResumeState($params);
+            return 'SaveState';
+        }
+        
+        $this->myCurrentAction = parent::establishCurrentActionId();
+
+        if (isset($params['f'], $params['h']) && ! $request->isMutation()) {
+            $this->getAction('SaveState')->setResumeCallback(function (\Nethgui\View\ViewInterface $view, $state) {                
+                $view['Proto'] = $state['Proto'];
+                $view['Description'] = $state['Description'];
+                $view['DstRaw'] = $state['DstRaw'];
+                $view['Destionation'] = ucfirst(str_replace(';', ' ', $state['DstRaw']));
+                $view['OriDst'] = $state['OriDst'];
+                $view['Src'] = $state['Src'];
+                $view['Dst'] = $state['Dst'];
+                $view['Allow'] = $state['Allow'];
+                $view['Destination'] = ucfirst(str_replace(';', ' ', $state['DstRaw']));
+                $view->getCommandList()->show();
+            });
+        }
+
+        return $this->myCurrentAction;
+    }
+
+    public function prepareView(\Nethgui\View\ViewInterface $view)
+    {
+        parent::prepareView($view);
+        if($this->getAction('SaveState')->hasResumeCallback()) {
+            $this->getAction('SaveState')->resumeView($view[$this->myCurrentAction]);
+        }
     }
 
     public function prepareViewForColumnProto(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
@@ -65,8 +126,17 @@ class PortForward extends \Nethgui\Controller\TableController
         if (!isset($values['status']) || ($values['status'] == "disabled")) {
             $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-locked');
         }
-        return $values['proto'];
+        return strtoupper($values['Proto']);
     }
+
+    public function prepareViewForColumnDstHost(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        if( ! isset($values['DstHost'])) {
+            return '';
+        }
+        return ucfirst(str_replace(';', ' ', $values['DstHost']));
+    }
+
 
     /**
      * Override prepareViewForColumnActions to hide/show enable/disable actions
@@ -98,6 +168,16 @@ class PortForward extends \Nethgui\Controller\TableController
 
         return $cellView;
     }
-        
-}
 
+    public function setSession(\Nethgui\Utility\SessionInterface $session)
+    {
+        $this->session = $session;
+        return $this;
+    }
+
+    public function getSession()
+    {
+        return $this->session;
+    }
+
+}

@@ -39,14 +39,14 @@ class Modify extends \Nethgui\Controller\Table\Modify
     {
         $parameterSchema = array(
             array('port', Validate::PORTNUMBER, \Nethgui\Controller\Table\Modify::KEY),
-            array('priority', $this->createValidator()->memberOf(array("1","2","3")), \Nethgui\Controller\Table\Modify::FIELD),
-            array('proto', $this->createValidator()->memberOf($this->protocols), \Nethgui\Controller\Table\Modify::FIELD),
-            array('description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
+            array('Priority', $this->createValidator()->memberOf(array("1","2","3")), \Nethgui\Controller\Table\Modify::FIELD),
+            array('Proto', $this->createValidator()->memberOf($this->protocols), \Nethgui\Controller\Table\Modify::FIELD),
+            array('Description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
         );
 
 
         $this->setSchema($parameterSchema);
-        $this->setDefaultValue('proto', 'tcp');
+        $this->setDefaultValue('Proto', 'tcp');
 
         parent::initialize();
     }
@@ -62,8 +62,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
         
-        $view['protoDatasource'] = array(array('tcp',$view->translate('tcp_label')),array('udp',$view->translate('udp_label')),array('icmp',$view->translate('icmp_label')));
-        $view['priorityDatasource'] = array(array('1',$view->translate('1_label')),array('2',$view->translate('2_label')),array('3',$view->translate('3_label')));
+        $view['ProtoDatasource'] = array(array('tcp',$view->translate('tcp_label')),array('udp',$view->translate('udp_label')),array('icmp',$view->translate('icmp_label')));
+        $view['PriorityDatasource'] = array(array('1',$view->translate('1_label')),array('2',$view->translate('2_label')),array('3',$view->translate('3_label')));
  
     }
 

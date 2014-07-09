@@ -34,6 +34,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
 {
 
     private $exitCode = 0;
+    private $protocols = array('tcp','udp','tcp,udp');
+    private $wanips = array();
 
     protected function calculateKeyFromRequest(\Nethgui\Controller\RequestInterface $request)
     {
@@ -44,6 +46,29 @@ class Modify extends \Nethgui\Controller\Table\Modify
          return (int)max(array_keys($rules))+1;
     }
 
+    private function readWanIPs()
+    {
+        $ret = array();
+        $interfaces = $this->getPlatform()->getDatabase('networks')->getAll();
+        foreach ($interfaces as $interface => $props) {
+            if (preg_match('/ethernet|bridge|bond|alias|ipsec/',$props['type'])) {
+                # if alias, search for parent ethernet
+                if (isset($props['role']) && $props['role'] == 'alias') {
+                    $tmp = explode(':',$interface);
+                    $tmp = $interfaces[$tmp[0]];
+                    $props['role'] = $tmp['role']?$tmp['role']:'';
+                }   
+                if(isset($props['role']) && $props['role'] == 'red' 
+                   && isset($props['ipaddr']) && $props['ipaddr'] != '') {
+                    $ret[] = $props['ipaddr'];
+                }
+            }
+        }
+        $ret[] = ''; # add any ip source
+        return $ret;
+
+    }
+
     public function initialize()
     {
         $portRangeValidator = $this->createValidator()
@@ -51,23 +76,34 @@ class Modify extends \Nethgui\Controller\Table\Modify
                 $this->createValidator()->integer()->greatThan(0)->lessThan(65535),
                 $this->createValidator()->regexp('/^[0-9]+\:[0-9]+$/') #port range, no check on maximum value
             );
+        $dstValidator = $this->createValidator()
+            ->orValidator(
+                $this->createValidator()->integer()->greatThan(0)->lessThan(65535),
+                $this->createValidator()->isEmpty()
+            );
+
+        $protoValidator = $this->createValidator()->memberOf($this->protocols);
+        if (!$this->wanips) {
+            $this->wanips = $this->readWanIPs();
+        }
 
         $parameterSchema = array(
             array('id', FALSE, \Nethgui\Controller\Table\Modify::KEY),
-            array('proto', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
-            array('src',  $portRangeValidator, \Nethgui\Controller\Table\Modify::FIELD),
-            array('dst', Validate::PORTNUMBER, \Nethgui\Controller\Table\Modify::FIELD),
-            array('dstHost', Validate::IPv4, \Nethgui\Controller\Table\Modify::FIELD),
-            array('srcHost', Validate::IPv4_OR_EMPTY, \Nethgui\Controller\Table\Modify::FIELD),
+            array('Proto', $protoValidator, \Nethgui\Controller\Table\Modify::FIELD),
+            array('Src',  $portRangeValidator, \Nethgui\Controller\Table\Modify::FIELD),
+            array('Dst', $dstValidator, \Nethgui\Controller\Table\Modify::FIELD),
+            array('DstRaw', $this->createValidator()->platform('firewall-object-exists'), \Nethgui\Controller\Table\Modify::FIELD, 'DstHost'),
+            array('OriDst', Validate::IPv4_OR_EMPTY, \Nethgui\Controller\Table\Modify::FIELD),
             array('status', Validate::SERVICESTATUS, \Nethgui\Controller\Table\Modify::FIELD),
-            array('allow', $this->createValidator(Validate::ANYTHING)->platform('shorewall-check'), \Nethgui\Controller\Table\Modify::FIELD),
-            array('description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
+            array('Allow', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
+            array('Description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
         );
 
 
         $this->setSchema($parameterSchema);
-        $this->setDefaultValue('proto', 'tcp');
+        $this->setDefaultValue('Proto', 'tcp');
         $this->setDefaultValue('status', 'enabled');
+        $this->setDefaultValue('OriDst', '');
 
         parent::initialize();
     }
@@ -98,7 +134,16 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
         
-        $view['protoDatasource'] = array(array('tcp',$view->translate('tcp_label')),array('udp',$view->translate('udp_label')));
+        $view['ProtoDatasource'] = array_map(function($fmt) use ($view) {
+                                return array($fmt, $view->translate($fmt . '_label'));
+        }, $this->protocols);
+
+        if (!$this->wanips) {
+            $this->wanips = $this->readWanIPs();
+        }
+        $view['OriDstDatasource'] = array_map(function($fmt) use ($view) {
+                                return array($fmt, $fmt?$fmt:$view->translate('any_label'));
+        }, $this->wanips);
  
         if ($this->exitCode != 0) {
             $view->getCommandList('/Notification')->showMessage($view->translate('shorewall_check_error'), \Nethgui\Module\Notification\AbstractNotification::NOTIFY_ERROR);

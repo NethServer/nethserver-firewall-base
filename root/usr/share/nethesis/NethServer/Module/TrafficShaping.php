@@ -1,4 +1,5 @@
 <?php
+
 namespace NethServer\Module;
 
 /*
@@ -24,8 +25,13 @@ namespace NethServer\Module;
  * TrafficShaping with plugin behaviour
  * First tab is always present and has plugin behaviour. All other tabs can be plugins.
  */
-class TrafficShaping extends \Nethgui\Controller\TabsController
+class TrafficShaping extends \Nethgui\Controller\TabsController implements \Nethgui\Utility\SessionConsumerInterface
 {
+    /**
+     *
+     * @var \Nethgui\Utility\SessionInterface
+     */
+    private $session;
 
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
     {
@@ -38,5 +44,24 @@ class TrafficShaping extends \Nethgui\Controller\TabsController
         $this->loadChildrenDirectory();
     }
 
-}
+    public function setSession(\Nethgui\Utility\SessionInterface $session)
+    {
+        
+        $this->session = $session;
+        return $this;
+    }
 
+    public function addChild(\Nethgui\Module\ModuleInterface $childModule)
+    {
+        if (isset($this->session) && $childModule instanceof \Nethgui\Utility\SessionConsumerInterface) {
+            $childModule->setSession($this->getSession());
+        }
+        parent::addChild($childModule);
+    }
+
+    public function getSession()
+    {
+        return $this->session;
+    }
+
+}
