@@ -144,6 +144,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $view['OriDstDatasource'] = array_map(function($fmt) use ($view) {
                                 return array($fmt, $fmt?$fmt:$view->translate('any_label'));
         }, $this->wanips);
+
+        $view['Destination'] = ucfirst(str_replace(';', ' ', $view['DstRaw']));
  
         if ($this->exitCode != 0) {
             $view->getCommandList('/Notification')->showMessage($view->translate('shorewall_check_error'), \Nethgui\Module\Notification\AbstractNotification::NOTIFY_ERROR);
