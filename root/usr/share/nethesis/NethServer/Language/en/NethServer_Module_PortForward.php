@@ -5,7 +5,7 @@
 $L['Allow_label'] = 'Allow only from';
 $L['check-rules_Header'] = 'Check firewall rules';
 $L['CheckRules_label'] = 'Check firewall';
-$L['create_header_label'] = 'Create port foward';
+$L['create_header_label'] = 'Create port forward';
 $L['Description_label'] = 'Description';
 $L['disable_label'] = 'Disable';
 $L['DstHost_label'] = 'Destination host';
