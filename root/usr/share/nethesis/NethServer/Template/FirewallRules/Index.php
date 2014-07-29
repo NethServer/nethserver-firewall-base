@@ -1,6 +1,5 @@
 <?php
 /* @var $view \Nethgui\Renderer\Xhtml */
-$view->useFile('css/font-awesome.css');
 
 echo $view->header()->setAttribute('template', $T('Index_header'));
 
