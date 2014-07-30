@@ -35,6 +35,14 @@ class Ip extends \Nethgui\Controller\TableController implements \Nethgui\Utility
 
     private $myCurrentAction;
 
+    protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $attributes)
+    {
+        return new \NethServer\Tool\CustomModuleAttributesProvider($attributes, array(
+            'languageCatalog' => array('NethServer_Module_TrafficShaping_Ip', 'NethServer_Module_FirewallRules')
+            )
+        );
+    }
+
     public function initialize()
     {
 
@@ -90,7 +98,7 @@ class Ip extends \Nethgui\Controller\TableController implements \Nethgui\Utility
                 $view['Priority'] = $state['Priority'];
                 $view['Description'] = $state['Description'];
                 $view['SrcRaw'] = $state['SrcRaw'];
-                $view['Source'] = ucfirst(str_replace(';', ' ', $state['SrcRaw']));
+                $view['Source'] = \NethServer\Module\FirewallRules\RuleGenericController::translateFirewallObjectTitle($view, $state['SrcRaw']);
                 $view->getCommandList()->show();
             });
         }
@@ -113,7 +121,7 @@ class Ip extends \Nethgui\Controller\TableController implements \Nethgui\Utility
 
     public function prepareViewForColumnKey(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
     {
-        return ucfirst(str_replace(';', ' ', $key));
+        return \NethServer\Module\FirewallRules\RuleGenericController::translateFirewallObjectTitle($view, $key);
     }
 
     public function setSession(\Nethgui\Utility\SessionInterface $session)

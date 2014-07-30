@@ -1,4 +1,5 @@
 <?php
+
 namespace NethServer\Module;
 
 /*
@@ -32,12 +33,14 @@ class PortForward extends \Nethgui\Controller\TableController implements \Nethgu
      * @var \Nethgui\Utility\SessionInterface
      */
     private $session;
-
     private $myCurrentAction;
 
-    protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
+    protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $attributes)
     {
-        return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Gateway', 20);
+        return new \NethServer\Tool\CustomModuleAttributesProvider($attributes, array(
+            'languageCatalog' => array('NethServer_Module_PortForward', 'NethServer_Module_FirewallRules'),
+            'category' => 'Gateway')
+        );
     }
 
     public function initialize()
@@ -54,7 +57,7 @@ class PortForward extends \Nethgui\Controller\TableController implements \Nethgu
         );
 
         $this
-            ->setTableAdapter($this->getPlatform()->getTableAdapter('portforward','pf'))
+            ->setTableAdapter($this->getPlatform()->getTableAdapter('portforward', 'pf'))
             ->setColumns($columns)
             ->addTableAction(new \NethServer\Module\PortForward\Modify('create'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
@@ -80,11 +83,11 @@ class PortForward extends \Nethgui\Controller\TableController implements \Nethgu
             $params = $request->getParameter('create');
             $action = 'create';
         } elseif ($request->hasParameter('update')) {
-            if($request->isMutation()) {
-            $params = $request->getParameter('update');
+            if ($request->isMutation()) {
+                $params = $request->getParameter('update');
             } else {
-               $subRequest = $request->spawnRequest('update');
-               $params = $subRequest->getParameter(\Nethgui\array_head($subRequest->getPath()));
+                $subRequest = $request->spawnRequest('update');
+                $params = $subRequest->getParameter(\Nethgui\array_head($subRequest->getPath()));
             }
             $action = implode('/', $request->getPath());
         }
@@ -92,20 +95,19 @@ class PortForward extends \Nethgui\Controller\TableController implements \Nethgu
             $this->getAction('SaveState')->setField('DstRaw')->setReturnPath($action)->setResumeState($params);
             return 'SaveState';
         }
-        
+
         $this->myCurrentAction = parent::establishCurrentActionId();
 
         if (isset($params['f'], $params['h']) && ! $request->isMutation()) {
-            $this->getAction('SaveState')->setResumeCallback(function (\Nethgui\View\ViewInterface $view, $state) {                
+            $this->getAction('SaveState')->setResumeCallback(function (\Nethgui\View\ViewInterface $view, $state) {
                 $view['Proto'] = $state['Proto'];
                 $view['Description'] = $state['Description'];
                 $view['DstRaw'] = $state['DstRaw'];
-                $view['Destionation'] = ucfirst(str_replace(';', ' ', $state['DstRaw']));
                 $view['OriDst'] = $state['OriDst'];
                 $view['Src'] = $state['Src'];
                 $view['Dst'] = $state['Dst'];
                 $view['Allow'] = $state['Allow'];
-                $view['Destination'] = ucfirst(str_replace(';', ' ', $state['DstRaw']));
+                $view['Destination'] = \NethServer\Module\FirewallRules\RuleGenericController::translateFirewallObjectTitle($view, $state['DstRaw']);
                 $view->getCommandList()->show();
             });
         }
@@ -134,9 +136,8 @@ class PortForward extends \Nethgui\Controller\TableController implements \Nethgu
         if( ! isset($values['DstHost'])) {
             return '';
         }
-        return ucfirst(str_replace(';', ' ', $values['DstHost']));
+        return \NethServer\Module\FirewallRules\RuleGenericController::translateFirewallObjectTitle($view, $values['DstHost']);
     }
-
 
     /**
      * Override prepareViewForColumnActions to hide/show enable/disable actions

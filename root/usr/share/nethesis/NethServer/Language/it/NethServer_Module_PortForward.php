@@ -9,6 +9,7 @@ $L['create_header_label'] = 'Crea port forward';
 $L['Description_label'] = 'Descrizione';
 $L['disable_label'] = 'Disabilita';
 $L['DstHost_label'] = 'Host destinazione';
+$L['DstRaw_label'] = 'Host destinazione';
 $L['Dst_label'] = 'Porta destinazione';
 $L['enable_label'] = 'Abilita';
 $L['Key_label'] = 'Id';

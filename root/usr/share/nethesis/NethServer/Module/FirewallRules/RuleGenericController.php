@@ -55,22 +55,27 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
         $this->declareParameter('Position', Validate::POSITIVE_INTEGER, array('fwrules', $this->ruleId, 'Position'));
         $this->declareParameter('LogType', $this->createValidator()->memberOf('none', 'info'), array('fwrules', $this->ruleId, 'Log'));
         $this->declareParameter('Action', $this->createValidator()->memberOf('accept', 'reject', 'drop'), array('fwrules', $this->ruleId, 'Action'));
-        $this->declareReadonlyParameters();
+        $this->declareParameter('Source', Validate::ANYTHING);
+        $this->declareParameter('Destination', Validate::ANYTHING);
+        $this->declareParameter('Service', Validate::ANYTHING);
         parent::bind($request);
     }
 
-    private function declareReadonlyParameters()
+    private function addReadonlyAdapter(\Nethgui\View\ViewInterface $view, $targetName, $sourceName)
     {
-        $P = $this->parameters;
-        $this->declareParameter('Source', Validate::ANYTHING, function() use ($P) {
-            return ucfirst(strtr($P['SrcRaw'], ';', ' '));
-        });
-        $this->declareParameter('Destination', Validate::ANYTHING, function() use ($P) {
-            return ucfirst(strtr($P['DstRaw'], ';', ' '));
-        });
-        $this->declareParameter('Service', Validate::ANYTHING, function() use ($P) {
-            return ucfirst(strtr($P['ServiceRaw'], ';', ' '));
-        });
+        if( ! isset($this->parameters[$targetName])) {
+            return;
+        }
+        $this->parameters->addAdapter(new \Nethgui\Adapter\MultipleAdapter(function () use ($view, $sourceName) {
+            return \NethServer\Module\FirewallRules\RuleGenericController::translateFirewallObjectTitle($view, $view[$sourceName]);
+        }), $targetName);
+    }
+
+    public static function translateFirewallObjectTitle(\Nethgui\View\ViewInterface $view, $raw)
+    {
+        list($type, $key) = is_string($raw) ? array_merge(explode(';', $raw), array('', '')) : array('', '');
+        $o = new \NethServer\Tool\FirewallObject($key, $type, array(), array($view, 'translate'));
+        return $o->getTitle();
     }
 
     public function process()
@@ -82,6 +87,9 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
+        $this->addReadonlyAdapter($view, 'Source', 'SrcRaw');
+        $this->addReadonlyAdapter($view, 'Destination', 'DstRaw');
+        $this->addReadonlyAdapter($view, 'Service', 'ServiceRaw');
         parent::prepareView($view);
         $view->setTemplate('NethServer\Template\FirewallRules\Rule');
         if ( ! $this->getRequest()->isValidated()) {

@@ -61,9 +61,9 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
 
-        if(isset($view['SrcRaw'])) {
-            $view['Source'] = ucfirst(str_replace(';', ' ', $view['SrcRaw']));
-        }
+        
+        $view['Source'] = $view['SrcRaw'] ? \NethServer\Module\FirewallRules\RuleGenericController::translateFirewallObjectTitle($view, $view['SrcRaw']) : '';
+        
         $view['PriorityDatasource'] = array(array('1',$view->translate('1_label')),array('2',$view->translate('2_label')),array('3',$view->translate('3_label')));
  
     }
