@@ -82,9 +82,9 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
                 $results[] = $ANY;
                 $where = array('fwservices' => array('fwservice'));
             } elseif ($this->parameters['m'] === 'ts') {
-                $where = array('hosts' => array('host'), 'networks' => array('zone'));
+                $where = array('hosts' => array('host', 'remote', 'local'));
             } elseif ($this->parameters['m'] === 'pf') {
-                $where = array('hosts' => array('host'));
+                $where = array('hosts' => array('host', 'remote', 'local'));
             } else {
                 $results[] = $ANY;
                 $where = array('hosts' => array('host', 'host-group', 'remote', 'local'), 'networks' => array('zone'), 'ROLES' => array());
