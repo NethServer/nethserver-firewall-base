@@ -30,15 +30,23 @@ namespace NethServer\Tool;
 class FirewallObject
 {
 
+    /**
+     *
+     * @param string $key
+     * @param string $type
+     * @param array $props
+     * @param callable $translator
+     */
     public function __construct($key, $type, $props, $translator = NULL)
     {
         $this->key = $key;
         $this->type = $type;
         $this->props = $props;
         $this->props['key'] = $key;
+        $this->props['type'] = $type;
 
-        $this->T = $translator === NULL ? function($x, $args = array()) use ($type, $key) {
-            return sprintf("%s %s", ucfirst($type), $key);
+        $this->T = ! is_callable($translator) ? function($x, $args = array()) {
+            return sprintf("%s %s", ucfirst($args['type']), $args['key']);
         } : $translator;
     }
 
@@ -57,9 +65,8 @@ class FirewallObject
     }
 
     public function getTitle()
-    {
-        $T = $this->T;
-        return $T("FirewallObject_" . $this->getType() . "_Title", $this->props);
+    {        
+        return call_user_func($this->T, sprintf("FirewallObject_%s_Title", $this->type), $this->props);
     }
 
     public function getShortTitle()
@@ -73,7 +80,7 @@ class FirewallObject
     }
 
     public function getType()
-    {
+    {        
         if ($this->type === 'remote') {
             return 'host';
         } elseif ($this->type === 'local') {

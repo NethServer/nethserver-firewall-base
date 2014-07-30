@@ -63,3 +63,12 @@ $L['zone_label'] = 'zona';
 $L['host-group_label'] = 'gruppo';
 $L['role_label'] = 'interfaccia';
 $L['confirm_reload_label'] = 'Le modifiche non state applicate.';
+
+$L['FirewallObject_any_Title'] = 'Any (qualsiasi)';
+$L['FirewallObject_host_Title'] = 'Host ${key}';
+$L['FirewallObject_local_Title'] = 'LAN host ${key}';
+$L['FirewallObject_remote_Title'] = 'Host ${key}';
+$L['FirewallObject_role_Title'] = 'Ruolo ${key}';
+$L['FirewallObject_zone_Title'] = 'Zona ${key}';
+$L['FirewallObject_host-group_Title'] = 'Gruppo di host ${key}';
+$L['FirewallObject_fwservice_Title'] = 'Servizio ${key}';

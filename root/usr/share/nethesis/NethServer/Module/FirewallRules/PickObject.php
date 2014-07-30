@@ -90,7 +90,7 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
                 $where = array('hosts' => array('host', 'host-group', 'remote', 'local'), 'networks' => array('zone'), 'ROLES' => array());
             }
 
-            $T = array($view->getTranslator(), 'translate');
+            $T = array($view, 'translate');
             $s = \NethServer\Tool\FirewallObjectsFinder::search($this->getPlatform(), $this->getRequest()->getParameter('q'), $where, $T);
             $i = 0;
             /* @var $result \NethServer\Tool\FirewallObject */
