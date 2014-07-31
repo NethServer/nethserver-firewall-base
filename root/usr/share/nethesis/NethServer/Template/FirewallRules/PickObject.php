@@ -50,6 +50,20 @@ jQuery(function ($) {
 '#${viewId} .Selector label, #${viewId} a.Button.link.Create {vertical-align: middle; display: block; height: 30px; margin: 0 0 0.5em 0; cursor: pointer; border: 1px solid #d3d3d3; padding: 2px; background: linear-gradient(to bottom, #e6e6e6 0%, #fff 100%);}',
 '#${viewId} .Selector label:hover, #${viewId} a.Button.link.Create  {background: linear-gradient(to bottom, #f0f0f0 0%, #fff 100%)}',
 '#${viewId} .Selector li {margin: 0}',
+'#${viewId} .Selector label { height: auto; padding: 12px; font-family: FontAwesome;  font-style: normal;  font-weight: normal;  line-height: 1;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}',
+'#${viewId} .Selector label::before { content: \"\\\\F10C\\\\20\"; letter-spacing: 4px }',
+'#${viewId} .Selector input[value^=\"host\"] + label::before { content: \"\\\\F1B2\\\\20\" }',
+'#${viewId} .Selector input[value^=\"remote\"] + label::before { content: \"\\\\F1B2\\\\20\" }',
+'#${viewId} .Selector input[value^=\"local\"] + label::before { content: \"\\\\F108\\\\20\" }',
+'#${viewId} .Selector input[value^=\"host-group\"] + label::before { content: \"\\\\F1B3\\\\20\" }',
+'#${viewId} .Selector input[value^=\"any\"] + label::before { content: \"\\\\F0AC\\\\20\" }',
+'#${viewId} .Selector input[value^=\"fwservice\"] + label::before { content: \"\\\\F013\\\\20\" }',
+'#${viewId} .Selector input[value^=\"zone\"] + label::before { content: \"\\\\F0E8\\\\20\" }',
+'#${viewId} .Selector input[value^=\"role\"] + label::before { content: \"\\\\F0C8\\\\20\" }',
+'#${viewId} .Selector input[value^=\"role;red\"] + label { color: red }',
+'#${viewId} .Selector input[value^=\"role;green\"] + label { color: green }',
+'#${viewId} .Selector input[value^=\"role;orange\"] + label { color: orange }',
+'#${viewId} .Selector input[value^=\"role;blue\"] + label { color: blue }',
 '</style>'].join(\"\\n\"));
     $('html > head').append(style);
 });

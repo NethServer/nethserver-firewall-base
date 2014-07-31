@@ -106,12 +106,12 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
     private function getObjectIcon($v)
     {
         $objectIcons = array(
-            'any' => 'fa-asterisk',
+            'any' => 'fa-globe',
             'role' => 'fa-square',
-            'host' => 'fa-desktop',
+            'host' => 'fa-cube',
             'zone' => 'fa-sitemap',
             'host-group' => 'fa-cubes',
-            'fwservice' => 'fa-sign-in',
+            'fwservice' => 'fa-gear',
         );
         $tmp = explode(';', $v);
         if ( isset($objectIcons[$tmp[0]]) ) {
