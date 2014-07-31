@@ -25,17 +25,23 @@ Configura le policy di base.
 
 Traffico verso Internet (interfaccia red)
     Le possibili scelte sono:
+    
+    * *Permesso*: tutto il traffico dalla LAN (green) a Internet (red)
+      è abilitato di default.
 
-    * *Permesso*: tutto il traffico dalla LAN (green) a Internet (red) è abilitato di default.
-    * *Bloccato*: tutto il traffico dalla LAN (green) a Internet (red) è disabilitato di default.
-      In questo caso è necessario creare esplicitamente regole per tutti i servizi che si vogliono permettere.
-      Ad esempio, una regola che permette il traffico web (porte 80 e 443) dalla green alla red.
+    * *Bloccato*: tutto il traffico dalla LAN (green) a Internet (red)
+      è disabilitato di default.  
+      
+      In questo caso è necessario creare esplicitamente regole per
+      tutti i servizi che si vogliono permettere.  Ad esempio, una
+      regola che permette il traffico web (porte 80 e 443) dalla green
+      alla red.
 
 
 Ping da Internet
     Se abilitato, le interfacce pubblice (red) risponderanno alle richieste di ping (ACCEPT).
     Se disabilitato, le interfacce pubblice (red) scarteranno le richieste di ping (DROP)
-
+    
     Per semplificare la risoluzione di problemi, si consiglia di lasciare il ping abilitato.
 
 
