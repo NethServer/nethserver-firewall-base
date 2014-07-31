@@ -61,8 +61,6 @@ class Ip extends \Nethgui\Controller\TableController implements \Nethgui\Utility
             ->addRowAction(new \NethServer\Module\TrafficShaping\Ip\Modify('update'))
             ->addRowAction(new \NethServer\Module\TrafficShaping\Ip\Modify('delete'))
             ->addChild(new \NethServer\Module\FirewallRules\CreateHost())
-            ->addChild(new \NethServer\Module\FirewallRules\CreateHostGroup())
-            ->addChild(new \NethServer\Module\FirewallRules\CreateZone())
             ->addChild(new \NethServer\Tool\SaveState(NULL, 'ts'))
             ->addChild(new \NethServer\Tool\PickObject());
         ;

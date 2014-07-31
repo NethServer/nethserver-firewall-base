@@ -134,7 +134,6 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
         } elseif($this->parameters['m'] === 'ts') {
             return array(
                 array('Create' => array($view->getModuleUrl('../CreateHost?q=' . $hint), $view->translate('Hosts_create', array($hint)))),
-                array('Create' => array($view->getModuleUrl('../CreateZone?q=' . $hint), $view->translate('Zones_create', array($hint)))),
             );
         } else {
             return array(

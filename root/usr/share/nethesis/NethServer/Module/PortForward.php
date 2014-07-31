@@ -66,8 +66,6 @@ class PortForward extends \Nethgui\Controller\TableController implements \Nethgu
             ->addRowAction(new \NethServer\Module\PortForward\Modify('update'))
             ->addRowAction(new \NethServer\Module\PortForward\Modify('delete'))
             ->addChild(new \NethServer\Module\FirewallRules\CreateHost())
-            ->addChild(new \NethServer\Module\FirewallRules\CreateHostGroup())
-            ->addChild(new \NethServer\Module\FirewallRules\CreateZone())
             ->addChild(new \NethServer\Tool\SaveState(NULL, 'pf'))
             ->addChild(new \NethServer\Tool\PickObject());
         ;
