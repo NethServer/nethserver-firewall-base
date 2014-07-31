@@ -145,11 +145,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
                                 return array($fmt, $fmt?$fmt:$view->translate('any_label'));
         }, $this->wanips);
         
-        $view['Destination'] = $view['DstRaw'] ? \NethServer\Module\FirewallRules\RuleGenericController::translateFirewallObjectTitle($view, $view['DstRaw']) : '';
- 
-        if ($this->exitCode != 0) {
-            $view->getCommandList('/Notification')->showMessage($view->translate('shorewall_check_error'), \Nethgui\Module\Notification\AbstractNotification::NOTIFY_ERROR);
-        }
+        $view['Destination'] = \NethServer\Module\FirewallRules\RuleGenericController::translateFirewallObjectTitle($view, $view['DstRaw']);
     }
 
 
@@ -164,7 +160,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     protected function onParametersSaved($changedParameters)
     {
-        $this->exitCode = $this->getPlatform()->signalEvent('firewall-adjust')->getExitCode();
+        $this->getPlatform()->signalEvent('firewall-adjust &');
     }
 
 }

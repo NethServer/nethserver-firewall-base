@@ -80,7 +80,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     protected function onParametersSaved($changedParameters)
     {
-        $this->getPlatform()->signalEvent('firewall-adjust@post-process');
+        $this->getPlatform()->signalEvent('firewall-adjust &');
     }
 
 }

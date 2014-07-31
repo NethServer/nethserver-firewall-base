@@ -19,7 +19,6 @@ $L['PortForward_Title'] = 'Port Forward';
 $L['Proceed with port forward disable?'] = 'Disabilitare il port forward?';
 $L['Proceed with port forward enable?'] = 'Abilitare il port forward?';
 $L['Proto_label'] = 'Protocollo';
-$L['shorewall_check_error'] = 'Shorewall ha ritornato un errore. Usare il pulsante "Controlla firewall" per maggiori informazioni.';
 $L['Src_label'] = 'Porta di origine';
 $L['tcp_label'] = 'TCP';
 $L['update_header_label'] = 'Modifica port forward';
