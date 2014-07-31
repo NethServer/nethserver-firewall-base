@@ -145,7 +145,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
                                 return array($fmt, $fmt?$fmt:$view->translate('any_label'));
         }, $this->wanips);
         
-        $view['Destination'] = \NethServer\Module\FirewallRules\RuleGenericController::translateFirewallObjectTitle($view, $view['DstRaw']);
+        $view['Destination'] = $view['DstRaw'] ? \NethServer\Module\FirewallRules\RuleGenericController::translateFirewallObjectTitle($view, $view['DstRaw']) : '';
     }
 
 
