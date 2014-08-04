@@ -38,6 +38,7 @@ class Services extends \Nethgui\Controller\TableController
             'Key',
             'Protocol',
             'Ports',
+            'Description',
             'Actions'
         );
 

@@ -38,6 +38,7 @@ class Zones extends \Nethgui\Controller\TableController
             'Key',
             'Interface',
             'Network',
+            'Description',
             'Actions'
         );
         

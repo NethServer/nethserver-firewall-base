@@ -38,13 +38,13 @@ class Modify extends \Nethgui\Controller\Table\Modify
             $this->interfaces = $this->readInterfaces();
         }
 
-
         $nameValidator = $this->getPlatform()->createValidator()->maxLength(5)->username();
         $interfaceValidator = $this->getPlatform()->createValidator()->memberOf($this->interfaces);
         $parameterSchema = array(
             array('name', $nameValidator, \Nethgui\Controller\Table\Modify::KEY),
             array('Network', Validate::CIDR_BLOCK, \Nethgui\Controller\Table\Modify::FIELD),
-            array('Interface', $interfaceValidator, \Nethgui\Controller\Table\Modify::FIELD)
+            array('Interface', $interfaceValidator, \Nethgui\Controller\Table\Modify::FIELD),
+            array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
         );
 
         $this->setSchema($parameterSchema);

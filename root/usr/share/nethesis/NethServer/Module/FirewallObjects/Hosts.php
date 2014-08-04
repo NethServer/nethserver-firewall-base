@@ -37,6 +37,7 @@ class Hosts extends \Nethgui\Controller\TableController
         $columns = array(
             'Key',
             'IpAddress',
+            'Description',
             'Actions'
         );
 
