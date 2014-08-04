@@ -21,7 +21,6 @@ namespace NethServer\Module\FirewallObjects\Services;
  */
 
 use Nethgui\System\PlatformInterface as Validate;
-use Nethgui\Controller\Table\Modify as Table;
 
 /**
  * Modify Service object
@@ -38,7 +37,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('name', Validate::USERNAME, \Nethgui\Controller\Table\Modify::KEY),
             array('Protocol', $this->createValidator()->memberOf($this->protocols), \Nethgui\Controller\Table\Modify::FIELD),
             array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
-            array('Ports', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
+            array('Ports', Validate::NOTEMPTY, \Nethgui\Controller\Table\Modify::FIELD)
         );
 
         $this->setSchema($parameterSchema);
