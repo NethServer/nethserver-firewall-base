@@ -46,8 +46,8 @@ class CreateHost extends \Nethgui\Controller\Collection\AbstractAction
     {
         parent::initialize();
         $this->state = new \NethServer\Module\FirewallRules\RuleWorkflow();
-        $this->declareParameter('name', Validate::HOSTNAME);
-        $this->declareParameter('IpAddress', Validate::IPv4_OR_EMPTY);
+        $this->declareParameter('name', Validate::USERNAME);
+        $this->declareParameter('IpAddress', Validate::IPv4);
         $this->declareParameter('Description', Validate::ANYTHING);
         $this->declareParameter('q', Validate::ANYTHING);
     }

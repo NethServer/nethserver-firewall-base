@@ -36,15 +36,17 @@ class Modify extends \Nethgui\Controller\Table\Modify
     {
         // The group name must satisfy the USERNAME generic grammar:
         if ($this->getIdentifier() === 'create') {
-            $groupNameValidator = $this->createValidator(Validate::HOSTNAME);
+            $groupNameValidator = $this->createValidator(Validate::USERNAME);
         } else {
             $groupNameValidator = FALSE;
         }
 
+        $membersValidator = $this->createValidator()->notEmpty()->collectionValidator($this->createValidator(Validate::USERNAME));
+
         $parameterSchema = array(
             array('name', $groupNameValidator, Table::KEY),
             array('Description', Validate::ANYTHING, Table::FIELD, 'Description'),
-            array('Members', Validate::USERNAME_COLLECTION, Table::FIELD, 'Members', ','),
+            array('Members', $membersValidator, Table::FIELD, 'Members', ','),
             array('MembersDatasource', FALSE, array($this, 'provideMembersDatasource')), // this parameter will never be submitted: set an always-failing validator
         );
         

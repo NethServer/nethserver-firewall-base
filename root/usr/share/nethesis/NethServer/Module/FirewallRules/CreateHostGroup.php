@@ -45,8 +45,8 @@ class CreateHostGroup extends \Nethgui\Controller\Collection\AbstractAction
     {
         parent::initialize();
         $this->state = new \NethServer\Module\FirewallRules\RuleWorkflow();
-        $this->declareParameter('name', Validate::HOSTNAME);
-        $this->declareParameter('Members', Validate::ANYTHING_COLLECTION);
+        $this->declareParameter('name', Validate::USERNAME);
+        $this->declareParameter('Members', Validate::USERNAME_COLLECTION);
         $this->declareParameter('Description', Validate::ANYTHING);
         $this->declareParameter('q', Validate::ANYTHING);
         $this->declareParameter('MembersDatasource', FALSE, array($this, 'provideMembersDatasource'));
