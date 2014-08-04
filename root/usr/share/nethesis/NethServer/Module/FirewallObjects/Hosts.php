@@ -41,8 +41,6 @@ class Hosts extends \Nethgui\Controller\TableController
             'Actions'
         );
 
-        $macv = $this->getPlatform()->createValidator()->orValidator($this->getPlatform()->createValidator()->macAddress(), $this->getPlatform()->createValidator()->isEmpty());
-
         $parameterSchema = array(
             array('name', Validate::USERNAME, \Nethgui\Controller\Table\Modify::KEY),
             array('IpAddress', Validate::IPv4, \Nethgui\Controller\Table\Modify::FIELD),

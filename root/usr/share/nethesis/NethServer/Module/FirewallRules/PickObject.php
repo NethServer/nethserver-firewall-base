@@ -94,10 +94,11 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
             $s = \NethServer\Tool\FirewallObjectsFinder::search($this->getPlatform(), $this->getRequest()->getParameter('q'), $where, $T);
             $i = 0;
             /* @var $result \NethServer\Tool\FirewallObject */
+            $partial = 10;
             foreach ($s as $result) {
                 $results[] = array($result->getValue(), $result->getTitle());
-                if (++ $i >= 10) {
-                    $view['ResultsCount'] = 'Showing 10 results out of ' . count($s);
+                if (++ $i >= $partial) {
+                    $view['ResultsCount'] = $view->translate('Show_x_outof_y_label', array('partial' => $partial, 'total' => count($s)));
                     break;
                 }
             }
