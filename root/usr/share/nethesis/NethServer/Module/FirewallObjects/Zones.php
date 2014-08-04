@@ -40,18 +40,11 @@ class Zones extends \Nethgui\Controller\TableController
             'Network',
             'Actions'
         );
-
-        $nameValidator = $this->getPlatform()->createValidator()->maxLength(5)->username();
-        $parameterSchema = array(
-            array('name', $nameValidator, \Nethgui\Controller\Table\Modify::KEY),
-            array('Network', Validate::CIDR_BLOCK, \Nethgui\Controller\Table\Modify::FIELD),
-            array('Interface', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
-        );
-
+        
         $this
             ->setTableAdapter($this->getPlatform()->getTableAdapter('networks', 'zone'))
             ->addRowAction(new \NethServer\Module\FirewallObjects\Zones\Modify('update'))
-            ->addRowAction(new \Nethgui\Controller\Table\Modify('delete', $parameterSchema, 'Nethgui\Template\Table\Delete')) // Standard DELETE template
+            ->addRowAction(new \NethServer\Module\FirewallObjects\Zones\Modify('delete'))
             ->addTableAction(new \NethServer\Module\FirewallObjects\Zones\Modify('create'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->setColumns($columns)
