@@ -55,6 +55,18 @@ class Modify extends \Nethgui\Controller\Table\Modify
         parent::initialize();
     }
 
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        $keyExists = $this->getPlatform()->getDatabase('hosts')->getType($this->parameters['name']) != '';
+        if($this->getIdentifier() === 'create' && $keyExists) {
+            $report->addValidationErrorMessage($this, 'name', 'Host_key_exists_message');
+        }
+        if($this->getIdentifier() !== 'create' && ! $keyExists) {
+            throw new \Nethgui\Exception\HttpException('Not found', 404, 1407169968);
+        }
+        parent::validate($report);
+    }
+
     public function provideMembersDatasource()
     {
         $platform = $this->getPlatform();

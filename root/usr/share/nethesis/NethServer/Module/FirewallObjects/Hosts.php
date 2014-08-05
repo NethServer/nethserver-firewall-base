@@ -39,17 +39,11 @@ class Hosts extends \Nethgui\Controller\TableController
             'Actions'
         );
 
-        $parameterSchema = array(
-            array('name', Validate::USERNAME, \Nethgui\Controller\Table\Modify::KEY),
-            array('IpAddress', Validate::IPv4, \Nethgui\Controller\Table\Modify::FIELD),
-            array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
-        );
-
         $this
             ->setTableAdapter($this->getPlatform()->getTableAdapter('hosts', 'host'))
-            ->addRowAction(new \Nethgui\Controller\Table\Modify('update', $parameterSchema, 'NethServer\Template\FirewallObjects\Hosts'))
-            ->addRowAction(new \Nethgui\Controller\Table\Modify('delete', $parameterSchema, 'Nethgui\Template\Table\Delete')) // Standard DELETE template
-            ->addTableAction(new \Nethgui\Controller\Table\Modify('create', $parameterSchema, 'NethServer\Template\FirewallObjects\Hosts'))
+            ->addRowAction(new \NethServer\Module\FirewallObjects\Hosts\Modify('update'))
+            ->addRowAction(new \NethServer\Module\FirewallObjects\Hosts\Modify('delete')) // Standard DELETE template
+            ->addTableAction(new \NethServer\Module\FirewallObjects\Hosts\Modify('create'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->setColumns($columns)
         ;

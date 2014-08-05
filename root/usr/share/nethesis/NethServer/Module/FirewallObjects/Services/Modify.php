@@ -70,7 +70,14 @@ class Modify extends \Nethgui\Controller\Table\Modify
                 }
             }
         }
-
+                
+        $keyExists = $this->getPlatform()->getDatabase('fwservices')->getType($this->parameters['name']) != '';
+        if($this->getIdentifier() === 'create' && $keyExists) {
+             $report->addValidationErrorMessage($this, 'name', 'Service_key_exists_message');
+        }
+        if($this->getIdentifier() !== 'create' && ! $keyExists) {
+            throw new \Nethgui\Exception\HttpException('Not found', 404, 1407169969);
+        }
         parent::validate($report);
     }
 

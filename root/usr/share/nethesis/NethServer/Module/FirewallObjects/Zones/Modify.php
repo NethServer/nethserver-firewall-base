@@ -51,6 +51,18 @@ class Modify extends \Nethgui\Controller\Table\Modify
         parent::initialize();
     }
 
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        parent::validate($report);
+        $keyExists = $this->getPlatform()->getDatabase('networks')->getType($this->parameters['name']) != '';
+        if ($this->getIdentifier() === 'create' && $keyExists) {
+            $report->addValidationErrorMessage($this, 'name', 'Zone_key_exists_message');
+        }
+        if ($this->getIdentifier() !== 'create' && ! $keyExists) {
+            throw new \Nethgui\Exception\HttpException('Not found', 404, 1407169970);
+        }
+    }
+
     private function readInterfaces() {
         $ret = array();
         $types = array('bridge', 'bond', 'vlan', 'ethernet');
