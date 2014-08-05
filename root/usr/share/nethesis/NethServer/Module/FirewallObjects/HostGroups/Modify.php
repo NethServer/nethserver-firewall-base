@@ -64,6 +64,12 @@ class Modify extends \Nethgui\Controller\Table\Modify
         if($this->getIdentifier() !== 'create' && ! $keyExists) {
             throw new \Nethgui\Exception\HttpException('Not found', 404, 1407169968);
         }
+       if($this->getIdentifier() === 'delete') {
+            $v = $this->createValidator()->platform('fwobject-host-group-delete', 'hosts');
+            if( ! $v->evaluate($this->parameters['name'])) {
+                $report->addValidationError($this, 'HostGroupsKey', $v);
+            }
+        }
         parent::validate($report);
     }
 

@@ -78,6 +78,12 @@ class Modify extends \Nethgui\Controller\Table\Modify
         if($this->getIdentifier() !== 'create' && ! $keyExists) {
             throw new \Nethgui\Exception\HttpException('Not found', 404, 1407169969);
         }
+       if($this->getIdentifier() === 'delete') {
+            $v = $this->createValidator()->platform('fwobject-fwservice-delete', 'fwservices');
+            if( ! $v->evaluate($this->parameters['name'])) {
+                $report->addValidationError($this, 'ServicesKey', $v);
+            }
+        }
         parent::validate($report);
     }
 

@@ -122,3 +122,14 @@ validator_actions('firewall-object-exists', qw(
                   uniq-fwobject 20
 ));
 
+validator_actions($_, qw(
+                  fwobject-referenced 20
+)) foreach (qw(
+   fwobject-host-group-delete
+   fwobject-host-delete
+   fwobject-zone-delete
+   fwobject-fwservice-delete
+));
+
+
+

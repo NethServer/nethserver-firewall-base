@@ -26,6 +26,7 @@ use esmith::NetworksDB;
 use esmith::HostsDB;
 use esmith::util;
 use NetAddr::IP;
+use Carp;
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(FIELDS_READ FIELDS_WRITE);
@@ -434,3 +435,73 @@ sub _getHostGroupAddresses($)
     return join (',',@hosts);
 }
 
+
+=head2 getReferences(db, key)
+
+Returns a list of firewall rules having a reference to the given <DB, key> 
+
+=cut
+sub getReferences($$)
+{
+    my $self = shift;
+    my $dbName = shift;
+    my $key = shift;
+
+    my $typeMap = {
+	'host-group' => 'host-group',
+	'host' => 'host',
+	'remote' => 'host',
+	'local' => 'host',
+	'fwservice' => 'fwservice',
+	'zone' => 'zone',
+	'ethernet' => 'role',
+	'bridge' => 'role',
+	'vlan' => 'role',
+	'alias' => 'role',
+	'bond' => 'role'	
+	};
+
+    my $db = esmith::DB::db->open_ro($dbName);
+    
+    if( ! $db) {
+	return ();
+    }
+
+    my $record = $db->get($key);
+
+    if( ! $record) {
+	return ();
+    }
+
+    my $type = $typeMap->{$record->prop('type')};
+
+    if( ! $type) {
+	carp "Unknown object type for $dbName:$key";
+	return (),
+    }
+
+    my @references = ();
+
+    foreach my $rule ($self->getRules()) {
+	my @props = ();
+
+	my $target = $type . ';' . $key;
+
+	if($type eq 'fwservice') {
+	    @props = qw(Service);
+	} elsif ($type eq 'role') {
+	    @props = qw(Src Dst);
+	    $target = 'role;' . $record->prop('role');
+	} else {
+	    @props = qw(Src Dst);
+	}
+
+	foreach(@props) {	
+	    if($rule->prop($_) eq $target) {
+		push @references, $rule;
+	    }
+	}
+    }
+    
+    return @references;
+}

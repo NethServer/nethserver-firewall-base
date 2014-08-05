@@ -52,8 +52,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
     }
 
     public function validate(\Nethgui\Controller\ValidationReportInterface $report)
-    {
-        parent::validate($report);
+    {        
         $keyExists = $this->getPlatform()->getDatabase('networks')->getType($this->parameters['name']) != '';
         if ($this->getIdentifier() === 'create' && $keyExists) {
             $report->addValidationErrorMessage($this, 'name', 'Zone_key_exists_message');
@@ -61,6 +60,13 @@ class Modify extends \Nethgui\Controller\Table\Modify
         if ($this->getIdentifier() !== 'create' && ! $keyExists) {
             throw new \Nethgui\Exception\HttpException('Not found', 404, 1407169970);
         }
+        if($this->getIdentifier() === 'delete') {
+            $v = $this->createValidator()->platform('fwobject-zone-delete', 'networks');
+            if( ! $v->evaluate($this->parameters['name'])) {
+                $report->addValidationError($this, 'ZonesKey', $v);
+            }
+        }
+        parent::validate($report);
     }
 
     private function readInterfaces() {
