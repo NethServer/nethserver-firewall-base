@@ -45,3 +45,7 @@ $L['Zones_CreateZone_label'] = 'Crea una nuova zona';
 $L['Zones_update_label'] = 'Modifica la zona "${0}"';
 $L['Zones_Title'] = 'Zone';
 
+$L['valid_platform,fwobject-zone-delete,fwobject-referenced,3'] = 'Impossibile eliminare ${2}. La zona è utilizzata dalle regole del firewall.';
+$L['valid_platform,fwobject-fwservice-delete,fwobject-referenced,3'] = 'Impossibile eliminare ${2}. Il servizio è utilizzato dalle regole del firewall.';
+$L['valid_platform,fwobject-host-delete,fwobject-referenced,3'] = 'Impossibile eliminare ${2}. L\'host è utilizzato dalle regole del firewall.';
+$L['valid_platform,fwobject-host-group-delete,fwobject-referenced,3'] = 'Impossibile eliminare ${2}. Il gruppo di host è utilizzato dalle regole del firewall.';
