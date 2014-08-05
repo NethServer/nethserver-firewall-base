@@ -3,7 +3,7 @@
 namespace NethServer\Module\FirewallObjects;
 
 /*
- * Copyright (C) 2011 Nethesis S.r.l.
+ * Copyright (C) 2014 Nethesis S.r.l.
  * 
  * This script is part of NethServer.
  * 
@@ -56,6 +56,6 @@ class Zones extends \Nethgui\Controller\TableController
 
     function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
     {
-        $this->getPlatform()->signalEvent('firewall-objects-modify');
+        $this->getPlatform()->signalEvent('firewall-objects-modify &');
     }
 }

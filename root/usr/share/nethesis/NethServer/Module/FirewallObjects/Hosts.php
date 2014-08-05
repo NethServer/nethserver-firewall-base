@@ -3,7 +3,7 @@
 namespace NethServer\Module\FirewallObjects;
 
 /*
- * Copyright (C) 2011 Nethesis S.r.l.
+ * Copyright (C) 2014 Nethesis S.r.l.
  * 
  * This script is part of NethServer.
  * 
@@ -21,10 +21,8 @@ namespace NethServer\Module\FirewallObjects;
  * along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Nethgui\System\PlatformInterface as Validate;
-
 /**
- * Mange firewall hosts
+ * Manage firewall hosts
  *
  * @author Giacomo Sanchietti
  *
@@ -61,6 +59,6 @@ class Hosts extends \Nethgui\Controller\TableController
 
     function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
     {
-        $this->getPlatform()->signalEvent('firewall-objects-modify');
+        $this->getPlatform()->signalEvent('firewall-objects-modify &');
     }
 }

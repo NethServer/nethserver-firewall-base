@@ -21,7 +21,6 @@ namespace NethServer\Module\FirewallObjects\Zones;
  */
 
 use Nethgui\System\PlatformInterface as Validate;
-use Nethgui\Controller\Table\Modify as Table;
 
 /**
  * Modify Service object
