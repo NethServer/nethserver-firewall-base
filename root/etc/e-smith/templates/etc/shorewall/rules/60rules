@@ -16,14 +16,14 @@
         $action = uc($action);
         my $service = $rule->prop("Service") || '';
         my $log = $rule->prop('Log') || "";
-        my $description = $rule->prop('Description') || '';
+        my $description = "RULE#" . $rule->key . " " . ($rule->prop('Description') || '');
 
         # src and dst can be: IP address, host, host-group, zone
         my $src_addr = $fw->getAddress($src);
         my $dst_addr = $fw->getAddress($dst);
         $action .= ":$log" unless ($log eq '');
 
-        my $prefix .= "\n#\n# RULE $src -> $dst \n#\n";
+        my $prefix .= "\n#\n# RULE#" . $rule->key . " $src -> $dst \n#\n";
         $prefix .= "?COMMENT $description\n";
         $prefix .= "$action\t".$fw->getZone($src_addr)."\t".$fw->getZone($dst_addr);
         if ($service eq 'any' || $service eq '') {
