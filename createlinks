@@ -135,5 +135,14 @@ validator_actions($_, qw(
    fwobject-fwservice-delete
 ));
 
-
-
+#
+# Adjust firewall when "remote" and "local" records in hosts DB
+# change:
+#
+event_actions($_, qw(
+     firewall-adjust 95
+)) foreach(qw(
+     host-delete
+     host-modify
+     host-create
+));
