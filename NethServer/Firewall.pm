@@ -238,17 +238,16 @@ sub getZone($)
 {
     my $self = shift;
     my $value = shift;
-    my $str = $value;
     
     if ( lc($value) eq 'any') {
         return 'any';
     }
 
-    if ( $value =~ m/,/ ) { # host group, pick the first one
-        my @tokens = split(/,/, $value);
-        $str = $tokens[0];
-    }
-    my $needle = NetAddr::IP->new($str);
+    # sanitize the list:
+    $value = join(",", grep { $_ ne '' } split(/,/, $value));
+
+    # host group or not: always pick the first element:
+    my $needle = NetAddr::IP->new((split(/,/, $value))[0]);
     return $value unless defined($needle); # skip garbage
 
     # check zones
