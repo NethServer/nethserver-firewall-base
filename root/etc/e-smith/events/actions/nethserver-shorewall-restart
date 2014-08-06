@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2014 Nethesis S.r.l.
+# http://www.nethesis.it - support@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see .
+#
+
+use strict;
+
+use NethServer::Service;
+use NethServer::TrackerClient;
+
+
+my $shs = NethServer::Service->new('shorewall');
+
+if( ! $shs->is_configured() ) {
+    exit(0);
+}
+
+my $tracker = NethServer::TrackerClient->new();
+my $taskId = $tracker->declare_task('Configuring shorewall');
+
+my $action = '';
+my $message = '';
+my $exitCode = 0;
+
+$tracker->set_task_progress($taskId, 0.2, "Adjusting Shorewall service status");
+if( ! $shs->adjust(\$action)) {
+    $message = 'Shorewall adjust failed';
+    $exitCode = 1;
+} elsif($shs->is_owned() && $shs->is_enabled()) {
+    $action = $shs->is_running() ? 'restart' : 'start';
+    $tracker->set_task_progress($taskId, 0.4, "Shorewall $action");
+    $message = qx(/sbin/shorewall $action 2>&1 1>/dev/null);
+    chomp($message);
+    if($? != 0) {
+	$exitCode = 1;	
+    } else {
+	$message = '';
+	$exitCode = 0;
+    }
+} 
+
+warn sprintf("[%s] Shorewall %s%s\n", ($exitCode ? 'ERROR' : 'NOTICE'), $action, ($message ? ': ' . $message : ''));
+
+$tracker->set_task_done($taskId, $message, $exitCode);
+exit($exitCode);
