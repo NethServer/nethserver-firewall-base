@@ -3,7 +3,7 @@
 namespace NethServer\Module\FirewallObjects;
 
 /*
- * Copyright (C) 2011 Nethesis S.r.l.
+ * Copyright (C) 2014 Nethesis S.r.l.
  * 
  * This script is part of NethServer.
  * 
@@ -42,18 +42,10 @@ class Services extends \Nethgui\Controller\TableController
             'Actions'
         );
 
-        $p = $this->getPlatform();
-        $parameterSchema = array(
-            array('name', Validate::USERNAME, \Nethgui\Controller\Table\Modify::KEY),
-            array('Protocol', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
-            array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
-            array('Ports', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
-        );
-
         $this
             ->setTableAdapter($this->getPlatform()->getTableAdapter('fwservices', 'fwservice'))
             ->addRowAction(new \NethServer\Module\FirewallObjects\Services\Modify('update'))
-            ->addRowAction(new \Nethgui\Controller\Table\Modify('delete', $parameterSchema, 'Nethgui\Template\Table\Delete')) // Standard DELETE template
+            ->addRowAction(new \NethServer\Module\FirewallObjects\Services\Modify('delete'))
             ->addTableAction(new \NethServer\Module\FirewallObjects\Services\Modify('create'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->setColumns($columns)
@@ -64,6 +56,6 @@ class Services extends \Nethgui\Controller\TableController
 
     function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
     {
-        $this->getPlatform()->signalEvent('firewall-objects-modify');
+        $this->getPlatform()->signalEvent('firewall-objects-modify &');
     }
 }

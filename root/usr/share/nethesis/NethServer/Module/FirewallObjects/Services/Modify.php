@@ -2,7 +2,7 @@
 namespace NethServer\Module\FirewallObjects\Services;
 
 /*
- * Copyright (C) 2012 Nethesis S.r.l.
+ * Copyright (C) 2014 Nethesis S.r.l.
  *
  * This script is part of NethServer.
  *
@@ -21,7 +21,6 @@ namespace NethServer\Module\FirewallObjects\Services;
  */
 
 use Nethgui\System\PlatformInterface as Validate;
-use Nethgui\Controller\Table\Modify as Table;
 
 /**
  * Modify Service object
@@ -38,7 +37,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('name', Validate::USERNAME, \Nethgui\Controller\Table\Modify::KEY),
             array('Protocol', $this->createValidator()->memberOf($this->protocols), \Nethgui\Controller\Table\Modify::FIELD),
             array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
-            array('Ports', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
+            array('Ports', Validate::NOTEMPTY, \Nethgui\Controller\Table\Modify::FIELD)
         );
 
         $this->setSchema($parameterSchema);
@@ -71,7 +70,20 @@ class Modify extends \Nethgui\Controller\Table\Modify
                 }
             }
         }
-
+                
+        $keyExists = $this->getPlatform()->getDatabase('fwservices')->getType($this->parameters['name']) != '';
+        if($this->getIdentifier() === 'create' && $keyExists) {
+             $report->addValidationErrorMessage($this, 'name', 'Service_key_exists_message');
+        }
+        if($this->getIdentifier() !== 'create' && ! $keyExists) {
+            throw new \Nethgui\Exception\HttpException('Not found', 404, 1407169969);
+        }
+       if($this->getIdentifier() === 'delete') {
+            $v = $this->createValidator()->platform('fwobject-fwservice-delete', 'fwservices');
+            if( ! $v->evaluate($this->parameters['name'])) {
+                $report->addValidationError($this, 'ServicesKey', $v);
+            }
+        }
         parent::validate($report);
     }
 

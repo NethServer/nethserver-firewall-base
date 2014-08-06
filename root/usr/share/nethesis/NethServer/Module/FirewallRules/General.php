@@ -56,7 +56,7 @@ class General extends \Nethgui\Controller\AbstractController
 
     protected function onParametersSaved($changes)
     {
-        $this->getPlatform()->signalEvent('firewall-adjust');
+        $this->getPlatform()->signalEvent('firewall-adjust &');
     }
 
 }

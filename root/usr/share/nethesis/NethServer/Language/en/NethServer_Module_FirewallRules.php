@@ -39,7 +39,7 @@ $L['Create_header'] = 'Create a new firewall rule';
 $L['Commit_label'] = 'Apply changes';
 $L['Edit_label'] = 'Edit';
 $L['Delete_label'] = 'Delete';
-$L['Index_header'] = 'Firewall rules [Beta]';
+$L['Index_header'] = 'Firewall rules';
 $L['RuleText_label'] = 'From ${Src} to ${Dst}, service ${Service}';
 $L['RuleId_label'] = '#${0}';
 $L['SearchPlaceholder_label'] = 'Search...';
@@ -55,9 +55,9 @@ $L['A_new_rule_label'] = "New rule";
 $L['Any_label'] = 'Any';
 $L['NoRulesDefined_label'] = 'No rules are defined. Create the first one now!';
 
-$L['any_service_label'] = 'any';
+$L['any_service_label'] = 'any service';
 $L['any_src_dst_label'] = 'any host';
-$L['all_label'] = 'all';
+$L['all_label'] = 'any';
 $L['host_label'] = 'host';
 $L['zone_label'] = 'zone';
 $L['host-group_label'] = 'group';
@@ -72,3 +72,5 @@ $L['FirewallObject_role_Title'] = 'Role ${key}';
 $L['FirewallObject_zone_Title'] = 'Zone ${key}';
 $L['FirewallObject_host-group_Title'] = 'Host group ${key}';
 $L['FirewallObject_fwservice_Title'] = 'Service ${key}';
+
+$L['Show_x_outof_y_label'] = 'Showing ${partial} results out of ${total}';

@@ -2,7 +2,7 @@
 namespace NethServer\Module\FirewallObjects\HostGroups;
 
 /*
- * Copyright (C) 2012 Nethesis S.r.l.
+ * Copyright (C) 2014 Nethesis S.r.l.
  *
  * This script is part of NethServer.
  *
@@ -53,6 +53,24 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $this->setSchema($parameterSchema);
 
         parent::initialize();
+    }
+
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        $keyExists = $this->getPlatform()->getDatabase('hosts')->getType($this->parameters['name']) != '';
+        if($this->getIdentifier() === 'create' && $keyExists) {
+            $report->addValidationErrorMessage($this, 'name', 'Host_key_exists_message');
+        }
+        if($this->getIdentifier() !== 'create' && ! $keyExists) {
+            throw new \Nethgui\Exception\HttpException('Not found', 404, 1407169968);
+        }
+       if($this->getIdentifier() === 'delete') {
+            $v = $this->createValidator()->platform('fwobject-host-group-delete', 'hosts');
+            if( ! $v->evaluate($this->parameters['name'])) {
+                $report->addValidationError($this, 'HostGroupsKey', $v);
+            }
+        }
+        parent::validate($report);
     }
 
     public function provideMembersDatasource()

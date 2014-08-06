@@ -44,9 +44,10 @@ class CreateHostGroup extends \Nethgui\Controller\Collection\AbstractAction
     public function initialize()
     {
         parent::initialize();
+        $membersValidator = $this->createValidator()->notEmpty()->collectionValidator($this->createValidator(Validate::USERNAME));
         $this->state = new \NethServer\Module\FirewallRules\RuleWorkflow();
         $this->declareParameter('name', Validate::USERNAME);
-        $this->declareParameter('Members', Validate::USERNAME_COLLECTION);
+        $this->declareParameter('Members', $membersValidator);
         $this->declareParameter('Description', Validate::ANYTHING);
         $this->declareParameter('q', Validate::ANYTHING);
         $this->declareParameter('MembersDatasource', FALSE, array($this, 'provideMembersDatasource'));
@@ -84,7 +85,7 @@ class CreateHostGroup extends \Nethgui\Controller\Collection\AbstractAction
             $this->getPlatform()
                 ->getDatabase('hosts')->setKey($this->parameters['name'], 'host-group', array(
                 'Description' => $this->parameters['Description'],
-                'Members' => implode(',', $this->parameters['Members']),
+                'Members' => implode(',', is_array($this->parameters['Members']) ? $this->parameters['Members'] : array()),
             ));
             $this->state->resume($this->getParent()->getSession())->assign(sprintf("host-group;%s", $this->parameters['name']));
         }

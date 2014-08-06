@@ -48,11 +48,12 @@ event_templates($event, '/etc/lsm/lsm.conf');
 event_actions($event,
               'initialize-default-databases' => '00',
               'nethserver-shorewall-conf' => '02',
-              'nethserver-firewall-base-conf' => '03');
+              'nethserver-firewall-base-conf' => '03',
+	      'nethserver-shorewall-restart' => '89'
+);
 
 event_services($event,
                      'rsyslog' => 'restart', 
-                     'shorewall' => 'restart',
                      'lsm' => 'restart' );
 
 
@@ -77,10 +78,13 @@ event_templates($event,
                 '/etc/shorewall/hosts',
                 '/etc/shorewall/zones');
 
+event_actions($event,
+	      'nethserver-shorewall-restart' => '89'
+);
+
 event_templates($event, '/etc/lsm/lsm.conf');
 
 event_services($event, 
-                     'shorewall' => 'restart',
                      'lsm' => 'restart' );
 
 
@@ -122,3 +126,23 @@ validator_actions('firewall-object-exists', qw(
                   uniq-fwobject 20
 ));
 
+validator_actions($_, qw(
+                  fwobject-referenced 20
+)) foreach (qw(
+   fwobject-host-group-delete
+   fwobject-host-delete
+   fwobject-zone-delete
+   fwobject-fwservice-delete
+));
+
+#
+# Adjust firewall when "remote" and "local" records in hosts DB
+# change:
+#
+event_actions($_, qw(
+     firewall-adjust 95
+)) foreach(qw(
+     host-delete
+     host-modify
+     host-create
+));

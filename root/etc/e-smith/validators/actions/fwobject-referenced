@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2014 Nethesis S.r.l.
+# http://www.nethesis.it - support@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see .
+#
+
+#
+# Check if a record is referenced by the firewall configuration. If
+# referenced exit with error, otherwise exit with success.
+#
+
+use strict;
+use NethServer::Firewall;
+
+my $dbName = shift;
+my $key = shift;
+
+my @references = NethServer::Firewall->new()->getReferences($dbName, $key);
+
+if( ! @references) {
+    print "$dbName:$key was not found.\n";
+    exit(0);
+}
+
+if(scalar @references > 0) {
+    print "$dbName:$key is used by firewall rules " . join(", ", map { $_->key } @references) . "\n";
+    exit(3);
+}
+
+exit(0);

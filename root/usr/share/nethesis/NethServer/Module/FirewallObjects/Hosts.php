@@ -3,7 +3,7 @@
 namespace NethServer\Module\FirewallObjects;
 
 /*
- * Copyright (C) 2011 Nethesis S.r.l.
+ * Copyright (C) 2014 Nethesis S.r.l.
  * 
  * This script is part of NethServer.
  * 
@@ -21,10 +21,8 @@ namespace NethServer\Module\FirewallObjects;
  * along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Nethgui\System\PlatformInterface as Validate;
-
 /**
- * Mange firewall hosts
+ * Manage firewall hosts
  *
  * @author Giacomo Sanchietti
  *
@@ -41,19 +39,11 @@ class Hosts extends \Nethgui\Controller\TableController
             'Actions'
         );
 
-        $macv = $this->getPlatform()->createValidator()->orValidator($this->getPlatform()->createValidator()->macAddress(), $this->getPlatform()->createValidator()->isEmpty());
-
-        $parameterSchema = array(
-            array('name', Validate::USERNAME, \Nethgui\Controller\Table\Modify::KEY),
-            array('IpAddress', Validate::IPv4, \Nethgui\Controller\Table\Modify::FIELD),
-            array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
-        );
-
         $this
             ->setTableAdapter($this->getPlatform()->getTableAdapter('hosts', 'host'))
-            ->addRowAction(new \Nethgui\Controller\Table\Modify('update', $parameterSchema, 'NethServer\Template\FirewallObjects\Hosts'))
-            ->addRowAction(new \Nethgui\Controller\Table\Modify('delete', $parameterSchema, 'Nethgui\Template\Table\Delete')) // Standard DELETE template
-            ->addTableAction(new \Nethgui\Controller\Table\Modify('create', $parameterSchema, 'NethServer\Template\FirewallObjects\Hosts'))
+            ->addRowAction(new \NethServer\Module\FirewallObjects\Hosts\Modify('update'))
+            ->addRowAction(new \NethServer\Module\FirewallObjects\Hosts\Modify('delete')) // Standard DELETE template
+            ->addTableAction(new \NethServer\Module\FirewallObjects\Hosts\Modify('create'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->setColumns($columns)
         ;
@@ -63,6 +53,6 @@ class Hosts extends \Nethgui\Controller\TableController
 
     function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
     {
-        $this->getPlatform()->signalEvent('firewall-objects-modify');
+        $this->getPlatform()->signalEvent('firewall-objects-modify &');
     }
 }
