@@ -30,6 +30,8 @@ namespace NethServer\Module\FirewallRules;
 class Index extends \Nethgui\Controller\Collection\AbstractAction
 {
 
+    private $firewallAdjustProcess;
+
     public function initialize()
     {
         parent::initialize();
@@ -65,7 +67,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         }
 
         if ( ! $this->getRequest()->hasParameter('sortonly')) {
-            $this->getPlatform()->signalEvent('firewall-adjust');
+            $this->firewallAdjustProcess = $this->getPlatform()->signalEvent('firewall-adjust &');
         }
     }
 
@@ -183,6 +185,14 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
 
         if ($this->getRequest()->isValidated()) {
             $view->getCommandList()->show();
+        }
+
+        if(isset($this->firewallAdjustProcess)) {
+            $this->firewallAdjustProcess->on('success', array(
+                    'location' => array(
+                        'url' => $view->getModuleUrl(),
+                        'freeze' => TRUE,
+                )));
         }
     }
 
