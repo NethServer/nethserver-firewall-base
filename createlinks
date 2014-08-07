@@ -135,6 +135,10 @@ validator_actions($_, qw(
    fwobject-fwservice-delete
 ));
 
+validator_actions('fwobject-host-delete', qw(
+   fwobject-hostgroup-remove-member 20
+));
+
 #
 # Adjust firewall when "remote" and "local" records in hosts DB
 # change:

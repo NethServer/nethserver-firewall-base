@@ -51,8 +51,4 @@ class Hosts extends \Nethgui\Controller\TableController
         parent::initialize();
     }
 
-    function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
-    {
-        $this->getPlatform()->signalEvent('firewall-objects-modify &');
-    }
 }

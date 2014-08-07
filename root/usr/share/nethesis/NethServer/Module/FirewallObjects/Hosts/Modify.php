@@ -61,6 +61,28 @@ class Modify extends \Nethgui\Controller\Table\Modify
         parent::validate($report);
     }
 
+    protected function processDelete($key)
+    {
+        parent::processDelete($key);
+        $this->clearHostgroupMembers($key);
+    }
+
+    private function clearHostgroupMembers($hostKey)
+    {
+        $hostsDb = $this->getPlatform()->getDatabase('hosts');
+
+        $notHostKey = function ($e) use ($hostKey) {
+            return $e !== $hostKey;
+        };
+
+        foreach ($hostsDb->getAll('host-group') as $groupKey => $groupProps) {
+            $members = isset($groupProps['Members']) ? explode(',', $groupProps['Members']) : array();
+            if (in_array($hostKey, $members)) {
+                $hostsDb->setProp($groupKey, array('Members' => implode(',', array_filter($members, $notHostKey))));
+            }
+        }
+    }
+
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
@@ -70,6 +92,11 @@ class Modify extends \Nethgui\Controller\Table\Modify
             'delete' => 'Nethgui\Template\Table\Delete',
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
+    }
+
+    function onParametersSaved($parameters)
+    {
+        $this->getPlatform()->signalEvent('firewall-objects-modify &');
     }
 
 }
