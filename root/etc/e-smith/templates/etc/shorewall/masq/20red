@@ -2,8 +2,7 @@
     use esmith::util;
     use esmith::NetworksDB;
     my $ndb = esmith::NetworksDB->open_ro();
-    my $green = $ndb->green;
     foreach ($ndb->get_by_role('red')) {
-        $OUT .= $_->key."\t".esmith::util::computeLocalNetworkShortSpec($green->prop('ipaddr'),$green->prop('netmask'))."\n";
+        $OUT .= $_->key."\n";
     }
 }
