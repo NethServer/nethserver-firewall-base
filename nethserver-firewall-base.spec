@@ -1,7 +1,7 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: @@VERSION@@
-Release: @@RELEASE@@
+Version: 2.0.0
+Release: 2%{?dist}
 License: GPL
 Group: Networking/Daemons
 Source0: %{name}-%{version}.tar.gz
@@ -50,6 +50,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 20 2014 Davide Principi <davide.principi@nethesis.it> - 2.0.0-2.ns6
+- Migration fragment 000_capitalize_props for old portforward DB.
+
 * Wed Aug 20 2014 Davide Principi <davide.principi@nethesis.it> - 2.0.0-1.ns6
 - Masquerade all sources - Bug #2836 [NethServer]
 - Firewall rules: preserve references to other DB records - Enhancement #2835 [NethServer]

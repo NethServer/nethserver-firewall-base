@@ -1,0 +1,41 @@
+{
+    #
+    # 000_capitalize_props
+    #
+    # Since version 2.0.0 prop names are capitalized. This migration
+    # fragment fixes them.  See commit:34e3ed10 on 2014-06-18
+    #
+
+    use esmith::ConfigDB;
+
+    my $db = esmith::ConfigDB->open('portforward');
+
+    my %propMap = (
+	'src' => 'Src',
+	'dst' => 'Dst',
+	'proto' => 'Proto',
+	'dstHost' => 'DstHost',
+	'srcHost' => 'SrcHost',
+	'description' => 'Description',
+	'allow' => 'Allow',
+	'oriDst' => 'OriDst',	
+	);
+
+    foreach my $record ($db->get_all_by_prop('type' => 'pf')) {
+
+	my %props = $record->props;
+
+	my @targets = grep { exists $props{$_} } keys %propMap;
+
+	foreach my $t (@targets) {
+	    $props{$propMap{$t}} = $props{$t};
+	    delete $props{$t};
+	}
+
+	if(@targets) {
+	    $record->reset_props(%props);
+	}
+    }
+
+    '';
+}
