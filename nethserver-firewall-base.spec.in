@@ -50,6 +50,24 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 20 2014 Davide Principi <davide.principi@nethesis.it> - 2.0.0-1.ns6
+- Masquerade all sources - Bug #2836 [NethServer]
+- Firewall rules: preserve references to other DB records - Enhancement #2835 [NethServer]
+- Embed Nethgui 1.6.0 into httpd-admin RPM - Enhancement #2820 [NethServer]
+- Firewall: beautify rules page - Enhancement #2783 [NethServer]
+- Firewall: disable unused roles - Enhancement #2776 [NethServer]
+- Firewall: support DNS/DHCP objects in firewall rules - Enhancement #2775 [NethServer]
+- Firewall: support objects on port forward and traffic shaping rules - Enhancement #2774 [NethServer]
+- Merge nethserver-shorewall and nethserver-firewall-base - Enhancement #2771 [NethServer]
+- Firewall: allow and deny access to local services - Enhancement #2752 [NethServer]
+- Firewall: rules to divert traffic via specific provider - Feature #2740 [NethServer]
+- Web UI: advanced network configuration  - Feature #2719 [NethServer]
+- Custom firewall rules - Feature #2716 [NethServer]
+- Firewall: select default policy - Feature #2714 [NethServer]
+- Firewall: support custom objects - Feature #2705 [NethServer]
+- Firewall-base: add support for multi-wan - Feature #2332 [NethServer]
+- IDS/IPS (snort) - Feature #1771 [NethServer]
+
 * Wed Feb 26 2014 Davide Principi <davide.principi@nethesis.it> - 1.1.0-1.ns6
 - Allow to specify a port range in firewall rules - Feature #2644 [NethServer]
 
