@@ -1,0 +1,15 @@
+{
+    use esmith::NetworksDB;
+    my $ndb = esmith::NetworksDB->open_ro();
+
+    if (!defined($ndb->red)) {
+        foreach my $i ($ndb->green) {
+            $OUT .= "# Force GREEN + RED mode with only one interface\n";
+            foreach my $n ($ndb->local_access_spec()) {
+                my ($addr, $mask) = split('/', $n);
+                my $net = esmith::util::computeLocalNetworkShortSpec($addr, $mask || '255.255.255.255');
+                $OUT .= "loc\t".$i->key.":".$net."\n";
+            }
+        }
+    }
+}

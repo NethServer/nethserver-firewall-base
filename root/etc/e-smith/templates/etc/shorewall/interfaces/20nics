@@ -5,23 +5,35 @@
     use esmith::NetworksDB;
     my $ndb = esmith::NetworksDB->open_ro();
 
-   
-
-    foreach my $i ($ndb->interfaces) {
-        my $role = $i->prop('role') || '';
-        my $type = $i->prop('type') || '';
-        next if ($i->prop('role') eq '');
-        next if ($i->prop('role') eq 'slave' || $i->prop('role') eq 'bridged');
-        next if ($type eq 'alias');
-        if ($role eq 'green') {
-            $OUT .= "loc\t".$i->key."\ttcpflags,nosmurfs";
-        } elsif ($role eq 'red') {
-            $OUT.="net\t".$i->key."\ttcpflags,dhcp,nosmurfs,logmartians,optional";
-        } else {
-            $role = substr($role,0,5); #truncate zone name to 5 chars
-            $OUT.="$role\t".$i->key."\ttcpflags,nosmurfs,logmartians";
+    if (!defined($ndb->red)) {
+        foreach my $i ($ndb->green) {
+            my $role = $i->prop('role') || next;
+            my $type = $i->prop('type') || '';
+            next if ($i->prop('role') eq 'slave' || $i->prop('role') eq 'bridged');
+            next if ($type eq 'alias');
+            if ($role eq 'green') {
+                $OUT .= "# Force GREEN + RED mode with only one interface\n";
+                $OUT .= "net\t".$i->key."\ttcpflags,dhcp,nosmurfs,logmartians,optional";
+            }
+            $OUT .= ",bridge" if ($type eq 'bridge');
+            $OUT .= "\n";
         }
-        $OUT .= ",bridge" if ($type eq 'bridge');
-        $OUT .= "\n";
-    } 
+    } else {
+        foreach my $i ($ndb->interfaces) {
+            my $role = $i->prop('role') || next;
+            my $type = $i->prop('type') || '';
+            next if ($i->prop('role') eq 'slave' || $i->prop('role') eq 'bridged');
+            next if ($type eq 'alias');
+            if ($role eq 'green') {
+                $OUT .= "loc\t".$i->key."\ttcpflags,nosmurfs";
+            } elsif ($role eq 'red') {
+                $OUT.="net\t".$i->key."\ttcpflags,dhcp,nosmurfs,logmartians,optional";
+            } else {
+                $role = substr($role,0,5); #truncate zone name to 5 chars
+                $OUT.="$role\t".$i->key."\ttcpflags,nosmurfs,logmartians";
+            }
+            $OUT .= ",bridge" if ($type eq 'bridge');
+            $OUT .= "\n";
+        } 
+    }
 }
