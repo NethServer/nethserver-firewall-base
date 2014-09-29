@@ -150,3 +150,15 @@ event_actions($_, qw(
      host-modify
      host-create
 ));
+
+#
+# Adjust firewall on local networks modifications
+# Rif #2861
+#
+event_actions($_, qw(
+     firewall-adjust 95
+)) foreach(qw(
+     network-delete
+     network-modify
+     network-create
+));

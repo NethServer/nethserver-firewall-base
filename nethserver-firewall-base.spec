@@ -14,6 +14,7 @@ Requires: shorewall
 Requires: ipset
 
 Obsoletes: nethserver-shorewall
+Provides: nethserver-firewall
 
 BuildRequires: nethserver-devtools
 AutoReq: no
