@@ -348,11 +348,17 @@ sub getProviders
     my @providers;
     my $number = 1;
     my @list = sort _sort_by_weight $self->{'ndb'}->get_all_by_prop('type' => 'provider'); # descending sort
+    my %reds;
+    foreach ($self->{'ndb'}->red()) {
+        $reds{$_->key} = '';
+    }
     foreach my $provider ( @list ) {
         my $status = $provider->prop('status') || 'disabled';
         next if ($status eq 'disabled');
         my $name = $provider->key;
         my $interface_name = $provider->prop('interface') || next;
+        # skip providers associated to non-existing red interfaces
+        next if (!exists($reds{$interface_name}));
         my $weight = $provider->prop('weight') || "1";
         my $mask = "0x" . $number . "0000";
         my @mask_array = ('mask', $mask);

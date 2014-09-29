@@ -27,6 +27,7 @@ use Nethgui\System\PlatformInterface as Validate;
  */
 class Providers extends \Nethgui\Controller\TableController
 {
+    private $interfaces;
 
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
     {
@@ -66,11 +67,27 @@ class Providers extends \Nethgui\Controller\TableController
         parent::initialize();
     }
 
+    private function readInterfaces() {
+        $ret = array();
+        $types = array('bridge', 'bond', 'vlan', 'ethernet');
+        $interfaces = $this->getPlatform()->getDatabase('networks')->getAll();
+        foreach ($interfaces as $key => $props) {
+           if (in_array($props['type'], $types) && isset($props['role']) && stripos($props['role'],'red') !== false) {
+               $ret[] = $key;
+           }
+        }
+        return $ret;
+    }
+
     public function prepareViewForColumnKey(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
     {
-        if (!isset($values['status']) || ($values['status'] == 'disabled')) {
+        if (!$this->interfaces) {
+            $this->interfaces = $this->readInterfaces();
+        }
+        if (!isset($values['status']) || ($values['status'] == 'disabled') || (!in_array($values['interface'],$this->interfaces)) ) {
             $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-locked');
         }
+
         return strval($key);
     }
 
