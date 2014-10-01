@@ -79,6 +79,7 @@ event_templates($event,
                 '/etc/shorewall/zones');
 
 event_actions($event,
+	      'providers-cleanup' => '02',
 	      'nethserver-shorewall-restart' => '89'
 );
 
