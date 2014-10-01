@@ -30,7 +30,7 @@
                 $OUT.="net\t".$i->key."\ttcpflags,dhcp,nosmurfs,logmartians,optional";
             } else {
                 $role = substr($role,0,5); #truncate zone name to 5 chars
-                $OUT.="$role\t".$i->key."\ttcpflags,nosmurfs,logmartians";
+                $OUT.="$role\t".$i->key."\ttcpflags,nosmurfs,logmartians,dhcp";
             }
             $OUT .= ",bridge" if ($type eq 'bridge');
             $OUT .= "\n";
