@@ -19,3 +19,4 @@ $L['WanMode_header'] = 'Modalità multi WAN';
 $L['WanMode_label'] = 'Modalità';
 $L['weight_label'] = 'Peso';
 $L['Configure_header'] = 'Configura modalità multi WAN';
+$L['valid_no_red_interface'] = 'non è disponibile alcuna interfaccia red';

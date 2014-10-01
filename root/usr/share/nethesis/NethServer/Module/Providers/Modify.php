@@ -64,6 +64,14 @@ class Modify extends \Nethgui\Controller\Table\Modify
         parent::initialize();
     }
 
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        parent::validate($report);
+        if( $this->getRequest()->isMutation() && ! $this->parameters['interface']) {
+            $report->addValidationErrorMessage($this, 'interface', 'valid_no_red_interface');
+        }
+    }
+
     private function readInterfaces() {
         $ret = array();
         $used = array();
