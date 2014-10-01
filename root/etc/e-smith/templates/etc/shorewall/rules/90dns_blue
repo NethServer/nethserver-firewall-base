@@ -1,0 +1,3 @@
+?COMMENT Allow DNS from blue
+ACCEPT	blue	$FW	tcp	53
+ACCEPT	blue	$FW	udp	53
