@@ -2,19 +2,23 @@
 
 echo "<div class='dashboard-item'>";
 echo $view->header()->setAttribute('template',$T('Providers_Title'));
-echo "<dl>";
-foreach ($view['providers'] as $name => $n) {
-    echo "<dt>".$T($name)."</dt>"; 
-    if ($n == "0") {
-        echo "<dd class='provider-green'>UP</dd>"; 
-    } else if ($n == "1") {
-        echo "<dd class='provider-red'>DOWN</dd>"; 
-    } else {
-        echo "<dd class='provider-grey'>OFF</dd>"; 
+if (!$view['providers']) {
+    echo $T('no_providers');
+} else {
+    echo "<dl>";
+    foreach ($view['providers'] as $name => $n) {
+        echo "<dt>".$T($name)."</dt>"; 
+        if ($n == "0") {
+            echo "<dd class='provider-green'>UP</dd>"; 
+        } else if ($n == "1") {
+            echo "<dd class='provider-red'>DOWN</dd>"; 
+        } else {
+            echo "<dd class='provider-grey'>OFF</dd>"; 
+        }
+        echo "</dd>";
     }
-    echo "</dd>";
+    echo "</dl>";
 }
-echo "</dl>";
 echo "</div>";
 
 $view->includeCSS("
