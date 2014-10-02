@@ -1,7 +1,7 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.0.0
-Release: 2%{?dist}
+Version: 2.1.0
+Release: 1%{?dist}
 License: GPL
 Group: Networking/Daemons
 Source0: %{name}-%{version}.tar.gz
@@ -51,6 +51,12 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Thu Oct 02 2014 Davide Principi <davide.principi@nethesis.it> - 2.1.0-1.ns6
+- Handle nethserver-firewall-base uninstallation - Enhancement #2873 [NethServer]
+- Shorewall: enable green-only mode - Feature #2861 [NethServer]
+- Changing role to a red interface doesn't remove it from providers - Bug #2852 [NethServer]
+- Firewall: add migration fragment for tc database - Bug #2846 [NethServer]
+
 * Wed Aug 20 2014 Davide Principi <davide.principi@nethesis.it> - 2.0.0-2.ns6
 - Migration fragment 000_capitalize_props for old portforward DB.
 
