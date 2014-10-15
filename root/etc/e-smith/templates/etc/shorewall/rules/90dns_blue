@@ -1,3 +1,12 @@
-?COMMENT Allow DNS from blue
-ACCEPT	blue	$FW	tcp	53
-ACCEPT	blue	$FW	udp	53
+#
+# 90dns_blue 
+#
+{
+    use esmith::NetworksDB;
+    my $ndb = esmith::NetworksDB->open_ro();
+    if ($ndb->blue()) {
+        $OUT.="?COMMENT Allow DNS from blue\n";
+        $OUT.="ACCEPT	blue	\$FW	tcp	53\n";
+        $OUT.="ACCEPT	blue	\$FW	udp	53\n";
+    }
+}
