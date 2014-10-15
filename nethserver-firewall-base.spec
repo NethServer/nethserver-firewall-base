@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.1.0
+Version: 2.1.1
 Release: 1%{?dist}
 License: GPL
 Group: Networking/Daemons
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Wed Oct 15 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.1.1-1.ns6
+- Support DHCP on multiple interfaces - Feature #2849
+
 * Thu Oct 02 2014 Davide Principi <davide.principi@nethesis.it> - 2.1.0-1.ns6
 - Handle nethserver-firewall-base uninstallation - Enhancement #2873 [NethServer]
 - Shorewall: enable green-only mode - Feature #2861 [NethServer]
