@@ -51,7 +51,7 @@
         $OUT.="?COMMENT $description\n";
         if ($nfqueue eq 'enabled') {
             $OUT.="DNAT-\tnet$allow\t$dstHost\t$proto\t$src$srcHost$oriDst\n";
-            $OUT.="NFQUEUE\tnet$allow\tloc\t$proto\t$dst$srcHost$oriDst\n";
+            $OUT.="NFQBY\tnet$allow\tloc\t$proto\t$dst$srcHost$oriDst\n";
         } else {
             $OUT.="DNAT\tnet$allow\tloc:$dstHost\t$proto\t$src$srcHost$oriDst\n";
         }

@@ -2,6 +2,8 @@
 #	L O C A T I O N	  O F	F I L E S   A N D   D I R E C T O R I E S
 ###############################################################################
 
+ARPTABLES=
+
 CONFIG_PATH="$\{CONFDIR\}/shorewall:$\{SHAREDIR\}/shorewall"
 
 GEOIPDIR=/usr/share/xt_geoip/LE
@@ -15,6 +17,8 @@ IPSET=/usr/sbin/ipset
 LOCKFILE=
 
 MODULESDIR=
+
+NFACCT=
 
 PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/sbin"
 

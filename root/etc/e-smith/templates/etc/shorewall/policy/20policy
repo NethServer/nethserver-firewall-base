@@ -10,7 +10,7 @@
     my $action = '';
     if ( $policy eq 'permissive') {
         if ($nfqueue eq 'enabled') {
-            $action = 'NFQUEUE';
+            $action = 'ACCEPT:NFQBY';
         } else {
             $action = 'ACCEPT';
         }

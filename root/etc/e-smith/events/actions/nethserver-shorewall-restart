@@ -46,7 +46,7 @@ if( ! $shs->adjust(\$action)) {
 } elsif($shs->is_owned() && $shs->is_enabled()) {
     $action = $shs->is_running() ? 'restart' : 'start';
     $tracker->set_task_progress($taskId, 0.4, "Shorewall $action");
-    $message = qx(/sbin/shorewall $action 2>&1 1>/dev/null);
+    $message = qx(/usr/sbin/shorewall $action 2>&1 1>/dev/null);
     chomp($message);
     if($? != 0) {
 	$exitCode = 1;	

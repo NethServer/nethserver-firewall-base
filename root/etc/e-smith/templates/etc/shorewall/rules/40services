@@ -7,7 +7,7 @@
     my $accept = 'ACCEPT';
     my $nfqueue = $firewall{'nfqueue'} || 'disabled';
     if ($nfqueue eq 'enabled') {
-        $accept = 'NFQUEUE';
+        $accept = 'NFQBY';
         # SSH and HTTPD-ADMIN exeception: do not filter ssh from local network
         $OUT.="#\n#\tAllow administration from local network\n#\n";
         $OUT .= "?COMMENT always accept sshd from loc\n";
