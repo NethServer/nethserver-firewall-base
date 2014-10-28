@@ -10,7 +10,7 @@ Packager: Giacomo Sanchietti <giacomo@nethesis.it>
 BuildArch: noarch
 Requires: nethserver-base >= 1.1.0
 Requires: nethserver-lsm
-Requires: shorewall
+Requires: shorewall >= 4.6
 Requires: ipset
 
 Obsoletes: nethserver-shorewall
