@@ -7,7 +7,7 @@
     my $nfqueue = $firewall{'nfqueue'} || 'disabled';
     my $action = '';
     if ($nfqueue eq 'enabled') {
-        $action = 'NFQUEUE';
+        $action = 'ACCEPT:NFQBY';
     } else {
         $action = 'ACCEPT';
     }
