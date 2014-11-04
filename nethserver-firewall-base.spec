@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.1.1
+Version: 2.2.0
 Release: 1%{?dist}
 License: GPL
 Group: Networking/Daemons
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Tue Nov 04 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.2.0-1.ns6
+- Firewall fallback when IPS is not running - Enhancement #2935 [NethServer]
+
 * Wed Oct 15 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.1.1-1.ns6
 - Support DHCP on multiple interfaces - Feature #2849
 
