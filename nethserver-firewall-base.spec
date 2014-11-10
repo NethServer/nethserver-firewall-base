@@ -8,7 +8,7 @@ Source0: %{name}-%{version}.tar.gz
 Packager: Giacomo Sanchietti <giacomo@nethesis.it>
 
 BuildArch: noarch
-Requires: nethserver-base >= 1.1.0
+Requires: nethserver-base > 2.5.2-1
 Requires: nethserver-lsm
 Requires: shorewall >= 4.6
 Requires: ipset

@@ -67,7 +67,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         }
 
         if ( ! $this->getRequest()->hasParameter('sortonly')) {
-            $this->firewallAdjustProcess = $this->getPlatform()->signalEvent('firewall-adjust &');
+            $this->getPlatform()->signalEvent('firewall-adjust &');
         }
     }
 
@@ -185,14 +185,6 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
 
         if ($this->getRequest()->isValidated()) {
             $view->getCommandList()->show();
-        }
-
-        if(isset($this->firewallAdjustProcess)) {
-            $this->firewallAdjustProcess->on('success', array(
-                    'location' => array(
-                        'url' => $view->getModuleUrl(),
-                        'freeze' => TRUE,
-                )));
         }
     }
 
