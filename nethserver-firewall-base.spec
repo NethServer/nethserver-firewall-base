@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.2.1
+Version: 2.2.2
 Release: 1%{?dist}
 License: GPL
 Group: Networking/Daemons
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Mon Dec 01 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.2.2-1.ns6
+- multi-wan: fix enable/disable failure - Bug #2966 [NethServer]
+
 * Wed Nov 19 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.2.1-1.ns6
 - Notify user if event fails - Enhancement #2927 [NethServer]
 
