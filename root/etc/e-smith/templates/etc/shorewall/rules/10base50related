@@ -1,0 +1,27 @@
+#
+# SECTION RELATED
+#
+?SECTION RELATED
+
+{
+    use esmith::NetworksDB;
+    my $nfqueue = $firewall{'nfqueue'} || 'disabled';
+    if ($nfqueue eq 'enabled') {
+        $OUT .= "# Enable NFQ for RELATED connections\n";
+        $OUT .= "NFQBY\tloc\tnet\n";
+        $OUT .= "NFQBY\tnet\tloc\n";
+        $OUT .= "NFQBY\tnet\tfw\n";
+        $OUT .= "NFQBY\tfw\tnet\n";
+
+        my $ndb = esmith::NetworksDB->open_ro();
+        if ($ndb->blue) {
+            $OUT .= "NFQBY\tblue\tnet\n";
+        }
+        if ($ndb->orange) {
+            $OUT .= "NFQBY\torange\tnet\n";
+        }
+        if ($ndb->blue && $ndb->orange) {
+            $OUT .= "NFQBY\tblue\torange\n";
+        }
+    }
+}

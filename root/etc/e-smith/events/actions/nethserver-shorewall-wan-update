@@ -58,10 +58,10 @@ DEVICE=`/sbin/e-smith/db networks getprop $NAME interface`
 
 if [ ${STATE} = up ]; then
   logger -i -p kern.info -t Shorewall Enabling device ${DEVICE}
-  /sbin/shorewall enable ${DEVICE} 2>>/var/log/firewall.log
+  /usr/sbin/shorewall enable ${DEVICE} 2>>/var/log/firewall.log
 else
   logger -i -p kern.info -t Shorewall Disabling device ${DEVICE}
-  /sbin/shorewall disable ${DEVICE} 2>>/var/log/firewall.log
+  /usr/sbin/shorewall disable ${DEVICE} 2>>/var/log/firewall.log
 fi
 
 exit 0;
