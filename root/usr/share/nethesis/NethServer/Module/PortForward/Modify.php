@@ -117,12 +117,25 @@ class Modify extends \Nethgui\Controller\Table\Modify
         }
     }
 
- 
-    public function process()
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
     {
-        parent::process();
-    }
+        if ($this->parameters['Allow']) {
+            $validator = $this->createValidator()
+                ->orValidator(
+                    $this->createValidator(Validate::IPv4),
+                    $this->createValidator(Validate::CIDR_BLOCK)
+                );
 
+            $values = explode(',', $this->parameters['Allow']);
+            foreach ($values as $v) {
+               if (!$validator->evaluate($v)) {
+                   $report->addValidationError($this, 'Allow', $validator);
+               }
+            }
+
+        }
+        parent::validate($report);
+    }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {

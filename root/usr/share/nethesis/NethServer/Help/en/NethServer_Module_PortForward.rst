@@ -20,9 +20,8 @@ Destination host
     Select the internal machine where traffic will be redirected.
 
 Allow only
-    Allow traffic forward only from some networks/hosts, as specified
-    into `Shorewall Port Forwarding FAQ
-    <http://shorewall.net/FAQ.htm#PortForwarding>`_.
+    Allow traffic forward only from some networks or hosts.
+    Insert a comma-separated list of IP addresses or networks in CIDR format.
 
 Description
     Optional description of port forwarding rule.

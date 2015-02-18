@@ -20,9 +20,8 @@ Host destinazione
     Selezionare la macchina interna alla LAN a cui verrà rediretto il traffico.
 
 Permetti solo da 
-    Permette il forward del traffico solo da alcune sorgenti
-    reti/host, secondo le `specifiche di Shorewall per SOURCE
-    <http://shorewall.net/FAQ.htm#PortForwarding>`_.
+    Permette il forward del traffico solo da alcune reti o host.
+    Inserire una lista separata da virgole di indirizzi IP o reti in formato CIDR.
 
 Descrizione
     Descrizione opzionale della regola di port forwarding.
