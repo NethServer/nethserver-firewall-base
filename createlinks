@@ -42,6 +42,7 @@ event_templates($event,
                 '/etc/shorewall/tunnels',
                 '/etc/shorewall/hosts',
                 '/etc/shorewall/findgw',
+                '/etc/shorewall/stoppedrules',
                 '/etc/sudoers');
 
 event_templates($event, '/etc/lsm/lsm.conf');
@@ -78,6 +79,7 @@ event_templates($event,
                 '/etc/shorewall/tcrules',
                 '/etc/shorewall/tunnels',
                 '/etc/shorewall/hosts',
+                '/etc/shorewall/stoppedrules',
                 '/etc/shorewall/zones');
 
 event_actions($event,

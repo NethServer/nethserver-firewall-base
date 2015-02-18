@@ -1,0 +1,5 @@
+# Always keep httpd-admin, SSH and ping available
+
+ACCEPT  -  $FW  icmp
+ACCEPT  -  $FW  tcp  {$sshd{'TCPPort'}}
+ACCEPT  -  $FW  tcp  {${'httpd-admin'}{'TCPPort'}}
