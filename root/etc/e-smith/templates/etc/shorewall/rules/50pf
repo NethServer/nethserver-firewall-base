@@ -42,18 +42,19 @@
         } else {
             $oriDst = "\t-";
         }
-        if ($dst eq '') {
-            $dstHost = "$dstHost";
-        } else {
-            $dstHost = "$dstHost:$dst";
+        $target_port = '';
+        if ($dst ne '') {
+            $target_port = ":$dst";
         }
-        $OUT.="#\n# PF $oriDst:$src -> $dstHost $allow_cmt \n#\n";
+        $target_host = $fw->getZone($dstHost);
+        $OUT.="#\n# PF $oriDst:$src -> $dstHost$target_port $allow_cmt \n#\n";
         $OUT.="?COMMENT $description\n";
         if ($nfqueue eq 'enabled') {
-            $OUT.="DNAT-\tnet$allow\t$dstHost\t$proto\t$src$srcHost$oriDst\n";
-            $OUT.="NFQBY\tnet$allow\tloc\t$proto\t$dst$srcHost$oriDst\n";
+            $OUT.="DNAT-\tnet$allow\t$dstHost$target_port\t$proto\t$src$srcHost$oriDst\n";
+            @z = split(/:/,$target_host);
+            $OUT.="NFQBY\tnet$allow\t".$z[0]."\t$proto\t$dst$srcHost$oriDst\n";
         } else {
-            $OUT.="DNAT\tnet$allow\tloc:$dstHost\t$proto\t$src$srcHost$oriDst\n";
+            $OUT.="DNAT\tnet$allow\t$target_host$target_port\t$proto\t$src$srcHost$oriDst\n";
         }
     }
 }
