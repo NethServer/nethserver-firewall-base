@@ -246,6 +246,11 @@ sub getZone($)
     # sanitize the list:
     $value = join(",", grep { $_ ne '' } split(/,/, $value));
 
+    # protect built-in zone from name resolution Refs #3056
+    if ($value =~ /loc|net|blue|orang|ivpn|lvpn|ovpn/) {
+        return $value;
+    }
+
     # host group or not: always pick the first element:
     my $needle = NetAddr::IP->new((split(/,/, $value))[0]);
     return $value unless defined($needle); # skip garbage
