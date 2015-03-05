@@ -1,0 +1,55 @@
+#
+# 20nat
+#
+{
+	# import db
+	use esmith::NetworksDB;
+	use esmith::HostsDB;
+
+	# open db
+	my $ndb = esmith::NetworksDB->open_ro();
+	my $hdb = esmith::HostsDB->open_ro();
+
+	# get aliases of red interfaces
+	foreach my $j ($ndb->red) {
+		my $red_inter = $j->key;
+		foreach my $k ($ndb->aliases) {
+			if($k->key =~ /^$red_inter:[\d]/) {
+				push @red_aliases, $k;
+			}
+		}
+	}
+
+	# get info from db
+	foreach my $i (@red_aliases) {
+		# get alias interface name
+		my $alias_interface = $i->key;
+
+		# get interface name
+		my @interface_parts = split /:/, $alias_interface;
+		my $interface = $interface_parts[0];
+		
+		# get alias interface ip
+		my $alias_interface_ip = $i->prop('ipaddr');	
+
+		# get ip from firewall obj
+		my $fw_obj = $i->prop('FwObjectNat');
+
+		# if nat exist add it
+		if($fw_obj ne "") {
+			# get hostname
+			my @host_parts =  split /;/, $fw_obj;
+			my $host_name = $host_parts[1];
+
+			# get record
+			my $internal_ip_record = $hdb->get($host_name);
+
+			# get ip address of host
+			my $internal_ip = $internal_ip_record->prop('IpAddress');
+
+			# print config
+			$OUT .= "$alias_interface_ip\t$interface\t\t$internal_ip\n";
+		}
+	}
+}
+
