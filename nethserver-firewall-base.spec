@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.2.3
+Version: 2.3.0
 Release: 1%{?dist}
 License: GPL
 Group: Networking/Daemons
@@ -57,6 +57,12 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Thu Mar 05 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.3.0-1
+- Protect built-int zones in Firewall.pm library - Enhancement #3056 [NethServer]
+- Port forward: limit validator for Allow field - Enhancement #3045 [NethServer]
+- MultiWAN: restrict validator for weight field - Enhancement #3044 [NethServer]
+- Firewall: avoid user lock out - Enhancement #3043 [NethServer]
+
 * Wed Jan 28 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.2.3-1.ns6
 - Shorewall: allow template-custom for ESTABLISHED and RELATED connection inside rules file - Enhancement #2999 [NethServer]
 
