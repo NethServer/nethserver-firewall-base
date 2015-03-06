@@ -1,4 +1,5 @@
 <?php
+
 namespace NethServer\Module;
 
 /*
@@ -25,33 +26,115 @@ namespace NethServer\Module;
  * 
  * @author Edoardo Spadoni <edoardo.spadoni@nethesis.it>
  */
-class NAT extends \Nethgui\Controller\TabsController
+class Nat extends \Nethgui\Controller\AbstractController
 {
+
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
     {
         return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Gateway', 60);
     }
 
-    public function initialize()
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
     {
-        parent::initialize();
-        $this->addChild(new \NethServer\Module\NAT\Configure());
+        parent::validate($report);
+        if ( ! $this->getRequest()->isMutation()) {
+            return;
+        }
+
+        $validKeys = array_keys($this->getNetworkInterfaces());
+
+        foreach (array_keys($this->getRequest()->getParameter('interfaces')) as $key) {
+            if ( ! in_array($key, $validKeys)) {
+                $report->addValidationErrorMessage($this, 'interfaces', 'invalid alias interface');
+            }
+        }
+    }
+
+    private function getNetworkInterfaces()
+    {
+        static $interfaces;
+
+        if (isset($interfaces)) {
+            return $interfaces;
+        }
+
+        // get all networks params
+        $all = $this->getPlatform()->getDatabase('networks')->getAll();
+
+        // declare empty array for red interfaces
+        $red_inter = array();
+
+        // get only red interfaces
+        foreach ($all as $key => $value) {
+            if (isset($value['role']) && $value['role'] === 'red') {
+                array_push($red_inter, $key);
+            }
+        }
+
+        // declare alias array
+        $aliases = array();
+
+        // get only aliases
+        foreach ($red_inter as $key_red) {
+            foreach ($all as $key => $value) {
+                if (isset($value['role']) && preg_match("/^$key_red/", $key) && $value['role'] === 'alias') {
+                    $aliases[$key] = $all[$key];
+                }
+            }
+        }
+
+        return $aliases;
+    }
+
+    public function process()
+    {
+        parent::process();
+        if ( ! $this->getRequest()->isMutation()) {
+            return;
+        }
+        $changes = 0;
+
+        $db = $this->getPlatform()->getDatabase('networks');
+        foreach ($this->getRequest()->getParameter('interfaces') as $key => $vals) {
+            $cur = $db->getProp($key, 'FwObjectNat');
+            if($cur === $vals['FwObjectNat']) {
+                continue;
+            }
+            $db->setProp($key, array('FwObjectNat' => $vals['FwObjectNat']));
+            $changes ++;
+        }
+
+        if ($changes) {
+            $this->getPlatform()->signalEvent('nethserver-firewall-base-save');
+        }
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
-        // $isConfigured = 0 !== count(array_filter($this->getPlatform()->getDatabase('networks')->getAll('alias'), function ($record) {
-        //             return $record['status'] === 'enabled';
-        //         }));
+        parent::prepareView($view);
+        $interfaces = $this->getNetworkInterfaces();
 
-        if ($isConfigured) {
-            $this->sortChildren(function (\Nethgui\Module\ModuleInterface $a, \Nethgui\Module\ModuleInterface $b) {
-                return 0;
-            });
+        $dstHosts = array();
+        $descriptions = array();
+        foreach (\NethServer\Tool\FirewallObjectsFinder::search($this->getPlatform(), '', array('hosts' => array('host')), $view->getTranslator()) as $o) {
+            $label = sprintf('%s (%s)', $o->getTitle(), $o->getDetails());
+            $descriptions[$o->getValue()] = $label;
+            $dstHosts[] = array('label' => $label, 'value' => $o->getValue());
         }
 
-        parent::prepareView($view);
+        $ds = array();
+        foreach ($interfaces as $key => $props) {
+            $ds[] = array(
+                'id' => $key,
+                'InterIp' => $props['ipaddr'],
+                'FwObjectDesc' => isset($descriptions[$props['FwObjectNat']]) ? $descriptions[$props['FwObjectNat']] : '',
+                'FwObjectNat' => isset($props['FwObjectNat']) ? $props['FwObjectNat'] : ''
+            );
+        }
+
+
+        $view['DstHosts'] = $dstHosts;
+        $view['interfaces'] = $ds;
     }
 
 }
-
