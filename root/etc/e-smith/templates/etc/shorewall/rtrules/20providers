@@ -23,17 +23,12 @@
         my $nat_obj = $i->prop('FwObjectNat');
         if($nat_obj ne "") {
             # get hostname
-            my @host_parts =  split /;/, $nat_obj;
-            my $host_name = $host_parts[1];
-            # get record
-            my $internal_ip_record = $hdb->get($host_name);
-            # get ip address of host
-            my $internal_ip = $internal_ip_record->prop('IpAddress');
+            $internal_ip = $fw->getAddress($nat_obj);
 
             foreach $j (@providers) {
                 my $provider_name = $j->{'name'};
                 if($j->{'interface'} eq $interface) {
-                    $OUT .= "$internal_ip\t\t-\t$provider_name\t1900\n";
+                    $OUT .= "$internal_ip\t\t-\t\t\t$provider_name\t\t1900\n";
                 }
             }
         }
@@ -43,7 +38,7 @@
     my $priority = 11900;
     foreach my $p( @providers ) { # descending order: more weight, more priority
         $name = $p->{'name'};
-        $OUT .= "-\t\t0.0.0.0/0\t$name\t$priority\n";
+        $OUT .= "-\t\t\t0.0.0.0/0\t\t$name\t\t$priority\n";
         $priority++;
     }
 }
