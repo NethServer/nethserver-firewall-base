@@ -1,8 +1,9 @@
 #
-# Shorewall version 4 - route rules File
+# Shorewall version 4 - Nat File
 #
-# For information about entries in this file, type "man shorewall-rtrules"
+# For information about entries in this file, type "man shorewall-nat"
 #
-# For additional information, see http://www.shorewall.net/MultiISP.html
-####################################################################################
-#SOURCE			DEST			PROVIDER	PRIORITY	MASK
+# For additional information, see http://shorewall.net/NAT.htm
+#
+###############################################################################
+#EXTERNAL	INTERFACE	INTERNAL	ALL		LOCAL

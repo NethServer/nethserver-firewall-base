@@ -4,11 +4,12 @@
 {
 	# import db
 	use esmith::NetworksDB;
-	use esmith::HostsDB;
+	use NethServer::Firewall;
 
 	# open db
 	my $ndb = esmith::NetworksDB->open_ro();
 	my $hdb = esmith::HostsDB->open_ro();
+	my $fw = new NethServer::Firewall();
 
 	# get aliases of red interfaces
 	foreach my $j ($ndb->red) {
@@ -38,14 +39,7 @@
 		# if nat exist add it
 		if($fw_obj ne "") {
 			# get hostname
-			my @host_parts =  split /;/, $fw_obj;
-			my $host_name = $host_parts[1];
-
-			# get record
-			my $internal_ip_record = $hdb->get($host_name);
-
-			# get ip address of host
-			my $internal_ip = $internal_ip_record->prop('IpAddress');
+			$internal_ip = $fw->getAddress($fw_obj);
 
 			# print config
 			$OUT .= "$alias_interface_ip\t$interface\t\t$internal_ip\n";
