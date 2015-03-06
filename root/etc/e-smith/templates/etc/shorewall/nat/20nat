@@ -1,0 +1,49 @@
+#
+# 20nat
+#
+{
+	# import db
+	use esmith::NetworksDB;
+	use NethServer::Firewall;
+
+	# open db
+	my $ndb = esmith::NetworksDB->open_ro();
+	my $hdb = esmith::HostsDB->open_ro();
+	my $fw = new NethServer::Firewall();
+
+	# get aliases of red interfaces
+	foreach my $j ($ndb->red) {
+		my $red_inter = $j->key;
+		foreach my $k ($ndb->aliases) {
+			if($k->key =~ /^$red_inter:[\d]/) {
+				push @red_aliases, $k;
+			}
+		}
+	}
+
+	# get info from db
+	foreach my $i (@red_aliases) {
+		# get alias interface name
+		my $alias_interface = $i->key;
+
+		# get interface name
+		my @interface_parts = split /:/, $alias_interface;
+		my $interface = $interface_parts[0];
+		
+		# get alias interface ip
+		my $alias_interface_ip = $i->prop('ipaddr');	
+
+		# get ip from firewall obj
+		my $fw_obj = $i->prop('FwObjectNat');
+
+		# if nat exist add it
+		if($fw_obj ne "") {
+			# get hostname
+			$internal_ip = $fw->getAddress($fw_obj);
+
+			# print config
+			$OUT .= "$alias_interface_ip\t$interface\t\t$internal_ip\n";
+		}
+	}
+}
+
