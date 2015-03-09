@@ -15,6 +15,7 @@
     # generate policy for blue zone
     if ($ndb->blue) {
         $OUT .= "\n# Zone: blue\n\n";
+        $OUT .= "loc\t\tblue\t\tACCEPT\n";
         $OUT .= "blue\t\tloc\t\tREJECT\n";
         $OUT .= "blue\t\t\$FW\t\tREJECT\t\tinfo\n";
         $OUT .= "\$FW\t\tblue\t\tACCEPT\n";
@@ -26,6 +27,7 @@
     # generate policy for orange zone
     if ($ndb->orange) {
         $OUT .= "\n# Zone: orange\n\n";
+        $OUT .= "loc\t\torang\t\tACCEPT\n";
         $OUT .= "orang\t\tloc\t\tREJECT\n"; #truncate zone name to 5 chars
         $OUT .= "orang\t\t\$FW\t\tREJECT\t\tinfo\n"; #truncate zone name to 5 chars
         $OUT .= "\$FW\t\torang\t\tACCEPT\n"; #truncate zone name to 5 chars
