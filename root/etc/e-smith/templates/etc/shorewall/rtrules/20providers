@@ -9,36 +9,15 @@
     }
     use esmith::NetworksDB;
     my $ndb = esmith::NetworksDB->open_ro();
-    my $hdb = esmith::HostsDB->open_ro();
     my $fw = new NethServer::Firewall();
     my @providers = $fw->getProviders();
-
-    foreach $i ($ndb->aliases) {
-        # get alias interface name
-        my $alias_interface = $i->key;
-        # get interface name
-        my @interface_parts = split /:/, $alias_interface;
-        my $interface = $interface_parts[0];
-        #get fw obj
-        my $nat_obj = $i->prop('FwObjectNat');
-        if($nat_obj ne "") {
-            # get hostname
-            $internal_ip = $fw->getAddress($nat_obj);
-
-            foreach $j (@providers) {
-                my $provider_name = $j->{'name'};
-                if($j->{'interface'} eq $interface) {
-                    $OUT .= "$internal_ip\t\t-\t\t\t$provider_name\t\t1900\n";
-                }
-            }
-        }
-    }
 
     # From shorewall-rtrules -> 11000- 11999 After 'MARK' rules but before Shorewall-generated rules for ISP interfaces.
     my $priority = 11900;
     foreach my $p( @providers ) { # descending order: more weight, more priority
         $name = $p->{'name'};
-        $OUT .= "-\t\t\t0.0.0.0/0\t\t$name\t\t$priority\n";
+        $OUT .= "-\t\t0.0.0.0/0\t$name\t$priority\n";
         $priority++;
     }
 }
+

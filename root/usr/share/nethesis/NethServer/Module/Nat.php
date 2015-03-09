@@ -117,7 +117,7 @@ class Nat extends \Nethgui\Controller\AbstractController
         $dstHosts = array();
         $descriptions = array();
         foreach (\NethServer\Tool\FirewallObjectsFinder::search($this->getPlatform(), '', array('hosts' => array('host')), $view->getTranslator()) as $o) {
-            $label = sprintf('%s (%s)', $o->getTitle(), $o->getDetails());
+            $label = sprintf('%s (%s)', $o->getDetails(), $o->key);
             $descriptions[$o->getValue()] = $label;
             $dstHosts[] = array('label' => $label, 'value' => $o->getValue());
         }
