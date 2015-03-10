@@ -6,8 +6,12 @@ One-to-one NAT is a way to make systems behind a firewall and configured with pr
 
 **Usage**
 
-The first input box contains the alias ip associated to **red** interface (readonly), in the second input box you can insert a *Firewall object* to configure the one-to-one nat to specific host.
+Public ip alias
+	Contains the alias ip associated to **red** interface (readonly)
 
-In the page are showed all aliases associated to **red** interfaces, with an easy autocomplete field you can choose, in the second input box, the *Firewall object*.
+Local host
+	You can insert a *Firewall object* to configure the one-to-one nat to specific host.
+
+In the page are showed all aliases associated to **red** interfaces, with an easy dropdown list you can choose, in the *Local host* input box, the *Firewall object*.
 
 *Empty input means NAT* **not** *configured.*

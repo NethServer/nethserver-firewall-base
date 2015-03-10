@@ -114,26 +114,31 @@ class Nat extends \Nethgui\Controller\AbstractController
         parent::prepareView($view);
         $interfaces = $this->getNetworkInterfaces();
 
+        if (!$this->hosts) {
+            $h = $this->getPlatform()->getDatabase('hosts')->getAll('host');
+            $l = $this->getPlatform()->getDatabase('hosts')->getAll('local');
+            $this->hosts = array_merge($h, $l);
+        }
+
         $dstHosts = array();
         $descriptions = array();
-        foreach (\NethServer\Tool\FirewallObjectsFinder::search($this->getPlatform(), '', array('hosts' => array('host')), $view->getTranslator()) as $o) {
-            $label = sprintf('%s (%s)', $o->getDetails(), $o->key);
-            $descriptions[$o->getValue()] = $label;
-            $dstHosts[] = array('label' => $label, 'value' => $o->getValue());
+
+        $tmp = array();
+        $tmp[] = array("", "-");
+        foreach ($this->hosts as $k => $v) {
+            $tmp[] = array($v['type'].";".$k, $k." (".$v['Description'].")");
         }
 
         $ds = array();
         foreach ($interfaces as $key => $props) {
             $ds[] = array(
                 'id' => $key,
-                'InterIp' => $props['ipaddr'],
-                'FwObjectDesc' => isset($descriptions[$props['FwObjectNat']]) ? $descriptions[$props['FwObjectNat']] : '',
+                'AliasIp' => $props['ipaddr'],
                 'FwObjectNat' => isset($props['FwObjectNat']) ? $props['FwObjectNat'] : ''
             );
         }
 
-
-        $view['DstHosts'] = $dstHosts;
+        $view['FwObjectNatDatasource'] = $tmp;
         $view['interfaces'] = $ds;
     }
 
