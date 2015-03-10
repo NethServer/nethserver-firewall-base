@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.3.0
+Version: 2.3.1
 Release: 1%{?dist}
 License: GPL
 Group: Networking/Daemons
@@ -57,6 +57,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Tue Mar 10 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.3.1-1
+- Traffic from green to blue is not allowed - Bug #3081 [NethServer]
+
 * Thu Mar 05 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.3.0-1
 - Protect built-int zones in Firewall.pm library - Enhancement #3056 [NethServer]
 - Port forward: limit validator for Allow field - Enhancement #3045 [NethServer]
