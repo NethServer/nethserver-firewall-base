@@ -79,6 +79,7 @@ event_templates($event,
                 '/etc/shorewall/tcrules',
                 '/etc/shorewall/tunnels',
                 '/etc/shorewall/hosts',
+                '/etc/shorewall/nat',
                 '/etc/shorewall/stoppedrules',
                 '/etc/shorewall/zones');
 
