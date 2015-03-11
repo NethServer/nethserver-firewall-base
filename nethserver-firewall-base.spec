@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.3.1
+Version: 2.4.0
 Release: 1%{?dist}
 License: GPL
 Group: Networking/Daemons
@@ -57,6 +57,10 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Wed Mar 11 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.4.0-1
+- firewall: routeback on all interfaces - Enhancement #3083 [NethServer]
+- NAT 1:1 - Feature #3035 [NethServer]
+
 * Tue Mar 10 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.3.1-1
 - Traffic from green to blue is not allowed - Bug #3081 [NethServer]
 
