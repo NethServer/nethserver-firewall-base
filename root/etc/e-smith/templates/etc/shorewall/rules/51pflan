@@ -1,0 +1,72 @@
+#
+# Hairpin NAT port forwarding
+#
+
+{
+    use NethServer::Firewall;
+
+    my $nfqueue = $firewall{'nfqueue'} || 'disabled';
+    
+    my $hairpin = $firewall{'HairpinNat'} || 'disabled';
+    if ($hairpin ne 'enabled') {
+        return '';
+    }
+
+    use esmith::util;
+    use esmith::NetworksDB;
+    my $ndb = esmith::NetworksDB->open_ro();
+
+    my @redip;
+    foreach ($ndb->get_by_role('red')) {
+        push (@redip, $_->prop('ipaddr'));
+    }
+
+    my $fw = new NethServer::Firewall();
+    $db = esmith::ConfigDB->open("portforward") || die "Can't open portforward database: $!\n";
+    foreach my $pf ( $db->get_all_by_prop('type' => 'pf') ) {
+        $proto = $pf->prop('Proto') || 'tcp,udp';
+        $status = $pf->prop('status') || "disabled";
+        next unless ($status eq "enabled");
+        $src = $pf->prop('Src') || next;
+        $dstHost = $pf->prop('DstHost') || next;
+        $srcHost = $pf->prop('SrcHost') || "";
+        $srcHost = $fw->getAddress($srcHost);
+        $dstHost = $fw->getAddress($dstHost);
+        if ($srcHost ne "") {
+            $srcHost = "\t-\t$srcHost";
+        } else {
+            $srcHost = "\t-";
+        }
+
+        $dst = $pf->prop('Dst') || '';
+        if ($src =~ /:/) { # if src is a range, just use it and discard dst
+            $dst = '';
+        }
+        $description = $pf->prop('Description') || "";
+        $allow = $pf->prop('Allow') || "";
+        $allow_cmt = "";
+        if ($allow ne "") {
+            $allow_cmt = "from $allow";
+            $allow=":$allow";
+        }
+        $oriDst = $pf->prop('OriDst') || ''; # external IP
+        if ($oriDst ne '') {
+            $oriDst = "\t$oriDst";
+        } else {
+            $oriDst = "\t" . join(',', @redip);
+        }
+        if ($dst eq '') {
+            $dstHost = "$dstHost";
+        } else {
+            $dstHost = "$dstHost:$dst";
+        }
+        $OUT.="#\n# PF $oriDst:$src -> $dstHost $allow_cmt \n#\n";
+        $OUT.="?COMMENT $description from lan\n";
+        if ($nfqueue eq 'enabled') {
+            $OUT.="DNAT-\tloc$allow\t$dstHost\t$proto\t$src$srcHost$oriDst\n";
+            $OUT.="NFQBY\tloc$allow\tloc\t$proto\t$dst$srcHost$oriDst\n";
+        } else {
+            $OUT.="DNAT\tloc$allow\tloc:$dstHost\t$proto\t$src$srcHost$oriDst\n";
+        }
+    }
+}
