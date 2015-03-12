@@ -14,7 +14,7 @@ $L['Dst_label'] = 'Porta destinazione';
 $L['enable_label'] = 'Abilita';
 $L['Key_label'] = 'Id';
 $L['PortForward_Description'] = 'Gestici port forwarding';
-$L['PortForward_Tags'] = 'port port forward open';
+$L['PortForward_Tags'] = 'port portforward forward hairpin';
 $L['PortForward_Title'] = 'Port Forward';
 $L['Proceed with port forward disable?'] = 'Disabilitare il port forward?';
 $L['Proceed with port forward enable?'] = 'Abilitare il port forward?';
@@ -27,4 +27,5 @@ $L['tcp,udp_label'] = 'TCP,UDP';
 $L['OriDst_label'] = "IP WAN (interfaccia red)";
 $L['any_label'] = "Qualsiasi";
 $L['PickDestination_label'] = 'Scegli destinazione...';
+$L['HairpinNat_label'] = 'Hairpin NAT';
 

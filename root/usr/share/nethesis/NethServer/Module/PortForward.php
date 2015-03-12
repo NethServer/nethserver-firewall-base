@@ -61,6 +61,7 @@ class PortForward extends \Nethgui\Controller\TableController implements \Nethgu
             ->setColumns($columns)
             ->addTableAction(new \NethServer\Module\PortForward\Modify('create'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
+            ->addTableAction(new \NethServer\Module\PortForward\HairpinNat())
             ->addRowAction(new \NethServer\Module\PortForward\ToggleEnable('disable'))
             ->addRowAction(new \NethServer\Module\PortForward\ToggleEnable('enable'))
             ->addRowAction(new \NethServer\Module\PortForward\Modify('update'))

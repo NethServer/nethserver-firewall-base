@@ -34,14 +34,7 @@ Le regole di Port Forwarding vengono abilitate di default al momento
 della creazione, è possibile abilitare/disabilitare momentaneamente
 attraverso questo pulsante
 
-Si
-    Abilita la regola.
+Haripin NAT
+============
 
-No
-    Disabilita la regola.
-
-Controllo Firewall
-==================
-
-Esegue un controllo generale delle regole del firewall configurate. Utile per individuare inconsistenze.
-
+Abilitare hairpin NAT per rendere accessibili i port forward anche dalla rete locale.

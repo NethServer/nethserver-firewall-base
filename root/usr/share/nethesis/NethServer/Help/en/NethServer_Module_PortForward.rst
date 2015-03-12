@@ -33,13 +33,7 @@ Port forwarding rules are enabled by default on
 creation. You can temporarily enable/disable them
 using this button
 
-Yes
-    Enable the rule.
+Haripin NAT
+============
 
-No
-    Disable the rule.
-
-Firewall check
-==================
-
-Performs a general control over configured firewall rules. Useful for inconsistencies detection.
+Enable Hairpin NAT to make all port forwards available from local network.
