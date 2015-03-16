@@ -8,6 +8,9 @@
     my $ndb = esmith::NetworksDB->open_ro();
     my $fw = new NethServer::Firewall();
     my @providers = $fw->getProviders();
+    if (scalar(@providers) < 2) {
+        return '';
+    }
 
     foreach my $p ( @providers ) {
         my $name = $p->{'name'};
