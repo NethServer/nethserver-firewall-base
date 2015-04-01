@@ -52,6 +52,7 @@ class PortForward extends \Nethgui\Controller\TableController implements \Nethgu
             'Src',
             'DstHost',
             'Dst',
+            'OriDst',
             'Description',
             'Actions'
         );
@@ -120,6 +121,11 @@ class PortForward extends \Nethgui\Controller\TableController implements \Nethgu
         if($this->getAction('SaveState')->hasResumeCallback()) {
             $this->getAction('SaveState')->resumeView($view[$this->myCurrentAction]);
         }
+    }
+
+    public function prepareViewForColumnOriDst(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        return $values['OriDst']?$values['OriDst']:$view->translate('any_label');
     }
 
     public function prepareViewForColumnProto(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
