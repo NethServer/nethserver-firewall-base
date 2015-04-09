@@ -51,6 +51,7 @@ echo $view->objectsCollection('Rules')
                 ->insert($view->textLabel('RuleText')->setAttribute('tag', 'div')))
             ->insert($view->buttonList()->setAttribute('class', 'Buttonset v1')
                 ->insert($view->button('Edit', $view::BUTTON_LINK))
+                ->insert($view->button('Copy', $view::BUTTON_LINK))
                 ->insert($view->button('Delete', $view::BUTTON_LINK))
             )
         ;

@@ -2,7 +2,7 @@
 /* @var $view \Nethgui\Renderer\Xhtml */
 
 
-echo $view->header('RuleId')->setAttribute('template', $view->getModule()->getIdentifier() === 'Create' ? $T('Create_header') : $T('Edit_header'));
+echo $view->header('RuleId')->setAttribute('template', $T($view->getModule()->getIdentifier() . '_header'));
 
 echo $view->checkbox('status', 'enabled')->setAttribute('uncheckedValue', 'disabled');
 echo $view->selector('Action', $view::SELECTOR_DROPDOWN)->setAttribute('choices', array(

@@ -33,13 +33,13 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
      *
      * @var \NethServer\Module\FirewallRules\RuleGenericController
      */
-    private $worker;
+    protected $worker;
 
     /**
      *
      * @var \NethServer\Module\FirewallRules\RuleWorkflow
      */
-    private $workflow;
+    protected $workflow;
 
     public function initialize()
     {
@@ -50,10 +50,27 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
         $this->workflow = new \NethServer\Module\FirewallRules\RuleWorkflow();
     }
 
+    protected function bindPosition(\Nethgui\Controller\RequestInterface $request)
+    {
+        return \Nethgui\array_head($request->getPath());
+    }
+
+    protected function getRuleDefaults()
+    {
+        return array(
+            'SrcRaw' => 'any',
+            'DstRaw' => 'any',
+            'ServiceRaw' => 'any',
+            'status' => 'enabled',
+            'LogType' => 'none',
+            'Description' => '',
+        );
+    }
+
     public function bind(\Nethgui\Controller\RequestInterface $request)
     {
         parent::bind($request);
-        $this->position = \Nethgui\array_head($request->getPath());
+        $this->position = $this->bindPosition($request);
         if (intval($this->position) <= 0) {
             throw new \Nethgui\Exception\HttpException('Not found', 404, 1399992980);
         }
@@ -63,17 +80,13 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
             $this->workflow->resume($this->getParent()->getSession());
         } else {
             // start a new workflow generating a random rule key
-            $defaults = array('SrcRaw' => 'any',
-                'DstRaw' => 'any',
-                'ServiceRaw' => 'any',
-                'status' => 'enabled'
-            );
+            $defaults = $this->getRuleDefaults();
             foreach (array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status', 'Description', 'LogType', 'Action') as $f) {
                 if ($request->hasParameter($f)) {
                     $defaults[$f] = $request->getParameter($f);
                 }
             }
-            $this->workflow->start($this->getParent()->getSession(), $this->getIdentifier(), 'Create/' . $this->position, $this->generateNextRuleId(), $defaults);
+            $this->workflow->start($this->getParent()->getSession(), $this->getIdentifier(), $this->getIdentifier() . '/' . $this->position, $this->generateNextRuleId(), $defaults);
         }
         $this->worker->ruleId = $this->workflow->getRuleId();
         $this->worker->bind($request);

@@ -156,6 +156,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
            
             $values['Action'] = $actionLabels[$values['Action']];
             $values['Edit'] = $view->getModuleUrl('../Edit/' . $key);
+            $values['Copy'] = $view->getModuleUrl('../Copy/' . ($values['Position'] + 1) . '?id=' . $key);
             $values['RuleText'] = $view->translate('RuleText_label', array(
                 'Src' => $this->resolveEndpoint($values['Src'], $view),
                 'Dst' => $this->resolveEndpoint($values['Dst'], $view),
