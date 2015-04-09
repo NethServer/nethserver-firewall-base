@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.5.0
+Version: 2.5.1
 Release: 1%{?dist}
 License: GPL
 Group: Networking/Daemons
@@ -57,6 +57,10 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Thu Apr 09 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.5.1-1
+- Port forward: display WAN IP - Enhancement #3100 [NethServer]
+- LSM: configuration tuning - Enhancement #3098 [NethServer]
+
 * Thu Mar 26 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.5.0-1
 - Hairpin nat - Feature #2989 [NethServer]
 - Firewall-base: multi-wan dhcp failover not supported - Enhancement #2827 [NethServer]
