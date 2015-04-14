@@ -118,6 +118,10 @@ sub getAddress($)
             } else { 
                 return substr($key, 0, 5); # truncate zone name to 5 chars
             }
+        } elsif ( $db eq 'cidr') {
+            return $self->_getCidrAddress($key);
+        } elsif ( $db eq 'iprange') {
+            return $self->_getIpRangeAddress($key);
         }
     } 
 
@@ -238,6 +242,7 @@ sub getZone($)
 {
     my $self = shift;
     my $value = shift;
+    my $original_value = undef;
     
     if ( lc($value) eq 'any') {
         return 'any';
@@ -251,9 +256,21 @@ sub getZone($)
         return $value;
     }
 
+    # ip range
+    if ($value =~ /\d+\.\d+\.\d+\.\d+\-\d+\.\d+\.\d+\.\d+/) {
+        $original_value = $value;
+        my @tmp = split('-',$value);
+        $value = $tmp[0];
+    }
+
     # host group or not: always pick the first element:
     my $needle = NetAddr::IP->new((split(/,/, $value))[0]);
     return $value unless defined($needle); # skip garbage
+
+    # restore original value if needed
+    if ($original_value) {
+        $value = $original_value;
+    }
 
     # check zones
     my @zones =  $self->{'ndb'}->zones;
@@ -444,6 +461,29 @@ sub _getHostGroupAddresses($)
     }
     return join (',',@hosts);
 }
+
+
+sub _getCidrAddress($)
+{
+    my $self = shift;
+    my $key = shift;
+
+    my $record = $self->{'hdb'}->get($key) || return '';
+    my $address = $record->prop('Address') || '';
+    return $address;
+}
+
+sub _getIpRangeAddress($)
+{
+    my $self = shift;
+    my $key = shift;
+
+    my $record = $self->{'hdb'}->get($key) || return '';
+    my $start = $record->prop('Start') || return '';
+    my $end = $record->prop('End') || return '';
+    return $start.'-'.$end;
+}
+
 
 
 =head2 getReferences(db, key)
