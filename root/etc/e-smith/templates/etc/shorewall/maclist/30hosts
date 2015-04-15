@@ -1,0 +1,28 @@
+#
+# 30hosts
+#
+{
+    use esmith::HostsDB;
+    use esmith::NetworksDB;
+    use NethServer::Firewall;
+    $OUT = '';
+    my $ndb = esmith::NetworksDB->open_ro() || return;
+    my $hdb = esmith::HostsDB->open_ro() || return '# hosts DB is not available';
+    my $fw = new NethServer::Firewall();
+
+    my $status = $firewall{'MACValidation'} || 'disabled';
+    return '' if ($status eq 'disabled');
+
+
+    foreach my $host ($hdb->get_all_by_prop('type', 'local'))
+    {
+        my $MacAddress = uc($host->prop('MacAddress')) || next;
+        my $IpAddress = $host->prop('IpAddress') || next;
+        my $i = $fw->getInterfaceFromIP($IpAddress);
+        
+        $OUT .= "ACCEPT\t$i\t$MacAddress\t$IpAddress\n";
+    }
+
+    $OUT;
+
+}

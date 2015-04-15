@@ -426,6 +426,33 @@ sub getTcRules
     return @list;
 }
 
+
+=head2 getInterfaceFromIP
+
+Return the name of the interfa connected to the given ip,
+or undef if no interface can be found.
+
+=cut
+sub getInterfaceFromIP($)
+{
+    my $self = shift;
+    my $value = shift;
+
+    my $needle = NetAddr::IP->new($value);
+    my @interfaces = $self->{'ndb'}->interfaces;
+    foreach my $i (@interfaces) {
+        my $ipaddr = $i->prop('ipaddr') || next;
+        my $netmask = $i->prop('netmask') || next;
+        my $bootproto = $i->prop('bootproto') || 'none';
+        next unless ($bootproto eq 'none' || $bootproto eq 'static');
+        my $haystack = NetAddr::IP->new($ipaddr,$netmask);
+        if ($needle->within($haystack)) {
+            return $i->key;
+        }
+    }
+    return undef;
+}
+
 sub _sort_by_position 
 {
      $a->prop('Position') <=> $b->prop('Position') ;

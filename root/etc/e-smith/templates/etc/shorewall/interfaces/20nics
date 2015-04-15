@@ -4,6 +4,11 @@
 {
     use esmith::NetworksDB;
     my $ndb = esmith::NetworksDB->open_ro();
+    my $mac_validation = $firewall{'MACValidation'} || 'disabled';
+    my $mac_option = '';
+    if ($mac_validation eq 'enabled') {
+        $mac_option = ',maclist';
+    }
 
     if (!defined($ndb->red)) {
         foreach my $i ($ndb->green) {
@@ -25,12 +30,16 @@
             next if ($i->prop('role') eq 'slave' || $i->prop('role') eq 'bridged');
             next if ($type eq 'alias');
             if ($role eq 'green') {
-                $OUT .= "loc\t".$i->key."\tnosmurfs,routeback";
+                $OUT .= "loc\t".$i->key."\tnosmurfs,routeback".$mac_option;
             } elsif ($role eq 'red') {
                 $OUT.="net\t".$i->key."\tdhcp,nosmurfs,optional";
             } else {
                 $role = substr($role,0,5); #truncate zone name to 5 chars
-                $OUT.="$role\t".$i->key."\tdhcp,nosmurfs,routeback";
+                if ($role eq 'blue') {
+                    $OUT.="$role\t".$i->key."\tdhcp,nosmurfs,routeback".$mac_option;
+                } else {
+                    $OUT.="$role\t".$i->key."\tdhcp,nosmurfs,routeback";
+                }
             }
             $OUT .= ",bridge" if ($type eq 'bridge');
             $OUT .= "\n";
