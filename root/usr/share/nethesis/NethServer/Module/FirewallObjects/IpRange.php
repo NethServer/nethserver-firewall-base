@@ -43,7 +43,7 @@ class IpRange extends \Nethgui\Controller\TableController
         );
         
         $this
-            ->setTableAdapter($this->getPlatform()->getTableAdapter('hosts', 'range'))
+            ->setTableAdapter($this->getPlatform()->getTableAdapter('hosts', 'iprange'))
             ->addRowAction(new \NethServer\Module\FirewallObjects\IpRange\Modify('update'))
             ->addRowAction(new \NethServer\Module\FirewallObjects\IpRange\Modify('delete'))
             ->addTableAction(new \NethServer\Module\FirewallObjects\IpRange\Modify('create'))
