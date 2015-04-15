@@ -40,6 +40,48 @@ Membri
 Descrizione
     Descrizione opzionale
 
+Subnet CIDR
+===========
+
+Un insieme di host all'interno di una rete, espresso in formato CIDR.
+
+Esempi:
+
+* 10.0.0.0/24: 254 indirizzi, da 10.0.0.0 a 10.0.0.255
+* 192.168.1.8/29: 6 indirizzi, da 192.168.1.8 a 192.168.1.15
+
+Nome
+    Nome identificativo della subnet.
+
+Rete
+    Rete in notazione CIDR
+
+Descrizione
+    Descrizione opzionale.
+
+Range IP
+========
+
+Un a lista di host espressi sotto forma di intervall (IP range).
+
+Esempi:
+
+* 10.0.0.1-10.0.0.21: 21 host
+* 192.168.1.8-192.168.1.10: 2 host
+
+Nome
+    Nome identificativo del range.
+
+Primo IP
+    Primo IP dell'intervallo.
+
+Ultimo IP
+    Ultimp IP dell'intervallo.
+
+Descrizione
+    Descrizione opzionale.
+
+
 Servizi
 =======
 
@@ -60,7 +102,7 @@ Porte
    Un numero intero che rappresenta una porta, oppure una lista di interi separati da virgole.
 
 Descrizione
-    Descrizione opzionale
+    Descrizione opzionale.
 
 Zone
 ====

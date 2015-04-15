@@ -40,6 +40,48 @@ Members
 Description
     Optional description.
 
+CIDR subnets
+============
+
+A set of hosts inside a network expressed in CIDR format.
+
+Examples:
+
+* 10.0.0.0/24: 254 addresses, from 10.0.0.0 to 10.0.0.255
+* 192.168.1.8/29: 6 addresses, from 192.168.1.8 to 192.168.1.15
+
+Name
+    Name identifier for the subnet.
+
+Network
+    Network in CIDR notation.
+
+Description
+    Optional description.
+
+IP ranges
+=========
+
+A list of hosts inside a network expressed in IP range format.
+
+Examples:
+
+* 10.0.0.1-10.0.0.21: 21 hosts
+* 192.168.1.8-192.168.1.10: 2 hosts
+
+Name
+    Name identifier for the range.
+
+Start IP
+    First IP of the range.
+
+End IP
+    Last IP of the range.
+
+Description
+    Optional description.
+
+
 Services
 ========
 
