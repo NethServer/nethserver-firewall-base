@@ -40,6 +40,12 @@ Ping from Internet
   
   To simplify troubleshooting, it is recommended to leave the ping enabled.
 
+MAC validation (IP/MAC binding)
+  If enabled, all traffic from hosts in green and blue interfaces is verified against a list of IP with associated MAC addresses.
+  The IP/MAC association can be configured using the DHCP page.
+
+Policy for hosts without IP/MAC binding (DHCP reservation)
+  If MAC validation is enabled, select the policy for hosts without DHCP reservation.
 
 Create / Edit
 =============

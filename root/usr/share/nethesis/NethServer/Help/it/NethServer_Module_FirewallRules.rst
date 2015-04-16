@@ -44,6 +44,14 @@ Ping da Internet
     
     Per semplificare la risoluzione di problemi, si consiglia di lasciare il ping abilitato.
 
+Validazione MAC (Binding IP/MAC)
+  Se abilitato, tutto il traffico dagli host nelle zone blue e green è verificato sulla base
+  di una lista di IP associati a indirizzi MAC.
+  L'associazione IP/MAC può essere configuration nella pagina di configurazione DHCP.
+
+Policy per host senza binding IP/MAC (riserva DHCP)
+  Se la validazione MAC è abilitata, seleziona la politica da applicare agli host senza riserva IP.
+
 
 Crea / Modifica
 ===============
