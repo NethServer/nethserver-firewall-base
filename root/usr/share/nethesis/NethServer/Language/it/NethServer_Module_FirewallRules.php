@@ -14,6 +14,10 @@ $L['Policy_label'] = 'Traffico verso Internet (interfaccia red)';
 $L['strict_label'] = 'Bloccato';
 $L['enabled_label'] = 'Abilitato';
 $L['disabled_label'] = 'Disabilitato';
+$L['MACValidation_label'] = 'Validazione MAC (Binding IP/MAC)';
+$L['MACValidationPolicy_label'] = 'Policy per host senza binding IP/MAC (riserva DHCP)';
+$L['drop_label'] = 'Blocca traffico';
+$L['accept_label'] = 'Permetti traffico';
 
 $L['Edit_header'] = 'Modifica la regola #${0}';
 $L['status_label'] = 'Abilitato';

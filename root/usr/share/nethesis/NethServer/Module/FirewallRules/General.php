@@ -31,12 +31,15 @@ class General extends \Nethgui\Controller\AbstractController
 {
 
     private $policies = array('permissive','strict');
+    private $mac_policies = array('drop','accept');
 
     public function initialize()
     {
         parent::initialize();
         $this->declareParameter('Policy', $this->createValidator()->memberOf($this->policies), array('configuration', 'firewall', 'Policy'));
         $this->declareParameter('ExternalPing', Validate::SERVICESTATUS, array('configuration', 'firewall', 'ExternalPing'));
+        $this->declareParameter('MACValidation', Validate::SERVICESTATUS, array('configuration', 'firewall', 'MACValidation'));
+        $this->declareParameter('MACValidationPolicy', $this->createValidator()->memberOf($this->mac_policies), array('configuration', 'firewall', 'MACValidationPolicy'));
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
@@ -49,6 +52,9 @@ class General extends \Nethgui\Controller\AbstractController
             $view['ExternalPingDatasource'] = array_map(function($fmt) use ($view) {
                                     return array($fmt, $view->translate($fmt . '_label'));
             }, array('enabled','disabled'));
+            $view['MACValidationPolicyDatasource'] = array_map(function($fmt) use ($view) {
+                                    return array($fmt, $view->translate($fmt . '_label'));
+            }, $this->mac_policies);
             $view->getCommandList()->show();
         }
     }
