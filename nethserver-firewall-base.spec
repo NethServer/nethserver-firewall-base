@@ -16,7 +16,7 @@ Requires: ipset
 Obsoletes: nethserver-shorewall
 Provides: nethserver-firewall
 
-BuildRequires: nethserver-devtools, gettext
+BuildRequires: nethserver-devtools
 AutoReq: no
 
 %description
@@ -28,9 +28,6 @@ NethServer simple firewall
 
 %build
 %{makedocs}
-for D in locale/*/LC_MESSAGES; do
-  [ -d "$D" ] && msgfmt -v $D/%{name}.po -o $D/%{name}.mo
-done
 perl createlinks
 mkdir -p root%{perl_vendorlib}
 mv -v NethServer root%{perl_vendorlib}
@@ -38,22 +35,9 @@ mv -v NethServer root%{perl_vendorlib}
 %install
 rm -rf $RPM_BUILD_ROOT
 (cd root ; find . -depth -print | cpio -dump $RPM_BUILD_ROOT)
-rm -f %{name}-%{version}-%{release}-filelist
-/sbin/e-smith/genfilelist $RPM_BUILD_ROOT > %{name}-%{version}-%{release}-filelist
-echo "%doc COPYING" >> %{name}-%{version}-%{release}-filelist
-for F in locale/*/LC_MESSAGES/%{name}.mo; do
-   install -D $F $RPM_BUILD_ROOT/%{_datadir}/$F
-done
-%{find_lang} %{name}
+%{genfilelist} $RPM_BUILD_ROOT > %{name}-%{version}-%{release}-filelist
 
-%post
-
-%preun
-
-%clean
-rm -rf $RPM_BUILD_ROOT
-
-%files -f %{name}-%{version}-%{release}-filelist -f %{name}.lang
+%files -f %{name}-%{version}-%{release}-filelist
 %defattr(-,root,root)
 
 %changelog
