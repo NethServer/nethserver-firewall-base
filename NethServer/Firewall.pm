@@ -44,13 +44,15 @@ sub new
     my $hdb_path = shift || '';
     my $fdb_path = shift || 'fwrules';
     my $tdb_path = shift || 'tc';
+    my $cdb_path = shift || '';
 
     my $self = {
         sdb_path => $sdb_path,
         ndb_path => $ndb_path,
         hdb_path => $hdb_path,
         fdb_path => $fdb_path,
-        tdb_path => $tdb_path
+        tdb_path => $tdb_path,
+        cdb_path => $cdb_path
     };
     bless $self, $class;
     $self->_initialize();
@@ -67,6 +69,7 @@ sub _initialize()
     $self->{'hdb'} = esmith::HostsDB->open_ro($self->{'hdb_path'});
     $self->{'fdb'} = esmith::ConfigDB->open_ro($self->{'fdb_path'});
     $self->{'tdb'} = esmith::ConfigDB->open_ro($self->{'tdb_path'});
+    $self->{'cdb'} = esmith::ConfigDB->open_ro($self->{'cdb_path'});
 }
 
 =head2 getAddress(id, expand_zone = 0)
@@ -108,6 +111,16 @@ sub getAddress($)
                 return "net";
             } elsif ($key eq 'green') {
                 return "loc";
+            } elsif ($key eq 'vpn') {
+                my @vpn;
+                if ($self->{'cdb'}->get('openvpn')) {
+                    push(@vpn,'ovpn');
+                }
+                if ($self->{'cdb'}->get('ipsec')) {
+                    push(@vpn,'ivpn');
+                    push(@vpn,'lvpn');
+                }
+                return join(',',@vpn);
             } else { 
                 return substr($key, 0, 5); # truncate zone name to 5 chars
             }
