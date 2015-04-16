@@ -3,9 +3,7 @@ Name: nethserver-firewall-base
 Version: 2.5.1
 Release: 1%{?dist}
 License: GPL
-Group: Networking/Daemons
 Source0: %{name}-%{version}.tar.gz
-Packager: Giacomo Sanchietti <giacomo@nethesis.it>
 
 BuildArch: noarch
 Requires: nethserver-base > 2.5.2-1
@@ -21,7 +19,6 @@ AutoReq: no
 
 %description
 NethServer simple firewall
-
 
 %prep
 %setup -q
@@ -39,6 +36,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -f %{name}-%{version}-%{release}-filelist
 %defattr(-,root,root)
+%doc COPYING
 
 %changelog
 * Thu Apr 09 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.5.1-1
