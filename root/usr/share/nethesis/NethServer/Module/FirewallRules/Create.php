@@ -64,6 +64,7 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
             'status' => 'enabled',
             'LogType' => 'none',
             'Description' => '',
+            'Action' => 'accept',
         );
     }
 
