@@ -107,6 +107,11 @@ class FirewallObjectsFinder implements \IteratorAggregate, \Countable
                 $tmp[$props['role']] = '';
             }
         }
+        $ovpn = $platform->getDatabase('configuration')->getProp('openvpn','status');
+        $ivpn = $platform->getDatabase('configuration')->getProp('ipsec','status');
+        if ($ovpn || $ivpn) {
+            $tmp['vpn'] = '';
+        }
         $roles = array_filter(array_diff(array_keys($tmp),array('bridged','alias','slave')));
         foreach ($roles as $role) {
             if ( ! $text || strstr($role, strtolower($text)) !== FALSE) {
