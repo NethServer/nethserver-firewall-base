@@ -18,10 +18,10 @@
             $OUT .= "NFQBY\tblue\tnet\n";
         }
         if ($ndb->orange) {
-            $OUT .= "NFQBY\torange\tnet\n";
+            $OUT .= "NFQBY\torang\tnet\n";
         }
         if ($ndb->blue && $ndb->orange) {
-            $OUT .= "NFQBY\tblue\torange\n";
+            $OUT .= "NFQBY\tblue\torang\n";
         }
     }
 }
