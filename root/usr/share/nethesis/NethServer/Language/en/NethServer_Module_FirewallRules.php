@@ -39,7 +39,7 @@ $L['PickObject_ServiceRaw_header'] = 'Choose the service protocol for rule "${Ru
 
 $L['Create_last_label'] = 'Create rule at bottom';
 $L['Create_first_label'] = 'Create rule at top';
-$L['Create_header'] = 'Create a new firewall rule';
+$L['Create_header'] = 'Create firewall rule';
 $L['Copy_header'] = 'Create a copy of #${0}';
 $L['Commit_label'] = 'Apply changes';
 $L['Edit_label'] = 'Edit';
@@ -52,12 +52,12 @@ $L['SearchPlaceholder_label'] = 'Search...';
 
 $L['Delete_header'] = 'Delete rule #${0}';
 $L['Delete_message'] = 'Confirm deletion of firewall rule #${id}';
-$L['HostGroups_create'] = 'Create new host group "${0}"';
-$L['Hosts_create'] = 'Create new host "${0}"';
-$L['Zones_create'] = 'Create new zone"${0}"';
-$L['Services_create'] = 'Create new service "${0}"';
-$L['IpRange_create'] = 'Create new IP range "${0}"';
-$L['Cidr_create'] = 'Create new CIDR network "${0}"';
+$L['HostGroups_create'] = 'Create host group "${0}"';
+$L['Hosts_create'] = 'Create host "${0}"';
+$L['Zones_create'] = 'Create zone"${0}"';
+$L['Services_create'] = 'Create service "${0}"';
+$L['IpRange_create'] = 'Create IP range "${0}"';
+$L['Cidr_create'] = 'Create CIDR network "${0}"';
 
 $L['A_new_rule_label'] = "New rule";
 $L['Any_label'] = 'Any';
