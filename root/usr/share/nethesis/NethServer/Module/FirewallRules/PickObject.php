@@ -87,7 +87,7 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
                 $where = array('hosts' => array('host', 'remote', 'local'));
             } else {
                 $results[] = $ANY;
-                $where = array('hosts' => array('host', 'host-group', 'remote', 'local'), 'networks' => array('zone'), 'ROLES' => array());
+                $where = array('hosts' => array('host', 'host-group', 'remote', 'local', 'iprange', 'cidr'), 'networks' => array('zone'), 'ROLES' => array());
             }
 
             $T = array($view, 'translate');
@@ -141,6 +141,8 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
                 array('Create' => array($view->getModuleUrl('../CreateHost?q=' . $hint), $view->translate('Hosts_create', array($hint)))),
                 array('Create' => array($view->getModuleUrl('../CreateHostGroup?q=' . $hint), $view->translate('HostGroups_create', array($hint)))),
                 array('Create' => array($view->getModuleUrl('../CreateZone?q=' . $hint), $view->translate('Zones_create', array($hint)))),
+                array('Create' => array($view->getModuleUrl('../CreateCidr?q=' . $hint), $view->translate('Cidr_create', array($hint)))),
+                array('Create' => array($view->getModuleUrl('../CreateIpRange?q=' . $hint), $view->translate('IpRange_create', array($hint)))),
             );
         }
     }

@@ -29,14 +29,11 @@ use Nethgui\System\PlatformInterface as Validate;
  */
 class Modify extends \Nethgui\Controller\Table\Modify
 {
-    private $interfaces;
 
     public function initialize()
     {
-        $nameValidator = $this->getPlatform()->createValidator()->username();
-        $interfaceValidator = $this->getPlatform()->createValidator()->memberOf($this->interfaces);
         $parameterSchema = array(
-            array('name', $nameValidator, \Nethgui\Controller\Table\Modify::KEY),
+            array('name', Validate::USERNAME, \Nethgui\Controller\Table\Modify::KEY),
             array('Address', Validate::CIDR_BLOCK, \Nethgui\Controller\Table\Modify::FIELD),
             array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
         );

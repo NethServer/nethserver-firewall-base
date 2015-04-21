@@ -56,6 +56,8 @@ $L['HostGroups_create'] = 'Create new host group "${0}"';
 $L['Hosts_create'] = 'Create new host "${0}"';
 $L['Zones_create'] = 'Create new zone"${0}"';
 $L['Services_create'] = 'Create new service "${0}"';
+$L['IpRange_create'] = 'Create new IP range "${0}"';
+$L['Cidr_create'] = 'Create new CIDR network "${0}"';
 
 $L['A_new_rule_label'] = "New rule";
 $L['Any_label'] = 'Any';
@@ -66,6 +68,8 @@ $L['any_src_dst_label'] = 'any host';
 $L['all_label'] = 'any';
 $L['host_label'] = 'host';
 $L['zone_label'] = 'zone';
+$L['iprange_label'] = 'IP range';
+$L['cidr_label'] = 'CIDR network';
 $L['host-group_label'] = 'group';
 $L['role_label'] = 'interface';
 $L['confirm_reload_label'] = 'No change has been applied.';
@@ -78,5 +82,7 @@ $L['FirewallObject_role_Title'] = 'Role ${key}';
 $L['FirewallObject_zone_Title'] = 'Zone ${key}';
 $L['FirewallObject_host-group_Title'] = 'Host group ${key}';
 $L['FirewallObject_fwservice_Title'] = 'Service ${key}';
+$L['FirewallObject_iprange_Title'] = 'IP range ${key}';
+$L['FirewallObject_cidr_Title'] = 'CIDR network ${key}';
 
 $L['Show_x_outof_y_label'] = 'Showing ${partial} results out of ${total}';

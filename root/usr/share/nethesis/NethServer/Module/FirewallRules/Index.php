@@ -30,8 +30,6 @@ namespace NethServer\Module\FirewallRules;
 class Index extends \Nethgui\Controller\Collection\AbstractAction
 {
 
-    private $firewallAdjustProcess;
-
     public function initialize()
     {
         parent::initialize();
@@ -113,6 +111,8 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             'host' => 'fa-cube',
             'zone' => 'fa-sitemap',
             'host-group' => 'fa-cubes',
+            'iprange' => 'fa-cubes',
+            'cidr' => 'fa-cubes',
             'fwservice' => 'fa-gear',
         );
         $tmp = explode(';', $v);
