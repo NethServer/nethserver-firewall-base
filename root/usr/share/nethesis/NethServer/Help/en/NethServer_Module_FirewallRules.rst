@@ -53,9 +53,11 @@ Create / Edit
 When creating and editing rules, you can create the following types of firewall objects: 
 
 * Host 
-* Host groups 
+* Host group
 * Zone 
-* Services 
+* Service
+* CIDR network
+* IP range
 
 Each rule consists of the following fields. 
 
