@@ -90,7 +90,7 @@ class CreateIpRange extends \Nethgui\Controller\Collection\AbstractAction
         parent::process();
         if ($this->getRequest()->isMutation()) {
             $this->getPlatform()
-                    ->getDatabase('hosts')->setKey($this->parameters['name'], 'host', array(
+                    ->getDatabase('hosts')->setKey($this->parameters['name'], 'iprange', array(
                 'Description' => $this->parameters['Description'],
                 'Start' => $this->parameters['Start'],
                 'End' => $this->parameters['End'],
