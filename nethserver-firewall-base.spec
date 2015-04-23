@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.5.1
+Version: 2.6.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -39,6 +39,15 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING
 
 %changelog
+* Thu Apr 23 2015 Davide Principi <davide.principi@nethesis.it> - 2.6.0-1
+- IPS: shorewall configuration not applied if there is at least an orange interface - Bug #3129 [NethServer]
+- Firewall rules (web UI): support ip range and CIDR object - Feature #3121 [NethServer]
+- MAC validation (IP / MAC binding) - Feature #3120 [NethServer]
+- Language packs support - Feature #3115 [NethServer]
+- Firewall: support ip range and CIDR objects - Feature #3112 [NethServer]
+- Copy action for firewall rules - Feature #3111 [NethServer]
+- Add VPN zones to firewall rules - Enhancement #3055 [NethServer]
+
 * Thu Apr 09 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.5.1-1
 - Port forward: display WAN IP - Enhancement #3100 [NethServer]
 - LSM: configuration tuning - Enhancement #3098 [NethServer]
