@@ -16,7 +16,7 @@
         my @interface_parts = split /:/, $alias_interface;
         my $interface = $interface_parts[0];
         #get fw obj
-        my $nat_obj = $i->prop('FwObjectNat');
+        my $nat_obj = $i->prop('FwObjectNat') || "";
         if($nat_obj ne "") {
             # get hostname
             $internal_ip = $fw->getAddress($nat_obj);
