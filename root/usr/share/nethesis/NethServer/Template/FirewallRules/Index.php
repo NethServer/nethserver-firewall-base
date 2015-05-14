@@ -105,7 +105,7 @@ $view->includeJavascript("
 jQuery(function ($) {
     $(window).on('unload beforeunload', function(e) {
        if($('input.${hasChangesTarget}').val() == '1') {
-            return '$confirm_reload';
+            return \"$confirm_reload\";
        }
     });
 
