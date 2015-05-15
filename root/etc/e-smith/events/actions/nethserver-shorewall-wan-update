@@ -49,13 +49,6 @@ SRCIP=${14}
 PREVSTATE=${15}
 TIMESTAMP=${16}
 
-# skip connection events
-if [ ${DEVICE} != "NA" ]; then 
-   exit 0
-fi
-  
-DEVICE=`/sbin/e-smith/db networks getprop $NAME interface`
-
 if [ ${STATE} = up ]; then
   logger -i -p kern.info -t Shorewall Enabling device ${DEVICE}
   /usr/sbin/shorewall enable ${DEVICE} 2>>/var/log/firewall.log
