@@ -48,6 +48,8 @@ $L['valid_platform,fwobject-zone-delete,fwobject-referenced,3'] = 'Could not del
 $L['valid_platform,fwobject-fwservice-delete,fwobject-referenced,3'] = 'Could not delete ${2}. The service is used by firewall rules.';
 $L['valid_platform,fwobject-host-delete,fwobject-referenced,3'] = 'Could not delete ${2}. The host is used by firewall rules.';
 $L['valid_platform,fwobject-host-group-delete,fwobject-referenced,3'] = 'Could not delete ${2}. The host group is used by firewall rules.';
+$L['valid_platform,fwobject-cidr-delete,fwobject-referenced,3'] = 'Could not delete ${2}. The CIDR is used by firewall rules.';
+$L['valid_platform,fwobject-iprange-delete,fwobject-referenced,3'] = 'Could not delete ${2}. The IP range is used by firewall rules.';
 $L['valid_platform,fwobject-host-delete,fwobject-hostgroup-remove-member,3'] = 'Could not delete ${2}: it is the last member of host group ${${reason}}.';
 $L['valid_iprange_outofbounds'] = 'The start IP must be less than the end IP';
 
@@ -57,6 +59,7 @@ $L['Cidr_create_label'] = 'Create CIDR subnet';
 $L['Cidr_update_label'] = 'Update CIDR subnet';
 $L['Cidr_key_exists_message'] = 'An object with the same name already exists inside the hosts database';
 $L['Cidr_CreateCidr_label'] = 'Create CIDR network';
+$L['CidrKey_label'] = 'CIDR';
 
 $L['IpRange_Title'] = 'IP ranges';
 $L['Start_label'] = 'Start IP';
@@ -65,3 +68,4 @@ $L['IpRange_create_label'] = 'Create IP range';
 $L['IpRange_update_label'] = 'Update IP range';
 $L['IpRange_key_exists_message'] = 'An object with the same name already exists inside the hosts database';
 $L['IpRange_CreateIpRange_label'] = 'Create IP range';
+$L['IpRangeKey_label'] = 'IP range';
