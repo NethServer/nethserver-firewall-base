@@ -31,15 +31,10 @@ use NethServer::Firewall;
 my $dbName = shift;
 my $key = shift;
 
-my @references = NethServer::Firewall->new()->getReferences($dbName, $key);
+my $refs = NethServer::Firewall->new()->countReferences($dbName, $key);
 
-if( ! @references) {
-    print "$dbName:$key was not found.\n";
-    exit(0);
-}
-
-if(scalar @references > 0) {
-    print "$dbName:$key is used by firewall rules " . join(", ", map { $_->key } @references) . "\n";
+if( $refs > 0 ) {
+    print "$dbName:$key is used by " . $refs . " rules \n";
     exit(3);
 }
 

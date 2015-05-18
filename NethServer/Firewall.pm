@@ -45,6 +45,7 @@ sub new
     my $fdb_path = shift || 'fwrules';
     my $tdb_path = shift || 'tc';
     my $cdb_path = shift || '';
+    my $pfdb_path = shift || 'portforward';
 
     my $self = {
         sdb_path => $sdb_path,
@@ -52,6 +53,7 @@ sub new
         hdb_path => $hdb_path,
         fdb_path => $fdb_path,
         tdb_path => $tdb_path,
+        pfdb_path => $pfdb_path,
         cdb_path => $cdb_path
     };
     bless $self, $class;
@@ -70,6 +72,7 @@ sub _initialize()
     $self->{'fdb'} = esmith::ConfigDB->open_ro($self->{'fdb_path'});
     $self->{'tdb'} = esmith::ConfigDB->open_ro($self->{'tdb_path'});
     $self->{'cdb'} = esmith::ConfigDB->open_ro($self->{'cdb_path'});
+    $self->{'pfdb'} = esmith::ConfigDB->open_ro($self->{'pfdb_path'});
 }
 
 =head2 getAddress(id, expand_zone = 0)
@@ -440,6 +443,35 @@ sub getTcRules
 }
 
 
+=head2 getBypassRules
+
+Return the list of proxy bypasses by source or destination.
+Each record has all database properties.
+
+=cut
+sub getBypassRules
+{
+    my $self = shift;
+    my @list = $self->{'fdb'}->get_all_by_prop('type' => 'bypass-src');
+    my @dst = $self->{'fdb'}->get_all_by_prop('type' => 'bypass-dst');
+
+    push(@list,@dst);
+    return @list;
+}
+
+=head2 getPortForwards
+
+Return the list of port forward.
+Each record has all database properties.
+
+=cut
+sub getPortForwards
+{
+    my $self = shift;
+    my @list = $self->{'pfdb'}->get_all_by_prop('type' => 'pf');
+    return @list;
+}
+
 =head2 getInterfaceFromIP
 
 Return the name of the interfa connected to the given ip,
@@ -526,12 +558,17 @@ sub _getIpRangeAddress($)
 
 
 
-=head2 getReferences(db, key)
+=head2 countReferences(db, key)
 
-Returns a list of firewall rules having a reference to the given <DB, key> 
+Returns the number of references of the given <DB, key>. 
+The object is searched inside one of following lists:
+* firewall rules
+* proxy bypasses
+* traffic shaping rules
+* port forwards
 
 =cut
-sub getReferences($$)
+sub countReferences($$)
 {
     my $self = shift;
     my $dbName = shift;
@@ -548,7 +585,9 @@ sub getReferences($$)
 	'bridge' => 'role',
 	'vlan' => 'role',
 	'alias' => 'role',
-	'bond' => 'role'	
+	'bond' => 'role',
+        'cidr', => 'cidr',
+        'iprange' => 'iprange'
 	};
 
     my $db = esmith::DB::db->open_ro($dbName);
@@ -570,28 +609,31 @@ sub getReferences($$)
 	return (),
     }
 
-    my @references = ();
+    my $found = 0;
+    my @fwrules = $self->getRules();
+    my @tcrules = $self->getTcRules(); 
+    my @pfrules = $self->getPortForwards();
+    my @bypass = $self->getBypassRules();
+    push(@fwrules, @tcrules);
+    push(@fwrules, @pfrules);
+    push(@fwrules, @bypass);
 
-    foreach my $rule ($self->getRules()) {
-	my @props = ();
+    foreach my $rule (@fwrules) {
+	my @props = qw(Src Dst DstHost Host Service);
 
 	my $target = $type . ';' . $key;
 
-	if($type eq 'fwservice') {
-	    @props = qw(Service);
-	} elsif ($type eq 'role') {
-	    @props = qw(Src Dst);
+	if ($type eq 'role') {
 	    $target = 'role;' . $record->prop('role');
-	} else {
-	    @props = qw(Src Dst);
 	}
 
-	foreach(@props) {	
-	    if($rule->prop($_) eq $target) {
-		push @references, $rule;
+	foreach(@props) {
+            my $prop = $rule->prop($_) || next;
+	    if($prop eq $target) {
+		$found++;
 	    }
 	}
     }
     
-    return @references;
+    return $found;
 }
