@@ -439,6 +439,8 @@ sub getTcRules
 {
     my $self = shift;
     my @list = sort _sort_by_position $self->{'tdb'}->get_all_by_prop('type' => 'rule'); # ascending sort
+    my @ip_list = $self->{'tdb'}->get_all_by_prop('type' => 'ip');
+    push(@list, @ip_list);
     return @list;
 }
 
@@ -626,6 +628,11 @@ sub countReferences($$)
 	if ($type eq 'role') {
 	    $target = 'role;' . $record->prop('role');
 	}
+        if ($type eq 'host') { # also check in tc rules using key
+            if($rule->key eq $target) {
+                $found++;
+            }
+        }
 
 	foreach(@props) {
             my $prop = $rule->prop($_) || next;
