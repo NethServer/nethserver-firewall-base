@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.6.0
+Version: 2.6.1
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -39,6 +39,12 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING
 
 %changelog
+* Tue May 19 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.6.1-1
+- Custom firewall zones precedence - Bug #3170 [NethServer]
+- MultiWAN failover ineffective - Bug #3167 [NethServer]
+- FirewallRules blank page error - Bug #3146 [NethServer]
+- Invalid port forward after deleting firewall objects - Bug #3136 [NethServer]
+
 * Thu Apr 23 2015 Davide Principi <davide.principi@nethesis.it> - 2.6.0-1
 - IPS: shorewall configuration not applied if there is at least an orange interface - Bug #3129 [NethServer]
 - Firewall rules (web UI): support ip range and CIDR object - Feature #3121 [NethServer]
