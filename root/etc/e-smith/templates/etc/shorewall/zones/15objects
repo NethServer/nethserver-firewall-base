@@ -1,5 +1,5 @@
 #
-# 50objects
+# 15objects
 #
 {
     use esmith::NetworksDB;
