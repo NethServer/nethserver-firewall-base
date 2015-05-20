@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.6.1
+Version: 2.6.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -39,6 +39,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING
 
 %changelog
+* Wed May 20 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.6.2-1
+- Invalid traffic shaping rules after deleting host object #3173
+
 * Tue May 19 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.6.1-1
 - Custom firewall zones precedence - Bug #3170 [NethServer]
 - MultiWAN failover ineffective - Bug #3167 [NethServer]
