@@ -33,7 +33,7 @@ use Nethgui\Controller\Table\Modify as Table;
 class Modify extends \Nethgui\Controller\Table\Modify
 {
 
-    private $protocols = array('tcp','udp','icmp');
+    private $protocols = array('tcp','udp','tcp,udp','icmp');
 
     public function initialize()
     {
@@ -62,9 +62,18 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
         
-        $view['ProtoDatasource'] = array(array('tcp',$view->translate('tcp_label')),array('udp',$view->translate('udp_label')),array('icmp',$view->translate('icmp_label')));
+        $view['ProtoDatasource'] = array(array('tcp',$view->translate('tcp_label')),array('udp',$view->translate('udp_label')),array('tcp,udp',$view->translate('tcp,udp_label')),array('icmp',$view->translate('icmp_label')));
         $view['PriorityDatasource'] = array(array('1',$view->translate('1_label')),array('2',$view->translate('2_label')),array('3',$view->translate('3_label')));
  
+    }
+
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        $key = $this->parameters['port'];
+        if ($this->getIdentifier() == 'create' && $this->getRequest()->isMutation() && $this->getPlatform()->getDatabase('tc')->getType($key)) {
+            $report->addValidationErrorMessage($this, 'port', 'Port_key_exists_message');
+        }
+        parent::validate($report);
     }
 
 
