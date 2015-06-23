@@ -25,9 +25,15 @@
             $srcHost = "\t-";
         }
 
+        $target_port = '';
         $dst = $pf->prop('Dst') || '';
         if ($src =~ /:/) { # if src is a range, just use it and discard dst
             $dst = '';
+        }
+        if ($dst eq '') {
+            $dst = $src;
+        } else { # change destination port
+            $target_port = ":$dst";
         }
         $description = $pf->prop('Description') || "";
         $allow = $pf->prop('Allow') || "";
@@ -42,21 +48,13 @@
         } else {
             $oriDst = "\t-";
         }
-        $target_port = '';
-        if ($dst ne '') {
-            $target_port = ":$dst";
-        }
         $target_host = $fw->getZone($dstHost);
         $OUT.="#\n# PF $oriDst:$src -> $dstHost$target_port $allow_cmt \n#\n";
         $OUT.="?COMMENT $description\n";
         if ($nfqueue eq 'enabled') {
             $OUT.="DNAT-\tnet$allow\t$dstHost$target_port\t$proto\t$src$srcHost$oriDst\n";
             @z = split(/:/,$target_host);
-            if ($src =~ /:/) {
-                $OUT.="NFQBY\tnet$allow\t".$z[0]."\t$proto\t$src$srcHost$oriDst\n";
-            } else {
-                $OUT.="NFQBY\tnet$allow\t".$z[0]."\t$proto\t$dst$srcHost$oriDst\n";
-            }
+            $OUT.="NFQBY\tnet$allow\t".$z[0]."\t$proto\t$dst$srcHost$oriDst\n";
         } else {
             $OUT.="DNAT\tnet$allow\t$target_host$target_port\t$proto\t$src$srcHost$oriDst\n";
         }
