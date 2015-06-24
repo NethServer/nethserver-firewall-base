@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.6.2
+Version: 2.6.3
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -39,6 +39,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING
 
 %changelog
+* Wed Jun 24 2015 Davide Principi <davide.principi@nethesis.it> - 2.6.3-1
+- shorewall syntax error with port-range port fwd and IPS - Bug #3200 [NethServer]
+- It's impossible to add a traffic shaping port in all protocol - Bug #3040 [NethServer]
+
 * Wed May 20 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.6.2-1
 - Invalid traffic shaping rules after deleting host object #3173
 
