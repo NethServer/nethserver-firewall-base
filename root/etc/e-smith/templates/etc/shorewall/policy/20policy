@@ -33,5 +33,8 @@
     foreach my $z (keys %zones) {
         $OUT .= "$z\t\tnet\t\t$action\n";
     }
-    $OUT .= "\$FW\t\tnet\t\t$action\n";	
 }
+
+# firewall can always connect outside
+$FW	net	ACCEPT
+
