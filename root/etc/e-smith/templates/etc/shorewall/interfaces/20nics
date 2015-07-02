@@ -14,7 +14,7 @@
         foreach my $i ($ndb->green) {
             my $role = $i->prop('role') || next;
             my $type = $i->prop('type') || '';
-            next if ($i->prop('role') eq 'slave' || $i->prop('role') eq 'bridged');
+            next if ($role eq 'slave' || $role eq 'bridged' || $role eq 'pppoe');
             next if ($type eq 'alias');
             if ($role eq 'green') {
                 $OUT .= "# Force GREEN + RED mode with only one interface\n";
@@ -27,7 +27,7 @@
         foreach my $i ($ndb->interfaces) {
             my $role = $i->prop('role') || next;
             my $type = $i->prop('type') || '';
-            next if ($i->prop('role') eq 'slave' || $i->prop('role') eq 'bridged');
+            next if ($role eq 'slave' || $role eq 'bridged' || $role eq 'pppoe');
             next if ($type eq 'alias');
             if ($role eq 'green') {
                 $OUT .= "loc\t".$i->key."\tnosmurfs,routeback".$mac_option;

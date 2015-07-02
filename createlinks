@@ -159,3 +159,16 @@ event_actions($_, qw(
      host-create
 ));
 
+#--------------------------------------------------
+# actions for interface-update event
+#--------------------------------------------------
+
+$event = 'interface-update';
+
+event_actions($event,
+    'interface-config-write-pppoe' => '40'
+);
+event_templates($event,
+    '/etc/ppp/chap-secrets',
+    '/etc/ppp/pap-secrets'
+);

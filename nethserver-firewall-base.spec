@@ -10,6 +10,7 @@ Requires: nethserver-base > 2.5.2-1
 Requires: nethserver-lsm
 Requires: shorewall >= 4.6
 Requires: ipset
+Requires: rp-pppoe
 
 Obsoletes: nethserver-shorewall
 Provides: nethserver-firewall

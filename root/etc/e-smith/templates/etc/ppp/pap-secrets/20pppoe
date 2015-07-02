@@ -1,0 +1,8 @@
+{
+    my $auth = $pppoe{'AuthType'} || 'auto';
+    if ($auth eq 'auto' || $auth eq 'pap') {
+        my $user = $pppoe{'User'} || return '';
+        my $password = $pppoe{'Password'} || '';
+        $OUT .= "\"$user\"\t*\t\"$password\"\n";
+    }
+}

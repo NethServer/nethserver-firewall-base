@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+#
+# Copyright (C) 2015 Nethesis S.r.l.
+# http://www.nethesis.it - support@nethesis.it
+# 
+# This script is part of NethServer.
+# 
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+# 
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+#
+# Add pppoe options to ifcfg-pppX files
+#
+
+use esmith::ConfigDB;
+use strict;
+
+our $output_dir = $output_dir || $ENV{ESMITH_NETWORK_OUT_DIR} || "/etc/sysconfig/network-scripts";
+my $db = esmith::ConfigDB->open_ro();
+my $pppoe = $db->get('pppoe') || exit 0;
+my $interface = $pppoe->prop('Interface') || exit 0;
+my $user = $pppoe->prop('User') || exit 0;
+my $name = $pppoe->prop('Name') || exit 0;
+my %options;
+
+my $file = "$output_dir/ifcfg-ppp0";
+
+if ( -f $file ) {
+     open my $if, $file or die;
+     while (my $line=<$if>) {
+         chomp($line);
+         (my $k, my $v) = split /=/, $line;
+         $options{$k} = $v;
+     }
+
+     $options{'TYPE'} = 'xDSL'; # network-scripts are case sensitive
+     $options{'USER'} = $user;
+     $options{'PROVIDER'} = $name;
+     $options{'NAME'} = $name;
+
+    open (my $fh, '>', $file) || exit 1;
+    while ( (my $k, my $v) = each %options ) {
+        print $fh "$k=$v\n";
+    }
+    close ($fh);
+
+} 
+
+
+exit 0;
