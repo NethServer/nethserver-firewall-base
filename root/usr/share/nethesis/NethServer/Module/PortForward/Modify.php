@@ -79,7 +79,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $dstValidator = $this->createValidator()
             ->orValidator(
                 $this->createValidator()->integer()->greatThan(0)->lessThan(65535),
-                $this->createValidator()->isEmpty()
+                $this->createValidator()->regexp('/^[0-9]+\:[0-9]+$/')
             );
 
         $protoValidator = $this->createValidator()->memberOf($this->protocols);
