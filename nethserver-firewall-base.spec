@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.6.3
+Version: 2.6.4
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -39,6 +39,11 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING
 
 %changelog
+* Wed Jul 15 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.6.4-1
+- Blocked firewall policy is too restrictive - Bug #3210 [NethServer]
+- Event trusted-networks-modify - Enhancement #3195 [NethServer]
+- Modify NAT 1:1 behavior  (only source NAT) - Enhancement #3192 [NethServer]
+
 * Wed Jun 24 2015 Davide Principi <davide.principi@nethesis.it> - 2.6.3-1
 - shorewall syntax error with port-range port fwd and IPS - Bug #3200 [NethServer]
 - It's impossible to add a traffic shaping port in all protocol - Bug #3040 [NethServer]
