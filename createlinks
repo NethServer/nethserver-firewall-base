@@ -172,3 +172,12 @@ event_templates($event,
     '/etc/ppp/chap-secrets',
     '/etc/ppp/pap-secrets'
 );
+
+#
+# Always execute interface-config-write-pppoe after
+# interface-config-write, to fix ifcfg-ppp0 contents
+# Refs #3218
+#
+event_actions('static-routes-save', qw(
+    interface-config-write-pppoe 30
+));
