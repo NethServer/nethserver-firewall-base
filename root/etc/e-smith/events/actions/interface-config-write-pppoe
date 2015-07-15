@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+
 #
 # Copyright (C) 2015 Nethesis S.r.l.
 # http://www.nethesis.it - support@nethesis.it
@@ -20,42 +21,59 @@
 #
 
 #
-# Add pppoe options to ifcfg-pppX files
+# Add pppoe options to ifcfg-ppp0 file.
+# Delete ifcfg-ppp0 file if pppoe/xdsl interface is disabled.
 #
 
 use esmith::ConfigDB;
+use esmith::NetworksDB;
 use strict;
 
 our $output_dir = $output_dir || $ENV{ESMITH_NETWORK_OUT_DIR} || "/etc/sysconfig/network-scripts";
-my $db = esmith::ConfigDB->open_ro();
-my $pppoe = $db->get('pppoe') || exit 0;
-my $interface = $pppoe->prop('Interface') || exit 0;
-my $user = $pppoe->prop('User') || exit 0;
-my $name = $pppoe->prop('Name') || exit 0;
-my %options;
+my $ndb = esmith::NetworksDB->open_ro() || die("Could not open networks DB");
+
+my $eth = $ndb->get_by_role('pppoe');
+
+my %defaults = (qw(
+    bootproto dialup
+    clampmss 1412
+    connect_poll 6
+    connect_timeout 60
+    defroute yes
+    demand no
+    device ppp0
+    firewall NONE
+    lcp_failure 3
+    lcp_interval 20
+    name dslprovider
+    onboot yes
+    peerdns no
+    pidfile /var/run/pppoe-adsl.pid
+    ping .
+    pppoe_timeout 80
+    synchronous no
+));
 
 my $file = "$output_dir/ifcfg-ppp0";
+my %props = $ndb->get('ppp0') ? $ndb->get('ppp0')->props : ();
+my %attrs = (%defaults, %props,
+             'type' => 'xDSL',
+             'eth' => (defined $eth ? $eth->key : '')
+             );
 
-if ( -f $file ) {
-     open my $if, $file or die;
-     while (my $line=<$if>) {
-         chomp($line);
-         (my $k, my $v) = split /=/, $line;
-         $options{$k} = $v;
-     }
+delete $attrs{'role'};
+delete $attrs{'Password'};
+delete $attrs{'AuthType'};
 
-     $options{'TYPE'} = 'xDSL'; # network-scripts are case sensitive
-     $options{'USER'} = $user;
-     $options{'PROVIDER'} = $name;
-     $options{'NAME'} = $name;
-
-    open (my $fh, '>', $file) || exit 1;
-    while ( (my $k, my $v) = each %options ) {
-        print $fh "$k=$v\n";
+if( $attrs{'eth'} ) {
+    open (FH, '>', $file) || die("Could not open $file for writing: $!\n");
+    while ( (my $k, my $v) = each %attrs ) {
+        $v =~ s/'/'\\''/g;
+        print FH uc($k) . "='$v'\n";
     }
-    close ($fh);
-
-} 
-
+    close (FH);
+} else {
+    unlink $file;
+}
 
 exit 0;
