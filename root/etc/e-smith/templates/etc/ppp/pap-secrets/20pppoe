@@ -1,8 +1,20 @@
+
+#
+# 20pppoe
+#
 {
-    my $auth = $pppoe{'AuthType'} || 'auto';
+    use esmith::NetworksDB;
+
+    my $ndb = esmith::NetworksDB->open_ro() || die("could not open networks DB");
+
+    if($ndb->get_prop('ppp0', 'type') ne 'xdsl') {
+        return '# ppp0 is disabled';
+    }
+
+    my $auth = $ndb->get_prop('ppp0', 'AuthType') || 'auto';
     if ($auth eq 'auto' || $auth eq 'pap') {
-        my $user = $pppoe{'User'} || return '';
-        my $password = $pppoe{'Password'} || '';
+        my $user = $ndb->get_prop('ppp0', 'user') || return '';
+        my $password = $ndb->get_prop('ppp0', 'Password') || '';
         $OUT .= "\"$user\"\t*\t\"$password\"\n";
     }
 }
