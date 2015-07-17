@@ -35,7 +35,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     public function initialize()
     {
-        $interfaces = $this->getPlatform()->getDatabase('networks')->getAll('ethernet');
+        $interfaces = iterator_to_array($this->getPlatform()->getTableAdapter('networks', array('ethernet', 'xdsl')));
         $parameterSchema = array(
             array('device', $this->createValidator()->memberOf(array_keys($interfaces)), \Nethgui\Controller\Table\Modify::KEY),
             array('In', Validate::POSITIVE_INTEGER, \Nethgui\Controller\Table\Modify::FIELD),
@@ -61,7 +61,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $view->setTemplate($templates[$this->getIdentifier()]);
         
         if ($this->getIdentifier() == 'create') {
-            $interfaces = $this->getPlatform()->getDatabase('networks')->getAll('ethernet');
+            $interfaces = iterator_to_array($this->getPlatform()->getTableAdapter('networks', array('ethernet', 'xdsl')));
             $configured = $this->getPlatform()->getDatabase('tc')->getAll('device');
             $tmp = array();
             foreach($interfaces as $interface => $props) {
