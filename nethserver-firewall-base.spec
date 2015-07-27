@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.6.4
+Version: 2.6.5
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -40,6 +40,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING
 
 %changelog
+* Fri Jul 17 2015 Davide Principi <davide.principi@nethesis.it> - 2.6.5-1
+- PPPoE support - Feature #3218 [NethServer]
+
 * Wed Jul 15 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.6.4-1
 - Blocked firewall policy is too restrictive - Bug #3210 [NethServer]
 - Event trusted-networks-modify - Enhancement #3195 [NethServer]
