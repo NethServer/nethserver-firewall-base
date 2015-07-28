@@ -7,6 +7,12 @@
     use NethServer::Firewall;
 
     my $nfqueue = $firewall{'nfqueue'} || 'disabled';
+    my $hairpin = $firewall{'HairpinNat'} || 'disabled';
+    my @sources = ('net');
+    if ($hairpin eq 'enabled') {
+        @sources = ('net','loc');
+    }
+
 
     my $fw = new NethServer::Firewall();
     $db = esmith::ConfigDB->open("portforward") || die "Can't open portforward database: $!\n";
@@ -50,13 +56,15 @@
         }
         $target_host = $fw->getZone($dstHost);
         $OUT.="#\n# PF $oriDst:$src -> $dstHost$target_port $allow_cmt \n#\n";
-        $OUT.="?COMMENT $description\n";
-        if ($nfqueue eq 'enabled') {
-            $OUT.="DNAT-\tnet$allow\t$dstHost$target_port\t$proto\t$src$srcHost$oriDst\n";
-            @z = split(/:/,$target_host);
-            $OUT.="NFQBY\tnet$allow\t".$z[0]."\t$proto\t$dst$srcHost$oriDst\n";
-        } else {
-            $OUT.="DNAT\tnet$allow\t$target_host$target_port\t$proto\t$src$srcHost$oriDst\n";
+        foreach (@sources) {
+            $OUT.="?COMMENT $description from $_\n";
+            if ($nfqueue eq 'enabled') {
+                $OUT.="DNAT-\t$_$allow\t$dstHost$target_port\t$proto\t$src$srcHost$oriDst\n";
+                @z = split(/:/,$target_host);
+                $OUT.="NFQBY\t$_t$allow\t".$z[0]."\t$proto\t$dst$srcHost$oriDst\n";
+            } else {
+                $OUT.="DNAT\t$_$allow\t$target_host$target_port\t$proto\t$src$srcHost$oriDst\n";
+            }
         }
     }
 }
