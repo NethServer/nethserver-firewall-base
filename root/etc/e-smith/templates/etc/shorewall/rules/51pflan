@@ -12,14 +12,6 @@
         return '';
     }
 
-    use esmith::util;
-    use esmith::NetworksDB;
-    my $ndb = esmith::NetworksDB->open_ro();
-
-    my @redip;
-    foreach ($ndb->get_by_role('red')) {
-        push (@redip, $_->prop('ipaddr'));
-    }
 
     my $fw = new NethServer::Firewall();
     $db = esmith::ConfigDB->open("portforward") || die "Can't open portforward database: $!\n";
@@ -38,9 +30,15 @@
             $srcHost = "\t-";
         }
 
+        $target_port = '';
         $dst = $pf->prop('Dst') || '';
         if ($src =~ /:/) { # if src is a range, just use it and discard dst
             $dst = '';
+        }
+        if ($dst eq '') {
+            $dst = $src;
+        } else { # change destination port
+            $target_port = ":$dst";
         }
         $description = $pf->prop('Description') || "";
         $allow = $pf->prop('Allow') || "";
@@ -53,20 +51,17 @@
         if ($oriDst ne '') {
             $oriDst = "\t$oriDst";
         } else {
-            $oriDst = "\t" . join(',', @redip);
+            $oriDst = "\t-";
         }
-        if ($dst eq '') {
-            $dstHost = "$dstHost";
-        } else {
-            $dstHost = "$dstHost:$dst";
-        }
-        $OUT.="#\n# PF $oriDst:$src -> $dstHost $allow_cmt \n#\n";
+        $target_host = $fw->getZone($dstHost);
+        $OUT.="#\n# PF $oriDst:$src -> $dstHost$target_port $allow_cmt \n#\n";
         $OUT.="?COMMENT $description from lan\n";
         if ($nfqueue eq 'enabled') {
-            $OUT.="DNAT-\tloc$allow\t$dstHost\t$proto\t$src$srcHost$oriDst\n";
-            $OUT.="NFQBY\tloc$allow\tloc\t$proto\t$dst$srcHost$oriDst\n";
+            $OUT.="DNAT-\tloc$allow\t$dstHost$target_port\t$proto\t$src$srcHost$oriDst\n";
+            @z = split(/:/,$target_host);
+            $OUT.="NFQBY\tloc$allow\t".$z[0]."\t$proto\t$dst$srcHost$oriDst\n";
         } else {
-            $OUT.="DNAT\tloc$allow\tloc:$dstHost\t$proto\t$src$srcHost$oriDst\n";
+            $OUT.="DNAT\tloc$allow\t$target_host$target_port\t$proto\t$src$srcHost$oriDst\n";
         }
     }
 }
