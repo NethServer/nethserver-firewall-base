@@ -69,7 +69,7 @@ class Providers extends \Nethgui\Controller\TableController
 
     private function readInterfaces() {
         $ret = array();
-        $types = array('bridge', 'bond', 'vlan', 'ethernet');
+        $types = array('bridge', 'bond', 'vlan', 'ethernet', 'xdsl');
         $interfaces = $this->getPlatform()->getDatabase('networks')->getAll();
         foreach ($interfaces as $key => $props) {
            if (in_array($props['type'], $types) && isset($props['role']) && stripos($props['role'],'red') !== false) {

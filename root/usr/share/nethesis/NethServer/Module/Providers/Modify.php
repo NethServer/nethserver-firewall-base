@@ -75,7 +75,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
     private function readInterfaces() {
         $ret = array();
         $used = array();
-        $types = array('bridge', 'bond', 'vlan', 'ethernet');
+        $types = array('bridge', 'bond', 'vlan', 'ethernet', 'xdsl');
         $providers = $this->getPlatform()->getDatabase('networks')->getAll('provider');
         foreach ($providers as $key => $props) {
             if (isset($props['interface'])) {
