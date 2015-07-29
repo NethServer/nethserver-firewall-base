@@ -104,7 +104,7 @@ class CreateZone extends \Nethgui\Controller\Collection\AbstractAction
 
     private function readInterfaces() {
         $ret = array();
-        $types = array('bridge', 'bond', 'vlan', 'ethernet' 'xdsl');
+        $types = array('bridge', 'bond', 'vlan', 'ethernet', 'xdsl');
         $interfaces = $this->getPlatform()->getDatabase('networks')->getAll();
         foreach ($interfaces as $key => $props) {
            if (in_array($props['type'], $types)) {
