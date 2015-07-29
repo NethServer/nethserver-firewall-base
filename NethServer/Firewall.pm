@@ -27,9 +27,92 @@ use esmith::HostsDB;
 use esmith::util;
 use NetAddr::IP;
 use Carp;
+use File::Basename qw(dirname);
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(FIELDS_READ FIELDS_WRITE);
+our @EXPORT_OK = qw(FIELDS_READ FIELDS_WRITE register_callback);
+
+=head1 NAME
+
+NethServer::Firewall -- extensible module for firewall rules generation
+
+=over
+
+=head1 DESCRIPTION
+
+This modules implements many utilities and can determinate the zone of a given ip address
+using the getZone function.
+
+The module also defines an API to extend getZone function behavior.
+For example, VPNs bring new zones. Each VPN package, using the API system,
+can find if the given address belongs to their own zones.
+
+Each package will be a "provider", implementing a special callback function.
+
+To define a provider function, add a Perl module under
+Firewall/ directory, with namespace prefix
+NethServer::Firewall.
+
+The callback function must:
+
+    * return the name of the zone if the ip address belongs to a zone defined by the package
+    * othwerwise, an empty string
+
+=head1 USAGE
+
+This is an example provider "Provider1" definition.
+
+ package NethServer::Firewall::Provider1;
+ use NethServer::Firewall qw(register_callback);
+
+ register_callback(&provider1);
+
+ sub provider1
+ {
+    my $value = shift;
+
+    # return the name of the zone if $value is in my zone
+    # return '' otherwise
+ }
+
+=over
+
+=cut
+
+my @callbacks = ();
+
+sub _init {
+    my $dir = dirname($INC{'NethServer/Firewall.pm'});
+    foreach (glob qq($dir/Firewall/*.pm)) {
+        require "$_";
+    }
+}
+
+sub register_callback
+{
+    my $func = shift;
+    my $order = shift;
+    push @callbacks, [$func, $order || 50];
+}
+
+sub _run_callbacks
+{
+    my $value = shift;
+
+    if( ! @callbacks) {
+        _init();
+    }
+    foreach (sort { $a->[1] <=> $b->[1] } @callbacks) {
+        my $ret = &{$_->[0]}($value);
+        if ($ret ne '') {
+            return $ret;
+        }
+    }
+
+    return '';
+}
+
+=head1 FUNCTIONS
 
 =head2 new
 
@@ -318,6 +401,10 @@ sub getZone($)
         }
     }
 
+    my $extra_zone = _run_callbacks($value);
+    if ($extra_zone ne '') {
+        return "$extra_zone:$value";
+    }
 
     # best guess: we don't know anything, it should be in net zone
     return "net:$value";
@@ -644,3 +731,5 @@ sub countReferences($$)
     
     return $found;
 }
+
+1;
