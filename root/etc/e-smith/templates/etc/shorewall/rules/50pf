@@ -61,7 +61,7 @@
             if ($nfqueue eq 'enabled') {
                 $OUT.="DNAT-\t$_$allow\t$dstHost$target_port\t$proto\t$src$srcHost$oriDst\n";
                 @z = split(/:/,$target_host);
-                $OUT.="NFQBY\t$_t$allow\t".$z[0]."\t$proto\t$dst$srcHost$oriDst\n";
+                $OUT.="NFQBY\t$_\t$allow\t".$z[0]."\t$proto\t$dst$srcHost$oriDst\n";
             } else {
                 $OUT.="DNAT\t$_$allow\t$target_host$target_port\t$proto\t$src$srcHost$oriDst\n";
             }
