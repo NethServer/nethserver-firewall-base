@@ -9,7 +9,7 @@
         }
         $in = $interface->prop('In') || next;
         $out = $interface->prop('Out') || next;
-        $OUT .= $interface->key."\t-\t".$in."kbit\t".$out."kbit\n"
+        $OUT .= $interface->key."\t-\t~".$in."kbit\t".$out."kbit\n"
     }
 
 }
