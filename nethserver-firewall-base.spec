@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.6.5
+Version: 2.7.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -40,6 +40,11 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING
 
 %changelog
+* Thu Aug 27 2015 Davide Principi <davide.principi@nethesis.it> - 2.7.0-1
+- Firewall rules: support hosts within VPN zones - Enhancement #3233 [NethServer]
+- hairpin nat - shorewall syntax error with port-range port fwd and IPS - Bug #3232 [NethServer]
+- server-manager PPPoE support - Enhancement #3227 [NethServer]
+
 * Fri Jul 17 2015 Davide Principi <davide.principi@nethesis.it> - 2.6.5-1
 - PPPoE support - Feature #3218 [NethServer]
 
