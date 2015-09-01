@@ -5,6 +5,18 @@
 
 {
     use NethServer::Firewall;
+    use esmith::NetworksDB;
+    my $ndb = esmith::NetworksDB->open_ro();
+
+    my @anyDst = map { "&" . $_->key; } $ndb->red();
+
+    foreach my $anyKey (map { $_->key } $ndb->get_all_by_prop("type" => "alias")) {
+	my $redKey = $anyKey;
+	$redKey =~ s/:.*$//;
+	if(($ndb->get_prop($redKey, 'role') || '') eq 'red') {
+           push @anyDst, $ndb->get_prop($anyKey, 'ipaddr');
+        }
+    }
 
     my $nfqueue = $firewall{'nfqueue'} || 'disabled';
     my $hairpin = $firewall{'HairpinNat'} || 'disabled';
@@ -52,7 +64,7 @@
         if ($oriDst ne '') {
             $oriDst = "\t$oriDst";
         } else {
-            $oriDst = "\t-";
+            $oriDst = "\t" . join(",", @anyDst);
         }
         $target_host = $fw->getZone($dstHost);
         $OUT.="#\n# PF $oriDst:$src -> $dstHost$target_port $allow_cmt \n#\n";
