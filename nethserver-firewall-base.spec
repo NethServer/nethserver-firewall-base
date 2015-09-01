@@ -1,7 +1,7 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
 Version: 2.7.0
-Release: 1%{?dist}
+Release: 3%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
 
