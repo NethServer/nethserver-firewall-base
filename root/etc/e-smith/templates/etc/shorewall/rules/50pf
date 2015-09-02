@@ -1,6 +1,6 @@
 
 #
-# PORT FORWARDING
+# 50pf -- PORT FORWARDING
 #
 
 {
@@ -11,10 +11,10 @@
     my @anyDst = map { "&" . $_->key; } $ndb->red();
 
     foreach my $anyKey (map { $_->key } $ndb->get_all_by_prop("type" => "alias")) {
-	my $redKey = $anyKey;
-	$redKey =~ s/:.*$//;
-	if(($ndb->get_prop($redKey, 'role') || '') eq 'red') {
-           push @anyDst, $ndb->get_prop($anyKey, 'ipaddr');
+        my $redKey = $anyKey;
+        $redKey =~ s/:.*$//;
+        if(($ndb->get_prop($redKey, 'role') || '') eq 'red') {
+            push @anyDst, $ndb->get_prop($anyKey, 'ipaddr');
         }
     }
 
@@ -24,7 +24,6 @@
     if ($hairpin eq 'enabled') {
         @sources = ('net','loc');
     }
-
 
     my $fw = new NethServer::Firewall();
     $db = esmith::ConfigDB->open("portforward") || die "Can't open portforward database: $!\n";
@@ -80,3 +79,4 @@
         }
     }
 }
+
