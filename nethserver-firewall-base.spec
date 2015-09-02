@@ -1,7 +1,7 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.7.0
-Release: 3%{?dist}
+Version: 2.7.1
+Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
 
@@ -40,6 +40,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING
 
 %changelog
+* Wed Sep 02 2015 Davide Principi <davide.principi@nethesis.it> - 2.7.1-1
+- hairpin nat intercepts outgoing traffic if port forward is on Any ip - Bug #3248 [NethServer]
+- hairpin nat - shorewall syntax error with port-range port fwd and IPS - Bug #3232 [NethServer]
+
 * Thu Aug 27 2015 Davide Principi <davide.principi@nethesis.it> - 2.7.0-1
 - Firewall rules: support hosts within VPN zones - Enhancement #3233 [NethServer]
 - hairpin nat - shorewall syntax error with port-range port fwd and IPS - Bug #3232 [NethServer]
