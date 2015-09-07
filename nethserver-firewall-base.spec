@@ -1,4 +1,4 @@
-Summary: NethServer simple firewall
+Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
 Version: 2.7.2
 Release: 1%{?dist}
@@ -18,6 +18,13 @@ Provides: nethserver-firewall
 BuildRequires: nethserver-devtools
 AutoReq: no
 
+%package ui
+Summary: Web Interface for firewall configuration
+Group: UI
+Requires: %{name} = %{version}-%{release}
+%description ui
+%files ui -f %{name}-%{version}-%{release}-filelist-ui
+
 %description
 NethServer simple firewall
 
@@ -34,8 +41,10 @@ mv -v NethServer root%{perl_vendorlib}
 rm -rf $RPM_BUILD_ROOT
 (cd root ; find . -depth -print | cpio -dump $RPM_BUILD_ROOT)
 %{genfilelist} $RPM_BUILD_ROOT > %{name}-%{version}-%{release}-filelist
+grep -e php$ -e rst$ -e html$ %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-ui
+grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-core
 
-%files -f %{name}-%{version}-%{release}-filelist
+%files -f %{name}-%{version}-%{release}-filelist-core
 %defattr(-,root,root)
 %doc COPYING
 
