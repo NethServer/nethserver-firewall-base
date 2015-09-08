@@ -34,7 +34,7 @@
         my $alias_interface_ip = $i->prop('ipaddr');    
 
         # get ip from firewall obj
-        my $fw_obj = $i->prop('FwObjectNat');
+        my $fw_obj = $i->prop('FwObjectNat') || "";
 
         # if nat exist add it
         if($fw_obj ne "") {
