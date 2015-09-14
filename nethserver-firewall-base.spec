@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.7.1
+Version: 2.7.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -40,6 +40,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING
 
 %changelog
+* Mon Sep 14 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.7.2-1
+- Warning uninitialized value $fw_obj - Enhancement #3242 [NethServer]
+
 * Wed Sep 02 2015 Davide Principi <davide.principi@nethesis.it> - 2.7.1-1
 - hairpin nat intercepts outgoing traffic if port forward is on Any ip - Bug #3248 [NethServer]
 - hairpin nat - shorewall syntax error with port-range port fwd and IPS - Bug #3232 [NethServer]
