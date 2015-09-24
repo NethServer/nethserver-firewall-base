@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 2.7.2
+Version: 2.8.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -49,6 +49,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 %doc COPYING
 
 %changelog
+* Thu Sep 24 2015 Davide Principi <davide.principi@nethesis.it> - 2.8.0-1
+- Drop lokkit support, always use shorewall - Enhancement #3258 [NethServer]
+
 * Mon Sep 14 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.7.2-1
 - Warning uninitialized value $fw_obj - Enhancement #3242 [NethServer]
 
