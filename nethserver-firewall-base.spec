@@ -14,9 +14,16 @@ Requires: rp-pppoe
 
 Obsoletes: nethserver-shorewall
 Provides: nethserver-firewall
+Requires: nethserver-firewall-base-ui
 
 BuildRequires: nethserver-devtools
 AutoReq: no
+
+%package ui
+Summary: Web Interface for firewall configuration
+Group: UI
+%description ui
+%files ui -f %{name}-%{version}-%{release}-filelist-ui
 
 %description
 NethServer simple firewall
@@ -34,6 +41,7 @@ mv -v NethServer root%{perl_vendorlib}
 rm -rf $RPM_BUILD_ROOT
 (cd root ; find . -depth -print | cpio -dump $RPM_BUILD_ROOT)
 %{genfilelist} $RPM_BUILD_ROOT > %{name}-%{version}-%{release}-filelist
+echo > %{name}-%{version}-%{release}-filelist-ui
 
 %files -f %{name}-%{version}-%{release}-filelist
 %defattr(-,root,root)
