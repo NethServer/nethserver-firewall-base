@@ -1,6 +1,6 @@
 Summary: NethServer simple firewall
 Name: nethserver-firewall-base
-Version: 2.7.2
+Version: 2.7.3
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -48,6 +48,9 @@ echo > %{name}-%{version}-%{release}-filelist-ui
 %doc COPYING
 
 %changelog
+* Fri Oct 02 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.7.3-1
+- Split nethserver-firewall-base package to ease upgrade for 6.7 - Enhancement #3278 [NethServer]
+
 * Mon Sep 14 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.7.2-1
 - Warning uninitialized value $fw_obj - Enhancement #3242 [NethServer]
 
