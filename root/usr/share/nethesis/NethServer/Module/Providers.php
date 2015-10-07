@@ -94,7 +94,6 @@ class Providers extends \Nethgui\Controller\TableController
 
     public function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
     {
-        $this->getPlatform()->signalEvent('static-routes-save');
         $this->getPlatform()->signalEvent('firewall-adjust');
     }
 

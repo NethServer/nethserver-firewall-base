@@ -114,16 +114,6 @@ event_actions($event,
 );
 
 #--------------------------------------------------
-# actions for static-routes-save event
-#--------------------------------------------------
-
-$event = "static-routes-save";
-
-event_actions($event,
-              'providers-static-routes' => '20'
-);
-
-#--------------------------------------------------
 # actions for firewall-object-exists validator
 #--------------------------------------------------
 
