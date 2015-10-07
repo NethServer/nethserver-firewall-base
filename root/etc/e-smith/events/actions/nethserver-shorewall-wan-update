@@ -54,6 +54,10 @@ if [ ${STATE} = up ]; then
   /usr/sbin/shorewall enable ${DEVICE} 2>>/var/log/firewall.log
 else
   logger -i -p kern.info -t Shorewall Disabling device ${DEVICE}
+  routing_file=/var/lib/shorewall/undo_${NAME%?}_routing
+  if [ -f $routing_file ]; then
+      sed -i -e "/${SRCIP}/d" -e '/flush/d' $routing_file
+  fi
   /usr/sbin/shorewall disable ${DEVICE} 2>>/var/log/firewall.log
 fi
 
