@@ -5,9 +5,13 @@
     use esmith::NetworksDB;
     my $ndb = esmith::NetworksDB->open_ro();
     my $mac_validation = $firewall{'MACValidation'} || 'disabled';
+    my $mac_validation_policy = $firewall{'MACValidationPolicy'} || 'accept';
     my $mac_option = '';
     if ($mac_validation eq 'enabled') {
         $mac_option = ',maclist';
+        if ($mac_validation_policy eq 'drop') {
+            $mac_option .= ',dhcp';
+        }
     }
 
     if (!defined($ndb->red)) {
