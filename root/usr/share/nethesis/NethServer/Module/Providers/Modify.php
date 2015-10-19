@@ -70,6 +70,12 @@ class Modify extends \Nethgui\Controller\Table\Modify
         if( $this->getRequest()->isMutation() && ! $this->parameters['interface']) {
             $report->addValidationErrorMessage($this, 'interface', 'valid_no_red_interface');
         }
+        if( $this->getRequest()->isMutation() && $this->parameters['interface']) {
+            $v = $this->createValidator()->platform('network-create');
+            if( ! $v->evaluate($this->getAdapter()->getKeyValue())) {
+                $report->addValidationError($this, 'interface', $v);
+            }
+         }
     }
 
     private function readInterfaces() {
