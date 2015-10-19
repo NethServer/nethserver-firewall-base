@@ -48,7 +48,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         }
 
         $p = $this->getPlatform();
-        $nv = $p->createValidator()->maxLength(5)->minLength(1)->not()->memberOf($this->interfaces);
+        $nv = $p->createValidator()->maxLength(5)->minLength(1);
         $parameterSchema = array(
             array('name', $nv, \Nethgui\Controller\Table\Modify::KEY),
             array('interface', $p->createValidator()->memberOf($this->interfaces), \Nethgui\Controller\Table\Modify::FIELD),
