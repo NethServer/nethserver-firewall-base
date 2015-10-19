@@ -5,13 +5,9 @@
     use esmith::NetworksDB;
     my $ndb = esmith::NetworksDB->open_ro();
     my $mac_validation = $firewall{'MACValidation'} || 'disabled';
-    my $mac_validation_policy = $firewall{'MACValidationPolicy'} || 'accept';
     my $mac_option = '';
     if ($mac_validation eq 'enabled') {
         $mac_option = ',maclist';
-        if ($mac_validation_policy eq 'drop') {
-            $mac_option .= ',dhcp';
-        }
     }
 
     if (!defined($ndb->red)) {
@@ -34,7 +30,7 @@
             next if ($role eq 'slave' || $role eq 'bridged' || $role eq 'pppoe');
             next if ($type eq 'alias');
             if ($role eq 'green') {
-                $OUT .= "loc\t".$i->key."\tnosmurfs,routeback".$mac_option;
+                $OUT .= "loc\t".$i->key."\tdhcp,nosmurfs,routeback".$mac_option;
             } elsif ($role eq 'red') {
                 $OUT.="net\t".$i->key."\tdhcp,nosmurfs,optional";
             } else {
