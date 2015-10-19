@@ -24,7 +24,7 @@
             foreach $j (@providers) {
                 my $provider_name = $j->{'name'};
                 if($j->{'interface'} eq $interface) {
-                    $OUT .= "$internal_ip\t\t-\t\t\t$provider_name\t\t1900\n";
+                    $OUT .= "$internal_ip\t\t-\t\t\t$provider_name\t\t11000\n";
                 }
             }
         }
