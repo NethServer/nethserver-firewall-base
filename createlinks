@@ -51,12 +51,12 @@ event_templates($event, '/etc/lsm/lsm.conf');
 event_actions($event,
               'initialize-default-databases' => '00',
               'nethserver-firewall-base-conf' => '02',
-              'nethserver-firewall-base-lsm-restart' => '80',
 	      'nethserver-shorewall-restart' => '89'
 );
 
 event_services($event,
-                     'rsyslog' => 'restart'); 
+                     'rsyslog' => 'restart', 
+                     'lsm' => 'restart' );
 
 
 #--------------------------------------------------
@@ -86,11 +86,13 @@ event_templates($event,
 
 event_actions($event,
 	      'providers-cleanup' => '02',
-              'nethserver-firewall-base-lsm-restart' => '80',
 	      'nethserver-shorewall-restart' => '89'
 );
 
 event_templates($event, '/etc/lsm/lsm.conf');
+
+event_services($event, 
+                     'lsm' => 'restart' );
 
 
 #--------------------------------------------------
