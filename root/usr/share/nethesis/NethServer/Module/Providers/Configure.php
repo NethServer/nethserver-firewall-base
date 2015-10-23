@@ -36,6 +36,7 @@ class Configure extends \Nethgui\Controller\Table\AbstractAction
     {
         parent::initialize();
         $this->declareParameter('WanMode', $this->createValidator()->memberOf($this->modes), array('configuration', 'firewall','WanMode'));
+        $this->declareParameter('CheckIP', Validate::IPv4, array('configuration', 'firewall','CheckIP'));
     }
 
     protected function onParametersSaved($changes)

@@ -14,15 +14,12 @@ echo $view->header('name')->setAttribute('template', $headerTemplate);
 
 echo $view->panel()
     ->insert($view->textInput('name', ($view->getModule()->getIdentifier() == 'update' ? $view::STATE_READONLY | $view::STATE_DISABLED : 0)))
-    ->insert($view->fieldsetSwitch('status', 'disabled'))
     ->insert($view->fieldsetSwitch('status', 'enabled', $view::FIELDSETSWITCH_EXPANDABLE)
         ->insert($interface)
         ->insert($view->textInput('weight'))
-        ->insert($view->textInput('Description'))
-        ->insert($view->fieldset('', $view::FIELDSET_EXPANDABLE)->setAttribute('template', $T('ProviderAdvanced_label'))
-            ->insert($view->textInput('checkip'))
-        )
-    );
+    )
+    ->insert($view->fieldsetSwitch('status', 'disabled'))
+    ->insert($view->textInput('Description'));
 
 
 
