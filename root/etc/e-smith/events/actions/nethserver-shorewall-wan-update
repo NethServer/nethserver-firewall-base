@@ -49,12 +49,20 @@ SRCIP=${14}
 PREVSTATE=${15}
 TIMESTAMP=${16}
 
+DEVICE=`/sbin/e-smith/db networks getprop ${NAME} interface`
+SRCIP=`/sbin/ip -o -4 address show ${DEVICE} primary | head -1 | awk '{print $4}' | cut -d'/' -f 1`
+
+if [ ${STATE} = ${PREVSTATE} ]; then
+    exit 0
+fi
+
 if [ ${STATE} = up ]; then
   logger -i -p kern.info -t Shorewall Enabling device ${DEVICE}
+  /sbin/ip -4 route flush table ${NAME}
   /usr/sbin/shorewall enable ${DEVICE} 2>>/var/log/firewall.log
 else
   logger -i -p kern.info -t Shorewall Disabling device ${DEVICE}
-  routing_file=/var/lib/shorewall/undo_${NAME%?}_routing
+  routing_file=/var/lib/shorewall/undo_${NAME}_routing
   if [ -f $routing_file ]; then
       sed -i -e "/${SRCIP}/d" -e '/flush/d' $routing_file
   fi
