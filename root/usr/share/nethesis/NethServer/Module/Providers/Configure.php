@@ -35,9 +35,33 @@ class Configure extends \Nethgui\Controller\Table\AbstractAction
     public function initialize()
     {
         parent::initialize();
+        $mv = $this->createValidator()->orValidator($this->createValidator(Validate::EMAIL), $this->createValidator(Validate::EMPTYSTRING));
+        $mnplv = $this->createValidator()->integer()->greatThan(2)->lessThan(99);
+        $mpplv = $this->createValidator()->integer()->greatThan(0)->lessThan(100);
+        $piv = $this->createValidator()->integer()->greatThan(0)->lessThan(60);
         $this->declareParameter('WanMode', $this->createValidator()->memberOf($this->modes), array('configuration', 'firewall','WanMode'));
-        $this->declareParameter('CheckIP', Validate::IPv4, array('configuration', 'firewall','CheckIP'));
+        $this->declareParameter('CheckIP', Validate::ANYTHING, array('configuration', 'firewall','CheckIP'));
+        $this->declareParameter('NotifyWan', Validate::SERVICESTATUS, array('configuration', 'firewall','NotifyWan'));
+        $this->declareParameter('NotifyWanFrom', $mv, array('configuration', 'firewall','NotifyWanFrom'));
+        $this->declareParameter('NotifyWanTo', $mv, array('configuration', 'firewall','NotifyWanTo'));
+        $this->declareParameter('MaxNumberPacketLoss', $mnplv, array('configuration', 'firewall','MaxNumberPacketLoss'));
+        $this->declareParameter('MaxPercentPacketLoss', $mpplv, array('configuration', 'firewall','MaxPercentPacketLoss'));
+        $this->declareParameter('PingInterval', $piv, array('configuration', 'firewall','PingInterval'));
     }
+
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        parent::validate($report);
+        if( $this->getRequest()->isMutation() ) {
+            $ipv =  $this->createValidator(Validate::IPv4);
+            foreach (explode(',',$this->parameters['CheckIP']) as $ip) {
+                if (!$ipv->evaluate($ip)) {
+                   $report->addValidationError($this, 'CheckIP', $ipv);
+                }
+            }
+        }
+    }
+
 
     protected function onParametersSaved($changes)
     {

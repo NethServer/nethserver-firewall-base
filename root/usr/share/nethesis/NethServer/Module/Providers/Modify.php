@@ -53,7 +53,6 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('name', $nv, \Nethgui\Controller\Table\Modify::KEY),
             array('interface', $p->createValidator()->memberOf($this->interfaces), \Nethgui\Controller\Table\Modify::FIELD),
             array('weight', $this->createValidator()->integer()->greatThan(0)->lessThan(256), \Nethgui\Controller\Table\Modify::FIELD),
-            array('checkip', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
             array('status', Validate::SERVICESTATUS, \Nethgui\Controller\Table\Modify::FIELD),
             array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD)
         );
@@ -75,7 +74,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             if( ! $v->evaluate($this->getAdapter()->getKeyValue())) {
                 $report->addValidationError($this, 'interface', $v);
             }
-         }
+        }
     }
 
     private function readInterfaces() {
