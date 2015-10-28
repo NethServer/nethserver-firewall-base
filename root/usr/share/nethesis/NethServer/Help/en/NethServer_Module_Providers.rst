@@ -15,6 +15,29 @@ Select provider's management policy:
 * Balance to use all connections at the same time
 * Active-Backup: to use backup connections in case of problems to the provider with the highest priority
 
+Check IP 
+     A ping is sent to Check IP every X (default is 5) seconds. 
+     In case of missing response, the system disables the provider until it begin to receive answers again.
+     It can be an IP or a list of IPs.
+     If using a list of IPs, the provider will be considered down if all specified hots are unreachable.
+
+Link status monitor
+     This group of options control the responsiveness of the Link Status Monitor, which monitors
+     the availability of each provider.
+     Available options:
+
+     * Ping interval: seconds between each ping to Check IP
+     * # lost pings: number of lost pings after a provider is set to down state
+     * % lost pings: percentage of lost pings after a provider is set to down state
+
+Send mail notification on provider status change 
+     If enabled, the system will send an email when a provider changes its state.
+     Available options:
+
+     * From: mail sender address
+     * To: mail recipient address
+
+
 Create or Edit
 ==============
 
@@ -38,10 +61,4 @@ Weight
 Description 
      An optional description to identify the provider. 
 
-Check IP 
-     A ping is sent to Check IP every 5 seconds. 
-     In case of missing response, the system disables the provider until it begin to receive answers again. 
-     Caution: the IP should be inside the provider's network: 
-     the system determines it automatically, we recommend not to change the pre-set IP. 
-     In case of connectivity problems, the Check IP host is not reachable. 
 
