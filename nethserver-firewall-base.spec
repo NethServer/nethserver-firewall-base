@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 2.8.0
+Version: 2.9.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -49,6 +49,13 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 %doc COPYING
 
 %changelog
+* Wed Nov 11 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.9.0-1
+- MultiWAN: remove static routes for checkip - Enhancement #3289 [NethServer]
+- PPPoE default route overrides multi WAN configuration - Bug #3287 [NethServer]
+- port forward not working with sNAT and multiWAN - Bug #3280 [NethServer]
+- DB key name clash in networks db - Bug #3272 [NethServer]
+- ip /mac binding blocks dhcp server requests - Bug #3257 [NethServer]
+
 * Thu Sep 24 2015 Davide Principi <davide.principi@nethesis.it> - 2.8.0-1
 - Drop lokkit support, always use shorewall - Enhancement #3258 [NethServer]
 
