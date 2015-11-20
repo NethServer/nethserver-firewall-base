@@ -27,7 +27,7 @@
  
         my $src = $rule->prop("Src") || next; 
         my $dst = $rule->prop("Dst") || next;
-        my $provider = $rule->prop("Provider") || next;
+        my $provider = $rule->prop("Action") || next;
         my $service = $rule->prop("Service") || '';
         my $description = $rule->prop('Description') || '';
         

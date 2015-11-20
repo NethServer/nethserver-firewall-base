@@ -512,8 +512,13 @@ Each record has all database properties.
 sub getRules
 {
     my $self = shift;
-    my @list = sort _sort_by_position $self->{'fdb'}->get_all_by_prop('type' => 'rule'); # ascending sort
-    return @list;
+    my @list;
+    foreach ($self->{'fdb'}->get_all_by_prop('type' => 'rule')) {
+        my $action = $_->prop('Action');
+        next if ($action =~ /^provider;/); # skip tc rules
+        push(@list,$_);
+    }
+    return sort _sort_by_position @list; # ascending sort
 }
 
 =head2 getTcRules
@@ -525,7 +530,14 @@ Each record has all database properties.
 sub getTcRules
 {
     my $self = shift;
-    my @list = sort _sort_by_position $self->{'tdb'}->get_all_by_prop('type' => 'rule'); # ascending sort
+    my @list;
+    foreach ($self->{'fdb'}->get_all_by_prop('type' => 'rule')) {
+        my $action = $_->prop('Action');
+        if ($action =~ /^provider;/) { # skip traffic rules
+            push(@list,$_);
+        }
+    }
+    @list = sort _sort_by_position @list; # ascending sort
     my @ip_list = $self->{'tdb'}->get_all_by_prop('type' => 'ip');
     push(@list, @ip_list);
     return @list;

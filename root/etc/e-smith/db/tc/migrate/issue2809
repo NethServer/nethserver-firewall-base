@@ -1,0 +1,35 @@
+{
+    #
+    # Move policy rules from db tc to fwrules
+    #
+    #
+
+    use esmith::ConfigDB;
+
+    my $tcdb = esmith::ConfigDB->open('tc');
+    my $fwdb = esmith::ConfigDB->open('fwrules');
+    my $pos = 0;
+    my $id = 0;
+    foreach my $rule ($fwdb->get_all_by_prop('type' => 'rule')) {
+        my $p = $rule->prop('Position');
+        $pos = $pos >= $p ? $pos : $p;
+        $id = $rule->key >= $id ? $rule->key : $id;
+    }
+
+    foreach my $record ($tcdb->get_all_by_prop('type' => 'rule')) {
+
+        my %props = $record->props;
+
+        $pos += 64;
+        $props{'Position'} = $pos;
+
+        $props{'Action'} = $props{'Provider'};
+        delete($props{'Provider'});
+
+        $id += 1;
+        my $new_record = $fwdb->new_record($id, \%props);
+        $record->delete;
+    }
+
+    '';
+}
