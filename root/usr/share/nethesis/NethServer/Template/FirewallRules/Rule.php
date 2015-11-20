@@ -5,11 +5,7 @@
 echo $view->header('RuleId')->setAttribute('template', $T($view->getModule()->getIdentifier() . '_header'));
 
 echo $view->checkbox('status', 'enabled')->setAttribute('uncheckedValue', 'disabled');
-echo $view->selector('Action', $view::SELECTOR_DROPDOWN)->setAttribute('choices', array(
-    array('accept', $T('ActionAccept_label')),
-    array('reject', $T('ActionReject_label')),
-    array('drop', $T('ActionDrop_label'))
-));
+echo $view->selector('Action', $view::SELECTOR_DROPDOWN);
 
 echo $view->panel()->setAttribute('class', 'labeled-control label-above')
     ->insert($view->literal(sprintf('<label for="%s">%s</label>', $view->getUniqueId('Source'), \htmlspecialchars($T('Source_label')))))

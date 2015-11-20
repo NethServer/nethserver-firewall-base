@@ -140,11 +140,16 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             'drop' => 'fa-minus-circle',
             'reject' => 'fa-shield',
         );
+
+        foreach(array_keys($this->getPlatform()->getDatabase('networks')->getAll('provider')) as $provider) {
+            $actionLabels['provider;' . $provider] = $view->translate('ActionRouteIndex_label', array($provider));
+            $actionIcons['provider;' . $provider] = 'fa-share';
+        }
         
         foreach ($this->getAdapter() as $key => $values) {
             $values['id'] = (String) $key;
             $values['Position'] = isset($values['Position']) ? intval($values['Position']) : 0;
-            $values['rawAction'] = $values['Action'];
+            $values['cssAction'] = str_replace(';', ' ', $values['Action']);
             $values['ActionIcon'] = $actionIcons[$values['Action']];
             $values['SrcIcon'] = $this->getObjectIcon($values['Src']);
             $values['DstIcon'] = $this->getObjectIcon($values['Dst']);

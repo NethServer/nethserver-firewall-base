@@ -47,6 +47,11 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
 
     public function bind(\Nethgui\Controller\RequestInterface $request)
     {
+        $validActions = array_merge(array('accept', 'reject', 'drop'), array_map(
+                        function ($x) {
+                    return 'provider;' . $x;
+                }, $this->getProviderKeys()));
+
         $this->declareParameter('SrcRaw', Validate::ANYTHING, array('fwrules', $this->ruleId, 'Src'));
         $this->declareParameter('DstRaw', Validate::ANYTHING, array('fwrules', $this->ruleId, 'Dst'));
         $this->declareParameter('ServiceRaw', Validate::ANYTHING, array('fwrules', $this->ruleId, 'Service'));
@@ -54,7 +59,7 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
         $this->declareParameter('Description', Validate::ANYTHING, array('fwrules', $this->ruleId, 'Description'));
         $this->declareParameter('Position', Validate::POSITIVE_INTEGER, array('fwrules', $this->ruleId, 'Position'));
         $this->declareParameter('LogType', $this->createValidator()->memberOf('none', 'info'), array('fwrules', $this->ruleId, 'Log'));
-        $this->declareParameter('Action', $this->createValidator()->memberOf('accept', 'reject', 'drop'), array('fwrules', $this->ruleId, 'Action'));
+        $this->declareParameter('Action', $this->createValidator()->memberOf($validActions), array('fwrules', $this->ruleId, 'Action'));
         $this->declareParameter('Source', Validate::ANYTHING);
         $this->declareParameter('Destination', Validate::ANYTHING);
         $this->declareParameter('Service', Validate::ANYTHING);
@@ -101,6 +106,21 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
         } else {
             $view->getCommandList()->sendQuery($view->getModuleUrl($this->getNextRequest()));
         }
+        
+        $actions =array(
+            array('accept', $view->translate('ActionAccept_label')),
+            array('reject', $view->translate('ActionReject_label')),
+            array('drop', $view->translate('ActionDrop_label'))
+        );
+        foreach($this->getProviderKeys() as $provider) {
+            $actions[] = array('provider;' . $provider, $view->translate('ActionRoute_label', array($provider)));
+        }
+        $view['ActionDatasource'] = $actions;
+    }
+
+    private function getProviderKeys()
+    {
+        return array_keys($this->getPlatform()->getDatabase('networks')->getAll('provider'));
     }
 
     private function getNextRequest()

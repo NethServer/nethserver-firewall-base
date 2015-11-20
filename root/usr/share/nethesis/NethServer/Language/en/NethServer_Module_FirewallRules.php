@@ -86,3 +86,5 @@ $L['FirewallObject_iprange_Title'] = 'IP range ${key}';
 $L['FirewallObject_cidr_Title'] = 'CIDR network ${key}';
 
 $L['Show_x_outof_y_label'] = 'Showing ${partial} results out of ${total}';
+$L['ActionRoute_label'] = 'Route to ${0}';
+$L['ActionRouteIndex_label'] = '${0}';
