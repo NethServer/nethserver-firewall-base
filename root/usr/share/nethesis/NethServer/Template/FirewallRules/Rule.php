@@ -34,13 +34,26 @@ echo $view->textInput('Description');
 echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_HELP)
     ->insert($view->button('Cancel', $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('../Index')));
 
+$actionId = $view->getUniqueId('Action');
+$jsCode .= "
+    var uiupdate = function (e) {
+       $('#" . $view->getUniqueId('LogType') . "').prop('disabled', $('#${actionId}').val().match(/^provider;/));
+    };
+    $('#" . $view->getUniqueId() . "').on('nethguishow', uiupdate);
+    $('#${actionId}').on('change', uiupdate);
+";
+
 foreach (array('Source', 'Destination', 'Service') as $target) {
     $buttonTarget = $view->getClientEventTarget('Pick' . $target);
     $inputTarget = $view->getClientEventTarget($target);
-    $view->includeJavascript("
-jQuery(function ($) {
+    $jsCode .= "
     $('.${buttonTarget}').hide();
     $('.${inputTarget}').css({'background-color': 'white', 'cursor': 'pointer'}).on('click', function(e) { $(this).next().click(); });
+";
+}
+
+$view->includeJavascript("
+jQuery(function ($) {
+${jsCode}
 });
 ");
-}
