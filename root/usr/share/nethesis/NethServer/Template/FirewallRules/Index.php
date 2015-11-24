@@ -92,7 +92,7 @@ $view->includeCss('
 .fields .service { padding-left: 1ex }
 .fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px 3px 3px 1ex}
 .fwrule.disabled, {color: gray !important; }
-.fwrule.disabled .actbox, .fwrule.disabled .idbox, .fwrule.disabled .green, .fwrule.disabled .red, .fwrule.disabled .orange, .fwrule.disabled .blue {color: gray !important}
+.fwrule.disabled .actbox, .fwrule.disabled .idbox, .fwrule.disabled .fields, .fwrule.disabled .green, .fwrule.disabled .red, .fwrule.disabled .orange, .fwrule.disabled .blue {color: gray !important}
 .fwrule.disabled .actbox, .fwrule.disabled .idbox {background-color: #eee}
 .fwrule.disabled .Description, .fwrule.disabled .RuleText {color: gray !important; }
 .placeholder {background-color: yellow; margin-bottom: 1.5em; background: linear-gradient(to bottom, rgba(234,239,181,1) 0%,rgba(225,233,160,1) 100%);}
