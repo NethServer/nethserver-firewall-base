@@ -5,11 +5,7 @@
 echo $view->header('RuleId')->setAttribute('template', $T($view->getModule()->getIdentifier() . '_header'));
 
 echo $view->checkbox('status', 'enabled')->setAttribute('uncheckedValue', 'disabled');
-echo $view->selector('Action', $view::SELECTOR_DROPDOWN)->setAttribute('choices', array(
-    array('accept', $T('ActionAccept_label')),
-    array('reject', $T('ActionReject_label')),
-    array('drop', $T('ActionDrop_label'))
-));
+echo $view->selector('Action', $view::SELECTOR_DROPDOWN);
 
 echo $view->panel()->setAttribute('class', 'labeled-control label-above')
     ->insert($view->literal(sprintf('<label for="%s">%s</label>', $view->getUniqueId('Source'), \htmlspecialchars($T('Source_label')))))
@@ -38,13 +34,26 @@ echo $view->textInput('Description');
 echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_HELP)
     ->insert($view->button('Cancel', $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('../Index')));
 
+$actionId = $view->getUniqueId('Action');
+$jsCode .= "
+    var uiupdate = function (e) {
+       $('#" . $view->getUniqueId('LogType') . "').prop('disabled', $('#${actionId}').val().match(/^provider;/));
+    };
+    $('#" . $view->getUniqueId() . "').on('nethguishow', uiupdate);
+    $('#${actionId}').on('change', uiupdate);
+";
+
 foreach (array('Source', 'Destination', 'Service') as $target) {
     $buttonTarget = $view->getClientEventTarget('Pick' . $target);
     $inputTarget = $view->getClientEventTarget($target);
-    $view->includeJavascript("
-jQuery(function ($) {
+    $jsCode .= "
     $('.${buttonTarget}').hide();
     $('.${inputTarget}').css({'background-color': 'white', 'cursor': 'pointer'}).on('click', function(e) { $(this).next().click(); });
+";
+}
+
+$view->includeJavascript("
+jQuery(function ($) {
+${jsCode}
 });
 ");
-}
