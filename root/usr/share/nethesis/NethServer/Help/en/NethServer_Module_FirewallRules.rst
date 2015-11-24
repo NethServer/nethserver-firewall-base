@@ -73,6 +73,7 @@ Action
      * *Reject*: block the traffic and notify the sender host 
      * *Drop*: block the traffic, packets are dropped and not
        notification is sent to the sender host
+     * *Route ...*: route the traffic to the WAN provider
 
 Source
     It's the source of the traffic, it can be: a host, a group of hosts or a zone.
