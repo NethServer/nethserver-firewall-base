@@ -83,7 +83,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         }
     }
 
-    private function resolveService($ep, $view = null) 
+    private function resolveService($ep, $view = null)
     {
         if ($ep == 'any') {
             if ($view == null) {
@@ -95,7 +95,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         return str_replace("fwservice;", "", $ep);
     }
 
-    private function resolveName($ep,$view) 
+    private function resolveName($ep,$view)
     {
         $tmp = explode(';', $ep);
         if ($ep == 'any') {
@@ -146,7 +146,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             $actionLabels['provider;' . $provider] = $view->translate('ActionRouteIndex_label', array($provider));
             $actionIcons['provider;' . $provider] = 'fa-share';
         }
-        
+
         foreach ($this->getAdapter() as $key => $values) {
 
             if($this->parameters['a'] === 'rules' && substr($values['Action'], 0, 9) === 'provider;') {
@@ -166,7 +166,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             } else {
                 $values['ServiceIcon'] = $this->getObjectIcon($values['Service']);
             }
-           
+
             $values['Action'] = $actionLabels[$values['Action']];
             $values['Edit'] = $view->getModuleUrl('../Edit/' . $key);
             $values['Copy'] = $view->getModuleUrl('../Copy/' . ($values['Position'] + 1) . '?id=' . $key);
@@ -180,6 +180,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             $values['Service'] = $this->resolveService($values['Service']);
             $values['Delete'] = $view->getModuleUrl('../Delete/' . $key);
             $values['LogIcon'] = ($values['Log']!='none')?'fa-book':'';
+            $values['LogLabel'] = ($values['Log']!='none')? $view->translate('ActionLog_label') : '';
             $r[] = $values;
         }
         usort($r, function ($a, $b) {

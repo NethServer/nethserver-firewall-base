@@ -26,7 +26,7 @@ echo $view->hidden('a');
 
 // 'groups' contains an array of views..
 echo $view->objectsCollection('Rules')
-    ->setAttribute('placeholders', array('cssAction','ActionIcon','SrcIcon','DstIcon','ServiceIcon','LogIcon','Src','Dst','Service', 'status'))
+    ->setAttribute('placeholders', array('cssAction','ActionIcon','SrcIcon','DstIcon','ServiceIcon','LogIcon', 'LogLabel','Src','Dst','Service', 'status'))
     ->setAttribute('key', 'id')
     ->setAttribute('ifEmpty', function ($view) use ($T) {
         return $T('NoRulesDefined_label');
@@ -36,26 +36,27 @@ echo $view->objectsCollection('Rules')
             ->setAttribute('class', 'fwrule ${cssAction} ${status}')
             ->insert($view->hidden('metadata', $view::STATE_DISABLED))
             ->insert($view->textInput('Position', $view::LABEL_NONE))
-            ->insert($view->panel()->setAttribute('class', 'actbox')                
-                ->insert($view->textLabel('id')->setAttribute('tag', 'div')->setAttribute('template', $T("RuleId_label")))
-
-                ->insert($view->literal('<i class="fwicon fa ${ActionIcon}"></i>'))
+            ->insert($view->panel()->setAttribute('class', 'idbox background-grip')
+                ->insert($view->textLabel('id')->setAttribute('tag', 'span')->setAttribute('template', $T("RuleId_label"))))
+            ->insert($view->panel()->setAttribute('class', 'actbox')
+                ->insert($view->literal('<i class="fwicon fa ${ActionIcon}"></i> '))
                 ->insert($view->textLabel('Action')->setAttribute('tag', 'span'))
+                ->insert($view->literal('<br/><i class="fwicon fwicon-log fa ${LogIcon} gray"></i>  <span class="gray">${LogLabel}</span>'))
                 )
             ->insert($view->panel()->setAttribute('class', 'descbox')
-                ->insert($view->panel()->setAttribute('class', 'objbox')
-                    ->insert($view->literal('<i class="fwicon fa ${SrcIcon} ${Src}"></i>'))
+                    ->insert($view->panel()->setAttribute('class', 'fields')
+                ->insert($view->panel()->setAttribute('class', 'src ${Src}')->setAttribute('tag', 'span')
+                    ->insert($view->literal('<i class="fwicon fa ${SrcIcon} ${Src}"></i> '))
                     ->insert($view->textLabel('Src')->setAttribute('tag', 'span')))
-                ->insert($view->panel()->setAttribute('class', 'objbox')
-                    ->insert($view->literal('<i class="fa fa-long-arrow-right fa-2x"></i>')))
-                ->insert($view->panel()->setAttribute('class', 'objbox')
-                    ->insert($view->literal('<i class="fwicon fa ${DstIcon} ${Dst}"></i>'))
+                ->insert($view->panel()->setAttribute('class', 'caret')->setAttribute('tag', 'span')
+                    ->insert($view->literal(' <i class="fa fa-caret-right"></i> ')))
+                ->insert($view->panel()->setAttribute('class', 'dst ${Dst}')->setAttribute('tag', 'span')
+                    ->insert($view->literal(' <i class="fwicon fa ${DstIcon} ${Dst}"></i> '))
                     ->insert($view->textLabel('Dst')->setAttribute('tag', 'span')))
-                ->insert($view->panel()->setAttribute('class', 'objbox')
-                    ->insert($view->literal('<i class="fwicon fa ${ServiceIcon} ${Service}"></i>'))
+                ->insert($view->panel()->setAttribute('class', 'service')->setAttribute('tag', 'span')
+                    ->insert($view->literal('<i class="fwicon fa ${ServiceIcon} ${Service}"></i> '))
                     ->insert($view->textLabel('Service')->setAttribute('tag', 'span')))
-                ->insert($view->panel()->setAttribute('class', 'objbox')
-                    ->insert($view->literal('<i class="fwicon fwicon-log fa ${LogIcon} ${Log}"></i>')))
+                            )
                 ->insert($view->textLabel('Description')->setAttribute('tag', 'div'))
                 ->insert($view->textLabel('RuleText')->setAttribute('tag', 'div')))
             ->insert($view->buttonList()->setAttribute('class', 'Buttonset v1')
@@ -76,7 +77,7 @@ $deleteUrl = $view->getModuleUrl('../Delete');
 $hasChangesTarget = $view->getClientEventTarget('hasChanges');
 $view->includeTranslations(array(
     'confirm_reload_label'
-));
+    ));
 
 $ruleStep = \NethServer\Module\FirewallRules::RULESTEP;
 
@@ -84,34 +85,32 @@ $view->includeCss('
 .fwrule {min-height: 50px; border:1px solid #d3d3d3; display: flex; margin-bottom: 1.5em; border-radius: 3px;}
 .fwrule .Buttonset {flex-grow: 0; margin-right: 0}
 .fwrule .Buttonset [role=button] {border-top: none}
-.fwrule .actbox {padding: 3px; width: 7em; font-size: 120%; background: white; text-transform: uppercase; cursor: move;}
-.fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px}
-.fwrule.disabled {color: #aaa !important; }
-.fwrule.disabled .actbox {color: #aaa !important; background-color: #eee}
-.fwrule.disabled .Description, .fwrule.disabled .RuleText {color: #aaa !important; }
+.fwrule .actbox {padding: 3px; width: 7em; text-transform: uppercase; cursor: move;}
+.fwrule .idbox {padding: 3px; cursor: move; color: gray; min-width: 4ex; padding-left: 16px; font-size: 0.8em}
+.fwrule .fields {margin-bottom: 3px}
+.fields .caret { padding: 0 1ex }
+.fields .service { padding-left: 2ex }
+.fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px 3px 3px 1ex}
+.fwrule.disabled {color: gray !important; }
+.fwrule.disabled .actbox, .fwrule.disabled .idbox {color: gray !important; background-color: #eee}
+.fwrule.disabled .Description, .fwrule.disabled .RuleText {color: gray !important; }
 .placeholder {background-color: yellow; margin-bottom: 1.5em; background: linear-gradient(to bottom, rgba(234,239,181,1) 0%,rgba(225,233,160,1) 100%);}
-.fwrule .id {color: #bbb; font-size: 0.7em}
-.Position {width: 2em}
-.objbox { float: left; display: none }
-.drop .actbox { color: red; font-weight: bold; }
-.reject .actbox { color: #700000; font-weight: bold;}
-.accept .actbox { color: green; font-weight: bold; }
-.fwicon { margin-right: 5px; margin-left: 5px; display: none}
-.fwicon-log { color: gray; };
-.Description { margin-top: 5px; float: right; margin-right: 10px; }
-.RuleText { color: gray;  clear: both; }
-.green {color: green;}
-.red {color: red;}
-.orange {color: orange;}
-.blue {color: blue;}
+
+.drop .actbox { color: red }
+.reject .actbox { color: #700000}
+.accept .actbox { color: green}
+
+.gray, .RuleText {color: gray}
+.green {color: green}
+.red {color: red}
+.orange {color: orange}
+.blue {color: blue}
 .my-state-active {
     background: #fff;
     color: #212121;
 }
 @media screen and (min-width: 40em){
-   .objbox { width: 10em; display: inline }
-   .fwicon { font-size: 150%; display: inline}
-   .Description { margin-top: 5px; float: right; margin-right: 10px; }
+
 }
 ');
 
@@ -125,7 +124,7 @@ jQuery(function ($) {
 
     $('#${rulesId}').sortable({
         axis: 'y',
-        handle: '.actbox',
+        handle: '.actbox, .idbox',
         placeholder: 'placeholder',
         opacity: 0.6,        
         forcePlaceholderSize: true,
@@ -165,6 +164,7 @@ jQuery(function ($) {
     });
 
     var updateShowGroup = function (e, value) {
+        value = value === null ? '' : value;
         $('#ShowGroup').children().each(function(index, elem) {
             var selected = RegExp('=' + value + '$').test($(elem).attr('href'));
             if(selected) {
