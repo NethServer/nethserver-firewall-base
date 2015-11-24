@@ -34,6 +34,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
     {
         parent::initialize();
         $this->declareParameter('Rules', \Nethgui\System\PlatformInterface::ANYTHING_COLLECTION);
+        $this->declareParameter('a', $this->createValidator()->memberOf('', 'rules', 'routes'));
     }
 
     public function process()
@@ -147,6 +148,13 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         }
         
         foreach ($this->getAdapter() as $key => $values) {
+
+            if($this->parameters['a'] === 'rules' && substr($values['Action'], 0, 9) === 'provider;') {
+                continue;
+            } elseif($this->parameters['a'] === 'routes' && in_array($values['Action'], array('accept', 'drop', 'reject'))) {
+                continue;
+            }
+
             $values['id'] = (String) $key;
             $values['Position'] = isset($values['Position']) ? intval($values['Position']) : 0;
             $values['cssAction'] = str_replace(';', ' ', $values['Action']);

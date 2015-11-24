@@ -12,8 +12,17 @@ echo $view->buttonList()
         ->insert($view->button('Configure', $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('../General')))
     )
     ->insert($view->button('Commit', $view::BUTTON_SUBMIT)->setAttribute('receiver', 'Commit'))
+    ->insert($view->textLabel('ShowAction')->setAttribute('template', $T('ShowAction_label')))
+        ->insert($view->panel()->setAttribute('class', 'inlineblock')->setAttribute('id', 'ShowGroup')
+                ->insert($view->button('ShowRules',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=rules')))
+                ->insert($view->button('ShowRoutes',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=routes')))
+                ->insert($view->button('ShowAll',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=')))
+                )
     ->insert($view->button('Help', $view::BUTTON_HELP))
 ;
+
+$filterTarget = $view->getClientEventTarget('a');
+echo $view->hidden('a');
 
 // 'groups' contains an array of views..
 echo $view->objectsCollection('Rules')
@@ -65,7 +74,9 @@ $commitId = $view->getUniqueId('Commit');
 $deleteId = $view->getUniqueId('Delete');
 $deleteUrl = $view->getModuleUrl('../Delete');
 $hasChangesTarget = $view->getClientEventTarget('hasChanges');
-$confirm_reload = $view->translate('confirm_reload_label');
+$view->includeTranslations(array(
+    'confirm_reload_label'
+));
 
 $ruleStep = \NethServer\Module\FirewallRules::RULESTEP;
 
@@ -93,7 +104,10 @@ $view->includeCss('
 .red {color: red;}
 .orange {color: orange;}
 .blue {color: blue;}
-
+.my-state-active {
+    background: #fff;
+    color: #212121;
+}
 @media screen and (min-width: 40em){
    .objbox { width: 10em; display: inline }
    .fwicon { font-size: 150%; display: inline}
@@ -105,7 +119,7 @@ $view->includeJavascript("
 jQuery(function ($) {
     $(window).on('unload beforeunload', function(e) {
        if($('input.${hasChangesTarget}').val() == '1') {
-            return \"$confirm_reload\";
+            return $.Nethgui.T('confirm_reload_label');
        }
     });
 
@@ -150,7 +164,19 @@ jQuery(function ($) {
         }, 100);
     });
 
-    
+    var updateShowGroup = function (e, value) {
+        $('#ShowGroup').children().each(function(index, elem) {
+            var selected = RegExp('=' + value + '$').test($(elem).attr('href'));
+            if(selected) {
+                $(elem).addClass('my-state-active');
+            } else {
+                $(elem).removeClass('my-state-active');
+            }
+        });
+    };
+    $('#ShowGroup').buttonset();
+    $('.${filterTarget}').on('nethguiupdateview', updateShowGroup);
+    updateShowGroup(null, '');
 });
 " . '
 /*!
