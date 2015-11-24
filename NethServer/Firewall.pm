@@ -622,7 +622,7 @@ sub _getHostGroupAddresses($)
 {
     my $self = shift;
     my $key = shift;
-    
+
     my $record = $self->{'hdb'}->get($key);
     return '' unless defined($record);
     my $members = $record->prop('Members') || '';
@@ -630,7 +630,8 @@ sub _getHostGroupAddresses($)
     return '' unless (@keys) ;
     my @hosts = ();
     foreach my $key (@keys) {
-        push(@hosts, $self->_getHostAddress($key));  
+        my $address = $self->_getHostAddress($key) || next;
+        push(@hosts, $address);
     }
     return join (',',@hosts);
 }
