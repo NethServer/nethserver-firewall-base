@@ -6,6 +6,7 @@
     use esmith::NetworksDB;
 
     my $db = esmith::ConfigDB->open_ro("tc") || die "Can't open tc database: $!\n";
+    my $ndb = esmith::NetworksDB->open_ro() || die "Can't open networks database: $!\n";
     my $fw = new NethServer::Firewall();
     our @providers = $fw->getProviders();
 
@@ -24,32 +25,59 @@
     foreach my $rule ( $fw->getTcRules() ) {
         my $status = $rule->prop("status") || "disabled";
         next unless ($status eq 'enabled');
- 
-        my $src = $rule->prop("Src") || next; 
+        my $src = $rule->prop("Src") || next;
         my $dst = $rule->prop("Dst") || next;
+        my $src_ori = $src;
+        my $dst_ori = $dst;
         my $provider = $rule->prop("Action") || next;
         my $service = $rule->prop("Service") || '';
         my $description = $rule->prop('Description') || '';
-        
+
         # retrieve provider object
         my ($type, $provider_key) = split(';', $provider);
         my $p = getProvider($provider_key);
         my $mask = $p->{'mask'} || next;
 
-        # src and dst can be: zone (not interface), host, ip address or CIDR
-        my $src_addr = $fw->getAddress($src, 1);
-        my $dst_addr = $fw->getAddress($dst, 1);
-        next if ($src_addr eq '' && $dst_addr eq '');
-        
-        my $comment = "\n#\n# FORCE traffic [$src_addr -> $dst_addr] to $provider_key \n#\n";
-        my $lines = "?COMMENT $description\n";
-        $lines .= $mask.":P\t".$src_addr."\t".$dst_addr;
-        if ($service eq 'any' || $service eq '') {
-            $OUT .= $comment.$lines."\n";
+        my @src_addr;
+        if ($src =~ /role;(.*)/) { # src is an interface
+            my $role = $1;
+            # red interface can't be used as source
+            next if ($role eq 'red');
+
+            # convert roles into interface names
+            my @interfaces = $ndb->get_by_role($role);
+            foreach(@interfaces) {
+                push(@src_addr, $_->key);
+            }
+        } elsif ($src eq 'any') { # map 'any' keyword to '-'
+            push(@src_addr,'-');
+        } else { #src is a zone, host, ip address, ip range or CIDR
+            my $addr = $fw->getAddress($src, 1) || '';
+            push(@src_addr, $addr) if ($addr ne '');
+        }
+
+        # dst is a zone, host, ip address, ip range or CIDR
+        my $dst_addr = '';
+        if ($dst eq 'any' || $dst eq 'role;red' ) { # map 'any' and red role to '-'
+            $dst_addr = '-';
         } else {
-            my %ports = $fw->getPorts($service);
-            foreach my $protocol (keys %ports) {
-                $OUT .= $comment.$lines."\t$protocol\t$ports{$protocol}\n";
+            next if ($src =~ /role;/); # skip all other roles
+            $dst_addr = $fw->getAddress($dst, 1);
+        }
+
+        foreach (@src_addr) {
+            next if ($_ eq '-' && ($dst_addr eq '-' || $dst_addr eq '')); # skip rules where dst and src are empty
+
+            my $comment = "\n#\n# FORCE traffic [$src_ori -> $dst_ori] to $provider_key \n#\n";
+            my $lines = "?COMMENT $description\n";
+            $lines .= $mask.":P\t".$_."\t".$dst_addr;
+            if ($service eq 'any' || $service eq '') {
+                $OUT .= $comment.$lines."\n";
+            } else {
+                my %ports = $fw->getPorts($service);
+                foreach my $protocol (keys %ports) {
+                    $OUT .= $comment.$lines."\t$protocol\t$ports{$protocol}\n";
+                }
             }
         }
     }
