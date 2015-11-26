@@ -66,6 +66,19 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
         parent::bind($request);
     }
 
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        parent::validate($report);
+        if ( ! $report->hasValidationErrors()
+                && $this->getRequest()->isMutation()
+                && $this->getRequest()->hasParameter('Submit')) {
+            $v = $this->createValidator()->platform('fwrule-modify', $this->getIdentifier());
+            if( ! $v->evaluate(json_encode($this->parameters->getArrayCopy()))) {
+                $report->addValidationError($this, 'Action', $v);
+            }
+        }
+    }
+
     private function addReadonlyAdapter(\Nethgui\View\ViewInterface $view, $targetName, $sourceName)
     {
         if( ! isset($this->parameters[$targetName])) {

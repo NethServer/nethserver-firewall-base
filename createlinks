@@ -174,3 +174,8 @@ event_templates($event,
 event_actions('static-routes-save', qw(
     interface-config-write-pppoe 30
 ));
+
+
+validator_actions('fwrule-modify', qw(
+    fwrule-route2provider 20
+));

@@ -94,3 +94,6 @@ $L['ShowAction_label'] = 'Show';
 $L['ShowAll_label'] = 'All';
 $L['ShowRules_label'] = 'Rules';
 $L['ShowRoutes_label'] = 'Routes';
+
+$L['valid_platform,fwrule-modify,fwrule-route2provider,3'] = 'Route rules does not allow the red zone to be set as Source.';
+$L['valid_platform,fwrule-modify,fwrule-route2provider,4'] = 'Route rules allow only the following Destination types: zone, host, ip range, cidr, red.';
