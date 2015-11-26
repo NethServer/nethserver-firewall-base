@@ -84,13 +84,15 @@ $view->includeCss('
 .fwrule {min-height: 50px; border:1px solid #d3d3d3; display: flex; margin-bottom: .5em; border-radius: 3px;}
 .fwrule .Buttonset {flex-grow: 0; margin-right: 0}
 .fwrule .Buttonset [role=button] {border-top: none}
-.fwrule .actbox {padding: 3px; min-width: 6em; text-transform: uppercase; cursor: move; font-size: 140%; font-weight: bold}
-.fwrule .log { font-size: 80%; font-weight: normal }
-.fwrule .idbox {padding: 3px; cursor: move; color: gray; min-width: 4ex; padding-left: 16px; font-size: 0.8em}
-.fwrule .fields {margin-bottom: 3px; font-size: 140%}
+.fwrule .actbox {padding: 3px; min-width: 5.5em; text-transform: uppercase; cursor: move; font-size: 1.4em; font-weight: bold}
+.fwrule .log { font-size: 0.8em; font-weight: normal }
+.fwrule .idbox {padding: 3px; cursor: move; color: gray; min-width: 4ex; font-size: 0.8em}
+.fwrule .fields {margin-bottom: 5px; font-size: 1.4em}
+.fields .src { display: inline-block; min-width: 10em }
 .fields .caret { padding: 0 1ex }
 .fields .service { padding-left: 1ex }
-.fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px 3px 3px 1ex}
+.fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px 3px 3px 1ex; position: relative }
+.fwrule .Description { bottom: 3px; position: absolute }
 .fwrule.disabled, {color: gray !important; }
 .fwrule.disabled .actbox, .fwrule.disabled .idbox, .fwrule.disabled .fields, .fwrule.disabled .green, .fwrule.disabled .red, .fwrule.disabled .orange, .fwrule.disabled .blue {color: gray !important}
 .fwrule.disabled .actbox, .fwrule.disabled .idbox {background-color: #eee}
