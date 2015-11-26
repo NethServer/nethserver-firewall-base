@@ -677,6 +677,7 @@ sub countReferences($$)
     my $key = shift;
 
     my $typeMap = {
+	'provider' => 'provider',
 	'host-group' => 'host-group',
 	'host' => 'host',
 	'remote' => 'host',
@@ -721,7 +722,7 @@ sub countReferences($$)
     push(@fwrules, @bypass);
 
     foreach my $rule (@fwrules) {
-	my @props = qw(Src Dst DstHost Host Service);
+	my @props = qw(Src Dst DstHost Host Service Action);
 
 	my $target = $type . ';' . $key;
 

@@ -27,3 +27,4 @@ $L['PingInterval_label'] = 'Ping interval in seconds (1-60)';
 $L['NotifyWan_label'] = 'Send mail notification on provider status change'; 
 $L['NotifyWanFrom_label'] = 'From';
 $L['NotifyWanTo_label'] = 'To';
+$L['valid_platform,fwobject-provider-delete,fwobject-referenced,3'] = 'Could not delete ${2}. The provider is used by firewall rules.';

@@ -69,8 +69,14 @@ class Modify extends \Nethgui\Controller\Table\Modify
         if( $this->getRequest()->isMutation() && ! $this->parameters['interface']) {
             $report->addValidationErrorMessage($this, 'interface', 'valid_no_red_interface');
         }
-        if( $this->getRequest()->isMutation() && $this->parameters['interface']) {
+        if( $this->getRequest()->isMutation() && $this->getIdentifier() === 'create') {
             $v = $this->createValidator()->platform('network-create');
+            if( ! $v->evaluate($this->getAdapter()->getKeyValue())) {
+                $report->addValidationError($this, 'interface', $v);
+            }
+        }
+        if($this->getIdentifier() === 'delete') {
+            $v = $this->createValidator()->platform('fwobject-provider-delete', 'networks');
             if( ! $v->evaluate($this->getAdapter()->getKeyValue())) {
                 $report->addValidationError($this, 'interface', $v);
             }

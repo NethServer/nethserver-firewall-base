@@ -45,20 +45,11 @@ class Providers extends \Nethgui\Controller\TableController
             'Actions',
         );
 
-        $parameterSchema = array(
-            array('name', Validate::USERNAME, \Nethgui\Controller\Table\Modify::KEY),
-            array('checkip', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
-            array('interface', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
-            array('weight', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
-            array('status', Validate::SERVICESTATUS, \Nethgui\Controller\Table\Modify::FIELD),
-            array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
-        );
-
         $this
             ->setTableAdapter($this->getPlatform()->getTableAdapter('networks', 'provider'))
             ->setColumns($columns)
             ->addRowAction(new \NethServer\Module\Providers\Modify('update'))
-            ->addRowAction(new \Nethgui\Controller\Table\Modify('delete', $parameterSchema, 'Nethgui\Template\Table\Delete')) // Standard DELETE template
+            ->addRowAction(new \NethServer\Module\Providers\Modify('delete'))
             ->addTableAction(new \NethServer\Module\Providers\Modify('create'))
             ->addTableAction(new \NethServer\Module\Providers\Configure())
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
