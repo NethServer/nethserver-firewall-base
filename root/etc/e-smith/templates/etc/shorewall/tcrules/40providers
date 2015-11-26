@@ -58,7 +58,8 @@
 
         # dst is a zone, host, ip address, ip range or CIDR
         my $dst_addr = '';
-        if ($dst eq 'any' || $dst eq 'role;red' ) { # map 'any' and red role to '-'
+        next if ($dst eq 'any'); # skip rules with destination set to 'any'
+        if ($dst eq 'role;red') { # map red role to '-'
             $dst_addr = '-';
         } else {
             next if ($src =~ /role;/); # skip all other roles
