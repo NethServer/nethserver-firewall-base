@@ -62,17 +62,16 @@
         if ($dst eq 'role;red') { # map red role to '-'
             $dst_addr = '-';
         } else {
-            next if ($src =~ /role;/); # skip all other roles
+            next if ($dst =~ /role;/); # skip all other roles
             $dst_addr = $fw->getAddress($dst, 1);
         }
 
         foreach (@src_addr) {
-            next if ($_ eq '-' && ($dst_addr eq '-' || $dst_addr eq '')); # skip rules where dst and src are empty
-
             my $comment = "\n#\n# FORCE traffic [$src_ori -> $dst_ori] to $provider_key \n#\n";
             my $lines = "?COMMENT $description\n";
             $lines .= $mask.":P\t".$_."\t".$dst_addr;
             if ($service eq 'any' || $service eq '') {
+                next if ($_ eq '-' && ($dst_addr eq '-' || $dst_addr eq '')); # skip rules where dst, src and service are empty
                 $OUT .= $comment.$lines."\n";
             } else {
                 my %ports = $fw->getPorts($service);
