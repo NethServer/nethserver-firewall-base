@@ -63,10 +63,13 @@ class CreateService extends \Nethgui\Controller\Collection\AbstractAction
         }
         $hint = $request->getParameter('q');
         if ($hint !== NULL) {
-            foreach (array('name', 'Protocol', 'Description', 'Ports') as $key) {
+            foreach (array('name', 'Protocol', 'Description') as $key) {
                 if ($this->getValidator($key)->evaluate($hint)) {
                     $this->parameters[$key] = $hint;
                 }
+            }
+            if (intval($hint) > 0) {
+                 $this->parameters['Ports'] = $hint;
             }
         }
     }
