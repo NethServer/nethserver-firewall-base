@@ -88,13 +88,4 @@ class Modify extends \Nethgui\Controller\Table\Modify
     }
 
 
-    public function nextPath()
-    {
-        // Workaround for LazyLoaderAdapter to reload table contents after mutation request
-        if($this->getRequest()->isMutation()) {
-            return '/FirewallObjects/Services/read';
-        }
-        return parent::nextPath();
-    }
-
 }
