@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 2.10.0
+Version: 2.10.1
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -49,6 +49,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 %doc COPYING
 
 %changelog
+* Thu Dec 03 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.10.1-1
+- Deny port forwarding the same port - Bug #3327 [NethServer]
+
 * Mon Nov 30 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.10.0-1
 - Error deleting firewall service object - Bug #3308 [NethServer]
 - Firewall: web interface for policy routing - Feature #2809 [NethServer]
