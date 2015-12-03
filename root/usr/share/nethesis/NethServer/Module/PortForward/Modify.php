@@ -134,6 +134,22 @@ class Modify extends \Nethgui\Controller\Table\Modify
             }
 
         }
+        if ($this->getRequest()->isMutation()) {
+            $duplicate = 0;
+            foreach ($this->getPlatform()->getDatabase('portforward')->getAll('pf') as $key => $props) {
+               # check duplicate id on create and update
+               if (isset($this->parameters['id']) && $this->parameters['id'] == $key) {
+                   continue;
+               }
+               if ($this->parameters['OriDst'] == $props['OriDst'] &&
+                   $this->parameters['Src'] == $props['Src']) {
+                   $duplicate = 1;
+               } 
+            }
+            if ($duplicate) {
+                $report->addValidationErrorMessage($this, 'Src', 'duplicate_pfw');
+            }
+        }
         parent::validate($report);
     }
 
