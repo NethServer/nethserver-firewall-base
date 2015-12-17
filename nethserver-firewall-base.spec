@@ -17,7 +17,6 @@ Obsoletes: nethserver-shorewall
 Provides: nethserver-firewall
 
 BuildRequires: nethserver-devtools
-AutoReq: no
 
 %package ui
 Summary: Web Interface for firewall configuration
