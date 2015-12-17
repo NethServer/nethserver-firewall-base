@@ -48,6 +48,8 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 %files -f %{name}-%{version}-%{release}-filelist-core
 %defattr(-,root,root)
 %doc COPYING
+%dir %{_nseventsdir}/%{name}-update
+
 
 %changelog
 * Thu Dec 03 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.10.1-1
