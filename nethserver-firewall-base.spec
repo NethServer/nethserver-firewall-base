@@ -4,9 +4,10 @@ Version: 2.10.1
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
-
+URL: %{url_prefix}/%{name}
 BuildArch: noarch
-Requires: nethserver-base > 2.5.2-1
+
+Requires: nethserver-base
 Requires: nethserver-lsm
 Requires: shorewall >= 4.6
 Requires: ipset
@@ -38,9 +39,9 @@ mkdir -p root%{perl_vendorlib}
 mv -v NethServer root%{perl_vendorlib}
 
 %install
-rm -rf $RPM_BUILD_ROOT
-(cd root ; find . -depth -print | cpio -dump $RPM_BUILD_ROOT)
-%{genfilelist} $RPM_BUILD_ROOT > %{name}-%{version}-%{release}-filelist
+rm -rf %{buildroot}
+(cd root ; find . -depth -print | cpio -dump %{buildroot})
+%{genfilelist} %{buildroot} > %{name}-%{version}-%{release}-filelist
 grep -e php$ -e rst$ -e html$ %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-ui
 grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-core
 
