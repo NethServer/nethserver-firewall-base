@@ -1,9 +1,0 @@
-{
-    use esmith::ConfigDB;
-
-    my $db = esmith::ConfigDB->open();
-    $db->set_prop('shorewall', 'status', 'enabled');
-
-    $db->get_prop_and_delete('firewall','event');
-    '';
-}
