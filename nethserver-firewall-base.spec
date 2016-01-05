@@ -37,6 +37,11 @@ perl createlinks
 mkdir -p root%{perl_vendorlib}
 mv -v NethServer root%{perl_vendorlib}
 
+for _nsdb in fwservices portforward tc; do
+   mkdir -p root/%{_nsdbconfdir}/${_nsdb}/{migrate,force,defaults}
+done 
+
+
 %install
 rm -rf %{buildroot}
 (cd root ; find . -depth -print | cpio -dump %{buildroot})
@@ -48,6 +53,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 %defattr(-,root,root)
 %doc COPYING
 %dir %{_nseventsdir}/%{name}-update
+%dir %{_nsdbconfdir}/fwservices
+%dir %{_nsdbconfdir}/portforward
+%dir %{_nsdbconfdir}/tc
 
 
 %changelog
