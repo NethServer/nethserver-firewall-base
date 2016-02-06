@@ -35,7 +35,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     public function initialize()
     {
-        $interfaces = iterator_to_array($this->getPlatform()->getTableAdapter('networks', array('ethernet', 'xdsl')));
+        $interfaces = iterator_to_array($this->getPlatform()->getTableAdapter('networks', array('ethernet', 'xdsl', 'vlan')));
         $parameterSchema = array(
             array('device', $this->createValidator()->memberOf(array_keys($interfaces)), \Nethgui\Controller\Table\Modify::KEY),
             array('In', Validate::POSITIVE_INTEGER, \Nethgui\Controller\Table\Modify::FIELD),
@@ -61,7 +61,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $view->setTemplate($templates[$this->getIdentifier()]);
         
         if ($this->getIdentifier() == 'create') {
-            $interfaces = iterator_to_array($this->getPlatform()->getTableAdapter('networks', array('ethernet', 'xdsl')));
+            $interfaces = iterator_to_array($this->getPlatform()->getTableAdapter('networks', array('ethernet', 'xdsl', 'vlan')));
             $configured = $this->getPlatform()->getDatabase('tc')->getAll('device');
             $tmp = array();
             foreach($interfaces as $interface => $props) {
@@ -69,6 +69,9 @@ class Modify extends \Nethgui\Controller\Table\Modify
                     # add only not configured interface with role red (for now)
                     if (isset($props['role']) && strpos($props['role'],'red') !== false ) { 
                         $tmp[] = array($interface,$interface);
+                    }
+                    elseif (isset($props['role']) && strpos($props['role'],'blue') !== false ){
+                     $tmp[] = array($interface,$interface);
                     }
                 }
             }
