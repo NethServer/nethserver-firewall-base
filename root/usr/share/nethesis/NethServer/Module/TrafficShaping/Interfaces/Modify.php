@@ -61,13 +61,16 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $view->setTemplate($templates[$this->getIdentifier()]);
         
         if ($this->getIdentifier() == 'create') {
-            $interfaces = iterator_to_array($this->getPlatform()->getTableAdapter('networks', array('ethernet', 'xdsl')));
+            $interfaces = iterator_to_array($this->getPlatform()->getTableAdapter('networks', array('ethernet', 'xdsl', 'vlan')));
             $configured = $this->getPlatform()->getDatabase('tc')->getAll('device');
             $tmp = array();
             foreach($interfaces as $interface => $props) {
                 if (!in_array($interface, array_keys($configured))) {
                     # add only not configured interface with role red (for now)
                     if (isset($props['role']) && strpos($props['role'],'red') !== false ) { 
+                        $tmp[] = array($interface,$interface);
+                    }
+                    elseif (isset($props['role']) && strpos($props['role'],'blue') !== false ){
                         $tmp[] = array($interface,$interface);
                     }
                 }
