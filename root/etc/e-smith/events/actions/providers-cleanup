@@ -24,7 +24,10 @@ package NethServer::Firewall;
 use strict;
 use esmith::ConfigDB;
 use esmith::NetworksDB;
+use NethServer::Firewall;
 my $ndb = esmith::NetworksDB->open();
+my $cdb = esmith::ConfigDB->open();
+my $fw = new NethServer::Firewall();
 my %reds;
 
 foreach ($ndb->red()) {
@@ -35,6 +38,14 @@ foreach ($ndb->red()) {
 foreach my $provider ( $ndb->get_all_by_prop('type' => 'provider') ) {
     my $i = $provider->prop('interface') || '';
     if ($i eq '' || !exists($reds{$i})) {
-        $provider->delete;    
+        $provider->set_prop('status','disabled'); 
     }
+}
+
+my @providers = $fw->getProviders();
+
+if (scalar(@providers) >= 2) {
+    $cdb->set_prop('lsm','status','enabled');
+} else {
+    $cdb->set_prop('lsm','status','disabled');
 }
