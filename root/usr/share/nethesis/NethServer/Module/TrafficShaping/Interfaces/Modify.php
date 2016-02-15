@@ -61,7 +61,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $view->setTemplate($templates[$this->getIdentifier()]);
         
         if ($this->getIdentifier() == 'create') {
-            $interfaces = iterator_to_array($this->getPlatform()->getTableAdapter('networks', array('ethernet', 'xdsl')));
+            $interfaces = iterator_to_array($this->getPlatform()->getTableAdapter('networks', array('ethernet', 'xdsl', 'vlan')));
             $configured = $this->getPlatform()->getDatabase('tc')->getAll('device');
             $tmp = array();
             foreach($interfaces as $interface => $props) {
