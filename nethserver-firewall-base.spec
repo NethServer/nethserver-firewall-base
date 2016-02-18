@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 2.10.1
+Version: 2.10.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Thu Feb 18 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.10.2-1
+- Cannot use main as provider name - Bug #3346 [NethServer]
+
 * Thu Dec 03 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.10.1-1
 - Deny port forwarding the same port - Bug #3327 [NethServer]
 
