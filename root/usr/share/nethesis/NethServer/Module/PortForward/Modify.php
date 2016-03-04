@@ -73,12 +73,12 @@ class Modify extends \Nethgui\Controller\Table\Modify
     {
         $portRangeValidator = $this->createValidator()
             ->orValidator(
-                $this->createValidator()->integer()->greatThan(0)->lessThan(65535),
+                $this->createValidator(Validate::PORTNUMBER),
                 $this->createValidator()->regexp('/^[0-9]+\:[0-9]+$/') #port range, no check on maximum value
             );
         $dstValidator = $this->createValidator()
             ->orValidator(
-                $this->createValidator()->integer()->greatThan(0)->lessThan(65535),
+                $this->createValidator(Validate::PORTNUMBER),
                 $this->createValidator()->isEmpty()
             );
 

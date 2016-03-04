@@ -41,7 +41,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             $groupNameValidator = FALSE;
         }
 
-        $membersValidator = $this->createValidator()->notEmpty()->collectionValidator($this->createValidator(Validate::USERNAME));
+        $membersValidator = $this->createValidator()->notEmpty()->collectionValidator($this->createValidator(Validate::HOSTNAME));
 
         $parameterSchema = array(
             array('name', $groupNameValidator, Table::KEY),
