@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 2.10.2
+Version: 2.10.3
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -49,6 +49,10 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 %doc COPYING
 
 %changelog
+* Fri Mar 04 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.10.3-1
+- Capitalized dhcp hostname can't be added to host groups - Bug #3342 [NethServer]
+- Invalid TCP port range - Bug #3333 [NethServer]
+
 * Thu Feb 18 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.10.2-1
 - Cannot use main as provider name - Bug #3346 [NethServer]
 
