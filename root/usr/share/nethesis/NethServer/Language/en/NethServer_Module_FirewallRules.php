@@ -61,6 +61,7 @@ $L['Cidr_create'] = 'Create CIDR network "${0}"';
 
 $L['A_new_rule_label'] = "New rule";
 $L['Any_label'] = 'Any';
+$L['Fw_label'] = 'Firewall';
 $L['NoRulesDefined_label'] = 'No rules are defined. Create the first one now!';
 
 $L['any_service_label'] = 'any service';
@@ -75,6 +76,7 @@ $L['role_label'] = 'interface';
 $L['confirm_reload_label'] = 'No change has been applied.';
 
 $L['FirewallObject_any_Title'] = 'Any';
+$L['FirewallObject_fw_Title'] = 'Firewall';
 $L['FirewallObject_host_Title'] = 'Host ${key}';
 $L['FirewallObject_local_Title'] = 'LAN host ${key}';
 $L['FirewallObject_remote_Title'] = 'Host ${key}';
@@ -82,6 +84,7 @@ $L['FirewallObject_role_Title'] = 'Role ${key}';
 $L['FirewallObject_zone_Title'] = 'Zone ${key}';
 $L['FirewallObject_host-group_Title'] = 'Host group ${key}';
 $L['FirewallObject_fwservice_Title'] = 'Service ${key}';
+$L['FirewallObject_service_Title'] = 'Local service ${key}';
 $L['FirewallObject_iprange_Title'] = 'IP range ${key}';
 $L['FirewallObject_cidr_Title'] = 'CIDR network ${key}';
 
