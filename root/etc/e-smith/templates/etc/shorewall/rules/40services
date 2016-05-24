@@ -1,8 +1,45 @@
 {
+    # support for old access property
+    sub accessToZones
+    {
+        my $access = shift;
+        my @zones;
+        if ($access eq 'none') {
+           return @zones;
+        } elsif ($access eq 'private') {
+            push(@zones, 'green');
+        } elsif ($access eq 'public') {
+            push(@zones, 'green');
+            push(@zones, 'red');
+        } else {
+            @zones = split(',',$access);
+        }
+
+        return @zones;
+    }
+
+    sub acceptRules
+    {
+        my $name = shift;
+        my $type = shift;
+        my $port = shift;
+        my $zones = shift;
+        $OUT.="?COMMENT $name \n";
+        foreach (@$zones) {
+            $_ =~ s/green/loc/;
+            $_ =~ s/red/net/;
+            $_ = substr($_, 0, 5);
+            if ($fw->isZone($_)) {
+                $OUT.="ACCEPT\t$_\t\$FW\t$type\t$port\n";
+            }
+        }
+
+    }
+
     use NethServer::Service;
     use NethServer::Firewall;
     use esmith::ConfigDB;
-    my $fw = NethServer::Firewall->new();
+    our $fw = NethServer::Firewall->new();
     my $confDb = esmith::ConfigDB->open();
     my $accept = 'ACCEPT';
     my $nfqueue = $firewall{'nfqueue'} || 'disabled';
@@ -17,10 +54,11 @@
     }
 
     foreach my $serviceRecord ($confDb->get_all_by_prop('type' => 'service')) {
-        my $access = $serviceRecord->prop('access') || 'private';
+        my $access = $serviceRecord->prop('access') || 'green';
+        my @zones = accessToZones($access);
         my $tcpPorts = $serviceRecord->prop('TCPPorts') || $serviceRecord->prop('TCPPort') || '';
         my $udpPorts = $serviceRecord->prop('UDPPorts') || $serviceRecord->prop('UDPPort') || '';
-        if ($access eq 'none') {
+        if (! @zones) {
             $OUT.="#\n#\tService: ".$serviceRecord->key." Access: NONE\n#\n";
             next;
         }
@@ -45,11 +83,7 @@
                     $OUT.="?COMMENT allow ".$serviceRecord->key." access from $host\n"; 
                     $OUT.="$accept\t".$fw->getZone($host)."\t\$FW\ttcp\t$port\n";
                 }
-                $OUT.="?COMMENT ".$serviceRecord->key."\n"; 
-                $OUT.="ACCEPT\tloc\t\$FW\ttcp\t$port\n";
-                if ($access eq 'public') {
-                    $OUT.="$accept\tnet\t\$FW\ttcp\t$port\n";
-                }
+                acceptRules($serviceRecord->key, 'tcp', $port, \@zones);
             }
             foreach my $port (split(',', $udpPorts)) {
                 my $allow = $serviceRecord->prop('AllowHosts') || '';
@@ -67,10 +101,7 @@
                     $OUT.="?COMMENT allow ".$serviceRecord->key." access from $host\n"; 
                     $OUT.="$accept\t".$fw->getZone($host)."\t\$FW\tudp\t$port\n";
                 }
-                $OUT.="ACCEPT\tloc\t\$FW\tudp\t$port\n";
-                if ($access eq 'public') {
-                    $OUT.="$accept\tnet\t\$FW\tudp\t$port\n";
-                }
+                acceptRules($serviceRecord->key, 'udp', $port, \@zones);
             }
         }
     }
