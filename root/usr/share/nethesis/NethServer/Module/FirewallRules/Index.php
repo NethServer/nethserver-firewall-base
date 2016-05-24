@@ -92,7 +92,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
                 return $view->translate("any_service_label");
             }
         }
-        return str_replace("fwservice;", "", $ep);
+        return preg_replace('/^(fw)?service;/', "", $ep);
     }
 
     private function resolveName($ep,$view)
@@ -100,6 +100,8 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         $tmp = explode(';', $ep);
         if ($ep == 'any') {
             return $view->translate("all_label");
+        } elseif ($ep === 'fw') {
+            return $view->translate("fw_label");
         }
         return isset($tmp[1])?$tmp[1]:$ep;
     }
@@ -115,6 +117,8 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             'iprange' => 'fa-cubes',
             'cidr' => 'fa-cubes',
             'fwservice' => 'fa-gear',
+            'service' => 'fa-circle-thin',
+            'fw' => 'fa-fire',
         );
         $tmp = explode(';', $v);
         if ( isset($objectIcons[$tmp[0]]) ) {
