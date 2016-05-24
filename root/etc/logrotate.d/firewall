@@ -1,4 +1,5 @@
 /var/log/firewall.log {
     copytruncate
     compress
+    missingok
 }
