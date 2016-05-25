@@ -23,69 +23,66 @@ namespace NethServer\Module;
 use Nethgui\System\PlatformInterface as Validate;
 
 /**
- * Implement gui module for providers configuration
+ * Change WanMode
+ *
+ * @author Giacomo Sanchietti<giacomo.sanchietti@nethesis.it>
  */
-class Providers extends \Nethgui\Controller\TableController
+class Providers extends \Nethgui\Controller\AbstractController
 {
-    private $interfaces;
+
+    private $modes = array('balance','backup');
 
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
     {
-        return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Gateway', 80);
+          return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Gateway', 80);
     }
 
 
     public function initialize()
     {
-        $columns = array(
-            'Key',
-            'interface',
-            'weight',
-            'Description',
-            'Actions',
-        );
-
-        $this
-            ->setTableAdapter($this->getPlatform()->getTableAdapter('networks', 'provider'))
-            ->setColumns($columns)
-            ->addRowAction(new \NethServer\Module\Providers\Modify('update'))
-            ->addRowAction(new \NethServer\Module\Providers\Modify('delete'))
-            ->addTableAction(new \NethServer\Module\Providers\Modify('create'))
-            ->addTableAction(new \NethServer\Module\Providers\Configure())
-            ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
-        ;
-
         parent::initialize();
+        $mv = $this->createValidator()->orValidator($this->createValidator(Validate::EMAIL), $this->createValidator(Validate::EMPTYSTRING));
+        $mnplv = $this->createValidator()->integer()->greatThan(2)->lessThan(99);
+        $mpplv = $this->createValidator()->integer()->greatThan(0)->lessThan(100);
+        $piv = $this->createValidator()->integer()->greatThan(0)->lessThan(60);
+        $this->declareParameter('WanMode', $this->createValidator()->memberOf($this->modes), array('configuration', 'firewall','WanMode'));
+        $this->declareParameter('CheckIP', Validate::ANYTHING, array('configuration', 'firewall','CheckIP'));
+        $this->declareParameter('NotifyWan', Validate::SERVICESTATUS, array('configuration', 'firewall','NotifyWan'));
+        $this->declareParameter('NotifyWanFrom', $mv, array('configuration', 'firewall','NotifyWanFrom'));
+        $this->declareParameter('NotifyWanTo', $mv, array('configuration', 'firewall','NotifyWanTo'));
+        $this->declareParameter('MaxNumberPacketLoss', $mnplv, array('configuration', 'firewall','MaxNumberPacketLoss'));
+        $this->declareParameter('MaxPercentPacketLoss', $mpplv, array('configuration', 'firewall','MaxPercentPacketLoss'));
+        $this->declareParameter('PingInterval', $piv, array('configuration', 'firewall','PingInterval'));
     }
 
-    private function readInterfaces() {
-        $ret = array();
-        $types = array('bridge', 'bond', 'vlan', 'ethernet', 'xdsl');
-        $interfaces = $this->getPlatform()->getDatabase('networks')->getAll();
-        foreach ($interfaces as $key => $props) {
-           if (in_array($props['type'], $types) && isset($props['role']) && stripos($props['role'],'red') !== false) {
-               $ret[] = $key;
-           }
-        }
-        return $ret;
-    }
-
-    public function prepareViewForColumnKey(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
     {
-        if (!$this->interfaces) {
-            $this->interfaces = $this->readInterfaces();
+        parent::validate($report);
+        if( $this->getRequest()->isMutation() ) {
+            $ipv =  $this->createValidator(Validate::IPv4);
+            foreach (explode(',',$this->parameters['CheckIP']) as $ip) {
+                if (!$ipv->evaluate($ip)) {
+                   $report->addValidationError($this, 'CheckIP', $ipv);
+                }
+            }
         }
-        if (!isset($values['status']) || ($values['status'] == 'disabled') || (!in_array($values['interface'],$this->interfaces)) ) {
-            $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-locked');
-        }
-
-        return strval($key);
     }
 
 
-    public function onParametersSaved(\Nethgui\Module\ModuleInterface $currentAction, $changes, $parameters)
+    protected function onParametersSaved($changes)
     {
         $this->getPlatform()->signalEvent('firewall-adjust');
     }
 
+    public function prepareView(\Nethgui\View\ViewInterface $view) 
+    {
+        parent::prepareView($view);
+
+        $view['WanMode'] = $this->getPlatform()->getDatabase('configuration')->getProp('firewall','WanMode');
+        $view['WanModeDatasource'] = array_map(function($fmt) use ($view) {
+                                return array($fmt, $view->translate($fmt . '_label'));
+        }, $this->modes);
+    }
+
 }
+
