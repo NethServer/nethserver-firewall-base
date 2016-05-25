@@ -22,6 +22,7 @@ $L['accept_label'] = 'Allow trafic';
 $L['Edit_header'] = 'Edit rule #${0}';
 $L['status_label'] = 'Enabled';
 $L['Action_label'] = 'Action';
+$L['Rule_label'] = 'Rule';
 $L['ActionReject_label'] = 'Reject';
 $L['ActionAccept_label'] = 'Accept';
 $L['ActionDrop_label'] = 'Drop';
@@ -61,11 +62,13 @@ $L['Cidr_create'] = 'Create CIDR network "${0}"';
 
 $L['A_new_rule_label'] = "New rule";
 $L['Any_label'] = 'Any';
+$L['Fw_label'] = 'Firewall';
 $L['NoRulesDefined_label'] = 'No rules are defined. Create the first one now!';
 
 $L['any_service_label'] = 'any service';
 $L['any_src_dst_label'] = 'any host';
 $L['all_label'] = 'any';
+$L['fw_label'] = 'firewall';
 $L['host_label'] = 'host';
 $L['zone_label'] = 'zone';
 $L['iprange_label'] = 'IP range';
@@ -75,6 +78,7 @@ $L['role_label'] = 'interface';
 $L['confirm_reload_label'] = 'No change has been applied.';
 
 $L['FirewallObject_any_Title'] = 'Any';
+$L['FirewallObject_fw_Title'] = 'Firewall';
 $L['FirewallObject_host_Title'] = 'Host ${key}';
 $L['FirewallObject_local_Title'] = 'LAN host ${key}';
 $L['FirewallObject_remote_Title'] = 'Host ${key}';
@@ -82,6 +86,7 @@ $L['FirewallObject_role_Title'] = 'Role ${key}';
 $L['FirewallObject_zone_Title'] = 'Zone ${key}';
 $L['FirewallObject_host-group_Title'] = 'Host group ${key}';
 $L['FirewallObject_fwservice_Title'] = 'Service ${key}';
+$L['FirewallObject_service_Title'] = 'Local service ${key}';
 $L['FirewallObject_iprange_Title'] = 'IP range ${key}';
 $L['FirewallObject_cidr_Title'] = 'CIDR network ${key}';
 
@@ -97,3 +102,4 @@ $L['ShowRoutes_label'] = 'Policy routing';
 
 $L['valid_platform,fwrule-modify,fwrule-route2provider,3'] = 'Route rules do not allow the red zone to be set as Source.';
 $L['valid_platform,fwrule-modify,fwrule-route2provider,4'] = 'Route rules allow only the following Destination types: zone, host, ip range, cidr, red.';
+$L['valid_platform,fwrule-modify,fwrule-localservice,3'] = 'Selecting "local service" requires the "firewall" destination.';

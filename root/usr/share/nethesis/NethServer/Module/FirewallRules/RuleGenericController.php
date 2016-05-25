@@ -74,7 +74,7 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
                 && $this->getRequest()->hasParameter('Submit')) {
             $v = $this->createValidator()->platform('fwrule-modify', $this->getIdentifier());
             if( ! $v->evaluate(json_encode($this->parameters->getArrayCopy()))) {
-                $report->addValidationError($this, 'Action', $v);
+                $report->addValidationError($this, 'Rule', $v);
             }
         }
     }
