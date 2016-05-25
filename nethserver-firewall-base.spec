@@ -52,6 +52,7 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 %files -f %{name}-%{version}-%{release}-filelist-core
 %defattr(-,root,root)
 %doc COPYING
+%doc README.rst
 %dir %{_nseventsdir}/%{name}-update
 %dir %{_nsdbconfdir}/fwservices
 %dir %{_nsdbconfdir}/portforward

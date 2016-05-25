@@ -1,0 +1,28 @@
+{
+
+    sub accessToZones
+    {
+        my $access = shift;
+        my @zones;
+        if ($access eq 'private') {
+            push(@zones, 'green');
+        } elsif ($access eq 'public') {
+            push(@zones, 'green');
+            push(@zones, 'red');
+        }
+
+        return @zones;
+    }
+
+    use esmith::ConfigDB;
+    my $db = esmith::ConfigDB->open();
+    foreach ($db->get_all_by_prop('type' => 'service')) {
+         my $access = $_->prop('access') || next;
+         if ($access eq 'private' || $access eq 'public' || $access eq 'none') {
+             my @zones = accessToZones($access);
+             $_->set_prop('access',join(',',@zones));          
+         }
+    }
+
+    '';
+}
