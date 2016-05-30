@@ -7,16 +7,14 @@ my $ndb = esmith::NetworksDB->open_ro();
 my %providers;
 
 foreach my $p ($ndb->get_all_by_prop('type' => 'provider')) {
-    my $status = $p->prop('status') || 'disabled';
     my $interface =  $p->prop('interface') || next;
     my $isusable = ''; 
 
-    if ($status eq 'enabled') {
-        open(FILE, "/var/lib/shorewall/$interface.status") or die "Can't read file 'filename' [$!]\n";  
-        $isusable = <FILE>; 
-        close (FILE);
-        chomp $isusable;
-    }
+    open(FILE, "/var/lib/shorewall/$interface.status") or die "Can't read file 'filename' [$!]\n";
+    $isusable = <FILE>;
+    close (FILE);
+    chomp $isusable;
+
     $providers{$p->key} = $isusable;
 }
 

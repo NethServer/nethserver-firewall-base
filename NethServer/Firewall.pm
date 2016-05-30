@@ -478,8 +478,6 @@ sub getProviders
         $reds{$_->key} = '';
     }
     foreach my $provider ( @list ) {
-        my $status = $provider->prop('status') || 'disabled';
-        next if ($status eq 'disabled');
         my $name = $provider->key;
         my $interface_name = $provider->prop('interface') || next;
         # skip providers associated to non-existing red interfaces
