@@ -1,3 +1,14 @@
+lease=''
 if [ -f /var/lib/dhclient/dhclient-$\{1\}.leases ]; then
-    grep 'option routers' /var/lib/dhclient/dhclient-$\{1\}.leases | tail -n 1 | while read j1 j2 gateway; do echo $gateway | sed 's/;//'; return 0; done
+    lease=/var/lib/dhclient/dhclient-$\{1\}.leases
+fi
+if [ -f /var/lib/dhclient/dhclient--$\{1\}.lease ]; then
+    lease=/var/lib/dhclient/dhclient--$\{1\}.lease
+fi
+if [ "x$lease" == "x" ]; then
+    exit 0
+fi
+
+if [ -f $lease ]; then
+    grep 'option routers' $lease | tail -n 1 | while read j1 j2 gateway; do echo $gateway | sed 's/;//'; return 0; done
 fi

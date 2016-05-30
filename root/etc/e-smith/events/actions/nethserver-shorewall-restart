@@ -32,6 +32,11 @@ if( ! $shs->is_configured() ) {
     exit(0);
 }
 
+# Fix for Shorewall 5
+if ( -f '/etc/shorewall/tcrules' ) {
+    unlink '/etc/shorewall/tcrules';
+}
+
 my $tracker = NethServer::TrackerClient->new();
 my $taskId = $tracker->declare_task('Configuring shorewall');
 

@@ -38,7 +38,7 @@ foreach ($ndb->red()) {
 foreach my $provider ( $ndb->get_all_by_prop('type' => 'provider') ) {
     my $i = $provider->prop('interface') || '';
     if ($i eq '' || !exists($reds{$i})) {
-        $provider->set_prop('status','disabled'); 
+        $provider->delete();
     }
 }
 
