@@ -23,15 +23,12 @@
     }
 
     foreach my $rule ( $fw->getTcRules() ) {
-        my $status = $rule->prop("status") || "disabled";
-        next unless ($status eq 'enabled');
         my $src = $rule->prop("Src") || next;
         my $dst = $rule->prop("Dst") || next;
         my $src_ori = $src;
         my $dst_ori = $dst;
         my $provider = $rule->prop("Action") || next;
         my $service = $rule->prop("Service") || '';
-        my $description = $rule->prop('Description') || '';
 
         # retrieve provider object
         my ($type, $provider_key) = split(';', $provider);
@@ -68,7 +65,7 @@
 
         foreach (@src_addr) {
             my $comment = "\n#\n# FORCE traffic [$src_ori -> $dst_ori] to $provider_key \n#\n";
-            my $lines = "?COMMENT $description\n";
+            my $lines = "?COMMENT $provider_key\n";
             $lines .= $mask.":P\t".$_."\t".$dst_addr;
             if ($service eq 'any' || $service eq '') {
                 next if ($_ eq '-' && ($dst_addr eq '-' || $dst_addr eq '')); # skip rules where dst, src and service are empty
