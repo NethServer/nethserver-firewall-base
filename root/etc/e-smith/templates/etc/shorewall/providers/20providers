@@ -21,7 +21,7 @@
         next if (!$interface);
         my $gateway = $interface->prop('gateway') || 'detect';
         my $mask = $p->{'mask'};
-        $OUT .= "$name\t$number\t$mask\t-\t$interface_name\t$gateway\ttrack,balance=$weight\t-\n";
+        $OUT .= "$name\t$number\t$mask\t-\t$interface_name\t$gateway\ttrack,balance=$weight,persistent\t-\n";
     }
 
 }
