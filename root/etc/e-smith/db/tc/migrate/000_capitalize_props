@@ -8,7 +8,7 @@
 
     use esmith::ConfigDB;
 
-    my $db = esmith::ConfigDB->open('tc');
+    my $db = esmith::ConfigDB->open('tc') || return '';
 
     my %propMap = (
         'priority' => 'Priority',

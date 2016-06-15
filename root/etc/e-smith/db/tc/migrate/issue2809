@@ -6,8 +6,8 @@
 
     use esmith::ConfigDB;
 
-    my $tcdb = esmith::ConfigDB->open('tc');
-    my $fwdb = esmith::ConfigDB->open('fwrules');
+    my $tcdb = esmith::ConfigDB->open('tc') || return '';
+    my $fwdb = esmith::ConfigDB->open('fwrules') || return '';
     my $pos = 0;
     my $id = 0;
     foreach my $rule ($fwdb->get_all_by_prop('type' => 'rule')) {

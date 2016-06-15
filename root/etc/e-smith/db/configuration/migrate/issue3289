@@ -1,7 +1,7 @@
 {
     use esmith::NetworksDB;
 
-    my $db = esmith::NetworksDB->open();
+    my $db = esmith::NetworksDB->open() || return '';
     foreach ( $db->get_all_by_prop('type' => 'provider') ) {
         $_->delete_prop('checkip');
     }
