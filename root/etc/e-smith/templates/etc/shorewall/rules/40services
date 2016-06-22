@@ -26,8 +26,8 @@
         my $zones = shift;
         $OUT.="?COMMENT $name \n";
         foreach (@$zones) {
-            $_ =~ s/green/loc/;
-            $_ =~ s/red/net/;
+            $_ =~ s/^green$/loc/;
+            $_ =~ s/^red$/net/;
             $_ = substr($_, 0, 5);
             if ($fw->isZone($_)) {
                 $OUT.="ACCEPT\t$_\t\$FW\t$type\t$port\n";
@@ -68,39 +68,9 @@
             }
             $OUT.="#\n#\tService: ".$serviceRecord->key." Access: $access\n#\n"; 
             foreach my $port (split(',', $tcpPorts)) {
-                my $allow = $serviceRecord->prop('AllowHosts') || '';
-                my $deny = $serviceRecord->prop('DenyHosts') || '';
-                $port =~ s/\-/:/g;
-                # Always deny from hosts listed in DenyHosts
-                foreach my $host (split(/,/,$deny)) {
-                    my $addr = $fw->getAddress($host);
-                    $OUT.="?COMMENT deny ".$serviceRecord->key." access from $host\n"; 
-                    $OUT.="REJECT\t".$fw->getZone($host)."\t\$FW\ttcp\t$port\n";
-                }
-                # Always accept from hosts listed in AllowHosts
-                foreach my $host (split(/,/,$allow)) {
-                    my $addr = $fw->getAddress($host);
-                    $OUT.="?COMMENT allow ".$serviceRecord->key." access from $host\n"; 
-                    $OUT.="$accept\t".$fw->getZone($host)."\t\$FW\ttcp\t$port\n";
-                }
                 acceptRules($serviceRecord->key, 'tcp', $port, \@zones);
             }
             foreach my $port (split(',', $udpPorts)) {
-                my $allow = $serviceRecord->prop('AllowHosts') || '';
-                my $deny = $serviceRecord->prop('DenyHosts') || '';
-                $port =~ s/\-/:/g;
-                # Always deny from hosts listed in DenyHosts
-                foreach my $host (split(/,/,$deny)) {
-                    my $addr = $fw->getAddress($host);
-                    $OUT.="?COMMENT deny ".$serviceRecord->key." access from $host\n"; 
-                    $OUT.="REJECT\t".$fw->getZone($host)."\t\$FW\tudp\t$port\n";
-                }
-                # Always accept from hosts listed in AllowHosts
-                foreach my $host (split(/,/,$allow)) {
-                    my $addr = $fw->getAddress($host);
-                    $OUT.="?COMMENT allow ".$serviceRecord->key." access from $host\n"; 
-                    $OUT.="$accept\t".$fw->getZone($host)."\t\$FW\tudp\t$port\n";
-                }
                 acceptRules($serviceRecord->key, 'udp', $port, \@zones);
             }
         }
