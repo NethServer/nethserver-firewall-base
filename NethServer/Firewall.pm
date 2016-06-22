@@ -313,8 +313,9 @@ sub getPorts($)
     
     if ( $id =~ m/;/ ) { # lookup is needed
         my ($db, $key) = split(';', $id);
+        my $service = undef;
         if ( $db eq 'fwservice' ) {
-            my $service = $self->{'sdb'}->get($key);
+            $service = $self->{'sdb'}->get($key);
             return %ports unless defined($service);
             if ($service->prop('Protocol') eq 'tcpudp') {
                 ($ports{'tcp'} = $service->prop('Ports')) =~ s/-/:/; # convert port range syntax
@@ -324,6 +325,15 @@ sub getPorts($)
             } else { # icmp
                 $ports{$service->prop('Protocol')} = $service->prop('Ports');
             }
+        }
+        if ( $db eq 'service' ) {
+            $service = $self->{'cdb'}->get($key);
+            return %ports unless defined($service);
+            my @tcp =  $service->prop('TCPPort');
+            $ports{'tcp'} =  $service->prop('TCPPorts') || $service->prop('TCPPort') || '';
+            $ports{'udp'} =  $service->prop('UDPPorts') || $service->prop('UDPPort') || '';
+            delete $ports{'tcp'} if ($ports{'tcp'} eq '');
+            delete $ports{'udp'} if ($ports{'udp'} eq '');
         }
     }
 

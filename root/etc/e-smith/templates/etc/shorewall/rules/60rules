@@ -27,7 +27,7 @@
 	$src_addr = $src_addr eq '' ? '-' : $src_addr;
 	$dst_addr = $dst_addr eq '' ? '-' : $dst_addr;
 
-        my $prefix .= "\n#\n# RULE#" . $rule->key . " $src -> $dst \n#\n";
+        my $prefix .= "\n#\n# RULE#" . $rule->key . " $src -> $dst -> $service\n#\n";
         $prefix .= "?COMMENT $description\n";
         $prefix .= "$action\t".$fw->getZone($src_addr)."\t".$fw->getZone($dst_addr);
         if ($service eq 'any' || $service eq '') {
