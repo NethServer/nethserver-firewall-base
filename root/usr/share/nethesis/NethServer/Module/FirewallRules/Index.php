@@ -34,7 +34,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
     {
         parent::initialize();
         $this->declareParameter('Rules', \Nethgui\System\PlatformInterface::ANYTHING_COLLECTION);
-        $this->declareParameter('a', $this->createValidator()->memberOf('', 'rules', 'routes'));
+        $this->declareParameter('a', $this->createValidator()->memberOf('', 'rules', 'routes', 'services'));
     }
 
     public function process()
@@ -47,7 +47,9 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         $rules = is_array($this->parameters['Rules']) ? $this->parameters['Rules'] : array();
         $A = $this->getAdapter();
         foreach ($rules as $key => $values) {
-            if ( ! isset($A[$key])) {
+            if($key[0] === 's') {
+                continue;
+            } elseif ( ! isset($A[$key])) {
                 throw new \RuntimeException("Unexistent fwrule key: $key", 1402062247);
             }
             $hasPosition = isset($rules[$key]['Position']) && $rules[$key]['Position'] > 0;
@@ -112,7 +114,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             'any' => 'fa-globe',
             'role' => 'fa-square',
             'host' => 'fa-cube',
-            'zone' => 'fa-sitemap',
+            'zone' => 'fa-square-o',
             'host-group' => 'fa-cubes',
             'iprange' => 'fa-cubes',
             'cidr' => 'fa-cubes',
@@ -157,11 +159,13 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
                 continue;
             } elseif($this->parameters['a'] === 'routes' && in_array($values['Action'], array('accept', 'drop', 'reject'))) {
                 continue;
+            } elseif($this->parameters['a'] === 'services') {
+                continue;
             }
 
             $values['id'] = (String) $key;
             $values['Position'] = isset($values['Position']) ? intval($values['Position']) : 0;
-            $values['cssAction'] = str_replace(';', ' ', $values['Action']);
+            $values['cssAction'] = 'sortable '  . str_replace(';', ' ', $values['Action']);
             $values['ActionIcon'] = $actionIcons[$values['Action']];
             $values['SrcIcon'] = $this->getObjectIcon($values['Src']);
             $values['DstIcon'] = $this->getObjectIcon($values['Dst']);
@@ -180,6 +184,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
                 'Service' => $this->resolveService($values['Service'], $view)
             ));
             $values['Src'] = $this->resolveName($values['Src'],$view);
+            $values['SrcCss'] = $values['Src'];
             $values['Dst'] = $this->resolveName($values['Dst'],$view);
             $values['Service'] = $this->resolveService($values['Service']);
             $values['Delete'] = $view->getModuleUrl('../Delete/' . $key);
@@ -197,6 +202,38 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         $first = (isset($positions[0]) ? $positions[0] / 2 : \NethServer\Module\FirewallRules::RULESTEP);
         $last = (end($positions) ? end($positions) : 0) + \NethServer\Module\FirewallRules::RULESTEP;
 
+        if($this->parameters['a'] === 'services' || ! $this->parameters['a']) {
+            $serviceCount = 0;
+            foreach($this->getNetworkServices() as $key => $values) {
+
+                $values['id'] = 's' . (++$serviceCount);
+                $values['Position'] = '';
+                $values['SrcIcon'] = $this->getAccessIconSrc($values['access']);
+                $values['DstIcon'] = $this->getObjectIcon('fw');
+                $values['ServiceIcon'] = 'fa-circle-thin';
+
+                $values['Action'] = 'accept';
+                $values['ActionIcon'] = $actionIcons[$values['Action']];
+                $values['cssAction'] = 'unsortable ' . $values['Action'];
+                $values['Action'] = $actionLabels[$values['Action']];
+
+                $values['Edit'] = $view->getModuleUrl('../EditService/' . $key);
+                $values['Copy'] = $view->getModuleUrl('..');
+                $values['Delete'] = $view->getModuleUrl('..');
+                $values['RuleText'] = '';
+
+                $values['Src'] = $this->resolveAccessSrc($values['access'], $view);
+                $values['SrcCss'] = strstr($values['access'], ',') ? '' : $values['access'];
+                $values['Dst'] = $this->resolveName('fw', $view);
+                $values['Service'] = $key;
+
+                $values['LogIcon'] = '';
+                $values['LogLabel'] = '';
+
+                $r[] = $values;
+            }
+        }
+
         $view['hasChanges'] = $this->hasChanges();
         $view['Rules'] = $r;
         $view['Create_last'] = $view->getModuleUrl('../Create/' . intval($last));
@@ -205,6 +242,45 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         if ($this->getRequest()->isValidated()) {
             $view->getCommandList()->show();
         }
+    }
+
+    private function getAccessIconSrc($access) {
+        if( ! $access) {
+            return 'fa-times';
+        } elseif(strstr($access, ',')) {
+            return 'fa-th-large';
+        }
+        return 'fa-square';
+    }
+
+    private function resolveAccessSrc($access, \Nethgui\View\ViewInterface $view) {
+        if( ! $access) {
+            return 'localhost';
+        }
+
+        return strtr($access, ',', ', ');
+    }
+
+    private function getNetworkServices()
+    {
+        $searchProps = array('TCPPort', 'UDPPort', 'TCPPorts', 'UDPPorts');
+        $services = $this->getPlatform()->getDatabase('configuration')->getAll('service');
+
+        // Unset records without a defined "port" prop:
+        foreach ($services as $key => $props) {
+            $hasPorts = FALSE;
+            foreach(\array_intersect($searchProps, \array_keys($props)) as $p) {
+                if($props[$p] !== '') {
+                    $hasPorts = TRUE;
+                    break;
+                }
+            }
+            if( ! $hasPorts ) {
+                unset($services[$key]);
+            }
+        }
+
+        return $services;
     }
 
     private function hasChanges()
