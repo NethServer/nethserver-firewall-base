@@ -72,6 +72,15 @@ class EditService extends \Nethgui\Controller\Collection\AbstractAction
         return array_keys($zones);
     }
 
+    protected function onParametersSaved($changedParameters)
+    {
+        // Mark the fwrules DB as modified even if we actually save the
+        // access props in configuration DB:
+        if(in_array('access', $changedParameters)) {
+            $this->getPlatform()->getDatabase('fwrules')->setKey('__mtime', time(), array());
+        }
+    }
+
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
