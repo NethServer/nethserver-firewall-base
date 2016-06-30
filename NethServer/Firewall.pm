@@ -721,7 +721,7 @@ sub countReferences($$)
 
     if( ! $type) {
 	carp "Unknown object type for $dbName:$key";
-	return (),
+	return ();
     }
 
     my $found = 0;
