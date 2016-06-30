@@ -135,6 +135,10 @@ validator_actions($_, qw(
    fwobject-provider-delete
 ));
 
+validator_actions('fwobject-zone-delete', qw(
+    fwzone-referenced 30
+));
+
 validator_actions('fwobject-host-delete', qw(
    fwobject-hostgroup-remove-member 20
 ));
