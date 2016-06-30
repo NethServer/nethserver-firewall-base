@@ -98,6 +98,8 @@ class EditService extends \Nethgui\Controller\Collection\AbstractAction
         }, $this->listZones());
 
         $view['FormAction'] = $view->getModuleUrl($this->parameters['name']);
+        $serviceRecord = $this->getPlatform()->getDatabase('configuration')->getKey($this->parameters['name']);
+        $view['Config'] = \NethServer\Module\NetworkServices\Modify::getConfigForView($view, $serviceRecord);
 
         if ($this->getRequest()->isMutation()) {
             $view->getCommandList()->sendQuery($view->getModuleUrl('../Index?a=services'));
