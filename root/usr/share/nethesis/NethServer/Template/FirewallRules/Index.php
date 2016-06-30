@@ -15,6 +15,7 @@ echo $view->buttonList()
     ->insert($view->textLabel('ShowAction')->setAttribute('template', $T('ShowAction_label')))
         ->insert($view->panel()->setAttribute('class', 'inlineblock')->setAttribute('id', 'ShowGroup')
                 ->insert($view->button('ShowRules',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=rules')))
+                ->insert($view->button('ShowServices',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=services')))
                 ->insert($view->button('ShowRoutes',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=routes')))
                 ->insert($view->button('ShowAll',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=')))
                 )
@@ -24,19 +25,18 @@ echo $view->buttonList()
 $filterTarget = $view->getClientEventTarget('a');
 echo $view->hidden('a');
 
-// 'groups' contains an array of views..
 echo $view->objectsCollection('Rules')
-    ->setAttribute('placeholders', array('cssAction','ActionIcon','SrcIcon','DstIcon','ServiceIcon','LogIcon', 'LogLabel','Src','Dst','Service', 'status'))
+    ->setAttribute('placeholders', array('cssAction', 'ActionIcon', 'SrcIcon', 'DstIcon', 'ServiceIcon', 'LogIcon', 'LogLabel', 'Src', 'SrcCss', 'Dst', 'Service', 'status'))
     ->setAttribute('key', 'id')
     ->setAttribute('ifEmpty', function ($view) use ($T) {
         return $T('NoRulesDefined_label');
     })
     ->setAttribute('template', function ($view) use ($T) {
         return $view->panel()
-            ->setAttribute('class', 'fwrule ${cssAction} ${status}')            
+            ->setAttribute('class', 'fwrule ${cssAction} ${status}')
             ->insert($view->hidden('metadata', $view::STATE_DISABLED))
             ->insert($view->textInput('Position', $view::LABEL_NONE))
-            ->insert($view->panel()->setAttribute('class', 'idbox background-grip')
+            ->insert($view->panel()->setAttribute('class', 'idbox')
                 ->insert($view->textLabel('id')->setAttribute('tag', 'span')->setAttribute('template', $T("RuleId_label"))))
             ->insert($view->panel()->setAttribute('class', 'actbox')
                 ->insert($view->literal('<i class="fwicon fa ${ActionIcon}"></i> '))
@@ -45,8 +45,8 @@ echo $view->objectsCollection('Rules')
                 )
             ->insert($view->panel()->setAttribute('class', 'descbox')
                     ->insert($view->panel()->setAttribute('class', 'fields')
-                ->insert($view->panel()->setAttribute('class', 'src ${Src}')->setAttribute('tag', 'span')
-                    ->insert($view->literal('<i class="fwicon fa ${SrcIcon} ${Src}"></i> '))
+                ->insert($view->panel()->setAttribute('class', 'src ${SrcCss}')->setAttribute('tag', 'span')
+                    ->insert($view->literal('<i class="fwicon fa ${SrcIcon} ${SrcCss}"></i> '))
                     ->insert($view->textLabel('Src')->setAttribute('tag', 'span')))
                 ->insert($view->panel()->setAttribute('class', 'caret')->setAttribute('tag', 'span')
                     ->insert($view->literal(' <i class="fa fa-long-arrow-right"></i> ')))
@@ -86,16 +86,15 @@ $view->includeCss('
 .fwrule .Buttonset [role=button] {border-top: none}
 .fwrule .actbox {padding: 3px; min-width: 5.5em; text-transform: uppercase; cursor: move; font-size: 1.4em; font-weight: bold}
 .fwrule .log { font-size: 0.8em; font-weight: normal }
-.fwrule .idbox {padding: 3px; cursor: move; color: gray; min-width: 4ex; font-size: 0.8em}
+.fwrule .idbox {padding: 3px; cursor: move; color: gray; min-width: 5ex; font-size: 0.8em}
 .fwrule .fields {margin-bottom: 5px; font-size: 1.4em}
 .fields .src { display: inline-block; min-width: 10em }
 .fields .caret { padding: 0 1ex }
 .fields .service { padding-left: 1ex }
 .fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px 3px 3px 1ex; position: relative }
 .fwrule .Description { bottom: 3px; position: absolute }
-.fwrule.disabled, {color: gray !important; }
+.fwrule.disabled {color: gray !important; background-color: #eee}
 .fwrule.disabled .actbox, .fwrule.disabled .idbox, .fwrule.disabled .fields, .fwrule.disabled .green, .fwrule.disabled .red, .fwrule.disabled .orange, .fwrule.disabled .blue {color: gray !important}
-.fwrule.disabled .actbox, .fwrule.disabled .idbox {background-color: #eee}
 .fwrule.disabled .Description, .fwrule.disabled .RuleText {color: gray !important; }
 .placeholder {background-color: yellow; margin-bottom: 1.5em; background: linear-gradient(to bottom, rgba(234,239,181,1) 0%,rgba(225,233,160,1) 100%);}
 
@@ -113,11 +112,21 @@ $view->includeCss('
     color: #212121;
 }
 
-.background-grip {
+.idbox {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAQCAYAAAArij59AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wsYDwA1kC7JJQAAACBJREFUKM9jXrJkyX9WVtbGq1evMmBjMzEQAKMKhpMCAAwjD5FRISjaAAAAAElFTkSuQmCC);
     background-position: 2px 50%;
     background-repeat: no-repeat
 }
+
+.unsortable .idbox {
+    visibility: hidden;
+}
+
+.unsortable .Button.Copy, .unsortable .Button.Delete {
+    display: none;
+}
+
+.fwrule.unsortable .actbox { cursor: inherit };
 ');
 
 $view->includeJavascript("
@@ -131,6 +140,8 @@ jQuery(function ($) {
     $('#${rulesId}').sortable({
         axis: 'y',
         handle: '.actbox, .idbox',
+        cancel: '.unsortable',
+        items: '> .sortable',
         placeholder: 'placeholder',
         opacity: 0.6,        
         forcePlaceholderSize: true,

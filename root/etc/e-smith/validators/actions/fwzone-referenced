@@ -20,25 +20,20 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-use NethServer::Firewall;
-use esmith::NetworksDB;
+use strict;
+use esmith::ConfigDB;
 
-my $objName = shift || die('Missing account object argument');
-my $fw = new NethServer::Firewall();
-my $val = undef;
+my $dbName = shift;
+my $key = shift;
 
-my @tmp = split(/;/,$objName);
-if ($tmp[0] eq "zone") {
-    my $ndb = esmith::NetworksDB->open_ro();
-    $val = $ndb->get($tmp[1]);
-} else {
-    $val = $fw->getAddress($objName);
+if($dbName ne 'networks') {
+    die("[ERROR] Unexpected DB argument: $dbName");
 }
 
-if ($val)
-{
-    exit 0;
-} else {
-    print "The firewall object '$objName' does not exists\n";
-    exit 3;
+foreach(esmith::ConfigDB->open_ro()->get_all_by_prop('type' => 'service')) {
+    if(grep { $_ eq $key } split(/,/, $_->prop('access'))) {
+        exit(3);
+    }
 }
+
+exit(0);

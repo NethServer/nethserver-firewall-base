@@ -49,6 +49,7 @@ class FirewallRules extends \Nethgui\Controller\CollectionController implements 
         $this
             ->addChild(new \NethServer\Module\FirewallRules\Create())
             ->addChild(new \NethServer\Module\FirewallRules\Edit())
+            ->addChild(new \NethServer\Module\FirewallRules\EditService())
             ->addChild(new \NethServer\Module\FirewallRules\Copy())
             ->addChild(new \NethServer\Module\FirewallRules\PickObject())
             ->addChild(new \NethServer\Module\FirewallRules\Delete())
