@@ -36,8 +36,6 @@ echo $view->objectsCollection('Rules')
             ->setAttribute('class', 'fwrule ${cssAction} ${status}')
             ->insert($view->hidden('metadata', $view::STATE_DISABLED))
             ->insert($view->textInput('Position', $view::LABEL_NONE))
-            ->insert($view->panel()->setAttribute('class', 'idbox')
-                ->insert($view->textLabel('id')->setAttribute('tag', 'span')->setAttribute('template', $T("RuleId_label"))))
             ->insert($view->panel()->setAttribute('class', 'actbox')
                 ->insert($view->literal('<i class="fwicon fa ${ActionIcon}"></i> '))
                 ->insert($view->textLabel('Action')->setAttribute('tag', 'span'))
@@ -84,9 +82,8 @@ $view->includeCss('
 .fwrule {min-height: 50px; border:1px solid #d3d3d3; display: flex; margin-bottom: .5em; border-radius: 3px;}
 .fwrule .Buttonset {flex-grow: 0; margin-right: 0}
 .fwrule .Buttonset [role=button] {border-top: none}
-.fwrule .actbox {padding: 3px; min-width: 5.5em; text-transform: uppercase; cursor: move; font-size: 1.4em; font-weight: bold}
+.fwrule .actbox {padding: 3px 3px 3px 15px; min-width: 5.5em; text-transform: uppercase; cursor: move; font-size: 1.4em; font-weight: bold}
 .fwrule .log { font-size: 0.8em; font-weight: normal }
-.fwrule .idbox {padding: 3px; cursor: move; color: gray; min-width: 5ex; font-size: 0.8em}
 .fwrule .fields {margin-bottom: 5px; font-size: 1.4em}
 .fields .src { display: inline-block; min-width: 10em }
 .fields .caret { padding: 0 1ex }
@@ -94,7 +91,7 @@ $view->includeCss('
 .fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px 3px 3px 1ex; position: relative }
 .fwrule .Description { bottom: 3px; position: absolute }
 .fwrule.disabled {color: gray !important; background-color: #eee}
-.fwrule.disabled .actbox, .fwrule.disabled .idbox, .fwrule.disabled .fields, .fwrule.disabled .green, .fwrule.disabled .red, .fwrule.disabled .orange, .fwrule.disabled .blue {color: gray !important}
+.fwrule.disabled .actbox, .fwrule.disabled .fields, .fwrule.disabled .green, .fwrule.disabled .red, .fwrule.disabled .orange, .fwrule.disabled .blue {color: gray !important}
 .fwrule.disabled .Description, .fwrule.disabled .RuleText {color: gray !important; }
 .placeholder {background-color: yellow; margin-bottom: 1.5em; background: linear-gradient(to bottom, rgba(234,239,181,1) 0%,rgba(225,233,160,1) 100%);}
 
@@ -112,14 +109,10 @@ $view->includeCss('
     color: #212121;
 }
 
-.idbox {
+.fwrule.sortable .actbox {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAQCAYAAAArij59AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wsYDwA1kC7JJQAAACBJREFUKM9jXrJkyX9WVtbGq1evMmBjMzEQAKMKhpMCAAwjD5FRISjaAAAAAElFTkSuQmCC);
     background-position: 2px 50%;
     background-repeat: no-repeat
-}
-
-.unsortable .idbox {
-    visibility: hidden;
 }
 
 .unsortable .Button.Copy, .unsortable .Button.Delete {
@@ -139,7 +132,7 @@ jQuery(function ($) {
 
     $('#${rulesId}').sortable({
         axis: 'y',
-        handle: '.actbox, .idbox',
+        handle: '.actbox',
         cancel: '.unsortable',
         items: '> .sortable',
         placeholder: 'placeholder',
