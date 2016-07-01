@@ -56,7 +56,7 @@ $L['Delete_message'] = 'Confirm deletion of firewall rule #${id}';
 $L['HostGroups_create'] = 'Create host group "${0}"';
 $L['Hosts_create'] = 'Create host "${0}"';
 $L['Zones_create'] = 'Create zone"${0}"';
-$L['Services_create'] = 'Create service "${0}"';
+$L['Services_create'] = 'Create service object "${0}"';
 $L['IpRange_create'] = 'Create IP range "${0}"';
 $L['Cidr_create'] = 'Create CIDR network "${0}"';
 
@@ -85,8 +85,8 @@ $L['FirewallObject_remote_Title'] = 'Host ${key}';
 $L['FirewallObject_role_Title'] = 'Role ${key}';
 $L['FirewallObject_zone_Title'] = 'Zone ${key}';
 $L['FirewallObject_host-group_Title'] = 'Host group ${key}';
-$L['FirewallObject_fwservice_Title'] = 'Service ${key}';
-$L['FirewallObject_service_Title'] = 'Local service ${key}';
+$L['FirewallObject_fwservice_Title'] = '${key} - service object';
+$L['FirewallObject_service_Title'] = '${key} - network service';
 $L['FirewallObject_iprange_Title'] = 'IP range ${key}';
 $L['FirewallObject_cidr_Title'] = 'CIDR network ${key}';
 
