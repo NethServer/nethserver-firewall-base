@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 2.10.5
+Version: 3.0.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -60,6 +60,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Thu Jul 07 2016 Stefano Fancello <stefano.fancello@nethesis.it> - 3.0.0-1
+- First NS7 release
+
 * Thu May 26 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.10.5-1
 - PPPoE backup connection restart failure - Bug #3394 [NethServer]
 - Can't create host groups with certain hosts - Bug #3392 [NethServer]
