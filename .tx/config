@@ -1,49 +1,49 @@
 [main]
 host = https://www.transifex.com
 
-[nethserver.nethserver-firewall-basepot]
+[nethserver-v6.nethserver-firewall-basepot]
 #file_filter = locale/<lang>/LC_MESSAGES/nethserver-firewall-base.po
 source_file = locale/nethserver-firewall-base.pot
 source_lang = en
 type = PO
 
-[nethserver.FirewallObjects]
+[nethserver-v6.FirewallObjects]
 #file_filter = root/usr/share/nethesis/NethServer/Language/<lang>/NethServer_Module_FirewallObjects.php
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_FirewallObjects.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
-[nethserver.FirewallObjects_HostGroups]
+[nethserver-v6.FirewallObjects_HostGroups]
 #file_filter = root/usr/share/nethesis/NethServer/Language/<lang>/NethServer_Module_FirewallObjects_HostGroups.php
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_FirewallObjects_HostGroups.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
-[nethserver.FirewallObjects_Hosts]
+[nethserver-v6.FirewallObjects_Hosts]
 #file_filter = root/usr/share/nethesis/NethServer/Language/<lang>/NethServer_Module_FirewallObjects_Hosts.php
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_FirewallObjects_Hosts.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
-[nethserver.FirewallObjects_Services]
+[nethserver-v6.FirewallObjects_Services]
 #file_filter = root/usr/share/nethesis/NethServer/Language/<lang>/NethServer_Module_FirewallObjects_Services.php
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_FirewallObjects_Services.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
-[nethserver.FirewallObjects_Zones]
+[nethserver-v6.FirewallObjects_Zones]
 #file_filter = root/usr/share/nethesis/NethServer/Language/<lang>/NethServer_Module_FirewallObjects_Zones.php
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_FirewallObjects_Zones.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
-[nethserver.FirewallRules]
+[nethserver-v6.FirewallRules]
 #file_filter = root/usr/share/nethesis/NethServer/Language/<lang>/NethServer_Module_FirewallRules.php
 source_file = root/usr/share/nethesis/NethServer/Language/en//NethServer_Module_FirewallRules.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
-[nethserver.FirewallRules_CheckRules]
+[nethserver-v6.FirewallRules_CheckRules]
 #file_filter = root/usr/share/nethesis/NethServer/Language/<lang>/NethServer_Module_FirewallRules_CheckRules.php
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_FirewallRules_CheckRules.php
 source_lang = en
@@ -51,73 +51,73 @@ type = PHP_ALT_ARRAY
 
 
 
-[nethserver.Dashboard_SystemStatus_Providers]
+[nethserver-v6.Dashboard_SystemStatus_Providers]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_Dashboard_SystemStatus_Providers.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.PortForward]
+[nethserver-v6.PortForward]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_PortForward.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.TrafficShaping_Ip]
+[nethserver-v6.TrafficShaping_Ip]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_TrafficShaping_Ip.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.PortForward_HairpinNat]
+[nethserver-v6.PortForward_HairpinNat]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_PortForward_HairpinNat.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.FirewallObjects_IpRange]
+[nethserver-v6.FirewallObjects_IpRange]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_FirewallObjects_IpRange.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.Providers]
+[nethserver-v6.Providers]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_Providers.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.Nat]
+[nethserver-v6.Nat]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_Nat.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.FirewallObjects_Cidr]
+[nethserver-v6.FirewallObjects_Cidr]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_FirewallObjects_Cidr.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.TrafficShaping_Interfaces]
+[nethserver-v6.TrafficShaping_Interfaces]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_TrafficShaping_Interfaces.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.FirewallRules]
+[nethserver-v6.FirewallRules]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_FirewallRules.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.TrafficShaping_Ports]
+[nethserver-v6.TrafficShaping_Ports]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_TrafficShaping_Ports.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.TrafficShaping]
+[nethserver-v6.TrafficShaping]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_TrafficShaping.php
 source_lang = en
 type = PHP_ALT_ARRAY
