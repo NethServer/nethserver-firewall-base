@@ -29,7 +29,7 @@
             $_ =~ s/^green$/loc/;
             $_ =~ s/^red$/net/;
             $_ = substr($_, 0, 5);
-            if ($fw->isZone($_)) {
+            if ($_ eq 'net' || $_ eq 'loc' || $fw->isZone($_)) {
                 $OUT.="ACCEPT\t$_\t\$FW\t$type\t$port\n";
             }
         }
