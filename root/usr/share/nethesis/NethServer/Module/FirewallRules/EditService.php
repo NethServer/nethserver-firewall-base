@@ -64,7 +64,7 @@ class EditService extends \Nethgui\Controller\Collection\AbstractAction
             if ($values['type'] == 'zone') {
                 $zones[$key] = '';
             }
-            if (isset($values['role']) && ! preg_match("/(" . implode('|', $invalid_roles) . ")/", $values['role'])) {
+            if (isset($values['role'])  && $values['role'] && ! preg_match("/(" . implode('|', $invalid_roles) . ")/", $values['role'])) {
                 $zones[$values['role']] = '';
             }
         }
