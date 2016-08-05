@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.0.1
+Version: 3.0.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -60,6 +60,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Fri Aug 05 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.0.2-1
+- Blank checkbox on FirewallRules/EditService page - Bug NethServer/dev#5070
+
 * Thu Jul 21 2016 Stefano Fancello <stefano.fancello@nethesis.it> - 3.0.1-1
 - Network services does not enforce "localhost" access - Bug NethServer/dev#5066
 - VPS: can't access public services  - Bug NethServer/dev#5068
