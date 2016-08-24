@@ -51,7 +51,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $ret = array();
         $interfaces = $this->getPlatform()->getDatabase('networks')->getAll();
         foreach ($interfaces as $interface => $props) {
-            if (preg_match('/ethernet|bridge|bond|alias|ipsec/',$props['type'])) {
+            if (preg_match('/ethernet|bridge|bond|alias|ipsec|vlan/',$props['type'])) {
                 # if alias, search for parent ethernet
                 if (isset($props['role']) && $props['role'] == 'alias') {
                     $tmp = explode(':',$interface);
