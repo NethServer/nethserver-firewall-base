@@ -66,7 +66,7 @@
         foreach (@src_addr) {
             my $comment = "\n#\n# FORCE traffic [$src_ori -> $dst_ori] to $provider_key \n#\n";
             my $lines = "?COMMENT $provider_key\n";
-            $lines .= "MARK(".$mask."):P\t".$_."\t".$dst_addr;
+            $lines .= "MARK(".$mask.")\t".$_."\t".$dst_addr;
             if ($service eq 'any' || $service eq '') {
                 next if ($_ eq '-' && ($dst_addr eq '-' || $dst_addr eq '')); # skip rules where dst, src and service are empty
                 $OUT .= $comment.$lines."\n";
