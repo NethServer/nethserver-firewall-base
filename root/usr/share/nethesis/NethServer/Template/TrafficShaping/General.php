@@ -1,6 +1,6 @@
 <?php
 
-echo $view->header()->setAttribute('template', 'Traffic shaping');
+echo $view->header()->setAttribute('template', $T('TrafficShaping_General_header'));
 
 echo $view->selector('tc');
 
