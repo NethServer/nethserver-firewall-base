@@ -9,11 +9,11 @@ if (!$view['providers']) {
     foreach ($view['providers'] as $name => $n) {
         echo "<dt>".$T($name)."</dt>"; 
         if ($n == "0") {
-            echo "<dd class='provider-green'>UP</dd>"; 
+            echo "<dd class='provider-green'>" . $T('Provider_status_UP') . "</dd>";
         } else if ($n == "1") {
-            echo "<dd class='provider-red'>DOWN</dd>"; 
+            echo "<dd class='provider-red'>" . $T('Provider_status_DOWN') . "</dd>";
         } else {
-            echo "<dd class='provider-grey'>OFF</dd>"; 
+            echo "<dd class='provider-grey'>" . $T('Provider_status_OFF') . "</dd>";
         }
         echo "</dd>";
     }
