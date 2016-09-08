@@ -16,12 +16,15 @@
         my $ndb = esmith::NetworksDB->open_ro();
         if ($ndb->blue) {
             $OUT .= "NFQBY\tblue\tnet\n";
+            $OUT .= "NFQBY\tnet\tblue\n";
         }
         if ($ndb->orange) {
             $OUT .= "NFQBY\torang\tnet\n";
+            $OUT .= "NFQBY\tnet\torang\n";
         }
         if ($ndb->blue && $ndb->orange) {
             $OUT .= "NFQBY\tblue\torang\n";
+            $OUT .= "NFQBY\torang\tblue\n";
         }
     }
 }

@@ -1,5 +1,11 @@
 {
     my $extping = $firewall{'ExternalPing'} || 'enabled';
+    my $nfq = $firewall{'nfqueue'} || 'disabled';
+    my $action = 'ACCEPT';
+    if ($nfq eq 'enabled') {
+        $action = 'NFQBY';
+    }
+
     if ($extping eq 'disabled') {
 $OUT = <<EOF
 #
@@ -12,13 +18,16 @@ $OUT = <<EOF
 #
 # Accept Ping from the "bad" net zone.
 #
-Ping/ACCEPT   net             \$FW
+Ping/$action   net             \$FW
 EOF
     }
-}
+
+$OUT = <<EOF
 #
 #  Make ping work bi-directionally between the dmz, net, Firewall and local zone
 #  (assumes that the loc-> net policy is ACCEPT).
 #
-Ping/ACCEPT     loc            $FW
+Ping/$action    loc            \$FW
+EOF
 
+}

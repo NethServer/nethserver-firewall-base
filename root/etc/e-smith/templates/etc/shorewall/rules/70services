@@ -24,13 +24,18 @@
         my $type = shift;
         my $port = shift;
         my $zones = shift;
+        my $nfq = $firewall{'nfqueue'} || 'disabled';
+        my $action = 'ACCEPT';
+        if ($nfq eq 'enabled') {
+            $action = 'NFQBY';
+        }
         $OUT.="?COMMENT $name \n";
         foreach (@$zones) {
             $_ =~ s/^green$/loc/;
             $_ =~ s/^red$/net/;
             $_ = substr($_, 0, 5);
             if ($_ eq 'net' || $_ eq 'loc' || $fw->isZone($_)) {
-                $OUT.="ACCEPT\t$_\t\$FW\t$type\t$port\n";
+                $OUT.="$action\t$_\t\$FW\t$type\t$port\n";
             }
         }
 
@@ -41,17 +46,6 @@
     use esmith::ConfigDB;
     our $fw = NethServer::Firewall->new();
     my $confDb = esmith::ConfigDB->open();
-    my $accept = 'ACCEPT';
-    my $nfqueue = $firewall{'nfqueue'} || 'disabled';
-    if ($nfqueue eq 'enabled') {
-        $accept = 'NFQBY';
-        # SSH and HTTPD-ADMIN exeception: do not filter ssh from local network
-        $OUT.="#\n#\tAllow administration from local network\n#\n";
-        $OUT .= "?COMMENT always accept sshd from loc\n";
-        $OUT.="ACCEPT\tloc\t\$FW\ttcp\t".$sshd{'TCPPort'}."\n";
-        $OUT .= "?COMMENT always accept httpd-admin from loc\n";
-        $OUT.="ACCEPT\tloc\t\$FW\ttcp\t".${'httpd-admin'}{'TCPPort'}."\n";
-    }
 
     foreach my $serviceRecord ($confDb->get_all_by_prop('type' => 'service')) {
         my $access = $serviceRecord->prop('access') || 'none';

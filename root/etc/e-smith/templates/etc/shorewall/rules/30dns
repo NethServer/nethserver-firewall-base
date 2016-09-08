@@ -1,4 +1,12 @@
 #
 #       Accept DNS connections from the firewall to the Internet
 #
-DNS/ACCEPT      $FW             net
+{
+    my $nfq = $firewall{'nfqueue'} || 'disabled';
+    my $action = 'ACCEPT';
+    if ($nfq eq 'enabled') {
+        $action = 'NFQBY';
+    }
+
+    $OUT .= "DNS/$action\t\$FW\tnet";
+}
