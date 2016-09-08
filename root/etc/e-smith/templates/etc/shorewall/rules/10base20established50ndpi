@@ -1,5 +1,6 @@
 #
-# 60rules
+# 10base20established50ndpi
+# Duplicate ndpi rules for established section
 #
 {
     use NethServer::Firewall;
@@ -16,8 +17,13 @@
         $action = uc($action);
         my $service = $rule->prop("Service") || '';
         my $log = $rule->prop('Log') || "";
+
+        # skip all non-ndpi rules
+        next if (! $fw->isNdpiService($service));
+    
         # skip ndpi rules if ndpi is not enabled
-        next if ($fw->isNdpiService($service) && ! $fw->isNdpiEnabled());
+        next if (! $fw->isNdpiEnabled());
+
         my $description = "RULE#" . $rule->key . " " . ($rule->prop('Description') || '');
 
         # src and dst can be: IP address, host, host-group, zone
@@ -36,14 +42,7 @@
             my $proto = $fw->getNdpiProtocol($service) || '';
             next if ($proto eq '');
             $OUT .= $prefix."\t;; -m ndpi --$proto\n";
-        } elsif ($service eq 'any' || $service eq '') {
-            $OUT .= $prefix."\tall\n";
-        } else {
-            my %ports = $fw->getPorts($service);
-            foreach my $protocol (keys %ports) {
-              $OUT .= $prefix."\t$protocol\t$ports{$protocol}\n";
-            }
-        }
+        } 
     }
 }
 

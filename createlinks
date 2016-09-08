@@ -44,6 +44,7 @@ event_templates($event,
                 '/etc/shorewall/findgw',
                 '/etc/shorewall/stoppedrules',
                 '/etc/shorewall/maclist',
+                '/etc/shorewall/modules',
                 '/etc/sudoers');
 
 event_templates($event, '/etc/lsm/lsm.conf');
@@ -82,6 +83,7 @@ event_templates($event,
                 '/etc/shorewall/nat',
                 '/etc/shorewall/stoppedrules',
                 '/etc/shorewall/maclist',
+                '/etc/shorewall/modules',
                 '/etc/shorewall/zones');
 
 event_actions($event,

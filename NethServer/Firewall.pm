@@ -38,6 +38,8 @@ NethServer::Firewall -- extensible module for firewall rules generation
 
 =over
 
+=back
+
 =head1 DESCRIPTION
 
 This modules implements many utilities and can determinate the zone of a given ip address
@@ -111,6 +113,9 @@ sub _run_callbacks
 
     return '';
 }
+
+
+=back
 
 =head1 FUNCTIONS
 
@@ -278,6 +283,50 @@ sub getZoneCIDR($)
     return '' if (!defined($z));
 
     return $z->prop('Network');
+}
+
+=head2 isValidNdpiProtocol(protocol)
+
+Return 1 if given protocol is listed in xt_ndpi kernel module,
+return 0 otherwise.
+
+=cut
+sub isValidNdpiProtocol($)
+{
+    my $self = shift;
+    my $protocol = shift;
+    my $proc = '/proc/net/xt_ndpi/proto';
+    if ( ! -f $proc ) {
+        return 0
+    }
+    open (my $fh, '<', $proc) or return 0;
+    while (my $line = <$fh>) {
+        if ($line =~ /$protocol/) {
+            close($fh);
+            return 1
+        }
+    }
+    close($fh);
+    return 0
+}
+
+=head2 getNdpiProtocol(id)
+
+Return the nDPI protocol for the service id, only if the protocol
+is defined in /proc/net/xt_ndpi/proto .
+Otherise return undef
+
+=cut
+sub getNdpiProtocol($)
+{
+    my $self = shift;
+    my $id = shift;
+
+    my $protocol = (split(/;/, $id))[1];
+    if ($self->isValidNdpiProtocol($protocol)) {
+        return $protocol;
+    }
+    return undef;
 }
 
 =head2 getPorts(id)
@@ -452,6 +501,32 @@ sub listZones($)
     }
     
     return %zones;
+}
+
+
+=head2 isNdpiEnabled
+
+Return 1 if the current xt_ndpi module is loaded, 0 otherwise
+
+=cut
+
+sub isNdpiEnabled
+{
+    return ( -d '/proc/net/xt_ndpi/');
+}
+
+
+=head2 isNdpiService
+
+Return 1 if the current service is a nDPI target, 0 otherwise
+
+=cut
+
+sub isNdpiService($)
+{
+    my $self = shift;
+    my $key = shift;
+    return ($key =~ /^ndpi;/);
 }
 
 
