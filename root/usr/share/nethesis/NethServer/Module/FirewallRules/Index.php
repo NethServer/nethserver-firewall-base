@@ -94,7 +94,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
                 return $view->translate("any_service_label");
             }
         }
-        return preg_replace('/^(fw)?service;/', "", $ep);
+        return preg_replace('/^(fwservice|service|ndpi);/', "", $ep);
     }
 
     private function resolveName($ep,$view)
@@ -121,6 +121,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             'fwservice' => 'fa-gear',
             'service' => 'fa-circle-thin',
             'fw' => 'fa-fire',
+            'ndpi' => 'fa-file-o',
         );
         $tmp = explode(';', $v);
         if ( isset($objectIcons[$tmp[0]]) ) {
