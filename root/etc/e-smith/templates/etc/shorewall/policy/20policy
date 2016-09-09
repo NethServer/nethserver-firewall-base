@@ -33,8 +33,19 @@
     foreach my $z (keys %zones) {
         $OUT .= "$z\t\tnet\t\t$action\n";
     }
+
+    if ($nfqueue eq 'enabled') {
+        $OUT .= "\n# firewall can always connect outside (via NFQ)\n";
+        $OUT .= "\$FW\tnet\tACCEPT:NFQBY\n";
+
+        $OUT .="# Traffic from firewall to local network is always allowed (via NFQ)\n";
+        $OUT .= "\$FW\tloc\tACCEPT:NFQBY\n";
+    } else {
+        $OUT .= "\n# firewall can always connect outside\n";
+        $OUT .= "\$FW\tnet\tACCEPT\n";
+
+        $OUT .="# Traffic from firewall to local network is always allowed\n";
+        $OUT .= "\$FW\tloc\tACCEPT\n";
+    }
+
 }
-
-# firewall can always connect outside
-$FW	net	ACCEPT
-

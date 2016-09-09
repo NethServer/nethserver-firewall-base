@@ -6,6 +6,7 @@
 
     my $db = esmith::ConfigDB->open_ro("fwrules") || die "Can't open portforward database: $!\n";
     my $fw = new NethServer::Firewall();
+    my $nfq = $firewall{'nfqueue'} || 'disabled';
     foreach my $rule ( $fw->getRules() ) {
         my $status = $rule->prop("status") || "disabled";
         next unless ($status eq 'enabled');
@@ -14,6 +15,10 @@
         my $dst = $rule->prop("Dst") || next;
         my $action= $rule->prop("Action") || next;
         $action = uc($action);
+
+        if ($nfq eq 'enabled' && $action eq 'ACCEPT') {
+            $action = "NFQBY";
+        }
         my $service = $rule->prop("Service") || '';
         my $log = $rule->prop('Log') || "";
         # skip ndpi rules if ndpi is not enabled
