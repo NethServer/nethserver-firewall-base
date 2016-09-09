@@ -24,6 +24,7 @@ use strict;
 use esmith::ConfigDB;
 use esmith::NetworksDB;
 use esmith::HostsDB;
+use NethServer::Database::Ndpi;
 use esmith::util;
 use NetAddr::IP;
 use Carp;
@@ -295,19 +296,11 @@ sub isValidNdpiProtocol($)
 {
     my $self = shift;
     my $protocol = shift;
-    my $proc = '/proc/net/xt_ndpi/proto';
-    if ( ! -f $proc ) {
-        return 0
-    }
-    open (my $fh, '<', $proc) or return 0;
-    while (my $line = <$fh>) {
-        if ($line =~ /$protocol/) {
-            close($fh);
-            return 1
-        }
-    }
-    close($fh);
-    return 0
+
+    my %ndpi;
+    tie %ndpi, 'NethServer::Database::Ndpi';
+
+    return exists $ndpi{$protocol} ? 1 : 0;
 }
 
 =head2 getNdpiProtocol(id)
