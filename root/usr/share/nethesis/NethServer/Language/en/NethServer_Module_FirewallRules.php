@@ -89,7 +89,7 @@ $L['FirewallObject_zone_Title'] = 'Zone ${key}';
 $L['FirewallObject_host-group_Title'] = 'Host group ${key}';
 $L['FirewallObject_fwservice_Title'] = '${key} - service object';
 $L['FirewallObject_service_Title'] = '${key} - network service';
-$L['FirewallObject_ndpi_Title'] = '${key} - NDPI protocol';
+$L['FirewallObject_ndpi_Title'] = '${key} - DPI protocol';
 $L['FirewallObject_iprange_Title'] = 'IP range ${key}';
 $L['FirewallObject_cidr_Title'] = 'CIDR network ${key}';
 
