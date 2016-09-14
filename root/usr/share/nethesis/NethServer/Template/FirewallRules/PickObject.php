@@ -37,6 +37,12 @@ echo $searchForm . $resultsForm . $createLinks;
 $viewId = $view->getUniqueId();
 $findButtonTarget = $view->getClientEventTarget('Find');
 
+$ndpiProtocolIcons = '';
+
+foreach(\NethServer\Module\FirewallRules\Index::$ndpiProtocolIcons as $proto => $values) {
+    $ndpiProtocolIcons .= "'#${viewId} .Selector input[value=\"ndpi;$proto\"] + label::before { content: \"\\\\${values[1]}\\\\20\" }',\n";
+}
+
 $view->includeJavascript("
 jQuery(function ($) {
     $('#${viewId}').on('change', function (e) { $(e.target).closest('form').submit(); });
@@ -63,6 +69,7 @@ jQuery(function ($) {
 '#${viewId} .Selector input[value^=\"fwservice\"] + label::before { content: \"\\\\F013\\\\20\" }',
 '#${viewId} .Selector input[value^=\"service\"] + label::before { content: \"\\\\F1DB\\\\20\" }',
 '#${viewId} .Selector input[value^=\"ndpi\"] + label::before { content: \"\\\\F016\\\\20\" }',
+$ndpiProtocolIcons
 '#${viewId} .Selector input[value^=\"zone\"] + label::before { content: \"\\\\F096\\\\20\" }',
 '#${viewId} .Selector input[value^=\"role\"] + label::before { content: \"\\\\F0C8\\\\20\" }',
 '#${viewId} .Selector input[value^=\"role;red\"] + label { color: red }',

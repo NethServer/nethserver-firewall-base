@@ -29,6 +29,10 @@ namespace NethServer\Module\FirewallRules;
  */
 class Index extends \Nethgui\Controller\Collection\AbstractAction
 {
+    public static $ndpiProtocolIcons = array(
+        'amazon' => array('fa-amazon', 'F270'),
+        'facebook' => array('fa-facebook-square', 'F082'),
+    );
 
     public function initialize()
     {
@@ -124,7 +128,9 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             'ndpi' => 'fa-file-o',
         );
         $tmp = explode(';', $v);
-        if ( isset($objectIcons[$tmp[0]]) ) {
+        if($tmp[0] === 'ndpi' && array_key_exists($tmp[1], self::$ndpiProtocolIcons)) {
+            return self::$ndpiProtocolIcons[$tmp[1]][0];
+        } elseif (isset($objectIcons[$tmp[0]])) {
             return $objectIcons[$tmp[0]];
         } else {
             return $v;
