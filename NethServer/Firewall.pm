@@ -29,6 +29,7 @@ use esmith::util;
 use NetAddr::IP;
 use Carp;
 use File::Basename qw(dirname);
+use Time::Local;
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(FIELDS_READ FIELDS_WRITE register_callback);
@@ -135,6 +136,7 @@ sub new
     my $tdb_path = shift || 'tc';
     my $cdb_path = shift || '';
     my $pfdb_path = shift || 'portforward';
+    my $ftdb_path = shift || 'fwtimes';
 
     my $self = {
         sdb_path => $sdb_path,
@@ -143,6 +145,7 @@ sub new
         fdb_path => $fdb_path,
         tdb_path => $tdb_path,
         pfdb_path => $pfdb_path,
+        ftdb_path => $ftdb_path,
         cdb_path => $cdb_path
     };
     bless $self, $class;
@@ -162,6 +165,7 @@ sub _initialize()
     $self->{'tdb'} = esmith::ConfigDB->open_ro($self->{'tdb_path'});
     $self->{'cdb'} = esmith::ConfigDB->open_ro($self->{'cdb_path'});
     $self->{'pfdb'} = esmith::ConfigDB->open_ro($self->{'pfdb_path'});
+    $self->{'ftdb'} = esmith::ConfigDB->open_ro($self->{'ftdb_path'});
 }
 
 =head2 getAddress(id, expand_zone = 0)
@@ -307,7 +311,7 @@ sub isValidNdpiProtocol($)
 
 Return the nDPI protocol for the service id, only if the protocol
 is defined in /proc/net/xt_ndpi/proto .
-Otherise return undef
+Otherwise return undef
 
 =cut
 sub getNdpiProtocol($)
@@ -321,6 +325,52 @@ sub getNdpiProtocol($)
     }
     return undef;
 }
+
+sub __localToUtc($)
+{
+    my $self = shift;
+    my $value = shift;
+
+    my ($hh,$mm,) = split(':', $value);
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+    my $time = timelocal( 0, $mm, $hh, $mday, $mon, $year );
+    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime($time);
+
+    return sprintf("%02d:%02d", $hour, $min);
+}
+
+=head2 getTimel(id)
+
+Return the time string in UTC.
+Return an '-' if the key doesn't exists;
+
+=cut
+sub getTime($)
+{
+    my $self = shift;
+    my $key = shift;
+
+    return '-' if ($key eq '');
+    $key = (split(';',$key))[1];
+    my $record = $self->{'ftdb'}->get($key) || return '-';
+    my $week_days = $record->prop('WeekDays') || '';
+    my $time_start = $record->prop('TimeStart') || '';
+    my $time_stop = $record->prop('TimeStop') || '';
+    my $str = 'utc';
+
+    if  ($week_days) {
+        $str .= "&weekdays=$week_days";
+    }
+    if ($time_start ne '') {
+        $str .= "&timestart=".$self->__localToUtc($time_start);
+    }
+    if ($time_stop ne '') {
+        $str .= "&timestop=".$self->__localToUtc($time_stop);
+    }
+
+    return $str;
+}
+
 
 =head2 getPorts(id)
 
@@ -343,7 +393,7 @@ sub getPorts($)
     my %ports;
     
     if ( lc($id) eq 'any') {
-        $ports{'all'} = '';
+        $ports{'-'} = '';
         return %ports; 
     }
     
@@ -466,6 +516,72 @@ sub getZone($)
     return "net:$value";
 }
 
+
+=head2 outRule
+
+Return the rule(s) in Shorewall format.
+
+Fields:
+
+1. ACTION
+2. SOURCE
+3. DEST
+4. PROTO
+5. DPORT
+6. SPORT (unused)
+7. ORIGDEST (unused)
+8. RATE (unused)
+9. USER (unused)
+10. MARK (unused)
+11. CONNLIMIT (unused)
+12. TIME
+
+=cut
+sub outRule($)
+{
+    my $self = shift;
+    my $params = shift;
+
+    my $str = "# ".$params->{'comment'}."\n?COMMENT ".$params->{'comment'}."\n";
+    $str .= $params->{'action'}."\t";
+    $str .= $params->{'src'}."\t";
+    $str .= $params->{'dst'}."\t";
+    if ($params->{'service'} ne '-') { # handle special services
+        if ($self->isNdpiService($params->{'service'})) {
+            my $proto = $self->getNdpiProtocol($params->{'service'}) || '';
+            if ($proto ne '') {
+                $str .= "\t-\t-\t-\t-\t-\t-\t-\t-\t"; # empty fields from 4 to 11
+                $str .= $params->{'time'}."\t";
+                $str .= ";; -m ndpi --$proto\n"; # this must be the last parameter
+
+                # generate also reverse rule
+                $str .= $params->{'action'}."\t";
+                $str .= $params->{'dst'}."\t";
+                $str .= $params->{'src'}."\t";
+                $str .= "\t-\t-\t-\t-\t-\t-\t-\t-\t"; # empty fields from 4 to 11
+                $str .= $params->{'time'}."\t";
+                $str .= ";; -m ndpi --$proto"; # this must be the last parameter
+            }
+        } else {
+            my %ports = $self->getPorts($params->{'service'});
+            foreach my $protocol (keys %ports) {
+                $str .= "$protocol\t";
+                $str .= "$ports{$protocol}\t";
+                $str .= "\t-\t-\t-\t-\t-\t-\t"; # empty fields from 6 to 11
+                $str .= $params->{'time'}."\t";
+            }
+
+        }
+    } else { # no service
+        $str .= "\t-\t-\t-\t-\t-\t-\t-\t-\t"; # empty fields from 4 to 11
+        $str .= $params->{'time'}."\t";
+    }
+
+
+    $str .= "\n?COMMENT\n\n"; # clear comment
+
+    return $str;
+}
 
 =head2 listZones
 
@@ -738,8 +854,6 @@ sub _getIpRangeAddress($)
     return $start.'-'.$end;
 }
 
-
-
 =head2 countReferences(db, key)
 
 Returns the number of references of the given <DB, key>. 
@@ -770,6 +884,7 @@ sub countReferences($$)
 	'alias' => 'role',
 	'bond' => 'role',
         'cidr', => 'cidr',
+        'time', => 'time',
         'iprange' => 'iprange'
 	};
 
@@ -802,7 +917,7 @@ sub countReferences($$)
     push(@fwrules, @bypass);
 
     foreach my $rule (@fwrules) {
-	my @props = qw(Src Dst DstHost Host Service Action);
+	my @props = qw(Src Dst DstHost Host Service Action Time);
 
 	my $target = $type . ';' . $key;
 

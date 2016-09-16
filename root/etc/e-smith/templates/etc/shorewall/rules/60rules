@@ -4,7 +4,6 @@
 {
     use NethServer::Firewall;
 
-    my $db = esmith::ConfigDB->open_ro("fwrules") || die "Can't open portforward database: $!\n";
     my $fw = new NethServer::Firewall();
     my $nfq = $firewall{'nfqueue'} || 'disabled';
     foreach my $rule ( $fw->getRules() ) {
@@ -19,10 +18,15 @@
         if ($nfq eq 'enabled' && $action eq 'ACCEPT') {
             $action = "NFQBY";
         }
-        my $service = $rule->prop("Service") || '';
+        my $service = $rule->prop("Service") || 'any';
+        $service = '-' if ($service eq '' || $service eq 'any');
         my $log = $rule->prop('Log') || "";
+        my $time =  $fw->getTime( $rule->prop('Time') || "" );
+        $time = '-' if ($time eq '');
+
         # skip ndpi rules if ndpi is not enabled
         next if ($fw->isNdpiService($service) && ! $fw->isNdpiEnabled());
+
         my $description = "RULE#" . $rule->key . " " . ($rule->prop('Description') || '');
 
         # src and dst can be: IP address, host, host-group, zone
@@ -34,25 +38,15 @@
 	$src_addr = $src_addr eq '' ? '-' : $src_addr;
 	$dst_addr = $dst_addr eq '' ? '-' : $dst_addr;
 
-        my $prefix .= "\n#\n# RULE#" . $rule->key . " $src -> $dst -> $service\n#\n";
-        $prefix .= "?COMMENT $description\n";
-        $prefix .= "$action\t".$fw->getZone($src_addr)."\t".$fw->getZone($dst_addr);
-        if ($fw->isNdpiService($service)) {
-            my $proto = $fw->getNdpiProtocol($service) || '';
-            next if ($proto eq '');
-            $OUT .= $prefix."\t;; -m ndpi --$proto\n";
+        my $params = {
+            'action' => $action,
+            'src' => $fw->getZone($src_addr),
+            'dst' => $fw->getZone($dst_addr),
+            'comment' => $description,
+            'time' => $time,
+            'service' => $service
+        };
 
-            # generate also reverse rule
-            $OUT .= "$action\t".$fw->getZone($dst_addr)."\t".$fw->getZone($src_addr)."\t;; -m ndpi --$proto\n";
-        } elsif ($service eq 'any' || $service eq '') {
-            $OUT .= $prefix."\tall\n";
-        } else {
-            my %ports = $fw->getPorts($service);
-            foreach my $protocol (keys %ports) {
-              $OUT .= $prefix."\t$protocol\t$ports{$protocol}\n";
-            }
-        }
+        $OUT .= $fw->outRule($params);
     }
 }
-
-
