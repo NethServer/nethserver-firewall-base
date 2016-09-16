@@ -161,7 +161,8 @@ Each rule record has the following fields:
   * ``ACCEPT`` allows the traffic
   * ``REJECT`` denies the traffic, an ICMP port unreachable packet is sent to the source address
   * ``DROP`` discards the traffic without informing the source address (the connection will timeout)
-* ``Service``: (optional) can be a service object or a port number. If a port number is used, both TCP and UDP protocols are matched.
+* ``Service``: (optional) can be a service object, a port number or a ndpi object. If a port number is used, both TCP and UDP protocols are matched.
+* ``Time``: (optional) can be a time object, the rule will be enabled only if the time conditions is matched
 * ``Log``: can be ``none`` or ``info``. If value is ``info``, all matched packets will be logged in ``/var/log/firewall.log``. Defaults to ``none``
 * ``status``: can be ``enabled`` or ``disabled``. Default is ``enabled``
 * ``Description``: (optional)
@@ -250,7 +251,7 @@ Supported objects are:
 * CIDR
 * Ip range
 * Zone
-
+* Time
 
 A host is an already defined entry inside the ``hosts`` db, or a new key of type ``host``: ::
 
@@ -295,6 +296,20 @@ A service can have a protocol and one or more ports. A ``service`` entry in ``fw
     name=fwservice
        Protocol=TCP/UDP/TCPUDP/ICMP
        Ports=port/port range
+
+A service can also be a refence in the format ``ndpi;<protocol>`` where ``protocol`` is a supported protocol from nDPI kernel module.
+To see a list of supported protocols: ::
+
+    db NethServer::Database::Ndpi keys
+
+
+A time condition is a ``time`` record entry in ``fwtimes`` database.
+All times are saved in *local time* and converted to UTC on template expansion.
+
+Database example: ::
+
+    db fwtimes setprop officehours WeekDays 'Mon,Tue,Wed,Thu' TimeStart '09:00' TimeStop '18:00'
+
 
 
 Rules based on mac address
