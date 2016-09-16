@@ -92,14 +92,12 @@ $view->includeCss('
 .fwrule .Description { bottom: 3px; position: absolute }
 .fwrule.disabled {color: gray !important; background-color: #eee}
 .fwrule.disabled .actbox, .fwrule.disabled .fields, .fwrule.disabled .green, .fwrule.disabled .red, .fwrule.disabled .orange, .fwrule.disabled .blue {color: gray !important}
-.fwrule.disabled .Description, .fwrule.disabled .RuleText {color: gray !important; }
 .placeholder {background-color: yellow; margin-bottom: 1.5em; background: linear-gradient(to bottom, rgba(234,239,181,1) 0%,rgba(225,233,160,1) 100%);}
 
 .drop .actbox { color: red }
 .reject .actbox { color: #700000}
 .accept .actbox { color: green}
 
-.gray, .RuleText {color: gray}
 .green {color: green}
 .red {color: red}
 .orange {color: orange}

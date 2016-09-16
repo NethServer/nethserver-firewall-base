@@ -382,11 +382,6 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             $values['Action'] = $actionLabels[$values['Action']];
             $values['Edit'] = array($view->getModuleUrl('../Edit/' . $key), $view->translate('EditRule_label'));
             $values['Copy'] = $view->getModuleUrl('../Copy/' . ($values['Position'] + 1) . '?id=' . $key);
-            $values['RuleText'] = $view->translate('RuleText_label', array(
-                'Src' => $this->resolveEndpoint($values['Src'], $view),
-                'Dst' => $this->resolveEndpoint($values['Dst'], $view),
-                'Service' => $this->resolveService($values['Service'], $view)
-            ));
             $values['Src'] = $this->resolveName($values['Src'],$view);
             $values['SrcCss'] = $values['Src'];
             $values['Dst'] = $this->resolveName($values['Dst'],$view);
@@ -424,7 +419,6 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
                 $values['Edit'] = array($view->getModuleUrl('../EditService/' . $key), $view->translate('EditService_label'));
                 $values['Copy'] = $view->getModuleUrl('..');
                 $values['Delete'] = $view->getModuleUrl('..');
-                $values['RuleText'] = '';
 
                 $values['Src'] = $this->resolveAccessSrc($values['access'], $view);
                 $values['SrcCss'] = strstr($values['access'], ',') ? '' : $values['access'];

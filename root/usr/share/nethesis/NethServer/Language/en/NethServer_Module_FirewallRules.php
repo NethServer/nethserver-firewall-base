@@ -49,7 +49,6 @@ $L['EditService_label'] = 'Edit service';
 $L['Copy_label'] = 'Copy';
 $L['Delete_label'] = 'Delete';
 $L['Index_header'] = 'Firewall rules';
-$L['RuleText_label'] = 'From ${Src} to ${Dst}, service ${Service}';
 $L['RuleId_label'] = '#${0}';
 $L['SearchPlaceholder_label'] = 'Search...';
 
