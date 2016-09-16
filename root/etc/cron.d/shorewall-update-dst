@@ -1,0 +1,1 @@
+10 5 * * * root	/usr/libexec/nethserver/shorewall-update-dst

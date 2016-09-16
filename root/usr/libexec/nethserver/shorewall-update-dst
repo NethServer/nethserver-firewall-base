@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#
+# If any time condition is set,
+# and today is the DST change day,
+# reconvert all local time conditions to UTC.
+#
+
+/sbin/e-smith/db fwrules print | /usr/bin/grep -q 'time;'
+
+# just exit 0 if time condition aren't use
+if [ $? -gt 0 ]; then
+    exit 0
+fi
+
+tz=$(/sbin/e-smith/config get TimeZone)
+year=$(date +%Y)
+today=$(date "+%a %b %d")
+
+# check if today is the DST change date
+/usr/sbin/zdump -v  $tz | /usr/bin/grep "$year" | /usr/bin/grep -q "$today"
+
+# regenerate all rules
+if [ $? -eq 0 ]; then
+    exec /sbin/signal-event firewall-adjust
+fi
+
+exit 0
