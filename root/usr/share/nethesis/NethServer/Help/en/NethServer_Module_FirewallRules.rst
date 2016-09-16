@@ -58,6 +58,7 @@ When creating and editing rules, you can create the following types of firewall 
 * Service
 * CIDR network
 * IP range
+* Time condition
 
 Each rule consists of the following fields. 
 
@@ -83,6 +84,9 @@ Destination
 
 Service
     A service network consisting of protocol and port (optional).
+
+Time condition
+    Limit the effectiveness of the firewall rule to the selected time condition.
 
 Write to log if this rule matches
     If enabled, all matched packets will be recorded in the log file

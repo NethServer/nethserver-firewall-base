@@ -323,6 +323,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             'service' => 'fa-circle-thin',
             'fw' => 'fa-fire',
             'ndpi' => 'fa-file-o',
+            'time' => 'fa-clock-o'
         );
         $tmp = explode(';', $v);
         if($tmp[0] === 'ndpi' && array_key_exists($tmp[1], self::$ndpiProtocolIcons)) {
@@ -373,6 +374,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             $values['ActionIcon'] = $actionIcons[$values['Action']];
             $values['SrcIcon'] = $this->getObjectIcon($values['Src']);
             $values['DstIcon'] = $this->getObjectIcon($values['Dst']);
+            $values['TimeIcon'] = $this->getObjectIcon($values['Time']);
             if ($values['Service'] == 'any') {
                 $values['ServiceIcon'] = '';
             } else {
@@ -386,6 +388,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             $values['SrcCss'] = $values['Src'];
             $values['Dst'] = $this->resolveName($values['Dst'],$view);
             $values['Service'] = $this->resolveService($values['Service']);
+            $values['Time'] = $values['Time'];
             $values['Delete'] = $view->getModuleUrl('../Delete/' . $key);
             $values['LogIcon'] = ($values['Log']!='none')?'fa-book':'';
             $values['LogLabel'] = ($values['Log']!='none')? $view->translate('ActionLog_label') : '';

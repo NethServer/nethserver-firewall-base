@@ -104,6 +104,19 @@ Ports
 Description
     Optional description.
 
+Time conditions
+===============
+
+A time condition can be associated to firewall rules to limit the time span where
+the rule is effective.
+
+Name
+    Identifier of the time condition.
+
+Description
+    Optional description.
+
+
 Zones
 =====
 

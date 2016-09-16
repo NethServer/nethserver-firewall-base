@@ -68,6 +68,7 @@ jQuery(function ($) {
 '#${viewId} .Selector input[value^=\"fw\"] + label::before { content: \"\\\\F06D\\\\20\" }',
 '#${viewId} .Selector input[value^=\"fwservice\"] + label::before { content: \"\\\\F013\\\\20\" }',
 '#${viewId} .Selector input[value^=\"service\"] + label::before { content: \"\\\\F1DB\\\\20\" }',
+'#${viewId} .Selector input[value^=\"time\"] + label::before { content: \"\\\\F017\\\\20\" }',
 '#${viewId} .Selector input[value^=\"ndpi\"] + label::before { content: \"\\\\F069\\\\20\" }',
 $ndpiProtocolIcons
 '#${viewId} .Selector input[value^=\"zone\"] + label::before { content: \"\\\\F096\\\\20\" }',

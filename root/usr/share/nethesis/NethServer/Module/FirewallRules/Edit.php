@@ -62,11 +62,11 @@ class Edit extends \Nethgui\Controller\Collection\AbstractAction
         $subrequest = $request->spawnRequest($ruleId);
         if ($subrequest->hasParameter('f') || $subrequest->hasParameter('Submit')) {
             // resume values from
-            $this->workflow->resume($this->getParent()->getSession())->copyTo($this->worker->parameters, array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status', 'Description', 'LogType', 'Action'));
+            $this->workflow->resume($this->getParent()->getSession())->copyTo($this->worker->parameters, array('SrcRaw', 'DstRaw', 'ServiceRaw', 'TimeRaw', 'status', 'Description', 'LogType', 'Action'));
         } else {
             // start new workflow
             $defaults = array();
-            foreach(array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status', 'Description', 'LogType', 'Action') as $f) {
+            foreach(array('SrcRaw', 'DstRaw', 'ServiceRaw', 'TimeRaw', 'status', 'Description', 'LogType', 'Action') as $f) {
                 if($request->hasParameter($f)) {
                     $defaults[$f] = $request->getParameter($f);
                 }

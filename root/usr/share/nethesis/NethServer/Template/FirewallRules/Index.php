@@ -26,7 +26,7 @@ $filterTarget = $view->getClientEventTarget('a');
 echo $view->hidden('a');
 
 echo $view->objectsCollection('Rules')
-    ->setAttribute('placeholders', array('cssAction', 'ActionIcon', 'SrcIcon', 'DstIcon', 'ServiceIcon', 'LogIcon', 'LogLabel', 'Src', 'SrcCss', 'Dst', 'Service', 'status'))
+    ->setAttribute('placeholders', array('cssAction', 'ActionIcon', 'SrcIcon', 'DstIcon', 'ServiceIcon', 'TimeIcon', 'LogIcon', 'LogLabel', 'Src', 'SrcCss', 'Dst', 'Service', 'Time', 'status'))
     ->setAttribute('key', 'id')
     ->setAttribute('ifEmpty', function ($view) use ($T) {
         return $T('NoRulesDefined_label');
@@ -54,6 +54,9 @@ echo $view->objectsCollection('Rules')
                 ->insert($view->panel()->setAttribute('class', 'service')->setAttribute('tag', 'span')
                     ->insert($view->literal('<i class="fwicon fa ${ServiceIcon} ${Service}"></i> '))
                     ->insert($view->textLabel('Service')->setAttribute('tag', 'span')))
+                ->insert($view->panel()->setAttribute('class', 'time')->setAttribute('tag', 'span')
+                        ->insert($view->literal('<i class="fwicon fa ${TimeIcon} ${Time}"></i> '))
+                        ->insert($view->textLabel('Time')->setAttribute('tag', 'span')))
                             )
                 ->insert($view->textLabel('Description')->setAttribute('tag', 'div')))
             ->insert($view->buttonList()->setAttribute('class', 'Buttonset v1')
@@ -88,6 +91,7 @@ $view->includeCss('
 .fields .src { display: inline-block; min-width: 10em }
 .fields .caret { padding: 0 1ex }
 .fields .service { padding-left: 1ex }
+.fields .time { padding-left: 1ex }
 .fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px 3px 3px 1ex; position: relative }
 .fwrule .Description { bottom: 3px; position: absolute }
 .fwrule.disabled {color: gray !important; background-color: #eee}

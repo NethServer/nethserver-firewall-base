@@ -28,6 +28,13 @@ echo $view->panel()->setAttribute('class', 'labeled-control label-above')
     ->insert($view->hidden('ServiceRaw'))
 ;
 
+echo $view->panel()->setAttribute('class', 'labeled-control label-above')
+    ->insert($view->literal(sprintf('<label for="%s">%s</label>', $view->getUniqueId('Time'), \htmlspecialchars($T('Time_label')))))
+    ->insert($view->textInput('Time', $view::STATE_READONLY | $view::LABEL_NONE)->setAttribute('class', 'pencil'))
+    ->insert($view->button('PickTime', $view::BUTTON_SUBMIT))
+    ->insert($view->hidden('TimeRaw'))
+;
+
 echo $view->checkbox('LogType', 'info')->setAttribute('uncheckedValue', 'none');
 echo $view->textInput('Description');
 
@@ -43,7 +50,7 @@ $jsCode .= "
     $('#${actionId}').on('change', uiupdate);
 ";
 
-foreach (array('Source', 'Destination', 'Service') as $target) {
+foreach (array('Source', 'Destination', 'Service', 'Time') as $target) {
     $buttonTarget = $view->getClientEventTarget('Pick' . $target);
     $inputTarget = $view->getClientEventTarget($target);
     $jsCode .= "
