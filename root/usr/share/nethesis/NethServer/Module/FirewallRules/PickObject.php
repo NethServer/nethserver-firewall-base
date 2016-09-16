@@ -76,7 +76,7 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
             $view['PickObjectHeader'] = $view->translate("PickObject_" . $this->parameters['f'] . "_header", array('RuleId' => $this->state->getStartIdentifier() === 'Edit' ? '#' . $this->state->getRuleId() : $view->translate('A_new_rule_label')));
 
             $results = array();
-            $ANY = array('any', $view->translate('Any_label'));
+            $ANY = array('any', ucfirst($view->translate('Type_any_label')));
 
             if ($this->parameters['f'] === 'ServiceRaw') {
                 $results[] = $ANY;
@@ -90,7 +90,7 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
                 $where = array('hosts' => array('host', 'remote', 'local'));
             } else {
                 $results[] = $ANY;
-                $results[] = array('fw', $view->translate('Fw_label'));
+                $results[] = array('fw', ucfirst($view->translate('Type_fw_label')));
                 $where = array('hosts' => array('host', 'host-group', 'remote', 'local', 'iprange', 'cidr'), 'networks' => array('zone'), 'ROLES' => array());
             }
 

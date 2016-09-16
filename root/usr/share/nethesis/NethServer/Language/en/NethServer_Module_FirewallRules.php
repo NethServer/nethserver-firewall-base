@@ -65,15 +65,13 @@ $L['IpRange_create'] = 'Create IP range "${0}"';
 $L['Cidr_create'] = 'Create CIDR network "${0}"';
 
 $L['A_new_rule_label'] = "New rule";
-$L['Any_label'] = 'Any';
-$L['Fw_label'] = 'Firewall';
 $L['NoRulesDefined_label'] = 'No rules are defined. Create the first one now!';
 
 $L['any_service_label'] = 'any service';
 $L['any_src_dst_label'] = 'any host';
 $L['Time_always'] = 'Always';
-$L['all_label'] = 'any';
-$L['fw_label'] = 'firewall';
+$L['Type_any_label'] = 'any';
+$L['Type_fw_label'] = 'firewall';
 $L['host_label'] = 'host';
 $L['zone_label'] = 'zone';
 $L['iprange_label'] = 'IP range';
