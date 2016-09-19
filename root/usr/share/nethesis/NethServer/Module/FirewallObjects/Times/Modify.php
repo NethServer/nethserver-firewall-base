@@ -31,20 +31,27 @@ class Modify extends \Nethgui\Controller\Table\Modify
 {
     private $interfaces;
 
+    public static $weekDays = array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
+
     public function initialize()
     {
+        $weekDaysValidator = $this->createValidator()->notEmpty()->collectionValidator($this->createValidator()->memberOf(self::$weekDays));
+
         $parameterSchema = array(
             array('name', Validate::USERNAME, \Nethgui\Controller\Table\Modify::KEY),
             array('Description', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
+            array('TimeStart', Validate::TIME, \Nethgui\Controller\Table\Modify::FIELD),
+            array('TimeStop', Validate::TIME, \Nethgui\Controller\Table\Modify::FIELD),
+            array('WeekDays', $weekDaysValidator, \Nethgui\Controller\Table\Modify::FIELD, 'WeekDays', ','),
         );
 
         $this->setSchema($parameterSchema);
-
+        $this->setDefaultValue('WeekDays', self::$weekDays);
         parent::initialize();
     }
 
     public function validate(\Nethgui\Controller\ValidationReportInterface $report)
-    {        
+    {
         $keyExists = $this->getPlatform()->getDatabase('fwtimes')->getType($this->parameters['name']) != '';
         if ($this->getIdentifier() === 'create' && $keyExists) {
             $report->addValidationErrorMessage($this, 'name', 'Time_key_exists_message');
@@ -71,6 +78,15 @@ class Modify extends \Nethgui\Controller\Table\Modify
             'delete' => 'Nethgui\Template\Table\Delete',
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
+        $view['WeekDaysDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource(array(
+            'Sun' => $view->translate('WeekDay_Sun_label'),
+            'Mon' => $view->translate('WeekDay_Mon_label'),
+            'Tue' => $view->translate('WeekDay_Tue_label'),
+            'Wed' => $view->translate('WeekDay_Wed_label'),
+            'Thu' => $view->translate('WeekDay_Thu_label'),
+            'Fri' => $view->translate('WeekDay_Fri_label'),
+            'Sat' => $view->translate('WeekDay_Sat_label'),
+        ));
     }
 
 }

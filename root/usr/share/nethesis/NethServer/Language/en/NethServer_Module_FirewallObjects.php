@@ -74,3 +74,15 @@ $L['IpRange_update_label'] = 'Update IP range';
 $L['IpRange_key_exists_message'] = 'An object with the same name already exists inside the hosts database';
 $L['IpRange_CreateIpRange_label'] = 'Create IP range';
 $L['IpRangeKey_label'] = 'IP range';
+
+$L['TimeStart_label'] = 'Time start';
+$L['TimeStop_label'] = 'Time stop';
+$L['Weekdays_label'] = 'Days of the week';
+
+$L['WeekDay_Sun_label'] = 'Sunday';
+$L['WeekDay_Mon_label'] = 'Monday';
+$L['WeekDay_Tue_label'] = 'Tuesday';
+$L['WeekDay_Wed_label'] = 'Wednesday';
+$L['WeekDay_Thu_label'] = 'Thursday';
+$L['WeekDay_Fri_label'] = 'Friday';
+$L['WeekDay_Sat_label'] = 'Saturday';
