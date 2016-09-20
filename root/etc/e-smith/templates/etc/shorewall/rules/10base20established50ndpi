@@ -5,22 +5,29 @@
 {
     use NethServer::Firewall;
 
-    my $db = esmith::ConfigDB->open_ro("fwrules") || die "Can't open portforward database: $!\n";
     my $fw = new NethServer::Firewall();
+    my $nfq = $firewall{'nfqueue'} || 'disabled';
     foreach my $rule ( $fw->getRules() ) {
         my $status = $rule->prop("status") || "disabled";
         next unless ($status eq 'enabled');
- 
-        my $src = $rule->prop("Src") || next; 
+
+        my $src = $rule->prop("Src") || next;
         my $dst = $rule->prop("Dst") || next;
         my $action= $rule->prop("Action") || next;
         $action = uc($action);
-        my $service = $rule->prop("Service") || '';
+
+        if ($nfq eq 'enabled' && $action eq 'ACCEPT') {
+            $action = "NFQBY";
+        }
+        my $service = $rule->prop("Service") || 'any';
+        $service = '-' if ($service eq '' || $service eq 'any');
         my $log = $rule->prop('Log') || "";
+        my $time =  $fw->getTime( $rule->prop('Time') || "" );
+        $time = '-' if ($time eq '');
 
         # skip all non-ndpi rules
         next if (! $fw->isNdpiService($service));
-    
+
         # skip ndpi rules if ndpi is not enabled
         next if (! $fw->isNdpiEnabled());
 
@@ -31,21 +38,19 @@
         my $dst_addr = $fw->getAddress($dst);
         $action .= ":$log" unless ($log eq '');
 
-	# Replace empty values with "-", for column count consistency:
-	$src_addr = $src_addr eq '' ? '-' : $src_addr;
-	$dst_addr = $dst_addr eq '' ? '-' : $dst_addr;
+        # Replace empty values with "-", for column count consistency:
+        $src_addr = $src_addr eq '' ? '-' : $src_addr;
+        $dst_addr = $dst_addr eq '' ? '-' : $dst_addr;
 
-        my $prefix .= "\n#\n# RULE#" . $rule->key . " $src -> $dst -> $service\n#\n";
-        $prefix .= "?COMMENT $description\n";
-        $prefix .= "$action\t".$fw->getZone($src_addr)."\t".$fw->getZone($dst_addr);
-        if ($fw->isNdpiService($service)) {
-            my $proto = $fw->getNdpiProtocol($service) || '';
-            next if ($proto eq '');
-            $OUT .= $prefix."\t;; -m ndpi --$proto\n";
-
-             # generate also reverse rule
-             $OUT .= "$action\t".$fw->getZone($dst_addr)."\t".$fw->getZone($src_addr)."\t;; -m ndpi --$proto\n";
-        } 
+        my $params = {
+            'action' => $action,
+            'src' => $fw->getZone($src_addr),
+            'dst' => $fw->getZone($dst_addr),
+            'comment' => $description,
+            'time' => $time,
+            'service' => $service
+        };
+        $OUT .= $fw->outRule($params);
     }
 }
 
