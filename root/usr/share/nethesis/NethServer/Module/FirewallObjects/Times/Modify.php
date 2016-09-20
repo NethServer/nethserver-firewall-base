@@ -66,6 +66,11 @@ class Modify extends \Nethgui\Controller\Table\Modify
             }
         }
         parent::validate($report);
+        if( ! $report->hasValidationErrors()) {
+            if(strcmp($this->parameters['TimeStart'], $this->parameters['TimeStop']) > 0) {
+                $report->addValidationErrorMessage($this, 'TimeStop', 'TimeStop_compare_TimeStart_message', array($this->parameters['TimeStart']));
+            }
+        }
     }
 
 

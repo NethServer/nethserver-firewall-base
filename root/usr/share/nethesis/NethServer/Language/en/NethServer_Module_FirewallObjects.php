@@ -80,6 +80,7 @@ $L['TimesKey_label'] = 'Condition name';
 $L['TimeStart_label'] = 'Time start';
 $L['TimeStop_label'] = 'Time stop';
 $L['WeekDays_label'] = 'Days of the week';
+$L['TimeStop_compare_TimeStart_message'] = 'Value must be greater than "Time start" (${0})';
 
 $L['WeekDay_Sun_label'] = 'Sunday';
 $L['WeekDay_Mon_label'] = 'Monday';
