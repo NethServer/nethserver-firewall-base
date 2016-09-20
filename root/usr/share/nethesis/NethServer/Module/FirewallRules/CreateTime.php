@@ -46,10 +46,15 @@ class CreateTime extends \Nethgui\Controller\Collection\AbstractAction
 
     public function initialize()
     {
+        $weekDaysValidator = $this->createValidator()->notEmpty()->collectionValidator($this->createValidator()->memberOf(\NethServer\Module\FirewallObjects\Times\Modify::$weekDays));
+
         parent::initialize();
         $this->state = new \NethServer\Module\FirewallRules\RuleWorkflow();
         $this->declareParameter('name', Validate::USERNAME);
         $this->declareParameter('Description', Validate::ANYTHING);
+        $this->declareParameter('TimeStart', Validate::TIME);
+        $this->declareParameter('TimeStop', Validate::TIME);
+        $this->declareParameter('WeekDays', $weekDaysValidator);
         $this->declareParameter('f', $this->createValidator()->memberOf('d', 's'));
         $this->declareParameter('i', Validate::POSITIVE_INTEGER);
         $this->declareParameter('q', Validate::ANYTHING);
@@ -87,6 +92,9 @@ class CreateTime extends \Nethgui\Controller\Collection\AbstractAction
             $this->getPlatform()
                 ->getDatabase('fwtimes')->setKey($this->parameters['name'], 'time', array(
                 'Description' => $this->parameters['Description'],
+                'TimeStart' => $this->parameters['TimeStart'],
+                'TimeStop' => $this->parameters['TimeStop'],
+                'WeekDays' => implode(',', $this->parameters['WeekDays']),
             ));
             $this->state->resume($this->getParent()->getSession())->assign(sprintf("time;%s", $this->parameters['name']));
         }
@@ -97,12 +105,22 @@ class CreateTime extends \Nethgui\Controller\Collection\AbstractAction
     {
         parent::prepareView($view);
         $view->setTemplate('NethServer/Template/FirewallObjects/Times/Modify');
+        $view['WeekDaysDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource(array(
+            'Sun' => $view->translate('WeekDay_Sun_label'),
+            'Mon' => $view->translate('WeekDay_Mon_label'),
+            'Tue' => $view->translate('WeekDay_Tue_label'),
+            'Wed' => $view->translate('WeekDay_Wed_label'),
+            'Thu' => $view->translate('WeekDay_Thu_label'),
+            'Fri' => $view->translate('WeekDay_Fri_label'),
+            'Sat' => $view->translate('WeekDay_Sat_label'),
+        ));
         if ( ! $this->getRequest()->isValidated()) {
             return;
         }
         if ($this->getRequest()->isMutation()) {
             $view->getCommandList()->sendQuery($view->getModuleUrl('../' . $this->state->getReturnPath()));
         } else {
+            $view['WeekDays'] = \NethServer\Module\FirewallObjects\Times\Modify::$weekDays;
             $view->getCommandList()->show();
         }
     }

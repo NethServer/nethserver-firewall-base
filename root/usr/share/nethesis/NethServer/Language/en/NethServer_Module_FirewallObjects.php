@@ -56,6 +56,7 @@ $L['valid_platform,fwobject-cidr-delete,fwobject-referenced,3'] = 'Could not del
 $L['valid_platform,fwobject-iprange-delete,fwobject-referenced,3'] = 'Could not delete ${2}. The IP range is used by firewall rules.';
 $L['valid_platform,fwobject-host-delete,fwobject-hostgroup-remove-member,3'] = 'Could not delete ${2}: it is the last member of host group ${${reason}}.';
 $L['valid_platform,fwobject-zone-delete,fwzone-referenced,3'] = 'Could not delete ${2}: it is used by network services';
+$L['valid_platform,fwobject-time-delete,fwobject-referenced,3'] = 'Could not delete ${2}: the time condition is used by firewall rules';
 $L['valid_iprange_outofbounds'] = 'The start IP must be less than the end IP';
 
 $L['Cidr_Title'] = 'CIDR subnets';
@@ -75,9 +76,10 @@ $L['IpRange_key_exists_message'] = 'An object with the same name already exists 
 $L['IpRange_CreateIpRange_label'] = 'Create IP range';
 $L['IpRangeKey_label'] = 'IP range';
 
+$L['TimesKey_label'] = 'Condition name';
 $L['TimeStart_label'] = 'Time start';
 $L['TimeStop_label'] = 'Time stop';
-$L['Weekdays_label'] = 'Days of the week';
+$L['WeekDays_label'] = 'Days of the week';
 
 $L['WeekDay_Sun_label'] = 'Sunday';
 $L['WeekDay_Mon_label'] = 'Monday';
