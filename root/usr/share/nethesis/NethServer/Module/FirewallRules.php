@@ -58,6 +58,7 @@ class FirewallRules extends \Nethgui\Controller\CollectionController implements 
             ->addChild(new \NethServer\Module\FirewallRules\CreateZone())
             ->addChild(new \NethServer\Module\FirewallRules\CreateHost())
             ->addChild(new \NethServer\Module\FirewallRules\CreateService())
+            ->addChild(new \NethServer\Module\FirewallRules\CreateTime())
             ->addChild(new \NethServer\Module\FirewallRules\CheckRules())
             ->addChild(new \NethServer\Module\FirewallRules\CreateCidr())
             ->addChild(new \NethServer\Module\FirewallRules\CreateIpRange())

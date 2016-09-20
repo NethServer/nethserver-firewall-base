@@ -26,7 +26,7 @@ $filterTarget = $view->getClientEventTarget('a');
 echo $view->hidden('a');
 
 echo $view->objectsCollection('Rules')
-    ->setAttribute('placeholders', array('cssAction', 'ActionIcon', 'SrcIcon', 'DstIcon', 'ServiceIcon', 'LogIcon', 'LogLabel', 'Src', 'SrcCss', 'Dst', 'Service', 'status'))
+    ->setAttribute('placeholders', array('cssAction', 'ActionIcon', 'LogIcon', 'LogLabel', 'Src', 'Dst', 'SrcColor', 'DstColor', 'status', 'ExtraTags'))
     ->setAttribute('key', 'id')
     ->setAttribute('ifEmpty', function ($view) use ($T) {
         return $T('NoRulesDefined_label');
@@ -43,18 +43,11 @@ echo $view->objectsCollection('Rules')
                 )
             ->insert($view->panel()->setAttribute('class', 'descbox')
                     ->insert($view->panel()->setAttribute('class', 'fields')
-                ->insert($view->panel()->setAttribute('class', 'src ${SrcCss}')->setAttribute('tag', 'span')
-                    ->insert($view->literal('<i class="fwicon fa ${SrcIcon} ${SrcCss}"></i> '))
-                    ->insert($view->textLabel('Src')->setAttribute('tag', 'span')))
-                ->insert($view->panel()->setAttribute('class', 'caret')->setAttribute('tag', 'span')
-                    ->insert($view->literal(' <i class="fa fa-long-arrow-right"></i> ')))
-                ->insert($view->panel()->setAttribute('class', 'dst ${Dst}')->setAttribute('tag', 'span')
-                    ->insert($view->literal(' <i class="fwicon fa ${DstIcon} ${Dst}"></i> '))
-                    ->insert($view->textLabel('Dst')->setAttribute('tag', 'span')))
-                ->insert($view->panel()->setAttribute('class', 'service')->setAttribute('tag', 'span')
-                    ->insert($view->literal('<i class="fwicon fa ${ServiceIcon} ${Service}"></i> '))
-                    ->insert($view->textLabel('Service')->setAttribute('tag', 'span')))
-                            )
+                        ->insert($view->textLabel('Src')->setAttribute('class', '${SrcColor}')->setAttribute('tag', 'div')->setAttribute('escapeHtml', FALSE))
+                        ->insert($view->literal(' <div class="arrow fa">&#xf178;</div> '))
+                        ->insert($view->textLabel('Dst')->setAttribute('class', '${DstColor}')->setAttribute('tag', 'div')->setAttribute('escapeHtml', FALSE))
+                        ->insert($view->textLabel('ExtraTags')->setAttribute('escapeHtml', FALSE))
+                    )
                 ->insert($view->textLabel('Description')->setAttribute('tag', 'div')))
             ->insert($view->buttonList()->setAttribute('class', 'Buttonset v1')
                 ->insert($view->button('Edit', $view::BUTTON_LINK))
@@ -85,25 +78,23 @@ $view->includeCss('
 .fwrule .actbox {padding: 3px 3px 3px 15px; min-width: 5.5em; text-transform: uppercase; cursor: move; font-size: 1.4em; font-weight: bold}
 .fwrule .log { font-size: 0.8em; font-weight: normal }
 .fwrule .fields {margin-bottom: 5px; font-size: 1.4em}
-.fields .src { display: inline-block; min-width: 10em }
-.fields .caret { padding: 0 1ex }
-.fields .service { padding-left: 1ex }
+.fields .Src { display: inline-block; min-width: 10em }
+.fields .Dst, .fields .arrow { display: inline-block; }
 .fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px 3px 3px 1ex; position: relative }
 .fwrule .Description { bottom: 3px; position: absolute }
 .fwrule.disabled {color: gray !important; background-color: #eee}
-.fwrule.disabled .actbox, .fwrule.disabled .fields, .fwrule.disabled .green, .fwrule.disabled .red, .fwrule.disabled .orange, .fwrule.disabled .blue {color: gray !important}
-.fwrule.disabled .Description, .fwrule.disabled .RuleText {color: gray !important; }
+.fwrule.disabled .actbox, .fwrule.disabled .fields, .fwrule.disabled .TextLabel i.fa {color: gray !important}
 .placeholder {background-color: yellow; margin-bottom: 1.5em; background: linear-gradient(to bottom, rgba(234,239,181,1) 0%,rgba(225,233,160,1) 100%);}
 
 .drop .actbox { color: red }
 .reject .actbox { color: #700000}
 .accept .actbox { color: green}
 
-.gray, .RuleText {color: gray}
-.green {color: green}
-.red {color: red}
-.orange {color: orange}
-.blue {color: blue}
+.green i.fa {color: green}
+.red i.fa {color: red}
+.orange i.fa {color: orange}
+.blue i.fa {color: blue}
+
 .my-state-active {
     background: #fff;
     color: #212121;

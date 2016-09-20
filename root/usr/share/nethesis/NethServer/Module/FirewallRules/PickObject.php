@@ -46,7 +46,7 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
     {
         parent::initialize();
         $this->declareParameter('q', Validate::ANYTHING);  // search query
-        $this->declareParameter('f', $this->createValidator()->memberOf('SrcRaw', 'DstRaw', 'ServiceRaw')); // field to modify
+        $this->declareParameter('f', $this->createValidator()->memberOf('SrcRaw', 'DstRaw', 'ServiceRaw', 'TimeRaw')); // field to modify
         $this->declareParameter('m', $this->createValidator()->memberOf('ts', 'pf', 'fr', ''));
         $this->declareParameter('Result', Validate::ANYTHING);
         $this->state = new \NethServer\Module\FirewallRules\RuleWorkflow();
@@ -76,18 +76,21 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
             $view['PickObjectHeader'] = $view->translate("PickObject_" . $this->parameters['f'] . "_header", array('RuleId' => $this->state->getStartIdentifier() === 'Edit' ? '#' . $this->state->getRuleId() : $view->translate('A_new_rule_label')));
 
             $results = array();
-            $ANY = array('any', $view->translate('Any_label'));
+            $ANY = array('any', ucfirst($view->translate('Type_any_label')));
 
             if ($this->parameters['f'] === 'ServiceRaw') {
                 $results[] = $ANY;
                 $where = array('fwservices' => array('fwservice'), 'SERVICES' => array(), 'NethServer::Database::Ndpi' => array('ndpi'));
+            } elseif($this->parameters['f'] === 'TimeRaw') {
+                $results[] = array('', $view->translate('Time_always'));
+                $where = array('fwtimes' => array('time'));
             } elseif ($this->parameters['m'] === 'ts') {
                 $where = array('hosts' => array('host', 'remote', 'local'));
             } elseif ($this->parameters['m'] === 'pf') {
                 $where = array('hosts' => array('host', 'remote', 'local'));
             } else {
                 $results[] = $ANY;
-                $results[] = array('fw', $view->translate('Fw_label'));
+                $results[] = array('fw', ucfirst($view->translate('Type_fw_label')));
                 $where = array('hosts' => array('host', 'host-group', 'remote', 'local', 'iprange', 'cidr'), 'networks' => array('zone'), 'ROLES' => array());
             }
 
@@ -128,6 +131,10 @@ class PickObject extends \Nethgui\Controller\Collection\AbstractAction
         if ($this->parameters['f'] === 'ServiceRaw') {
             return array(
                 array('Create' => array($view->getModuleUrl('../CreateService?q=' . $hint), $view->translate('Services_create', array($hint)))),
+            );
+        } elseif($this->parameters['f'] === 'TimeRaw') {
+            return array(
+                array('Create' => array($view->getModuleUrl('../CreateTime?q=' . $hint), $view->translate('Time_create', array($hint)))),
             );
         } elseif($this->parameters['m'] === 'pf') {
             return array(

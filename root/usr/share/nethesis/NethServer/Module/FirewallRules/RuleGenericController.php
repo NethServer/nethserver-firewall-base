@@ -55,6 +55,7 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
         $this->declareParameter('SrcRaw', Validate::ANYTHING, array('fwrules', $this->ruleId, 'Src'));
         $this->declareParameter('DstRaw', Validate::ANYTHING, array('fwrules', $this->ruleId, 'Dst'));
         $this->declareParameter('ServiceRaw', Validate::ANYTHING, array('fwrules', $this->ruleId, 'Service'));
+        $this->declareParameter('TimeRaw', Validate::ANYTHING, array('fwrules', $this->ruleId, 'Time'));
         $this->declareParameter('status', Validate::SERVICESTATUS, array('fwrules', $this->ruleId, 'status'));
         $this->declareParameter('Description', Validate::ANYTHING, array('fwrules', $this->ruleId, 'Description'));
         $this->declareParameter('Position', Validate::POSITIVE_INTEGER, array('fwrules', $this->ruleId, 'Position'));
@@ -63,6 +64,7 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
         $this->declareParameter('Source', Validate::ANYTHING);
         $this->declareParameter('Destination', Validate::ANYTHING);
         $this->declareParameter('Service', Validate::ANYTHING);
+        $this->declareParameter('Time', Validate::ANYTHING);
         parent::bind($request);
     }
 
@@ -85,6 +87,9 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
             return;
         }
         $this->parameters->addAdapter(new \Nethgui\Adapter\MultipleAdapter(function () use ($view, $sourceName) {
+            if($sourceName === 'TimeRaw' && $view['TimeRaw'] === '') {
+                return $view->translate('Time_always');
+            }
             return \NethServer\Module\FirewallRules\RuleGenericController::translateFirewallObjectTitle($view, $view[$sourceName]);
         }), $targetName);
     }
@@ -108,6 +113,7 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
         $this->addReadonlyAdapter($view, 'Source', 'SrcRaw');
         $this->addReadonlyAdapter($view, 'Destination', 'DstRaw');
         $this->addReadonlyAdapter($view, 'Service', 'ServiceRaw');
+        $this->addReadonlyAdapter($view, 'Time', 'TimeRaw');
         parent::prepareView($view);
         $view->setTemplate('NethServer\Template\FirewallRules\Rule');
         if ( ! $this->getRequest()->isValidated()) {
@@ -148,6 +154,8 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
                 return '../PickObject?f=DstRaw';
             } elseif ($R->hasParameter('PickService')) {
                 return '../PickObject?f=ServiceRaw';
+            } elseif ($R->hasParameter('PickTime')) {
+                return '../PickObject?f=TimeRaw';
             }
         }        
     }

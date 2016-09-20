@@ -29,6 +29,24 @@ namespace NethServer\Module\FirewallRules;
  */
 class Index extends \Nethgui\Controller\Collection\AbstractAction
 {
+    public static $objectIcons = array(
+        'any' => array('fa-globe', 'f0ac'),
+        'role' => array('fa-square', 'f0c8'),
+        'host' => array('fa-cube', 'f1b2'),
+        'zone' => array('fa-square-o', 'f096'),
+        'host-group' => array('fa-cubes', 'f1b3'),
+        'iprange' => array('fa-cubes', 'f1b3'),
+        'cidr' => array('fa-cubes', 'f1b3'),
+        'fwservice' => array('fa-gear', 'f013'),
+        'service' => array('fa-circle-thin', 'f1db'),
+        'fw' => array('fa-fire', 'f06d'),
+        'ndpi' => array('fa-file-o', 'f016'),
+        'time' => array('fa-clock-o', 'f017'),
+        'service-zone' => array('fa-square', 'f0c8'),
+        'service-localhost' => array('fa-times', 'f00d'),
+        'service-zones' => array('fa-th-large', 'f009'),
+    );
+
     public static $ndpiProtocolIcons = array(
         'amazon' => array('fa-amazon', 'F270'),
         'facebook' => array('fa-facebook-square', 'F082'),
@@ -273,68 +291,6 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         }
     }
 
-    private function resolveEndpoint($ep, $view)
-    {
-        if ($ep == 'any') {
-            return $view->translate("any_src_dst_label");
-        }
-        $tmp = explode(';', $ep);
-        if (isset($tmp[1])) {
-            return $view->translate($tmp[0].'_label')." ".$tmp[1];
-        } else {
-            return $ep;
-        }
-    }
-
-    private function resolveService($ep, $view = null)
-    {
-        if ($ep == 'any') {
-            if ($view == null) {
-                return '';
-            }  else {
-                return $view->translate("any_service_label");
-            }
-        }
-        return preg_replace('/^(fwservice|service|ndpi);/', "", $ep);
-    }
-
-    private function resolveName($ep,$view)
-    {
-        $tmp = explode(';', $ep);
-        if ($ep == 'any') {
-            return $view->translate("all_label");
-        } elseif ($ep === 'fw') {
-            return $view->translate("fw_label");
-        }
-        return isset($tmp[1])?$tmp[1]:$ep;
-    }
-
-    private function getObjectIcon($v)
-    {
-        $objectIcons = array(
-            'any' => 'fa-globe',
-            'role' => 'fa-square',
-            'host' => 'fa-cube',
-            'zone' => 'fa-square-o',
-            'host-group' => 'fa-cubes',
-            'iprange' => 'fa-cubes',
-            'cidr' => 'fa-cubes',
-            'fwservice' => 'fa-gear',
-            'service' => 'fa-circle-thin',
-            'fw' => 'fa-fire',
-            'ndpi' => 'fa-file-o',
-        );
-        $tmp = explode(';', $v);
-        if($tmp[0] === 'ndpi' && array_key_exists($tmp[1], self::$ndpiProtocolIcons)) {
-            return self::$ndpiProtocolIcons[$tmp[1]][0];
-        } elseif (isset($objectIcons[$tmp[0]])) {
-            return $objectIcons[$tmp[0]];
-        } else {
-            return $v;
-        }
-    }
-
-
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
@@ -371,26 +327,17 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             $values['Position'] = isset($values['Position']) ? intval($values['Position']) : 0;
             $values['cssAction'] = 'sortable '  . str_replace(';', ' ', $values['Action']);
             $values['ActionIcon'] = $actionIcons[$values['Action']];
-            $values['SrcIcon'] = $this->getObjectIcon($values['Src']);
-            $values['DstIcon'] = $this->getObjectIcon($values['Dst']);
-            if ($values['Service'] == 'any') {
-                $values['ServiceIcon'] = '';
-            } else {
-                $values['ServiceIcon'] = $this->getObjectIcon($values['Service']);
-            }
+            $values['ExtraTags'] = $this->renderExtraTagsRule($view, $key, $values);
 
             $values['Action'] = $actionLabels[$values['Action']];
             $values['Edit'] = array($view->getModuleUrl('../Edit/' . $key), $view->translate('EditRule_label'));
             $values['Copy'] = $view->getModuleUrl('../Copy/' . ($values['Position'] + 1) . '?id=' . $key);
-            $values['RuleText'] = $view->translate('RuleText_label', array(
-                'Src' => $this->resolveEndpoint($values['Src'], $view),
-                'Dst' => $this->resolveEndpoint($values['Dst'], $view),
-                'Service' => $this->resolveService($values['Service'], $view)
-            ));
-            $values['Src'] = $this->resolveName($values['Src'],$view);
-            $values['SrcCss'] = $values['Src'];
-            $values['Dst'] = $this->resolveName($values['Dst'],$view);
-            $values['Service'] = $this->resolveService($values['Service']);
+            $values['SrcColor'] = $this->resolveColor($values['Src'], $view);
+            $values['DstColor'] = $this->resolveColor($values['Dst'], $view);
+            $values['Src'] = $this->resolveName($values['Src'], $view);
+            $values['Dst'] = $this->resolveName($values['Dst'], $view);
+
+
             $values['Delete'] = $view->getModuleUrl('../Delete/' . $key);
             $values['LogIcon'] = ($values['Log']!='none')?'fa-book':'';
             $values['LogLabel'] = ($values['Log']!='none')? $view->translate('ActionLog_label') : '';
@@ -412,9 +359,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
 
                 $values['id'] = 's' . (++$serviceCount);
                 $values['Position'] = '';
-                $values['SrcIcon'] = $this->getAccessIconSrc($values['access']);
-                $values['DstIcon'] = $this->getObjectIcon('fw');
-                $values['ServiceIcon'] = 'fa-circle-thin';
+                $values['ExtraTags'] = $this->renderExtraTagsService($view, $key, $values);
 
                 $values['Action'] = 'accept';
                 $values['ActionIcon'] = $actionIcons[$values['Action']];
@@ -424,12 +369,12 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
                 $values['Edit'] = array($view->getModuleUrl('../EditService/' . $key), $view->translate('EditService_label'));
                 $values['Copy'] = $view->getModuleUrl('..');
                 $values['Delete'] = $view->getModuleUrl('..');
-                $values['RuleText'] = '';
 
+                $values['SrcColor'] = $this->resolveColor($values['access'], $view);
+                $values['DstColor'] = '';
                 $values['Src'] = $this->resolveAccessSrc($values['access'], $view);
-                $values['SrcCss'] = strstr($values['access'], ',') ? '' : $values['access'];
                 $values['Dst'] = $this->resolveName('fw', $view);
-                $values['Service'] = $key;
+                $values['Service'] = $this->resolveName('service;' . $key, $view);
 
                 $values['LogIcon'] = '';
                 $values['LogLabel'] = '';
@@ -448,21 +393,79 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         }
     }
 
-    private function getAccessIconSrc($access) {
-        if( ! $access) {
-            return 'fa-times';
-        } elseif(strstr($access, ',')) {
-            return 'fa-th-large';
+    private function resolveName($dbValue , $view)
+    {
+        $icon = sprintf('<i class="fa">&#x%s;</i>', $this->getObjectIcon($dbValue));
+        list($type, $value) = array_merge(explode(';', $dbValue), array(NULL));
+
+        if($value) {
+            $label = $value;
+        } else {
+            $label = $view->translate("Type_${type}_label", array($dbValue));
         }
-        return 'fa-square';
+
+        return $icon . ' ' . $label;
+    }
+
+    private function getObjectIcon($v)
+    {
+        list($type, $value) = array_merge(explode(';', $v), array(NULL));
+        if($type === 'ndpi' && array_key_exists($value, self::$ndpiProtocolIcons)) {
+            return self::$ndpiProtocolIcons[$value][1];
+        } elseif (array_key_exists($type, self::$objectIcons)) {
+            return self::$objectIcons[$type][1];
+        }
+
+        return 'f096';  //square-o
+    }
+
+    private function renderExtraTagsService($view, $key, $values)
+    {
+        return sprintf(' <span class="Service">%s</span>', $this->resolveName('service;' . $key, $view));
+    }
+
+    private function renderExtraTagsRule($view, $key, $values)
+    {
+        $out = '';
+        if(isset($values['Service']) && $values['Service'] && $values['Service'] !== 'any') {
+            $out .= sprintf(' <span class="Service">%s</span>', $this->resolveName($values['Service'], $view));
+        }
+
+        if(isset($values['Time']) && $values['Time']) {
+            $out .= sprintf(' <span class="Time">%s</span>', $this->resolveName($values['Time'], $view));
+        }
+
+        return $out;
+    }
+
+    private function resolveColor($dbValue, $view) {
+        list($type, $value) = array_merge(explode(';', $dbValue), array(NULL));
+
+        if($type === 'role') {
+            return $value;
+        }
+
+        if(strstr($type, ',') ) {
+            return '';
+        }
+
+        return $type;
     }
 
     private function resolveAccessSrc($access, \Nethgui\View\ViewInterface $view) {
         if( ! $access) {
-            return 'localhost';
+            $access = 'localhost';
         }
 
-        return strtr($access, ',', ', ');
+        if($access === 'localhost') {
+            $icon = $this->getObjectIcon('service-localhost', $view);
+        } elseif(strstr($access, ',')) {
+            $icon = $this->getObjectIcon('service-zones', $view);
+        } else {
+            $icon = $this->getObjectIcon('service-zone', $view);
+        }
+
+        return sprintf('<i class="fa">&#x%s;</i>', $icon) . ' ' . strtr($access, ',', ', ');
     }
 
     private function getNetworkServices()

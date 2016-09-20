@@ -135,6 +135,7 @@ validator_actions($_, qw(
    fwobject-cidr-delete
    fwobject-iprange-delete
    fwobject-provider-delete
+   fwobject-time-delete
 ));
 
 validator_actions('fwobject-zone-delete', qw(
