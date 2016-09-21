@@ -1,12 +1,3 @@
-{
-    use esmith::NetworksDB;
-    my $idb = esmith::NetworksDB->open_ro();
-    $db = esmith::ConfigDB->open("tc") || die "Can't open tc database: $!\n";
-    my $tc_enabled = scalar($db->get_all_by_prop('type' => 'device'));
-    if ($tc_enabled) {
-        $OUT .= "?COMMENT high priority ping to avoid false line-down reports\n";
-        $OUT .= "1       icmp    8\n";
-    }
-
-    return "";
-}
+?COMMENT high priority ping to avoid false line-down reports
+1       icmp    8
+?COMMENT
