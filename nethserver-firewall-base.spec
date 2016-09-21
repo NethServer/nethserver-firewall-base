@@ -37,7 +37,7 @@ perl createlinks
 mkdir -p root%{perl_vendorlib}
 mv -v NethServer root%{perl_vendorlib}
 
-for _nsdb in fwservices portforward tc; do
+for _nsdb in fwservices portforward ; do
    mkdir -p root/%{_nsdbconfdir}/${_nsdb}/{migrate,force,defaults}
 done 
 
@@ -56,7 +56,6 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 %dir %{_nseventsdir}/%{name}-update
 %dir %{_nsdbconfdir}/fwservices
 %dir %{_nsdbconfdir}/portforward
-%dir %{_nsdbconfdir}/tc
 
 
 %changelog

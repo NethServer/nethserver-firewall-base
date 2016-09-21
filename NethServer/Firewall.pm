@@ -133,7 +133,6 @@ sub new
     my $ndb_path = shift || '';
     my $hdb_path = shift || '';
     my $fdb_path = shift || 'fwrules';
-    my $tdb_path = shift || 'tc';
     my $cdb_path = shift || '';
     my $pfdb_path = shift || 'portforward';
     my $ftdb_path = shift || 'fwtimes';
@@ -143,7 +142,6 @@ sub new
         ndb_path => $ndb_path,
         hdb_path => $hdb_path,
         fdb_path => $fdb_path,
-        tdb_path => $tdb_path,
         pfdb_path => $pfdb_path,
         ftdb_path => $ftdb_path,
         cdb_path => $cdb_path
@@ -162,7 +160,6 @@ sub _initialize()
     $self->{'ndb'} = esmith::NetworksDB->open_ro($self->{'ndb_path'});
     $self->{'hdb'} = esmith::HostsDB->open_ro($self->{'hdb_path'});
     $self->{'fdb'} = esmith::ConfigDB->open_ro($self->{'fdb_path'});
-    $self->{'tdb'} = esmith::ConfigDB->open_ro($self->{'tdb_path'});
     $self->{'cdb'} = esmith::ConfigDB->open_ro($self->{'cdb_path'});
     $self->{'pfdb'} = esmith::ConfigDB->open_ro($self->{'pfdb_path'});
     $self->{'ftdb'} = esmith::ConfigDB->open_ro($self->{'ftdb_path'});
