@@ -1,15 +1,20 @@
 {
     use esmith::NetworksDB;
     my $idb = esmith::NetworksDB->open_ro();
-    $db = esmith::ConfigDB->open("tc") || die "Can't open tc database: $!\n";
-    foreach my $interface ( $db->get_all_by_prop('type' => 'device') ) {
-        my $i = $idb->get($interface->key) || next;
-        if ( ($i->prop('role') || "") eq "") {
-            next;
-        }
-        $in = $interface->prop('In') || next;
-        $out = $interface->prop('Out') || next;
-        $OUT .= $interface->key."\t-\t~".$in."kbit\t".$out."kbit\n"
-    }
+    foreach my $interface ( $idb->get_all() ) {
+        my $role = $interface->prop('role') || '';
+        next if ($role ne 'red');
+        my $type = $interface->prop('type') || '';
+        next if ($type eq 'xdsl-disabled'); # handle pppoe special case
 
+        my $out = $interface->prop('FwOutBandwidth') || '';
+        my $in = $interface->prop('FwInBandwidth') || '';
+
+        $OUT .= $interface->key."\texternal\t";
+        $OUT .= ($in eq '') ? "-" : "~".$in."kbit";
+        $OUT .= "\t";
+        $OUT .= ($out eq '') ? "-" : $out."kbit";
+        $OUT .= "\t";
+        $OUT .="\n";
+    }
 }
