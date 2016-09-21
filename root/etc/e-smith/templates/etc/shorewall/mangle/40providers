@@ -29,6 +29,7 @@
         my $dst_ori = $dst;
         my $provider = $rule->prop("Action") || next;
         my $service = $rule->prop("Service") || '';
+        my $time = $fw->getTime($rule->prop("Time") || '');
 
         # retrieve provider object
         my ($type, $provider_key) = split(';', $provider);
@@ -63,23 +64,48 @@
             $dst_addr = $fw->getAddress($dst, 1);
         }
 
+        my @lines = ();
         foreach (@src_addr) {
-            my $comment = "\n#\n# FORCE traffic [$src_ori -> $dst_ori] to $provider_key \n#\n";
-            my $lines = "?COMMENT $provider_key\n";
-            $lines .= "MARK(".$mask.")\t".$_."\t".$dst_addr;
+            # skip rules where dst, src and service are empty
+            next if ( ($service eq 'any' || $service eq '') &&  $_ eq '-' && ($dst_addr eq '-' || $dst_addr eq '') );
+
             if ($fw->isNdpiService($service)) {
                 my $proto = $fw->getNdpiProtocol($service) || '';
                 next if ($proto eq '');
-                $OUT .= $comment.$lines."\t;; -m ndpi --$proto\n";
-            } elsif ($service eq 'any' || $service eq '') {
-                next if ($_ eq '-' && ($dst_addr eq '-' || $dst_addr eq '')); # skip rules where dst, src and service are empty
-                $OUT .= $comment.$lines."\n";
+                push(@lines, { 'action' => "MARK($mask)",
+                               'source' => $_,
+                               'dest' => $dst_addr, 'time' => $time,
+                               'ndpi' => "-m ndpi --$proto"
+                             } );
             } else {
                 my %ports = $fw->getPorts($service);
                 foreach my $protocol (keys %ports) {
-                    $OUT .= $comment.$lines."\t$protocol\t$ports{$protocol}\n";
+                    push(@lines, { 'action' => "MARK($mask)",
+                                   'source' => $_,
+                                   'dest' => $dst_addr,
+                                   'time' => $time,
+                                   'proto' => $protocol || '-',
+                                   'dport' => $ports{$protocol} || '-',
+                                   'ndpi' => ''
+                                 });
                 }
             }
+        }
+
+        foreach my $line (@lines) {
+            $OUT .= "{";
+            foreach my $key ( keys $line ) {
+                next if ($key eq 'ndpi');
+                $OUT .= $key.':'.$line->{$key}.', '
+            }
+            $OUT = substr($OUT, 0, -2);
+            $OUT .= "}";
+
+            # append ndpi syntax as last argument
+            if ( $line->{'ndpi'} ne '' ) {
+                $OUT .= "; ".$line->{'ndpi'};
+            }
+            $OUT .= "\n";
         }
     }
 }
