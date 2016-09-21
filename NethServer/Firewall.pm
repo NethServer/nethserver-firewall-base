@@ -517,6 +517,70 @@ sub getZone($)
 }
 
 
+#
+#  Output mangle rule in compact format
+#  { key1:value1, key2:value2, ... }
+#
+sub _compactRuleFormat($)
+{
+    my $self = shift;
+    my $params = shift;
+
+    my $str = "{";
+    foreach my $key ( keys $params ) {
+        next if ($key eq 'ndpi');
+        $str .= $key.':'.$params->{$key}.', ';
+    }
+    $str = substr($str, 0, -2);
+    $str .= "}";
+
+    # append ndpi syntax as last argument
+    if ( $params->{'ndpi'} ne '' ) {
+         $str .= "; ".$params->{'ndpi'};
+    }
+
+    return $str."\n";
+}
+
+=head2 outMangleRule
+
+Return the mangle rule(s) in Shorewall format.
+
+=cut
+
+sub outMangleRule($)
+{
+    my $self = shift;
+    my $params = shift;
+
+    my $service = $params->{'service'};
+    my $str = "# ".$params->{'comment'}."\n?COMMENT ".$params->{'comment'}."\n";
+    delete($params->{'comment'});
+    delete($params->{'service'});
+
+    if ($self->isNdpiService($service)) {
+        my $proto = $self->getNdpiProtocol($service) || '';
+        if ($proto ne '') {
+            $params->{'ndpi'} = "-m ndpi --$proto";
+            $str .= $self->_compactRuleFormat($params);
+        }
+    } else {
+        my %ports = $self->getPorts($service);
+        foreach my $protocol (keys %ports) {
+            $params->{'ndpi'} = "";
+            $params->{'proto'} =  $protocol || '-';
+            $params->{'dport'} =  $ports{$protocol} || '-';
+            $str .= $self->_compactRuleFormat($params);
+         }
+    }
+
+    $str .= "\n?COMMENT\n\n"; # clear comment
+
+    return $str;
+}
+
+
+
 =head2 outRule
 
 Return the rule(s) in Shorewall format.
@@ -711,7 +775,7 @@ sub getRules
     my @list;
     foreach ($self->{'fdb'}->get_all_by_prop('type' => 'rule')) {
         my $action = $_->prop('Action');
-        next if ($action =~ /^provider;/); # skip tc rules
+        next if ($action =~ /^provider;/ || $action =~ /^priority;/); # skip tc rules
         push(@list,$_);
     }
     return sort _sort_by_position @list; # ascending sort
@@ -729,13 +793,11 @@ sub getTcRules
     my @list;
     foreach ($self->{'fdb'}->get_all_by_prop('type' => 'rule')) {
         my $action = $_->prop('Action');
-        if ($action =~ /^provider;/) { # skip traffic rules
+        if ($action =~ /^provider;/ || $action =~ /^priority;/) { # skip traffic rules
             push(@list,$_);
         }
     }
     @list = sort _sort_by_position @list; # ascending sort
-    my @ip_list = $self->{'tdb'}->get_all_by_prop('type' => 'ip');
-    push(@list, @ip_list);
     return @list;
 }
 
