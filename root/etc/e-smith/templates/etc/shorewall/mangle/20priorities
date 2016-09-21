@@ -11,6 +11,9 @@
     foreach my $rule ( reverse($fw->getTcRules()) ) {
         my $src = $rule->prop("Src") || next;
         my $dst = $rule->prop("Dst") || next;
+        my $status = $rule->prop("status") || 'disabled';
+        next if ($status eq 'disabled');
+
         my $mask = '';
         my $action = $rule->prop("Action") || next;
         if ($action =~ /^priority;(.*)/) {
