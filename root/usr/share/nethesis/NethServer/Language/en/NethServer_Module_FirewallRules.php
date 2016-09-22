@@ -101,7 +101,6 @@ $L['ActionRouteIndex_label'] = '${0}';
 $L['ActionLog_label'] = 'Log';
 
 $L['ShowAction_label'] = 'Show';
-$L['ShowAll_label'] = 'All';
 $L['ShowRules_label'] = 'Firewall';
 $L['ShowRoutes_label'] = 'Policy routing';
 $L['ShowServices_label'] = 'Network services';

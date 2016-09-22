@@ -296,6 +296,10 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         parent::prepareView($view);
         $r = array();
 
+        if( ! $view['a']) {
+            $view['a'] = 'rules';
+        }
+
         $actionLabels = array(
             'accept' => $view->translate('ActionAccept_label'),
             'reject' => $view->translate('ActionReject_label'),
@@ -315,11 +319,10 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
 
         foreach ($this->getAdapter() as $key => $values) {
 
-            if($this->parameters['a'] === 'rules' && substr($values['Action'], 0, 9) === 'provider;') {
-                continue;
-            } elseif($this->parameters['a'] === 'routes' && in_array($values['Action'], array('accept', 'drop', 'reject'))) {
-                continue;
-            } elseif($this->parameters['a'] === 'services') {
+            $actionMatch['routes'] = substr($values['Action'], 0, 9) === 'provider;';
+            $actionMatch['rules'] =  in_array($values['Action'], array('accept', 'drop', 'reject'));
+
+            if($view['a'] === 'services' || ! $actionMatch[$view['a']]) {
                 continue;
             }
 
@@ -353,7 +356,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         $first = (isset($positions[0]) ? $positions[0] / 2 : \NethServer\Module\FirewallRules::RULESTEP);
         $last = (end($positions) ? end($positions) : 0) + \NethServer\Module\FirewallRules::RULESTEP;
 
-        if($this->parameters['a'] === 'services' || ! $this->parameters['a']) {
+        if($view['a'] === 'services') {
             $serviceCount = 0;
             foreach($this->getNetworkServices() as $key => $values) {
 

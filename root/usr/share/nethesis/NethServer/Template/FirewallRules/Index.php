@@ -12,14 +12,13 @@ echo $view->buttonList()
         ->insert($view->button('Configure', $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('../General')))
     )
     ->insert($view->button('Commit', $view::BUTTON_SUBMIT)->setAttribute('receiver', 'Commit'))
-    ->insert($view->textLabel('ShowAction')->setAttribute('template', $T('ShowAction_label')))
-        ->insert($view->panel()->setAttribute('class', 'inlineblock')->setAttribute('id', 'ShowGroup')
-                ->insert($view->button('ShowRules',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=rules')))
-                ->insert($view->button('ShowServices',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=services')))
-                ->insert($view->button('ShowRoutes',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=routes')))
-                ->insert($view->button('ShowAll',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=')))
-                )
     ->insert($view->button('Help', $view::BUTTON_HELP))
+;
+
+echo $view->panel()->setAttribute('id', 'ShowGroup')
+    ->insert($view->button('ShowRules',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=rules')))
+    ->insert($view->button('ShowServices',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=services')))
+    ->insert($view->button('ShowRoutes',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=routes')))
 ;
 
 $filterTarget = $view->getClientEventTarget('a');
@@ -72,6 +71,9 @@ $view->includeTranslations(array(
 $ruleStep = \NethServer\Module\FirewallRules::RULESTEP;
 
 $view->includeCss('
+#ShowGroup { margin-bottom: 1em; border-bottom: 1px solid #d3d3d3; position: relative }
+#ShowGroup a { position: relative; bottom: -1px; margin-right: .2em }
+
 .fwrule {min-height: 50px; border:1px solid #d3d3d3; display: flex; margin-bottom: .5em; border-radius: 3px;}
 .fwrule .Buttonset {flex-grow: 0; margin-right: 0}
 .fwrule .Buttonset [role=button] {border-top: none}
@@ -97,7 +99,9 @@ $view->includeCss('
 
 .my-state-active {
     background: #fff;
-    color: #212121;
+    color: #00729D;
+    border-color: #00729D;
+    border-bottom-color: #fff;
 }
 
 .fwrule.sortable .actbox {
@@ -165,19 +169,18 @@ jQuery(function ($) {
     });
 
     var updateShowGroup = function (e, value) {
-        value = value === null ? '' : value;
-        $('#ShowGroup').children().each(function(index, elem) {
-            var selected = RegExp('=' + value + '$').test($(elem).attr('href'));
-            if(selected) {
+        var re = RegExp('=' + value + '$');
+        $('#ShowGroup').children('a').each(function(index, elem) {
+            if(re.test($(elem).attr('href'))) {
                 $(elem).addClass('my-state-active');
             } else {
                 $(elem).removeClass('my-state-active');
             }
         });
     };
-    $('#ShowGroup').buttonset();
+
     $('.${filterTarget}').on('nethguiupdateview', updateShowGroup);
-    updateShowGroup(null, '');
+    updateShowGroup(null, 'rules');
 });
 " . '
 /*!
