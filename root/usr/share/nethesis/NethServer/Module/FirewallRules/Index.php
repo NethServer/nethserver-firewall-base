@@ -253,7 +253,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
     {
         parent::initialize();
         $this->declareParameter('Rules', \Nethgui\System\PlatformInterface::ANYTHING_COLLECTION);
-        $this->declareParameter('a', $this->createValidator()->memberOf('', 'rules', 'routes', 'services'));
+        $this->declareParameter('a', $this->createValidator()->memberOf('rules', 'routes', 'services', 'trafficshaping'));
     }
 
     public function process()
@@ -304,12 +304,16 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             'accept' => $view->translate('ActionAccept_label'),
             'reject' => $view->translate('ActionReject_label'),
             'drop' => $view->translate('ActionDrop_label'),
+            'priority;high' => $view->translate('ActionPrioHi_label'),
+            'priority;low' => $view->translate('ActionPrioLo_label'),
         );
 
         $actionIcons = array(
             'accept' => 'fa-check-circle',
             'drop' => 'fa-minus-circle',
             'reject' => 'fa-shield',
+            'priority;high' => 'fa-arrow-circle-up',
+            'priority;low' => 'fa-arrow-circle-down',
         );
 
         foreach(array_keys($this->getPlatform()->getDatabase('networks')->getAll('provider')) as $provider) {
@@ -320,6 +324,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         foreach ($this->getAdapter() as $key => $values) {
 
             $actionMatch['routes'] = substr($values['Action'], 0, 9) === 'provider;';
+            $actionMatch['trafficshaping'] = substr($values['Action'], 0, 9) === 'priority;';
             $actionMatch['rules'] =  in_array($values['Action'], array('accept', 'drop', 'reject'));
 
             if($view['a'] === 'services' || ! $actionMatch[$view['a']]) {

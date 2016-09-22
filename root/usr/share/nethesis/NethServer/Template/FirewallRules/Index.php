@@ -19,6 +19,7 @@ echo $view->panel()->setAttribute('id', 'ShowGroup')
     ->insert($view->button('ShowRules',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=rules')))
     ->insert($view->button('ShowServices',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=services')))
     ->insert($view->button('ShowRoutes',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=routes')))
+    ->insert($view->button('ShowTrafficShaping',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=trafficshaping')))
 ;
 
 $filterTarget = $view->getClientEventTarget('a');
@@ -84,8 +85,10 @@ $view->includeCss('
 .fields .Dst, .fields .arrow { display: inline-block; }
 .fwrule .descbox {flex-grow: 8; border-left: 1px solid #d3d3d3; padding: 3px 3px 3px 1ex; position: relative }
 .fwrule .Description { bottom: 3px; position: absolute }
+.fwrule.high .fwicon { color: blue }
+.fwrule.low .fwicon { color: red }
 .fwrule.disabled {color: gray !important; background-color: #eee}
-.fwrule.disabled .actbox, .fwrule.disabled .fields, .fwrule.disabled .TextLabel i.fa {color: gray !important}
+.fwrule.disabled .actbox, .fwrule.disabled .actbox .fwicon, .fwrule.disabled .fields, .fwrule.disabled .TextLabel i.fa {color: gray !important}
 .placeholder {background-color: yellow; margin-bottom: 1.5em; background: linear-gradient(to bottom, rgba(234,239,181,1) 0%,rgba(225,233,160,1) 100%);}
 
 .drop .actbox { color: red }

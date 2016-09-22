@@ -104,6 +104,12 @@ $L['ShowAction_label'] = 'Show';
 $L['ShowRules_label'] = 'Firewall';
 $L['ShowRoutes_label'] = 'Policy routing';
 $L['ShowServices_label'] = 'Network services';
+$L['ShowTrafficShaping_label'] = 'Traffic shaping';
+
+$L['ActionPriorityHigh_label'] = 'High priority';
+$L['ActionPriorityLow_label'] = 'Low priority';
+$L['ActionPrioLo_label'] = 'Lo-Prio';
+$L['ActionPrioHi_label'] = 'Hi-Prio';
 
 $L['valid_platform,fwrule-modify,fwrule-route2provider,3'] = 'Route rules do not allow the red zone to be set as Source.';
 $L['valid_platform,fwrule-modify,fwrule-route2provider,4'] = 'Route rules allow only the following Destination types: zone, host, ip range, cidr, red.';
