@@ -58,13 +58,14 @@
             $dst_addr = $fw->getAddress($dst, 1);
         }
 
+        my $description = $rule->prop('Description') || "RULE#" . $rule->key . " $service";
         foreach(@src_addr) {
 
             my $params = {
-                'action' => "MARK($mask):T",
+                'action' => "MARK($mask)",
                 'source' => $_,
                 'dest' => $dst_addr,
-                'comment' => "RULE#" . $rule->key . " " . ($rule->prop('Description') || ''),
+                'comment' => $description,
                 'time' => $time,
                 'service' => $service
             };

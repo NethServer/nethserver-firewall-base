@@ -24,8 +24,9 @@
         my $time =  $fw->getTime( $rule->prop('Time') || "" );
         $time = '-' if ($time eq '');
 
-        # skip ndpi rules if ndpi is not enabled
-        next if ($fw->isNdpiService($service) && ! $fw->isNdpiEnabled());
+        # skip ndpi rules
+        # ndpi rules will be generated only in established section
+        next if ($fw->isNdpiService($service));
 
         my $description = "RULE#" . $rule->key . " " . ($rule->prop('Description') || '');
 
@@ -40,8 +41,8 @@
 
         my $params = {
             'action' => $action,
-            'src' => $fw->getZone($src_addr),
-            'dst' => $fw->getZone($dst_addr),
+            'source' => $fw->getZone($src_addr),
+            'dest' => $fw->getZone($dst_addr),
             'comment' => $description,
             'time' => $time,
             'service' => $service
