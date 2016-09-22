@@ -44,7 +44,7 @@ echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_HELP)
 $actionId = $view->getUniqueId('Action');
 $jsCode .= "
     var uiupdate = function (e) {
-       $('#" . $view->getUniqueId('LogType') . "').prop('disabled', $('#${actionId}').val().match(/^provider;/));
+       $('#" . $view->getUniqueId('LogType') . "').prop('disabled', $('#${actionId}').val().match(/^(provider|priority);/));
     };
     $('#" . $view->getUniqueId() . "').on('nethguishow', uiupdate);
     $('#${actionId}').on('change', uiupdate);
