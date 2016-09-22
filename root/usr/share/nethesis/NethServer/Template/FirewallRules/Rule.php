@@ -39,7 +39,7 @@ echo $view->checkbox('LogType', 'info')->setAttribute('uncheckedValue', 'none');
 echo $view->textInput('Description');
 
 echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_HELP)
-    ->insert($view->button('Cancel', $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('../Index')));
+    ->insert($view->button('Cancel', $view::BUTTON_LINK));
 
 $actionId = $view->getUniqueId('Action');
 $jsCode .= "
