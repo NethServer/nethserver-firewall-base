@@ -1,0 +1,40 @@
+#
+# 80ndpi
+#
+{
+   use NethServer::Database::Ndpi;
+   use esmith::ConfigDB;
+   use NethServer::Firewall;
+
+   my $fw = new NethServer::Firewall();
+
+   return '' if (!$fw->isNdpiEnabled());
+
+   my $db = esmith::ConfigDB->open_ro('fwrules');
+   tie my %udb, 'NethServer::Database::Ndpi';
+   
+   my %protocols = ();
+   foreach ( $db->get_all() ) {
+       my $service = $_->prop('Service') || '';
+       if ($fw->isNdpiService($service)) {
+           $protocols{$fw->getNdpiProtocol($service)} = '';
+       }
+   }
+
+   return '' if (! %protocols);
+
+   $OUT .= "# Restore the connection mark into the current packet.\n";
+   $OUT .= "RESTORE:F       -               -               -\n";
+   $OUT .= "# Test that restored mark and if it is not equal to zero, the packet is ACCEPTed\n";
+   $OUT .= "CONTINUE:F      -               -               -     -       -       -       !0x000/0xff00\n\n";
+
+   foreach my $proto ( keys %protocols ) {
+       my $mark = $fw->getNdpiMark($proto) || next;
+       $OUT .= "# Mark $proto\n";
+       $OUT .= "MARK($mark):F\t-\t-\t;; -m ndpi --$proto\n\n";
+   }
+
+   $OUT .= "# Save the current packet mark in the conntrack table if it's already marked\n";
+   $OUT .= "SAVE:F          -               -               -     -       -       -       !0x000/0xff00";
+
+}

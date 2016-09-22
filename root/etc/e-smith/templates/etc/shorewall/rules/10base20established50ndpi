@@ -44,8 +44,8 @@
 
         my $params = {
             'action' => $action,
-            'src' => $fw->getZone($src_addr),
-            'dst' => $fw->getZone($dst_addr),
+            'source' => $fw->getZone($src_addr),
+            'dest' => $fw->getZone($dst_addr),
             'comment' => $description,
             'time' => $time,
             'service' => $service

@@ -133,7 +133,6 @@ sub new
     my $ndb_path = shift || '';
     my $hdb_path = shift || '';
     my $fdb_path = shift || 'fwrules';
-    my $tdb_path = shift || 'tc';
     my $cdb_path = shift || '';
     my $pfdb_path = shift || 'portforward';
     my $ftdb_path = shift || 'fwtimes';
@@ -143,7 +142,6 @@ sub new
         ndb_path => $ndb_path,
         hdb_path => $hdb_path,
         fdb_path => $fdb_path,
-        tdb_path => $tdb_path,
         pfdb_path => $pfdb_path,
         ftdb_path => $ftdb_path,
         cdb_path => $cdb_path
@@ -162,7 +160,6 @@ sub _initialize()
     $self->{'ndb'} = esmith::NetworksDB->open_ro($self->{'ndb_path'});
     $self->{'hdb'} = esmith::HostsDB->open_ro($self->{'hdb_path'});
     $self->{'fdb'} = esmith::ConfigDB->open_ro($self->{'fdb_path'});
-    $self->{'tdb'} = esmith::ConfigDB->open_ro($self->{'tdb_path'});
     $self->{'cdb'} = esmith::ConfigDB->open_ro($self->{'cdb_path'});
     $self->{'pfdb'} = esmith::ConfigDB->open_ro($self->{'pfdb_path'});
     $self->{'ftdb'} = esmith::ConfigDB->open_ro($self->{'ftdb_path'});
@@ -517,6 +514,63 @@ sub getZone($)
 }
 
 
+#
+#  Output mangle rule in compact format
+#  { key1:value1, key2:value2, ... }
+#
+sub _compactRuleFormat($)
+{
+    my $self = shift;
+    my $params = shift;
+
+    my $str = "{";
+    foreach my $key ( keys $params ) {
+        $str .= $key.':'.$params->{$key}.', ';
+    }
+    $str = substr($str, 0, -2);
+    $str .= "}";
+
+    return $str."\n";
+}
+
+=head2 outMangleRule
+
+Return the mangle rule(s) in Shorewall format.
+
+=cut
+
+sub outMangleRule($)
+{
+    my $self = shift;
+    my $params = shift;
+
+    my $service = $params->{'service'};
+    my $str = "?COMMENT ".$params->{'comment'}."\n";
+    delete($params->{'comment'});
+    delete($params->{'service'});
+
+    if ($self->isNdpiService($service)) {
+        my $proto = $self->getNdpiProtocol($service) || '';
+        if ($proto ne '') {
+            $params->{'test'} = $self->getNdpiMark($proto);
+            $str .= $self->_compactRuleFormat($params);
+        }
+    } else {
+        my %ports = $self->getPorts($service);
+        foreach my $protocol (keys %ports) {
+            $params->{'proto'} =  $protocol || '-';
+            $params->{'dport'} =  $ports{$protocol} || '-';
+            $str .= $self->_compactRuleFormat($params);
+         }
+    }
+
+    $str .= "\n?COMMENT\n\n"; # clear comment
+
+    return $str;
+}
+
+
+
 =head2 outRule
 
 Return the rule(s) in Shorewall format.
@@ -542,39 +596,28 @@ sub outRule($)
     my $self = shift;
     my $params = shift;
 
-    my $str = "# ".$params->{'comment'}."\n?COMMENT ".$params->{'comment'}."\n";
-    $str .= $params->{'action'}."\t";
-    $str .= $params->{'src'}."\t";
-    $str .= $params->{'dst'}."\t";
-    if ($params->{'service'} ne '-') { # handle special services
-        if ($self->isNdpiService($params->{'service'})) {
-            my $proto = $self->getNdpiProtocol($params->{'service'}) || '';
+    my $str = "?COMMENT ".$params->{'comment'}."\n";
+    my $service = $params->{'service'};
+    delete($params->{'service'});
+    delete($params->{'comment'});
+    if ($service ne '-') { # handle special services
+        if ($self->isNdpiService($service)) {
+            my $proto = $self->getNdpiProtocol($service) || '';
             if ($proto ne '') {
-                $str .= "\t-\t-\t-\t-\t-\t-\t-\t-\t"; # empty fields from 4 to 11
-                $str .= $params->{'time'}."\t";
-                $str .= ";; -m ndpi --$proto\n"; # this must be the last parameter
-
-                # generate also reverse rule
-                $str .= $params->{'action'}."\t";
-                $str .= $params->{'dst'}."\t";
-                $str .= $params->{'src'}."\t";
-                $str .= "\t-\t-\t-\t-\t-\t-\t-\t-\t"; # empty fields from 4 to 11
-                $str .= $params->{'time'}."\t";
-                $str .= ";; -m ndpi --$proto"; # this must be the last parameter
+                $params->{'mark'} = $self->getNdpiMark($proto);
+                $str .= $self->_compactRuleFormat($params);
             }
         } else {
-            my %ports = $self->getPorts($params->{'service'});
+            my %ports = $self->getPorts($service);
             foreach my $protocol (keys %ports) {
-                $str .= "$protocol\t";
-                $str .= "$ports{$protocol}\t";
-                $str .= "\t-\t-\t-\t-\t-\t-\t"; # empty fields from 6 to 11
-                $str .= $params->{'time'}."\t";
+                $params->{'proto'} =  $protocol || '-';
+                $params->{'dport'} =  $ports{$protocol} || '-';
+                $str .= $self->_compactRuleFormat($params);
             }
 
         }
     } else { # no service
-        $str .= "\t-\t-\t-\t-\t-\t-\t-\t-\t"; # empty fields from 4 to 11
-        $str .= $params->{'time'}."\t";
+        $str .= $self->_compactRuleFormat($params);
     }
 
 
@@ -636,6 +679,29 @@ sub isNdpiService($)
     my $self = shift;
     my $key = shift;
     return ($key =~ /^ndpi;/);
+}
+
+
+=head2 getNdpiMark
+
+Return ndpi mark shifted by 8
+
+=cut
+
+sub getNdpiMark($)
+{
+    my $self = shift;
+    my $key = shift;
+    tie my %udb, 'NethServer::Database::Ndpi';
+
+    my $proto = $key;
+    if ($key =~ /^ndpi;(.*)/) {
+        $proto = $1;
+    }
+    my $mark  = esmith::db::db_get_prop(\%udb, $proto, 'mark') || return '';
+    my $dec = hex($mark)<<8;
+    $mark = sprintf("0x%X", $dec);
+    return "$mark/0xff00";
 }
 
 
@@ -711,7 +777,7 @@ sub getRules
     my @list;
     foreach ($self->{'fdb'}->get_all_by_prop('type' => 'rule')) {
         my $action = $_->prop('Action');
-        next if ($action =~ /^provider;/); # skip tc rules
+        next if ($action =~ /^provider;/ || $action =~ /^priority;/); # skip tc rules
         push(@list,$_);
     }
     return sort _sort_by_position @list; # ascending sort
@@ -729,13 +795,11 @@ sub getTcRules
     my @list;
     foreach ($self->{'fdb'}->get_all_by_prop('type' => 'rule')) {
         my $action = $_->prop('Action');
-        if ($action =~ /^provider;/) { # skip traffic rules
+        if ($action =~ /^provider;/ || $action =~ /^priority;/) { # skip traffic rules
             push(@list,$_);
         }
     }
     @list = sort _sort_by_position @list; # ascending sort
-    my @ip_list = $self->{'tdb'}->get_all_by_prop('type' => 'ip');
-    push(@list, @ip_list);
     return @list;
 }
 
