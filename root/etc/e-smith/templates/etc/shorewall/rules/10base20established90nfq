@@ -10,6 +10,8 @@
         $OUT .= "NFQBY\tnet\tloc\n";
         $OUT .= "NFQBY\tnet\tfw\n";
         $OUT .= "NFQBY\tfw\tnet\n";
+        $OUT .= "NFQBY\tfw\tloc\n";
+        $OUT .= "NFQBY\tloc\tfw\n";
 
         my $ndb = esmith::NetworksDB->open_ro();
         if ($ndb->blue) {
