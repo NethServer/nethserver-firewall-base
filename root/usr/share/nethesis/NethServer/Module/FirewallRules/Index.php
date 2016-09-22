@@ -253,7 +253,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
     {
         parent::initialize();
         $this->declareParameter('Rules', \Nethgui\System\PlatformInterface::ANYTHING_COLLECTION);
-        $this->declareParameter('a', $this->createValidator()->memberOf('', 'rules', 'routes', 'services'));
+        $this->declareParameter('a', $this->createValidator()->memberOf('rules', 'routes', 'services', 'trafficshaping'));
     }
 
     public function process()
@@ -296,16 +296,24 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         parent::prepareView($view);
         $r = array();
 
+        if( ! $view['a']) {
+            $view['a'] = 'rules';
+        }
+
         $actionLabels = array(
             'accept' => $view->translate('ActionAccept_label'),
             'reject' => $view->translate('ActionReject_label'),
             'drop' => $view->translate('ActionDrop_label'),
+            'priority;high' => $view->translate('ActionPrioHi_label'),
+            'priority;low' => $view->translate('ActionPrioLo_label'),
         );
 
         $actionIcons = array(
             'accept' => 'fa-check-circle',
             'drop' => 'fa-minus-circle',
             'reject' => 'fa-shield',
+            'priority;high' => 'fa-arrow-circle-up',
+            'priority;low' => 'fa-arrow-circle-down',
         );
 
         foreach(array_keys($this->getPlatform()->getDatabase('networks')->getAll('provider')) as $provider) {
@@ -315,11 +323,11 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
 
         foreach ($this->getAdapter() as $key => $values) {
 
-            if($this->parameters['a'] === 'rules' && substr($values['Action'], 0, 9) === 'provider;') {
-                continue;
-            } elseif($this->parameters['a'] === 'routes' && in_array($values['Action'], array('accept', 'drop', 'reject'))) {
-                continue;
-            } elseif($this->parameters['a'] === 'services') {
+            $actionMatch['routes'] = substr($values['Action'], 0, 9) === 'provider;';
+            $actionMatch['trafficshaping'] = substr($values['Action'], 0, 9) === 'priority;';
+            $actionMatch['rules'] =  in_array($values['Action'], array('accept', 'drop', 'reject'));
+
+            if($view['a'] === 'services' || ! $actionMatch[$view['a']]) {
                 continue;
             }
 
@@ -353,7 +361,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         $first = (isset($positions[0]) ? $positions[0] / 2 : \NethServer\Module\FirewallRules::RULESTEP);
         $last = (end($positions) ? end($positions) : 0) + \NethServer\Module\FirewallRules::RULESTEP;
 
-        if($this->parameters['a'] === 'services' || ! $this->parameters['a']) {
+        if($view['a'] === 'services') {
             $serviceCount = 0;
             foreach($this->getNetworkServices() as $key => $values) {
 

@@ -89,6 +89,13 @@ class Edit extends \Nethgui\Controller\Collection\AbstractAction
     {
         $this->worker->prepareView($view);
         $view['FormAction'] = $view->getModuleUrl($this->worker->ruleId);
+        $action = 'rules';
+        if(substr($view['Action'], 0, 9) === 'provider;') {
+            $action = 'routes';
+        } elseif (substr($view['Action'], 0, 9) === 'priority;') {
+            $action = 'trafficshaping';
+        }
+        $view['Cancel'] = $view->getModuleUrl('../Index?a=' . $action);
     }
 
     public function nextPath()

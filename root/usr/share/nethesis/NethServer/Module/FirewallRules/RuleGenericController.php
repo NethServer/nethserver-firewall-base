@@ -50,7 +50,9 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
         $validActions = array_merge(array('accept', 'reject', 'drop'), array_map(
                         function ($x) {
                     return 'provider;' . $x;
-                }, $this->getProviderKeys()));
+                }, $this->getProviderKeys()),
+                array('priority;low', 'priority;high')
+            );
 
         $this->declareParameter('SrcRaw', Validate::ANYTHING, array('fwrules', $this->ruleId, 'Src'));
         $this->declareParameter('DstRaw', Validate::ANYTHING, array('fwrules', $this->ruleId, 'Dst'));
@@ -129,7 +131,9 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
         $actions =array(
             array('accept', $view->translate('ActionAccept_label')),
             array('reject', $view->translate('ActionReject_label')),
-            array('drop', $view->translate('ActionDrop_label'))
+            array('drop', $view->translate('ActionDrop_label')),
+            array('priority;high', $view->translate('ActionPriorityHigh_label')),
+            array('priority;low', $view->translate('ActionPriorityLow_label')),
         );
         foreach($this->getProviderKeys() as $provider) {
             $actions[] = array('provider;' . $provider, $view->translate('ActionRoute_label', array($provider)));

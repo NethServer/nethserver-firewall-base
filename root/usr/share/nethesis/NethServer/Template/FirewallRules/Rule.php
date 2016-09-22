@@ -39,15 +39,19 @@ echo $view->checkbox('LogType', 'info')->setAttribute('uncheckedValue', 'none');
 echo $view->textInput('Description');
 
 echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_HELP)
-    ->insert($view->button('Cancel', $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('../Index')));
+    ->insert($view->button('Cancel', $view::BUTTON_LINK));
 
 $actionId = $view->getUniqueId('Action');
+$serviceTarget = $view->getClientEventTarget('ServiceRaw');
 $jsCode .= "
     var uiupdate = function (e) {
-       $('#" . $view->getUniqueId('LogType') . "').prop('disabled', $('#${actionId}').val().match(/^provider;/));
+        var isLogDisabled = $('#${actionId}').val().match(/^(provider|priority);/)
+            || $('.${serviceTarget}').val().match(/^ndpi;/);
+        $('#" . $view->getUniqueId('LogType') . "').prop('disabled', isLogDisabled);
     };
     $('#" . $view->getUniqueId() . "').on('nethguishow', uiupdate);
     $('#${actionId}').on('change', uiupdate);
+    $('.${serviceTarget}').on('nethguiupdateview', uiupdate);
 ";
 
 foreach (array('Source', 'Destination', 'Service', 'Time') as $target) {

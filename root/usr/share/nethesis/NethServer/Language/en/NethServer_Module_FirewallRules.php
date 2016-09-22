@@ -3,7 +3,7 @@
 /* NethServer_Module_FirewallRules translation, language: en */
 
 $L['FirewallRules_Description'] = 'Manage firewall rules';
-$L['FirewallRules_Tags'] = 'firewall rule policy';
+$L['FirewallRules_Tags'] = 'firewall rule policy traffic shaping';
 $L['FirewallRules_Title'] = 'Firewall rules';
 
 $L['general_header'] = 'General';
@@ -101,11 +101,18 @@ $L['ActionRouteIndex_label'] = '${0}';
 $L['ActionLog_label'] = 'Log';
 
 $L['ShowAction_label'] = 'Show';
-$L['ShowAll_label'] = 'All';
 $L['ShowRules_label'] = 'Firewall';
 $L['ShowRoutes_label'] = 'Policy routing';
 $L['ShowServices_label'] = 'Network services';
+$L['ShowTrafficShaping_label'] = 'Traffic shaping';
+
+$L['ActionPriorityHigh_label'] = 'High priority';
+$L['ActionPriorityLow_label'] = 'Low priority';
+$L['ActionPrioLo_label'] = 'Lo-Prio';
+$L['ActionPrioHi_label'] = 'Hi-Prio';
 
 $L['valid_platform,fwrule-modify,fwrule-route2provider,3'] = 'Route rules do not allow the red zone to be set as Source.';
 $L['valid_platform,fwrule-modify,fwrule-route2provider,4'] = 'Route rules allow only the following Destination types: zone, host, ip range, cidr, red.';
 $L['valid_platform,fwrule-modify,fwrule-localservice,3'] = 'Selecting "local service" requires the "firewall" destination.';
+$L['valid_platform,fwrule-modify,fwrule-trafficshaping,3'] = 'Traffic shaping rules do not allow the red zone to be set as source';
+$L['valid_platform,fwrule-modify,fwrule-trafficshaping,4'] = 'Traffic shaping rules allow only the following Destination types: zone, host, IP range, CIDR, red';
