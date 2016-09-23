@@ -1,5 +1,6 @@
 #
-# 80ndpi
+# 20ndpi
+# All nDPI traffic is marked in forward chain
 #
 {
    use NethServer::Database::Ndpi;

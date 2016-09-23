@@ -1,45 +1,37 @@
 #
-# 40providers
+# 40priorities
+# All priority rules are marked inside the post chain.
+# If FW is the source, rules are moved to output chain.
 #
 {
     use NethServer::Firewall;
     use esmith::NetworksDB;
 
-    my $db = esmith::ConfigDB->open_ro("tc") || die "Can't open tc database: $!\n";
-    my $ndb = esmith::NetworksDB->open_ro() || die "Can't open networks database: $!\n";
     my $fw = new NethServer::Firewall();
+    my $ndb = esmith::NetworksDB->open_ro();
     our @providers = $fw->getProviders();
 
-    sub getProvider
-    {
-        my $needle = shift;
-
-        foreach my $p (@providers) {
-            if ($p->{'name'} eq $needle) {
-                return $p;
-            }
-        }   
-        return undef;
-    }
-
-    foreach my $rule ( $fw->getTcRules() ) {
+    foreach my $rule ( reverse($fw->getTcRules()) ) {
         my $src = $rule->prop("Src") || next;
         my $dst = $rule->prop("Dst") || next;
         my $status = $rule->prop("status") || 'disabled';
         next if ($status eq 'disabled');
 
-        my $provider = $rule->prop("Action") || next;
+        my $mask = '';
+        my $action = $rule->prop("Action") || next;
+        if ($action =~ /^priority;(.*)/) {
+            # map low to 3 (low), map high to 2 (medium)
+            # 1 (high) is reserved for system use
+            $mask = (lc($1) eq 'low') ? "0x3/0xff": "0x2/0xff"; 
+        } else {
+            # skip non-priority rules
+            next;
+        }
         my $service = $rule->prop("Service") || '';
         my $time = $fw->getTime($rule->prop("Time") || '');
 
         # skip ndpi rules if ndpi is not enabled
         next if ($fw->isNdpiService($service) && ! $fw->isNdpiEnabled());
-
-
-        # retrieve provider object
-        my ($type, $provider_key) = split(';', $provider);
-        my $p = getProvider($provider_key);
-        my $mask = $p->{'mask'} || next;
 
         my @src_addr;
         if ($src =~ /role;(.*)/) { # src is an interface
@@ -69,19 +61,23 @@
             $dst_addr = $fw->getAddress($dst, 1);
         }
 
+        my $description = $rule->prop('Description') || "RULE#" . $rule->key . " $service";
         foreach(@src_addr) {
 
+            my $chain = ':T';
+            if ( $_ eq '$FW') {
+                $chain = '';
+            }
             my $params = {
-                'action' => "MARK($mask)",
+                'action' => "MARK($mask)$chain",
                 'source' => $_,
                 'dest' => $dst_addr,
-                'comment' => "RULE#" . $rule->key . " " . ($rule->prop('Description') || ''),
+                'comment' => $description,
                 'time' => $time,
                 'service' => $service
             };
 
             $OUT .= $fw->outMangleRule($params);
         }
-
     }
 }
