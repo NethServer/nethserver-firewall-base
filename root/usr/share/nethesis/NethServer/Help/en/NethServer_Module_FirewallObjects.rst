@@ -116,6 +116,14 @@ Name
 Description
     Optional description.
 
+Time start
+    Use HH:MM[:SS] format to specify when the time span begins.
+
+Time stop
+    Use HH:MM[:SS] format to specify when the time span ends.
+
+Days of the week
+    Limit the rule effectiveness to the selected day(s).
 
 Zones
 =====
