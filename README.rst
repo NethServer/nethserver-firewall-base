@@ -361,6 +361,7 @@ During template-expanding phase, the associated host is mapping with referenced 
 
 More information are available here: http://shorewall.net/NAT.htm
 
+.. _section-tc:
 
 Traffic shaping
 ================
@@ -374,43 +375,69 @@ The feature is controlled by ``tc`` property in ``firewall`` key from ``configur
 
 See TC_ENABLED at http://shorewall.net/manpages/shorewall.conf.html .
 
-All traffic shaping rules are saved inside ``tc`` db.
+All traffic shaping rules are saved inside the ``fwrules`` database with the same format.
+Valid actions for traffic shaping rules are:
 
-A record could be of type:
+- ``priority;high``: set the priority to high (actually the value is normalized to 2 - medium)
+- ``priority;low``: set the priority to low
+- ``provider;<name>``: force the traffic to the provider specified by ``name``
 
-* ``device``: describe an interface
-* ``port``: describe a rule for a port
-* ``ip``: describe a rule for an ip (or MAC address)
-* ``helper``: describe an helper rule (eg. sip)
+Assumptions and limitations
 
-Device record:
+1. All nDPI traffic is marked in forward chain.
+   When a nDPI protocol is found, the whole connection is marke.
 
-* ``key``: interface name
-* ``In``: inbound  bandwidth in kbps
-* ``Out``: outbound  bandwidth in kbps
-* ``Priority``: traffic priority, default is 2
-* ``Description``: optional description
+2. Priority rules are in post chain and can use nDPI markers.
+   If a priority rule uses a role (interface) as source, the rule can't be added 
+   to postrouting chain since the packet is already natted: Shorewall will move the rule on top of forwarding chain.
 
-Port record:
+3. nDPI rules can't block the http/https traffic if web proxy is enabled in transparent mode.
 
-* ``key``: port number
-* ``Priority``: traffic priority
-* ``Proto``: protocol name
-* ``Description``: optional description
+4. All nDPI markers are read from ``/proc/net/xt_ndpi/proto`` and shifted by 8 bits.
 
-Ip record:
+5. Divert rules can't be used with nDPI, because an established TCP connection can't be moved between providers.
 
-* ``key``: host object, in the form ``host;<hostname>``
-* ``Priority``: traffic priority
-* ``Description``: optional description
+6. Prerouting table is reserved by Shorewall for handlind the multi wan scenario.
 
-Helper record:
 
-* ``key``: helper name
-* ``Priority``: traffic priority
-* ``Description``: optional description
+Divert rules
+------------
 
-For more information about helpers, see: http://www.shorewall.net/Helpers.html
+A divert rule is used to force traffic to a specific provider.
+
+For example, this rules will route all traffic to port 22 via the provider named myadsl: ::
+
+ 1=rule
+     Src=192.168.1.0/24
+     Dst=0.0.0.0/0
+     Service=fwservice;ssh
+     Action=provider;myadsl
+     status=enabled
+     Position=2
+     Description=
+
+
+Properties:
+
+* ``key``: numeric id
+* ``Src``: can be a 'any', role (execpt red), zone (not interface), host object, ip address, ip range or CIDR
+* ``Dst``: can be a zone (not interface), host object, ip address, ip range  or CIDR
+* ``Action``: provider object, in the form of "provider;<name>"
+* ``Service``: (optional) can be a service object
+* ``status``: can be enabled or disabled. Default is enabled
+* ``Position``: integer sorting key
+* ``Description``: (optional)
+
+
+A rule is ignored during template expansion if:
+
+* the source is red role
+* the destination is a role which is not red
+* source, destination and service are all set to any
+* the provider doesn't exists
+* destination is set to any
+
+
 
 .. _section-multiwan:
 
@@ -515,43 +542,6 @@ Routes can be checked using: ::
 
  shorewall show routing
 
-Force traffic to a specific provider
-------------------------------------
-
-A mangle rule can route all matched network traffic through a specific provider.
-Mangle rules are record of type ``rule`` inside the ``tc`` database.
-
-For example, this rules will route all traffic to port 22 via the provider named myadsl: ::
-
- 1=rule
-     Src=192.168.1.0/24
-     Dst=0.0.0.0/0
-     Service=fwservice;ssh
-     Action=provider;myadsl
-     status=enabled
-     Position=2
-     Description=
-
-
-Properties:
-
-* ``key``: numeric id
-* ``Src``: can be a 'any', role (execpt red), zone (not interface), host object, ip address, ip range or CIDR
-* ``Dst``: can be a zone (not interface), host object, ip address, ip range  or CIDR
-* ``Action``: provider object, in the form of "provider;<name>"
-* ``Service``: (optional) can be a service object
-* ``status``: can be enabled or disabled. Default is enabled
-* ``Position``: integer sorting key
-* ``Description``: (optional)
-
-
-A rule is ignore during template expansion if:
-
-* the source is red role
-* the destination is a role which is not red
-* source, destination and service are all set to any
-* the provider doesn't exists
-* destination is set to any
 
 Static routes
 =============
