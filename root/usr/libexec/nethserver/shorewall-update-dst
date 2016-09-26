@@ -22,7 +22,7 @@ today=$(date "+%a %b %d")
 
 # regenerate all rules
 if [ $? -eq 0 ]; then
-    exec /sbin/signal-event firewall-adjust
+    exec /sbin/e-smith/signal-event firewall-adjust
 fi
 
 exit 0
