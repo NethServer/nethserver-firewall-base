@@ -49,7 +49,10 @@ if($props->{'DstRaw'} !~ m/^(role;red$|host;|iprange;|zone;|cidr;)/) {
     exit(4);
 }
 
-
+if($props->{'ServiceRaw'} =~ m/^ndpi;/) {
+    print "DPI protocol is not allowed with route rules.\n";
+    exit(5);
+}
 
 
 
