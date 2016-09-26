@@ -122,8 +122,4 @@ source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_T
 source_lang = en
 type = PHP_ALT_ARRAY
 
-[nethserver.Ndpi]
-source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_Ndpi.php
-source_lang = en
-type = PHP_ALT_ARRAY
 
