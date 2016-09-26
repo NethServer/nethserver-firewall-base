@@ -101,10 +101,10 @@ $L['ActionRouteIndex_label'] = '${0}';
 $L['ActionLog_label'] = 'Log';
 
 $L['ShowAction_label'] = 'Show';
-$L['ShowRules_label'] = 'Firewall';
-$L['ShowRoutes_label'] = 'Policy routing';
-$L['ShowServices_label'] = 'Network services';
-$L['ShowTrafficShaping_label'] = 'Traffic shaping';
+$L['ShowRules_label'] = 'Firewall (${0})';
+$L['ShowRoutes_label'] = 'Policy routing (${0})';
+$L['ShowServices_label'] = 'Network services (${0})';
+$L['ShowTrafficShaping_label'] = 'Traffic shaping (${0})';
 
 $L['ActionPriorityHigh_label'] = 'High priority';
 $L['ActionPriorityLow_label'] = 'Low priority';

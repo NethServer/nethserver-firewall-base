@@ -16,10 +16,10 @@ echo $view->buttonList()
 ;
 
 echo $view->panel()->setAttribute('id', 'ShowGroup')
-    ->insert($view->button('ShowRules',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=rules')))
-    ->insert($view->button('ShowServices',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=services')))
-    ->insert($view->button('ShowRoutes',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=routes')))
-    ->insert($view->button('ShowTrafficShaping',  $view::BUTTON_LINK)->setAttribute('value', $view->getModuleUrl('./?FirewallRules[Index][a]=trafficshaping')))
+    ->insert($view->button('ShowRules',  $view::BUTTON_LINK))
+    ->insert($view->button('ShowServices',  $view::BUTTON_LINK))
+    ->insert($view->button('ShowRoutes',  $view::BUTTON_LINK))
+    ->insert($view->button('ShowTrafficShaping',  $view::BUTTON_LINK))
 ;
 
 $filterTarget = $view->getClientEventTarget('a');
