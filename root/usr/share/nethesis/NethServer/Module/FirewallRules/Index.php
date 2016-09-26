@@ -300,6 +300,10 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             $view['a'] = 'rules';
         }
 
+        $countRules = 0;
+        $countRoutes = 0;
+        $countTrafficShaping = 0;
+
         $actionLabels = array(
             'accept' => $view->translate('ActionAccept_label'),
             'reject' => $view->translate('ActionReject_label'),
@@ -326,6 +330,14 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             $actionMatch['routes'] = substr($values['Action'], 0, 9) === 'provider;';
             $actionMatch['trafficshaping'] = substr($values['Action'], 0, 9) === 'priority;';
             $actionMatch['rules'] =  in_array($values['Action'], array('accept', 'drop', 'reject'));
+
+            if($actionMatch['routes']) {
+                $countRoutes ++;
+            } elseif($actionMatch['trafficshaping']) {
+                $countTrafficShaping ++;
+            } elseif($actionMatch['rules']) {
+                $countRules ++;
+            }
 
             if($view['a'] === 'services' || ! $actionMatch[$view['a']]) {
                 continue;
@@ -361,40 +373,47 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         $first = (isset($positions[0]) ? $positions[0] / 2 : \NethServer\Module\FirewallRules::RULESTEP);
         $last = (end($positions) ? end($positions) : 0) + \NethServer\Module\FirewallRules::RULESTEP;
 
+        $countServices = 0;
+        foreach($this->getNetworkServices() as $key => $values) {
+
+            $values['id'] = 's' . (++$countServices);
+            $values['Position'] = '';
+            $values['ExtraTags'] = $this->renderExtraTagsService($view, $key, $values);
+
+            $values['Action'] = 'accept';
+            $values['ActionIcon'] = $actionIcons[$values['Action']];
+            $values['cssAction'] = 'unsortable ' . $values['Action'];
+            $values['Action'] = $actionLabels[$values['Action']];
+
+            $values['Edit'] = array($view->getModuleUrl('../EditService/' . $key), $view->translate('EditService_label'));
+            $values['Copy'] = $view->getModuleUrl('..');
+            $values['Delete'] = $view->getModuleUrl('..');
+
+            $values['SrcColor'] = $this->resolveColor($values['access'], $view);
+            $values['DstColor'] = '';
+            $values['Src'] = $this->resolveAccessSrc($values['access'], $view);
+            $values['Dst'] = $this->resolveName('fw', $view);
+            $values['Service'] = $this->resolveName('service;' . $key, $view);
+
+            $values['LogIcon'] = '';
+            $values['LogLabel'] = '';
+
+            $serviceRules[] = $values;
+        }
+
         if($view['a'] === 'services') {
-            $serviceCount = 0;
-            foreach($this->getNetworkServices() as $key => $values) {
-
-                $values['id'] = 's' . (++$serviceCount);
-                $values['Position'] = '';
-                $values['ExtraTags'] = $this->renderExtraTagsService($view, $key, $values);
-
-                $values['Action'] = 'accept';
-                $values['ActionIcon'] = $actionIcons[$values['Action']];
-                $values['cssAction'] = 'unsortable ' . $values['Action'];
-                $values['Action'] = $actionLabels[$values['Action']];
-
-                $values['Edit'] = array($view->getModuleUrl('../EditService/' . $key), $view->translate('EditService_label'));
-                $values['Copy'] = $view->getModuleUrl('..');
-                $values['Delete'] = $view->getModuleUrl('..');
-
-                $values['SrcColor'] = $this->resolveColor($values['access'], $view);
-                $values['DstColor'] = '';
-                $values['Src'] = $this->resolveAccessSrc($values['access'], $view);
-                $values['Dst'] = $this->resolveName('fw', $view);
-                $values['Service'] = $this->resolveName('service;' . $key, $view);
-
-                $values['LogIcon'] = '';
-                $values['LogLabel'] = '';
-
-                $r[] = $values;
-            }
+            $r = &$serviceRules;
         }
 
         $view['hasChanges'] = $this->hasChanges();
         $view['Rules'] = $r;
         $view['Create_last'] = $view->getModuleUrl('../Create/' . intval($last));
         $view['Create_first'] = $view->getModuleUrl('../Create/' . intval($first));
+
+        $view['ShowRules'] = array($view->getModuleUrl('./?FirewallRules[Index][a]=rules'), $view->translate('ShowRules_label', array($countRules)));
+        $view['ShowServices'] = array($view->getModuleUrl('./?FirewallRules[Index][a]=services'), $view->translate('ShowServices_label', array($countServices)));
+        $view['ShowRoutes'] = array($view->getModuleUrl('./?FirewallRules[Index][a]=routes'), $view->translate('ShowRoutes_label', array($countRoutes)));
+        $view['ShowTrafficShaping'] = array($view->getModuleUrl('./?FirewallRules[Index][a]=trafficshaping'), $view->translate('ShowTrafficShaping_label', array($countTrafficShaping)));
 
         if ($this->getRequest()->isValidated()) {
             $view->getCommandList()->show();
