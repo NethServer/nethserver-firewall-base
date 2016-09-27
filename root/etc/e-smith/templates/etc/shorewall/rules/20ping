@@ -22,7 +22,7 @@ Ping/$action   net             \$FW
 EOF
     }
 
-$OUT = <<EOF
+$OUT .= <<EOF
 #
 #  Make ping work bi-directionally between the dmz, net, Firewall and local zone
 #  (assumes that the loc-> net policy is ACCEPT).
