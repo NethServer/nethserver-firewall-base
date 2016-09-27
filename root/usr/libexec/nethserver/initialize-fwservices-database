@@ -1,0 +1,48 @@
+#!/bin/bash
+
+cat <<EOF | (while read KEY PORTS PROTO; do db fwservices set "$KEY" fwservice Description '' Ports "$PORTS" Protocol "$PROTO"; done)
+dhcp	67,68	tcpudp
+dhcpv6	546,547	tcpudp
+dns	53	tcpudp
+email-grp	25,110,143,465,587,993,995	tcp
+ftp	21,20	tcpudp
+gopher	70	tcpudp
+http	80	tcp
+http-alt	8080,81,82	tcp
+https	443	tcp
+hylafax	4559	tcp
+iax	4569	udp
+imap	143	tcp
+imaps	993	tcp
+isakmp	500	tcpudp
+kerberos-grp	88,749,750,751	tcpudp
+l2tp	1701	tcpudp
+ldap	389	tcpudp
+ldaps	636	tcpudp
+ms-sql	1434,1433	tcpudp
+mysql	3306	tcpudp
+netbios-grp	138,137,139	tcpudp
+server-manager	980	tcp
+nfs	2049	tcpudp
+ntp	123	tcpudp
+openvpn	1194	udp
+pop3	110	tcp
+pop3s	995	tcp
+postgres	5432	tcpudp
+pptp	1723	tcp
+printer	515	tcpudp
+radius-grp	1812,1813	tcpudp
+rdp	3389	tcp
+smtp	25	tcp
+smtps	465	tcp
+snmp-grp	161,162	tcpudp
+squid	3128	tcp
+ssh	22	tcpudp
+submission	587	tcpudp
+telnet	23	tcpudp
+telnets	992	tcpudp
+web-grp	80,443,980	tcp
+who	513	udp
+wins	1512	tcpudp
+wnn6-ds	26208	tcpudp
+EOF
