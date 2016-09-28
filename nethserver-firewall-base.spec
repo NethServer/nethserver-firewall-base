@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.0.4
+Version: 3.1.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,12 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Wed Sep 28 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.1.0-1
+- Enchance traffic shaping - NethServer/dev#5113
+- nDPI support: deep packet inspection - NethServer/dev#5102
+- Firewall: time rules - NethServer/dev#5107
+- Replace Snort with Suricata - NethServer/dev#5104
+
 * Thu Sep 01 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.0.4-1
 - Missing i18n labels - Bug NethServer/dev#5094
 - Fix shorewall error on divert rules from firewall - Bug NethServer/dev#5091
