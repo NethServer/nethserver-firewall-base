@@ -215,7 +215,6 @@ sub getAddress($)
                 }
                 if ($self->{'cdb'}->get('ipsec')) {
                     push(@vpn,'ivpn');
-                    push(@vpn,'lvpn');
                 }
                 return join(',',@vpn);
             } else { 
@@ -454,7 +453,7 @@ sub getZone($)
     $value = join(",", grep { $_ ne '' } split(/,/, $value));
 
     # protect built-in zone from name resolution Refs #3056
-    if ($value =~ /loc|net|blue|orang|ivpn|lvpn|ovpn/) {
+    if ($value =~ /loc|net|blue|orang|ivpn|ovpn/) {
         return $value;
     }
 
