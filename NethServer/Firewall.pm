@@ -210,7 +210,7 @@ sub getAddress($)
                 return "loc";
             } elsif ($key eq 'vpn') {
                 my @vpn;
-                if ($self->{'cdb'}->get('openvpn')) {
+                if ($self->{'cdb'}->get('openvpn@host-to-net')) {
                     push(@vpn,'ovpn');
                 }
                 if ($self->{'cdb'}->get('ipsec')) {
