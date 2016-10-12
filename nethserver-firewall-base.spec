@@ -8,7 +8,7 @@ Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 Requires: nethserver-base > 2.5.2-1
 Requires: nethserver-lsm
-Requires: shorewall >= 4.6
+Requires: shorewall >= 5.0
 Requires: ipset
 Requires: rp-pppoe
 
