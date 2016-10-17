@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.1.1
+Version: 3.1.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Mon Oct 17 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.1.2-1
+- Unable to make FTP connection with virtualhost - Bug NethServer/dev#5127
+
 * Tue Oct 04 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.1.1-1
 - Firewall: can't create a rule with "vpn" role - Bug NethServer/dev#5119
 
