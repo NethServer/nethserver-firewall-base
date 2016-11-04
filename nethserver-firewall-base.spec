@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 2.10.7
+Version: 2.11.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -49,6 +49,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 %doc COPYING
 
 %changelog
+* Fri Nov 04 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.11.0-1
+- Update to shorewall 5 - Enhancement #3427
+
 * Thu Aug 25 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.10.7-1
 - Port forward from VLAN red - Enhancement #3149
 
