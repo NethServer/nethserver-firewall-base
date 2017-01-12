@@ -32,6 +32,11 @@ if( ! $shs->is_configured() ) {
     exit(0);
 }
 
+if ( -f "/var/run/.nethserver-fixnetwork" ) {
+    warn "[WARNING] shorewall is disabled by /var/run/.nethserver-fixnetwork\n";
+    exit(0);
+}
+
 # Fix for Shorewall 5
 if ( -f '/etc/shorewall/tcrules' ) {
     unlink '/etc/shorewall/tcrules';
