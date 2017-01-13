@@ -32,6 +32,18 @@ if( ! $shs->is_configured() ) {
     exit(0);
 }
 
+if ( -f "/var/run/.nethserver-fixnetwork" ) {
+    warn "[WARNING] shorewall is disabled by /var/run/.nethserver-fixnetwork\n";
+    system('/usr/sbin/shorewall clear');
+    if($? == 0) {
+        warn "[WARNING] shorewall cleared!\n";
+        exit(0);
+    } else {
+        warn "[ERROR] shorwall clear failed!\n";
+        exit(1);
+    }
+}
+
 # Fix for Shorewall 5
 if ( -f '/etc/shorewall/tcrules' ) {
     unlink '/etc/shorewall/tcrules';
@@ -51,7 +63,7 @@ if( ! $shs->adjust(\$action)) {
 } elsif($shs->is_owned() && $shs->is_enabled()) {
     $action = $shs->is_running() ? 'restart' : 'start';
     $tracker->set_task_progress($taskId, 0.4, "Shorewall $action");
-    $message = qx(/usr/sbin/shorewall $action 2>&1 1>/dev/null);
+    $message = qx(/usr/sbin/shorewall $action 2>&1);
     chomp($message);
     if($? != 0) {
 	$exitCode = 1;	

@@ -9,7 +9,7 @@
 #		       S T A R T U P   E N A B L E D
 ###############################################################################
 
-STARTUP_ENABLED=Yes
+STARTUP_ENABLED={ ( -f "/var/run/.nethserver-fixnetwork" ) ? 'No' : 'Yes' }
 
 ###############################################################################
 #		              V E R B O S I T Y
