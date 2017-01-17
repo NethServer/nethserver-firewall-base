@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cat <<EOF | (while read KEY PORTS PROTO; do db fwservices set "$KEY" fwservice Description '' Ports "$PORTS" Protocol "$PROTO"; done)
+cat <<EOF | (while read KEY PORTS PROTO; do /sbin/e-smith/db fwservices set "$KEY" fwservice Description '' Ports "$PORTS" Protocol "$PROTO"; done)
 dhcp	67,68	tcpudp
 dhcpv6	546,547	tcpudp
 dns	53	tcpudp
