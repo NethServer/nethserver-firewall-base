@@ -61,6 +61,7 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
             'SrcRaw' => 'any',
             'DstRaw' => 'any',
             'ServiceRaw' => 'any',
+            'TimeRaw' => '',
             'status' => 'enabled',
             'LogType' => 'none',
             'Description' => '',
@@ -82,7 +83,7 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
         } else {
             // start a new workflow generating a random rule key
             $defaults = $this->getRuleDefaults();
-            foreach (array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status', 'Description', 'LogType', 'Action') as $f) {
+            foreach (array('SrcRaw', 'DstRaw', 'ServiceRaw', 'TimeRaw', 'status', 'Description', 'LogType', 'Action') as $f) {
                 if ($request->hasParameter($f)) {
                     $defaults[$f] = $request->getParameter($f);
                 }
@@ -91,7 +92,7 @@ class Create extends \Nethgui\Controller\Collection\AbstractAction
         }
         $this->worker->ruleId = $this->workflow->getRuleId();
         $this->worker->bind($request);
-        $this->workflow->copyTo($this->worker->parameters, array('SrcRaw', 'DstRaw', 'ServiceRaw', 'status', 'Description', 'LogType', 'Action'));
+        $this->workflow->copyTo($this->worker->parameters, array('SrcRaw', 'DstRaw', 'ServiceRaw', 'TimeRaw', 'status', 'Description', 'LogType', 'Action'));
 
         if ($request->isMutation()) {
             $this->worker->parameters['Position'] = $this->position;
