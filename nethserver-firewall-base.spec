@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.1.5
+Version: 3.1.6
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Thu Jan 19 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.1.6-1
+- Firewall web interface: wrong selected time condition - Bug NethServer/dev#5200
+
 * Tue Jan 17 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.1.5-1
 - Console message: failed to register logger - NethServer/dev#5202
 
