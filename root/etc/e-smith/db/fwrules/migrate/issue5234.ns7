@@ -1,0 +1,63 @@
+{
+    #
+    # migrate tc rules under fwrules db - NethServer/dev#5234
+    #
+
+    sub find_free_position {
+        my $db = shift;
+        my $pos = 0;
+        foreach ($db->get_all_by_prop('type' => 'rule')) {
+            my $k = $_->prop('Position') || next;
+            if ($k > $pos) {
+                $pos = $k;
+            }
+        }
+        return $pos + 64;
+    }
+
+    sub find_free_key {
+        my $db = shift;
+        my $max = 0;
+        foreach ($db->get_all_by_prop('type' => 'rule')) {
+            if ($_->key > $max) {
+                $max = $_->key;
+            }
+        }
+        return $max + 1;
+    }
+
+    use esmith::ConfigDB;
+    my $src_db = esmith::ConfigDB->open('tc');
+    my $dst_db = esmith::ConfigDB->open('fwrules');
+    my $services_db = esmith::ConfigDB->open('fwservices');
+    foreach ($src_db->get_all()) {
+         my $service = '';
+         my $src = '';
+         my $desc = 'Migrated traffic shaping';
+         my $type = $_->prop('type');
+         if ($type eq 'ip') {
+             $src = $_->key;
+             $service = "any";
+         } elsif ($type eq 'port') {
+             $src = "role;green";
+             $service = 'migrated_tc_'.$_->key;
+             my $proto = $_->prop('Proto');
+             $proto =~ s/,//;
+             my $service_obj = $services_db->new_record($service, { type => 'fwservice', Protocol => $proto, Ports => $_->key, Description => $desc." port ".$_->key });
+             next if ( ! defined($service_obj) );
+             $service = "fwservice;$service";
+         } else {
+             next; # skip device records
+         }
+         # map 1 to high, everything else to low
+         my $priority = $_->prop('Priority') eq "1" ? "priority;high" : "priority;low";
+         my $position = find_free_position($dst_db);
+         my %props = (type => 'rule', Dst => 'role;red', Position => $position, Log => "none", Service => $service, status => "enabled", Action => $priority, Src => $src, Description => $desc.' rule');
+         my $key = find_free_key($dst_db);
+         my $new = $dst_db->new_record($key,\%props);
+         # delete original record
+         $_->delete();
+    }
+
+    '';
+}
