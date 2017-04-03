@@ -35,6 +35,7 @@
 
 . /etc/sysconfig/network-scripts/ifcfg-ppp0
 if [ "${DEFROUTE}" = "no" ]; then
+  /usr/sbin/shorewall enable ppp0  &>/dev/null
   /usr/sbin/shorewall restart &>/dev/null
 fi
 
