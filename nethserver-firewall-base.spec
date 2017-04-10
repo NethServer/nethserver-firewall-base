@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.1.6
+Version: 3.1.7
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,10 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Mon Apr 10 2017 Davide Principi <davide.principi@nethesis.it> - 3.1.7-1
+- Upgrade from NS 6 via backup and restore - NethServer/dev#5234
+- PPPoE backup connection restart failure - Bug NethServer/dev#5260
+
 * Thu Jan 19 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.1.6-1
 - Firewall web interface: wrong selected time condition - Bug NethServer/dev#5200
 
