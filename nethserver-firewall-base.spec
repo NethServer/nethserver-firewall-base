@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 2.11.1
+Version: 2.11.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -49,6 +49,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 %doc COPYING
 
 %changelog
+* Tue Apr 18 2017 Davide Principi <davide.principi@nethesis.it> - 2.11.2-1
+- PPPoE backup connection restart failure -- Bug NethServer/dev#5260
+
 * Thu Dec 01 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.11.1-1
 - Support traffic shaping on red VLANs - Enhancement #3430
 
