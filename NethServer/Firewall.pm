@@ -428,6 +428,29 @@ sub getPorts($)
     return %ports;
 }
 
+=head2 getAliasZone(alias)
+
+Return the zone of an alias by searching its parent.
+
+=cut
+sub getAliasZone($)
+{
+    my $self = shift;
+    my $alias = shift;
+
+    my $parent = (split(/:/,$alias))[0];
+    $parent = $self->{'ndb'}->get($parent) || return 'net'; # parent not found
+    my $role = $parent->prop('role');
+
+    if ($role eq 'red') {
+        return "net";
+    } elsif ($role eq 'green') {
+        return "loc";
+    } else {
+        return substr($role, 0, 5); # truncate zone name to 5 chars
+    }
+}
+
 =head2 getZone(value)
 
 Return the given value prefixed with its own zone.
@@ -497,6 +520,8 @@ sub getZone($)
                 return "net:$value";
             } elsif ($i->prop('role') eq 'green') {
                 return "loc:$value";
+            } elsif ($i->prop('role') eq 'alias') {
+                return $self->getAliasZone($i->key).":$value";
             } else {
                 return substr($i->prop('role'), 0, 5).":$value"; # truncate zone name to 5 chars
             }
