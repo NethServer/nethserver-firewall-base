@@ -1,5 +1,5 @@
 {
-    my $ssh_port = `ss -nlp4t | grep sshd  | awk '{print \$4}' | cut -d':' -f 2`;
+    my $ssh_port = `ss -nlp4t | grep sshd  | awk '{print \$4}' | cut -d':' -f 2` || return '';
     $ssh_port =~ s/^\s+//;
     $ssh_port =~ s/\s+$//;
     if ($sshd{'TCPPort'} ne $ssh_port) {
