@@ -34,12 +34,12 @@ if( ! $shs->is_configured() ) {
 
 if ( -f "/var/run/.nethserver-fixnetwork" ) {
     warn "[WARNING] shorewall is disabled by /var/run/.nethserver-fixnetwork\n";
-    system('/usr/sbin/shorewall clear');
+    system('/usr/sbin/shorewall stop');
     if($? == 0) {
-        warn "[WARNING] shorewall cleared!\n";
+        warn "[WARNING] shorewall stopped!\n";
         exit(0);
     } else {
-        warn "[ERROR] shorwall clear failed!\n";
+        warn "[ERROR] shorwall stop failed!\n";
         exit(1);
     }
 }
