@@ -1,0 +1,9 @@
+{
+    my $ssh_port = `ss -nlp4t | grep sshd  | awk '{print \$4}' | cut -d':' -f 2`;
+    $ssh_port =~ s/^\s+//;
+    $ssh_port =~ s/\s+$//;
+    if ($sshd{'TCPPort'} ne $ssh_port) {
+        $OUT .= "\n# Make sure running sshd port is open\n";
+        $OUT .= "ACCEPT  -  \$FW  tcp  $ssh_port\n";    
+    }
+}
