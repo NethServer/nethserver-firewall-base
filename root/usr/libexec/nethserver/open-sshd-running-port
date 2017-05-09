@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ssh_port=$(ss -nlp4t | grep sshd  | awk '{print $4}' | cut -d':' -f 2)
+
+iptables -I INPUT 1 -p tcp --dport $ssh_port -j ACCEPT

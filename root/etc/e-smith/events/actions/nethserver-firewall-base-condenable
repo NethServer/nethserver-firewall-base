@@ -22,7 +22,9 @@
 
 flag=/var/run/.nethserver-upgrade-configdb
 
-if [[ ! -f ${flag} ]]; then
-    exec /etc/e-smith/events/action/nethserver-firewall-base-enable $*
+if [[ -f ${flag} ]]; then
+    exec /usr/libexec/nethserver/open-sshd-running-port
+else
+    exec /etc/e-smith/events/actions/nethserver-firewall-base-enable $*
 fi
 
