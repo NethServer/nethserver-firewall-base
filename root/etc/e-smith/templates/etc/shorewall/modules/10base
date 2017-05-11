@@ -24,7 +24,7 @@ INCLUDE modules.essential
 #
 # Helpers
 #
-#INCLUDE helpers
+INCLUDE helpers
 #
 # Ipset
 #
