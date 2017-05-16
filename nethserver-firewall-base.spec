@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.2.0
+Version: 3.2.1
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Tue May 16 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.1-1
+- shorewall: load Connection Tracking helpers - Bug NethServer/dev#5279
+
 * Wed May 10 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.0-1
 - Upgrade from NS 6 via backup and restore - NethServer/dev#5234
 
