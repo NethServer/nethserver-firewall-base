@@ -53,6 +53,7 @@ class PortForward extends \Nethgui\Controller\TableController implements \Nethgu
             'DstHost',
             'Dst',
             'OriDst',
+            'Allow',
             'Description',
             'Actions'
         );
@@ -143,6 +144,15 @@ class PortForward extends \Nethgui\Controller\TableController implements \Nethgu
         }
         return \NethServer\Module\FirewallRules\RuleGenericController::translateFirewallObjectTitle($view, $values['DstHost']);
     }
+
+    public function prepareViewForColumnAllow(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        if(isset($values['Allow']) && $values['Allow']) {
+            return $values['Allow'];
+        }
+        return '-';
+    }
+
 
     /**
      * Override prepareViewForColumnActions to hide/show enable/disable actions
