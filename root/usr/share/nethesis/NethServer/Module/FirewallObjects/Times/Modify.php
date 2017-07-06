@@ -31,7 +31,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
 {
     private $interfaces;
 
-    public static $weekDays = array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
+    public static $weekDays = array('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun');
 
     public function initialize()
     {
@@ -84,13 +84,13 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
         $view['WeekDaysDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource(array(
-            'Sun' => $view->translate('WeekDay_Sun_label'),
             'Mon' => $view->translate('WeekDay_Mon_label'),
             'Tue' => $view->translate('WeekDay_Tue_label'),
             'Wed' => $view->translate('WeekDay_Wed_label'),
             'Thu' => $view->translate('WeekDay_Thu_label'),
             'Fri' => $view->translate('WeekDay_Fri_label'),
             'Sat' => $view->translate('WeekDay_Sat_label'),
+            'Sun' => $view->translate('WeekDay_Sun_label'),
         ));
     }
 

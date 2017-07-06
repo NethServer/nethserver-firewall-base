@@ -106,13 +106,13 @@ class CreateTime extends \Nethgui\Controller\Collection\AbstractAction
         parent::prepareView($view);
         $view->setTemplate('NethServer/Template/FirewallObjects/Times/Modify');
         $view['WeekDaysDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource(array(
-            'Sun' => $view->translate('WeekDay_Sun_label'),
             'Mon' => $view->translate('WeekDay_Mon_label'),
             'Tue' => $view->translate('WeekDay_Tue_label'),
             'Wed' => $view->translate('WeekDay_Wed_label'),
             'Thu' => $view->translate('WeekDay_Thu_label'),
             'Fri' => $view->translate('WeekDay_Fri_label'),
             'Sat' => $view->translate('WeekDay_Sat_label'),
+            'Sun' => $view->translate('WeekDay_Sun_label'),
         ));
         if ( ! $this->getRequest()->isValidated()) {
             return;
