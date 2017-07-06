@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.2.2
+Version: 3.2.3
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Thu Jul 06 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.3-1
+- Set Monday as first day of week in Firewall - NethServer/dev#5326
+
 * Fri Jun 30 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.2-1
 - Port forward: display Allow field in table - NethServer/nethserver-firewall-base#50
 
