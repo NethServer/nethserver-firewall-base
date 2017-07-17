@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.2.3
+Version: 3.2.4
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Mon Jul 17 2017 Davide Principi <davide.principi@nethesis.it> - 3.2.4-1
+- Traffic shaping not applied on new installations - Bug NethServer/dev#5333
+
 * Thu Jul 06 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.3-1
 - Set Monday as first day of week in Firewall - NethServer/dev#5326
 
