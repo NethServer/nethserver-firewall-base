@@ -183,11 +183,11 @@ event_actions('static-routes-save', qw(
 
 event_actions('post-restore-config', qw(
     nethserver-firewall-base-disable 01
-    nethserver-firewall-base-condenable 99
+    nethserver-firewall-base-condenable 98
 ));
 
 event_actions('post-restore-data', qw(
-    nethserver-firewall-base-enable 99
+    nethserver-firewall-base-enable 98
 ));
 
 validator_actions('fwrule-modify', qw(
