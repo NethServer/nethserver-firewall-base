@@ -20,11 +20,6 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-status=$(/sbin/e-smith/config getprop shorewall status)
-
-if [[ "${status}" == "enabled" ]]; then
-    echo "[NOTICE] forcibly disable shorewall service"
-    /sbin/e-smith/config setprop shorewall status disabled
-    systemctl stop shorewall || :
-fi
-
+echo "[NOTICE] forcibly stop and mask shorewall service"
+systemctl stop shorewall
+systemctl --runtime mask shorewall

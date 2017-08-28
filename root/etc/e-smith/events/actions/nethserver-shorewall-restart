@@ -45,6 +45,10 @@ if ( -f "/var/run/.nethserver-fixnetwork" ) {
     }
 }
 
+if( $shs->is_masked() ) {
+    exit(0);
+}
+
 # Fix for Shorewall 5
 if ( -f '/etc/shorewall/tcrules' ) {
     unlink '/etc/shorewall/tcrules';

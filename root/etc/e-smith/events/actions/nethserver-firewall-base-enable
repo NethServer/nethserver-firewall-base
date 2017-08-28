@@ -22,9 +22,10 @@
 
 status=$(/sbin/e-smith/config getprop shorewall status)
 
-if [[ "${status}" == "disabled" ]]; then
-    echo "[NOTICE] forcibly enable shorewall service"
-    /sbin/e-smith/config setprop shorewall status enabled
+echo "[NOTICE] forcibly unmask shorewall service"
+systemctl --runtime unmask shorewall
+
+if [[ "${status}" == "enabled" ]]; then
     systemctl start shorewall || :
 fi
 
