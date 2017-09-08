@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.2.4
+Version: 3.2.5
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,10 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Fri Sep 08 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.5-1
+- Shorewall config error with X11 forwarding - Bug NethServer/dev#5336
+- NS 6 upgrade: avoid restore-data when possible - NethServer/dev#5343
+
 * Mon Jul 17 2017 Davide Principi <davide.principi@nethesis.it> - 3.2.4-1
 - Traffic shaping not applied on new installations - Bug NethServer/dev#5333
 
