@@ -27,7 +27,7 @@
     }
 
     use esmith::ConfigDB;
-    my $src_db = esmith::ConfigDB->open('tc');
+    my $src_db = esmith::ConfigDB->open('tc') || exit(0);
     my $dst_db = esmith::ConfigDB->open('fwrules');
     my $services_db = esmith::ConfigDB->open('fwservices');
     foreach ($src_db->get_all()) {
