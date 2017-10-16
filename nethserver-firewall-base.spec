@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.2.6
+Version: 3.2.7
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Mon Oct 16 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.7-1
+- PPPoE connect timeout - NethServer/dev#5358
+
 * Mon Oct 09 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.6-1
 - Relax lsm ping packets defaults
 - Fix mangle warnings
