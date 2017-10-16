@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 2.11.4
+Version: 2.11.5
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -49,6 +49,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 %doc COPYING
 
 %changelog
+* Mon Oct 16 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.11.5-1
+- PPPoE connect timeout - NethServer/dev#5358
+
 * Wed Apr 26 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.11.4-1
 - Bad port forward to host inside a green alias network - Bug NethServer/dev#5274
 
