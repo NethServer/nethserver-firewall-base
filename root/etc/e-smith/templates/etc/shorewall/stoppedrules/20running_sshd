@@ -4,7 +4,7 @@
     $ssh_port =~ s/\s+$//;
     if ($sshd{'TCPPort'} ne $ssh_port) {
         $OUT .= "\n# Make sure running sshd port is open\n";
-        foreach (split("\n", $ssh_port)) { // handle multiple SSH server instances
+        foreach (split("\n", $ssh_port)) { # handle multiple SSH server instances
             $OUT .= "ACCEPT  -  \$FW  tcp  $_\n";
         }
     }
