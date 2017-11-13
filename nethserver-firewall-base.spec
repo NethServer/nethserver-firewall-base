@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.2.7
+Version: 3.2.8
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Mon Nov 13 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.8-1
+- Shorewall config error with multiple sshd instances - Bug NethServer/dev#5380
+
 * Mon Oct 16 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.7-1
 - PPPoE connect timeout - NethServer/dev#5358
 
