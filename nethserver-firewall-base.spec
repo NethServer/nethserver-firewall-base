@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.2.8
+Version: 3.2.9
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Fri Nov 24 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.9-1
+- shorewall: some netfilter helpers not loaded - Bug NethServer/dev#5385
+
 * Mon Nov 13 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.8-1
 - Shorewall config error with multiple sshd instances - Bug NethServer/dev#5380
 
