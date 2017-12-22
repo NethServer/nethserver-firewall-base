@@ -41,6 +41,8 @@ my @templates = qw(
     /etc/shorewall/modules
     /etc/shorewall/tcinterfaces
     /etc/shorewall/tcpri
+    /etc/shorewall/tcclasses
+    /etc/shorewall/tcdevices
     /etc/shorewall/nat
     /etc/lsm/lsm.conf
 );
