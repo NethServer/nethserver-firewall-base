@@ -126,7 +126,7 @@ class Nat extends \Nethgui\Controller\AbstractController
         $tmp = array();
         $tmp[] = array("", "-");
         foreach ($this->hosts as $k => $v) {
-            $tmp[] = array($v['type'].";".$k, $k." (".$v['Description'].")");
+            $tmp[] = array("host;".$k, $k." (".$v['Description'].")");
         }
 
         $ds = array();
