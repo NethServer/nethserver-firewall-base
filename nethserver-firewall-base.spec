@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.2.10
+Version: 3.2.11
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Mon Feb 05 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.11-1
+- Firewall: invalid source NAT to host with DHCP reservation - Bug NethServer/dev#5417
+
 * Thu Dec 07 2017 Filippo Carletti <filippo.carletti@gmail.com> - 3.2.10-1
 - shorewall: some netfilter helpers not loaded - Bug NethServer/dev#5385
 
