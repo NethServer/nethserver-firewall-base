@@ -4,7 +4,7 @@
 
 ARPTABLES=
 
-CONFIG_PATH="$\{CONFDIR\}/shorewall:$\{SHAREDIR\}/shorewall"
+CONFIG_PATH=":$\{CONFDIR\}/shorewall:$\{SHAREDIR\}/shorewall"
 
 GEOIPDIR=/usr/share/xt_geoip/LE
 
@@ -12,7 +12,7 @@ IPTABLES=
 
 IP=
 
-IPSET=/usr/sbin/ipset
+IPSET=
 
 LOCKFILE=
 
