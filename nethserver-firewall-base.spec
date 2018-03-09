@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.2.11
+Version: 3.3.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,10 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Fri Mar 09 2018 Davide Principi <davide.principi@nethesis.it> - 3.3.0-1
+- Update to shorewall 5.1 - NethServer/dev#5429
+- Multi WAN shorewall warning DEFAULT_ROUTE - NethServer/dev#5431
+
 * Mon Feb 05 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.2.11-1
 - Firewall: invalid source NAT to host with DHCP reservation - Bug NethServer/dev#5417
 
