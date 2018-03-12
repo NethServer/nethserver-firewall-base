@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.3.0
+Version: 3.3.1
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Mon Mar 12 2018 Davide Principi <davide.principi@nethesis.it> - 3.3.1-1
+- Revert "shorewall.conf: set AUTOMAKE to Yes" - NethServer/nethserver-firewall-base#62
+
 * Fri Mar 09 2018 Davide Principi <davide.principi@nethesis.it> - 3.3.0-1
 - Update to shorewall 5.1 - NethServer/dev#5429
 - Multi WAN shorewall warning DEFAULT_ROUTE - NethServer/dev#5431
