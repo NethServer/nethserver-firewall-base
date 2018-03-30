@@ -1,0 +1,18 @@
+{
+    use esmith::NetworksDB;
+    my $idb = esmith::NetworksDB->open_ro();
+    foreach my $interface ( $idb->get_all() ) {
+        my $role = $interface->prop('role') || '';
+        next if ($role ne 'red');
+        my $type = $interface->prop('type') || '';
+        next if ($type eq 'xdsl-disabled'); # handle pppoe special case
+
+        my $out = $interface->prop('FwOutBandwidth') || '';
+        my $in = $interface->prop('FwInBandwidth') || '';
+
+        $OUT .= $interface->key."\t\t1\t5*full/10\t9*full/10\t1\tfq_codel,flow=nfct-src\n";
+        $OUT .= $interface->key."\t\t2\t3*full/10\t9*full/10\t2\tdefault,fq_codel,flow=nfct-src\n";
+        $OUT .= $interface->key."\t\t3\t2*full/10\t9*full/10\t3\tfq_codel,flow=nfct-src\n";
+        $OUT .="\n";
+    }
+}
