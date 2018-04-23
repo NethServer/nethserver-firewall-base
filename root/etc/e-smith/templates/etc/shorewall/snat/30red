@@ -1,8 +1,11 @@
+#
+# 30red - Masquerading for red interfaces
+#
 {
     use esmith::util;
     use esmith::NetworksDB;
     my $ndb = esmith::NetworksDB->open_ro();
     foreach ($ndb->get_by_role('red')) {
-        $OUT .= $_->key."\n";
+        $OUT .= "MASQUERADE\t-\t".$_->key."\n";
     }
 }

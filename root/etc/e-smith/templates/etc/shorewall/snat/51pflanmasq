@@ -1,7 +1,6 @@
 #
-# Hairpin NAT port forwarding
+# 51pflanmasq - Hairpin NAT port forwarding
 #
-
 {
     use NethServer::Firewall;
     use esmith::util;
@@ -52,7 +51,7 @@
 
         foreach ($ndb->get_by_role('green')) {
             my $net = esmith::util::computeLocalNetworkShortSpec($_->prop('ipaddr'),$_->prop('netmask'));
-            $OUT .= $_->key.":$dstHost\t$net\t" . $_->prop('ipaddr') . "\t$proto\t$dst\n";
+            $OUT .= "SNAT(".$_->prop('ipaddr').")\t$net\t".$_->key.":$dstHost\t$proto\t$dst\n";
         }
 
     }
