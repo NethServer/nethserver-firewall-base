@@ -1,5 +1,5 @@
 #
-# 20nat
+# 20snat - Source NAT
 #
 {
     # import db
@@ -42,7 +42,7 @@
             $internal_ip = $fw->getAddress($fw_obj);
 
             # print config
-            $OUT .= "$interface\t$internal_ip\t$alias_interface_ip\n";
+            $OUT .= "SNAT($alias_interface_ip)\t$internal_ip\t$interface\n";
         }
     }
 }
