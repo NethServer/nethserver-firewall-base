@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.3.1
+Version: 3.3.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -59,6 +59,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Thu Apr 26 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.3.2-1
+- Shorewall: remove obsolete masq file - NethServer/dev#5467
+
 * Mon Mar 12 2018 Davide Principi <davide.principi@nethesis.it> - 3.3.1-1
 - Revert "shorewall.conf: set AUTOMAKE to Yes" - NethServer/nethserver-firewall-base#62
 
