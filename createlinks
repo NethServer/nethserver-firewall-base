@@ -22,33 +22,39 @@
 use esmith::Build::CreateLinks  qw(:all);
 use File::Path;
 
+my @templates = qw(
+    /etc/shorewall/shorewall.conf
+    /etc/shorewall/actions
+    /etc/shorewall/interfaces
+    /etc/shorewall/masq
+    /etc/shorewall/snat
+    /etc/shorewall/policy
+    /etc/shorewall/rules
+    /etc/shorewall/zones
+    /etc/shorewall/providers
+    /etc/shorewall/rtrules
+    /etc/shorewall/mangle
+    /etc/shorewall/tunnels
+    /etc/shorewall/hosts
+    /etc/shorewall/findgw
+    /etc/shorewall/stoppedrules
+    /etc/shorewall/maclist
+    /etc/shorewall/modules
+    /etc/shorewall/tcinterfaces
+    /etc/shorewall/tcpri
+    /etc/shorewall/nat
+    /etc/lsm/lsm.conf
+);
+
 #--------------------------------------------------
 # actions for nethserver-firewall-base-update event
 #--------------------------------------------------
 
 $event = "nethserver-firewall-base-update";
 
-event_templates($event, 
-                '/etc/shorewall/shorewall.conf',
-                '/etc/shorewall/actions',
-                '/etc/shorewall/interfaces',
-                '/etc/shorewall/masq',
-                '/etc/shorewall/snat',
-                '/etc/shorewall/policy',
-                '/etc/shorewall/rules',
-                '/etc/shorewall/zones',
-                '/etc/shorewall/providers',
-                '/etc/shorewall/rtrules',
-                '/etc/shorewall/mangle',
-                '/etc/shorewall/tunnels',
-                '/etc/shorewall/hosts',
-                '/etc/shorewall/findgw',
-                '/etc/shorewall/stoppedrules',
-                '/etc/shorewall/maclist',
-                '/etc/shorewall/modules',
-                '/etc/sudoers');
 
-event_templates($event, '/etc/lsm/lsm.conf');
+event_templates($event, @templates);
+event_templates($event, '/etc/sudoers');
 
 event_actions($event,
               'initialize-default-databases' => '00',
@@ -67,33 +73,11 @@ event_services($event,
 
 $event = "nethserver-firewall-base-save";
 
-event_templates($event, 
-                '/etc/shorewall/shorewall.conf',
-                '/etc/shorewall/actions',
-                '/etc/shorewall/interfaces',
-                '/etc/shorewall/masq',
-                '/etc/shorewall/snat',
-                '/etc/shorewall/policy',
-                '/etc/shorewall/rules',
-                '/etc/shorewall/tcinterfaces',
-                '/etc/shorewall/tcpri',
-                '/etc/shorewall/providers',
-                '/etc/shorewall/rtrules',
-                '/etc/shorewall/mangle',
-                '/etc/shorewall/tunnels',
-                '/etc/shorewall/hosts',
-                '/etc/shorewall/nat',
-                '/etc/shorewall/stoppedrules',
-                '/etc/shorewall/maclist',
-                '/etc/shorewall/modules',
-                '/etc/shorewall/zones');
-
+event_templates($event, @templates);
 event_actions($event,
 	      'providers-cleanup' => '02',
 	      'nethserver-shorewall-restart' => '89'
 );
-
-event_templates($event, '/etc/lsm/lsm.conf');
 
 event_services($event, 
                      'lsm' => 'restart' );
