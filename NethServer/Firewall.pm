@@ -335,7 +335,7 @@ sub __localToUtc($)
     return sprintf("%02d:%02d", $hour, $min);
 }
 
-=head2 getTimel(id)
+=head2 getTime(id)
 
 Return the time string in UTC.
 Return an '-' if the key doesn't exists;
