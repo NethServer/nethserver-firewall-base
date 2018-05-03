@@ -1,0 +1,101 @@
+{
+  use esmith::NetworksDB;
+  use esmith::ConfigDB;
+  use NethServer::Firewall;
+ 
+  my $ndb = esmith::NetworksDB->open_ro() || die("Can't open networks db");
+  my $tdb = esmith::ConfigDB->open_ro('tc') || die("Can't open networks TC db");
+  my $fw = new NethServer::Firewall();
+  my $linklayer = $firewall{'TCLinklayer'} || 'ethernet';
+  my $priority = $firewall{'TCPriority'} || 'balanced';
+  my $voip = $firewall{'TCVoipReservation'} || '';
+  my $tos = $firewall{'TCTosOptimization'} || 'enabled';
+
+  my @providers = $fw->getProviders();
+  my @classes = $tdb->get_all_by_prop('type' => 'class');
+
+  sub getProviderName
+  {
+      my $needle = shift;
+      foreach my $p (@providers) {
+          if ($p->{'interface'} eq $needle) {
+              return $p->{'name'};
+          }
+      }
+      return "red-$needle";
+  }
+
+  sub outRate
+  {
+      my $direction = shift;
+      my $min = shift;
+      my $max = shift;
+      my $out = '';
+
+      if ($min || $max) {
+          $out .= "$direction";
+          if ($min > 0) {
+              $out .= " commit $min%";
+          }
+          if ($max > 0) {
+              $out .= " ceil $max%";
+          }
+      }
+
+      return $out;
+  }
+
+  $OUT .= 'FIREQOS_CONNMARK_RESTORE="act_connmark"';
+
+  foreach my $red ($ndb->red()) {
+      my $interface = $red->key;
+      my $in = $red->prop('FwInBandwidth') || next;
+      my $out = $red->prop('FwOutBandwidth') || next;
+
+      # Use only 90% of the bandwidth
+      $in = $in*0.90; 
+      $out = $out*0.90;
+
+      $OUT .= "\n\n";
+
+      $OUT .= "interface $interface ".getProviderName($interface)." bidirectional input rate ${in}kbit output rate ${out}kbit $priority $linklayer\n";
+
+      if ($voip ne '') {
+          $OUT .= "\n";
+          $OUT .= "\tclass voip commit $voip% pfifo\n";
+          $OUT .= "\t\tserver sip\n";
+          $OUT .= "\t\tclient sip\n";
+          $OUT .= "\t\tserver rtp\n";
+          $OUT .= "\t\tclient stun\n";
+      }
+
+      if ($tos eq 'enabled') {
+          $OUT .= "\n"; 
+          $OUT .= "\tclass interactive commit 20%\n";
+          $OUT .= "\t\tmatch tos interactive\n";
+          $OUT .= "\t\tmatch proto icmp\n";
+          my $prio = scalar(@classes) + 3; # number of classes + 1 for interactive + for default class
+          $prio = $prio + 1 if ($voip ne ''); # + 1 voip if enabled
+          $OUT .= "\n"; 
+          $OUT .= "\tclass bulk prio $prio\n";
+          $OUT .= "\t\tmatch tos bulk\n";
+      }
+     
+      foreach my $class (@classes) {
+          my $name = $class->key;
+          my $mark = $class->prop('Mark') || next;
+          my $min_out = $class->prop('MinOutputRate') || 0;
+          my $max_out = $class->prop('MaxOutputRate') || 0;
+          my $min_in = $class->prop('MinInputRate') || 0;
+          my $max_in = $class->prop('MaxInputRate') || 0;
+
+          # skip empty classes
+          next if (!$min_out && !$max_out && !$min_in && !$max_in);
+
+          $OUT .= "\n";
+          $OUT .= "\tclass $name ".outRate('input',$min_in,$max_in)." ".outRate('output',$min_out,$max_out)."\n";
+          $OUT .= "\t\tmatch connmark 0x$mark\n";
+      }
+
+  }
+}

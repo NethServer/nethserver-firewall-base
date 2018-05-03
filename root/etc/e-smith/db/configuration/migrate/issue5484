@@ -1,0 +1,10 @@
+{
+    #
+    # Issue 5484
+    # Remove unused 'tc' prop
+    #
+
+    $DB->get_prop_and_delete('firewall','tc');
+
+    '';
+}

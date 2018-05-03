@@ -1,0 +1,6 @@
+#!/bin/bash
+
+
+/sbin/e-smith/db tc set "high" class Mark "2" MaxInputRate "" MaxOutputRate "" MinInputRate "10" MinOutputRate "10" Description ""
+/sbin/e-smith/db tc set "low" class Mark "3" MaxInputRate "90" MaxOutputRate "90" MinInputRate "" MinOutputRate "" Description ""
+

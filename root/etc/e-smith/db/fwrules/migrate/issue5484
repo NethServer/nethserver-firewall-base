@@ -1,0 +1,24 @@
+{
+    #
+    # Issue 5484
+    # Migrate rules from <priority;low> format to generic <class;_name_>
+    # Make sure also default low and high priority classes are defined
+    #
+
+    use esmith::ConfigDB;
+    my $db = esmith::ConfigDB->open('fwrules');
+    my $tdb = esmith::ConfigDB->open('tc');
+    my $initTc = 0;
+    foreach ($db->get_all_by_prop('type','rule')) {
+         my $action = $_->prop('Action') || next;
+         if ($action =~ /^priority;(.*)/) {
+             $_->set_prop('Action', 'class;'.lc($1));
+             $initTc = 1;
+         }
+    }
+    if ($initTc) {
+        system("/usr/libexec/nethserver/initialize-tc-database");
+    }
+
+    '';
+}

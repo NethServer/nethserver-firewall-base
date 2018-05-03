@@ -1,0 +1,5 @@
+# Cleanup current TC configuration
+fireqos clear_all_qos
+
+# Apply new TC configuration
+fireqos start
