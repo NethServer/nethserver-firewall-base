@@ -437,8 +437,8 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
     private function getObjectIcon($v)
     {
         list($type, $value) = array_merge(explode(';', $v), array(NULL));
-        if($type === 'ndpi' && array_key_exists($value, self::$ndpiProtocolIcons)) {
-            return self::$ndpiProtocolIcons[$value][1];
+        if($type === 'ndpi' && array_key_exists(strtolower($value), self::$ndpiProtocolIcons)) {
+            return self::$ndpiProtocolIcons[strtolower($value)][1];
         } elseif (array_key_exists($type, self::$objectIcons)) {
             return self::$objectIcons[$type][1];
         }
