@@ -4,7 +4,6 @@ $L['TcClasses_Description'] = 'Traffic shaping configuration';
 $L['TcClasses_Tags'] = 'tc qos traffic shaping';
 $L['configure_header'] = 'Configuration';
 $L['Options_label'] = 'Options';
-$L['TCPriority_label'] = 'Prevent traffic starvation';
 $L['TCTosOptimization_label'] = 'Enable TOS optimizations';
 $L['TCVoipReservation_label'] = 'Reserve bandwidth for VoIP (%)';
 $L['Key_label'] = 'Class name';

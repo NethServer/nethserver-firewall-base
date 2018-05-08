@@ -7,7 +7,6 @@
   my $tdb = esmith::ConfigDB->open_ro('tc') || die("Can't open networks TC db");
   my $fw = new NethServer::Firewall();
   my $linklayer = $firewall{'TCLinklayer'} || 'ethernet';
-  my $priority = $firewall{'TCPriority'} || 'balanced';
   my $voip = $firewall{'TCVoipReservation'} || '';
   my $tos = $firewall{'TCTosOptimization'} || 'enabled';
 
@@ -58,7 +57,7 @@
 
       $OUT .= "\n\n";
 
-      $OUT .= "interface $interface ".getProviderName($interface)." bidirectional input rate ${in}kbit output rate ${out}kbit $priority $linklayer\n";
+      $OUT .= "interface $interface ".getProviderName($interface)." bidirectional input rate ${in}kbit output rate ${out}kbit balanced $linklayer\n";
 
       if ($voip ne '') {
           $OUT .= "\n";

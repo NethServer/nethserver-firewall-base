@@ -41,7 +41,6 @@ class Configure extends \Nethgui\Controller\Table\AbstractAction
         parent::initialize();
         $this->declareParameter('TCTosOptimization', Validate::SERVICESTATUS, array('configuration', 'firewall', 'TCTosOptimization'));
         $this->declareParameter('TCVoipReservation', $rateValidator, array('configuration', 'firewall', 'TCVoipReservation'));
-        $this->declareParameter('TCPriority', $this->createValidator()->memberOf('priority', 'balanced'), array('configuration', 'firewall', 'TCPriority'));
 
     }
 
