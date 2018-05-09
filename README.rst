@@ -387,7 +387,7 @@ The firewall needs to know how much inbound and outbound bandwidth has a red int
 The bandwidth value (expressed in kbit) is stored inside ``FwInBandwidth`` and ``FwOutBandwidth`` properties, wich are
 parts of the network interface record inside the ``networks`` db.
 
-FireQOS configuration uses 90% of the declared bandwidth to faster shaped the inbound traffic.
+FireQOS suggests to use 90% of the declared bandwidth to faster shaped the inbound traffic.
 
 On red interfaces with  ``FwInBandwidth`` and ``FwOutBandwidth`` set, ethernet offloading is automatic disabled.
 
