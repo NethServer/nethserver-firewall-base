@@ -51,10 +51,6 @@
       my $in = $red->prop('FwInBandwidth') || next;
       my $out = $red->prop('FwOutBandwidth') || next;
 
-      # Use only 90% of the bandwidth
-      $in = $in*0.90; 
-      $out = $out*0.90;
-
       $OUT .= "\n\n";
 
       $OUT .= "interface $interface ".getProviderName($interface)." bidirectional input rate ${in}kbit output rate ${out}kbit balanced $linklayer\n";
