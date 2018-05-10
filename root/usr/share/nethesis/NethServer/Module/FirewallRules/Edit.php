@@ -92,7 +92,7 @@ class Edit extends \Nethgui\Controller\Collection\AbstractAction
         $action = 'rules';
         if(substr($view['Action'], 0, 9) === 'provider;') {
             $action = 'routes';
-        } elseif (substr($view['Action'], 0, 9) === 'priority;') {
+        } elseif (substr($view['Action'], 0, 9) === 'class;') {
             $action = 'trafficshaping';
         }
         $view['Cancel'] = $view->getModuleUrl('../Index?a=' . $action);

@@ -308,27 +308,29 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
             'accept' => $view->translate('ActionAccept_label'),
             'reject' => $view->translate('ActionReject_label'),
             'drop' => $view->translate('ActionDrop_label'),
-            'priority;high' => $view->translate('ActionPrioHi_label'),
-            'priority;low' => $view->translate('ActionPrioLo_label'),
+            'class;high' => $view->translate('ActionPrioHi_label'),
+            'class;low' => $view->translate('ActionPrioLo_label'),
         );
 
         $actionIcons = array(
             'accept' => 'fa-check-circle',
             'drop' => 'fa-minus-circle',
             'reject' => 'fa-shield',
-            'priority;high' => 'fa-arrow-circle-up',
-            'priority;low' => 'fa-arrow-circle-down',
         );
 
         foreach(array_keys($this->getPlatform()->getDatabase('networks')->getAll('provider')) as $provider) {
             $actionLabels['provider;' . $provider] = $view->translate('ActionRouteIndex_label', array($provider));
             $actionIcons['provider;' . $provider] = 'fa-share';
         }
+        foreach(array_keys($this->getPlatform()->getDatabase('tc')->getAll('class')) as $provider) {
+            $actionLabels['class;' . $provider] = $view->translate('ActionRouteIndex_label', array($provider));
+            $actionIcons['class;' . $provider] = 'fa-exchange';
+        }
 
         foreach ($this->getAdapter() as $key => $values) {
 
             $actionMatch['routes'] = substr($values['Action'], 0, 9) === 'provider;';
-            $actionMatch['trafficshaping'] = substr($values['Action'], 0, 9) === 'priority;';
+            $actionMatch['trafficshaping'] = substr($values['Action'], 0, 6) === 'class;';
             $actionMatch['rules'] =  in_array($values['Action'], array('accept', 'drop', 'reject'));
 
             if($actionMatch['routes']) {

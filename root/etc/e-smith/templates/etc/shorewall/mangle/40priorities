@@ -6,9 +6,11 @@
 {
     use NethServer::Firewall;
     use esmith::NetworksDB;
+    use esmith::ConfigDB;
 
     my $fw = new NethServer::Firewall();
     my $ndb = esmith::NetworksDB->open_ro();
+    my $tdb = esmith::ConfigDB->open_ro('tc');
     our @providers = $fw->getProviders();
 
     foreach my $rule ( reverse($fw->getTcRules()) ) {
@@ -19,10 +21,10 @@
 
         my $mask = '';
         my $action = $rule->prop("Action") || next;
-        if ($action =~ /^priority;(.*)/) {
-            # map low to 3 (low), map high to 2 (medium)
-            # 1 (high) is reserved for system use
-            $mask = (lc($1) eq 'low') ? "0x3/0xff": "0x2/0xff"; 
+        if ($action =~ /^class;(.*)/) {
+            my $class = $tdb->get($1);
+            my $mark = $class->prop('Mark') || next;
+            $mask = "0x$mark/0xff";
         } else {
             # skip non-priority rules
             next;
@@ -69,7 +71,7 @@
                 $chain = '';
             }
             my $params = {
-                'action' => "MARK($mask)$chain",
+                'action' => "CONNMARK($mask)$chain",
                 'source' => $_,
                 'dest' => $dst_addr,
                 'comment' => $description,

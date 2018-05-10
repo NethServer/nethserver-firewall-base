@@ -14,7 +14,7 @@
    my $db = esmith::ConfigDB->open_ro('fwrules');
    tie my %udb, 'NethServer::Database::Ndpi';
    
-   my %protocols = ();
+   our %protocols = ();
    foreach ( $db->get_all() ) {
        my $service = $_->prop('Service') || '';
        if ($fw->isNdpiService($service)) {
@@ -34,8 +34,4 @@
        $OUT .= "# Mark $proto\n";
        $OUT .= "MARK($mark):F\t-\t-\t;; -m ndpi --$proto\n\n";
    }
-
-   $OUT .= "# Save the current packet mark in the conntrack table if it's already marked\n";
-   $OUT .= "SAVE:F          -               -               -     -       -       -       !0x000/0xff00";
-
 }

@@ -98,6 +98,7 @@ $L['FirewallObject_cidr_Title'] = 'CIDR network ${key}';
 $L['Show_x_outof_y_label'] = 'Showing ${partial} results out of ${total}';
 $L['ActionRoute_label'] = 'Route to ${0}';
 $L['ActionRouteIndex_label'] = '${0}';
+$L['ActionPriorityIndex_label'] = '${0}';
 $L['ActionLog_label'] = 'Log';
 
 $L['ShowAction_label'] = 'Show';
@@ -108,6 +109,7 @@ $L['ShowTrafficShaping_label'] = 'Traffic shaping (${0})';
 
 $L['ActionPriorityHigh_label'] = 'High priority';
 $L['ActionPriorityLow_label'] = 'Low priority';
+$L['ActionPriority_label'] = 'Priority ${0}';
 $L['ActionPrioLo_label'] = 'Lo-Prio';
 $L['ActionPrioHi_label'] = 'Hi-Prio';
 

@@ -335,7 +335,7 @@ sub __localToUtc($)
     return sprintf("%02d:%02d", $hour, $min);
 }
 
-=head2 getTimel(id)
+=head2 getTime(id)
 
 Return the time string in UTC.
 Return an '-' if the key doesn't exists;
@@ -801,7 +801,7 @@ sub getRules
     my @list;
     foreach ($self->{'fdb'}->get_all_by_prop('type' => 'rule')) {
         my $action = $_->prop('Action');
-        next if ($action =~ /^provider;/ || $action =~ /^priority;/); # skip tc rules
+        next if ($action =~ /^provider;/ || $action =~ /^class;/); # skip tc rules
         push(@list,$_);
     }
     return sort _sort_by_position @list; # ascending sort
@@ -819,7 +819,7 @@ sub getTcRules
     my @list;
     foreach ($self->{'fdb'}->get_all_by_prop('type' => 'rule')) {
         my $action = $_->prop('Action');
-        if ($action =~ /^provider;/ || $action =~ /^priority;/) { # skip traffic rules
+        if ($action =~ /^provider;/ || $action =~ /^class;/) { # skip traffic rules
             push(@list,$_);
         }
     }
