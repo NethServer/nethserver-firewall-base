@@ -38,7 +38,7 @@ The firewall has the following built-in zones, ordered from the most to the leas
 
 There is also a special *firewall* zone which represents the firewall itself. The firewall can access any other zone. 
 
-Each network interface with a configured role is a firewall zone. Roles are mapped to Shorewall zone as:
+Each network interface with a configured role is a firewall zone. Roles are mapped to Shorewall zones as:
 
 * green -> loc
 * red -> net
@@ -376,16 +376,16 @@ More information are available here: http://shorewall.net/NAT.htm
 Traffic shaping
 ================
 
-Traffic shaping is implemented using Shorewall mangle and FireQOS: each mangle rule sets a well-know marker,
+Traffic shaping is implemented using Shorewall mangle and FireQOS: each mangle rule sets a well-known marker,
 markers are used to match traffic inside FireQOS tc classes. 
 
 The firewall needs to know how much inbound and outbound bandwidth has a red interface.
 The bandwidth value (expressed in kbit) is stored inside ``FwInBandwidth`` and ``FwOutBandwidth`` properties, wich are
 parts of the network interface record inside the ``networks`` db.
 
-FireQOS suggests to use 90% of the declared bandwidth to faster shaped the inbound traffic.
+FireQOS tutorial suggests to use 90% of the declared bandwidth to shape the inbound traffic faster.
 
-On red interfaces with  ``FwInBandwidth`` and ``FwOutBandwidth`` set, ethernet offloading is automatic disabled.
+On red interfaces with ``FwInBandwidth`` and ``FwOutBandwidth`` set, ethernet offloading is automatically disabled.
 
 Example: ::
 
@@ -412,7 +412,7 @@ tc classess
 
 tc classes are saved inside the ``tc`` database with type ``class``.
 
-Each tc class has following properties:
+Each tc class has the following properties:
 
 - ``Description``: optional class description (used only in the UI)
 - ``Mark``: integer value which identify the marker used for this class. Maximum is ``63``
