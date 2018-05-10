@@ -63,12 +63,6 @@ source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.TrafficShaping_Ip]
-source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_TrafficShaping_Ip.php
-source_lang = en
-type = PHP_ALT_ARRAY
-
-
 [nethserver.PortForward_HairpinNat]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_PortForward_HairpinNat.php
 source_lang = en
@@ -99,28 +93,11 @@ source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.TrafficShaping_Interfaces]
-source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_TrafficShaping_Interfaces.php
-source_lang = en
-type = PHP_ALT_ARRAY
-
-
 [nethserver.FirewallRules]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_FirewallRules.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
-
-[nethserver.TrafficShaping_Ports]
-source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_TrafficShaping_Ports.php
-source_lang = en
-type = PHP_ALT_ARRAY
-
-
-[nethserver.TrafficShaping]
-source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_TrafficShaping.php
-source_lang = en
-type = PHP_ALT_ARRAY
 
 [nethserver.NethServer_Module_TcClasses]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_TcClasses.php
