@@ -59,7 +59,6 @@ class TcClasses extends \Nethgui\Controller\TableController
             ->setColumns($columns)
             ->addTableAction(new \NethServer\Module\TcClasses\Modify('create'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
-            ->addTableAction(new \NethServer\Module\TcClasses\Configure())
             ->addRowAction(new \NethServer\Module\TcClasses\Modify('update'))
             ->addRowAction(new \NethServer\Module\TcClasses\Modify('delete'))
         ;

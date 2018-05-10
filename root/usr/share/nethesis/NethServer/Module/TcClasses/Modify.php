@@ -87,9 +87,6 @@ class Modify extends \Nethgui\Controller\Table\Modify
             }
             $tot_out += $this->parameters['MinOutputRate'];
             $tot_in += $this->parameters['MinInputRate'];
-            $voip = $this->getPlatform()->getDatabase('configuration')->getProp('firewall', 'TCVoipReservation');
-            $tot_in += $voip;
-            $tot_out += $voip;
             if ($tot_in > 100) {
                 $report->addValidationErrorMessage($this, 'MinInputRate', 'input_overcommit');
             }
