@@ -76,8 +76,6 @@ Properties of ``firewall`` key inside ``configuration`` db:
 * ``NotifyWanTo``: recipient address for mails sent if NotifyWAN is set to enabled
 * ``TCLinklayer``: default empty (map to ``ethernet``), can contains all information about connections overheads
   See https://firehol.org/fireqos-manual/fireqos-params-class/#linklayer-linklayer-name-ethernet-atm
-* ``TCVoipReservation``: reserve given bandwidth percentage to VoIP traffic, if empty, no bandwidth will be reserver
-* ``TCTosOptimization``: can be ``enabled`` or ``disabled``. If enabled, define default class for traffic markes as ``bulk`` or ``interactive``
 
 
 Example
@@ -99,8 +97,6 @@ Example
     PingInterval=5
     Policy=permissive
     TCLinklayer=
-    TCTosOptimization=enabled
-    TCVoipReservation=5
     WanMode=balance
 
 

@@ -7,8 +7,6 @@
   my $tdb = esmith::ConfigDB->open_ro('tc') || die("Can't open networks TC db");
   my $fw = new NethServer::Firewall();
   my $linklayer = $firewall{'TCLinklayer'} || 'ethernet';
-  my $voip = $firewall{'TCVoipReservation'} || '';
-  my $tos = $firewall{'TCTosOptimization'} || 'enabled';
 
   my @providers = $fw->getProviders();
   my @classes = $tdb->get_all_by_prop('type' => 'class');
@@ -55,27 +53,6 @@
 
       $OUT .= "interface $interface ".getProviderName($interface)." bidirectional input rate ${in}kbit output rate ${out}kbit balanced $linklayer\n";
 
-      if ($voip ne '') {
-          $OUT .= "\n";
-          $OUT .= "\tclass voip commit $voip% pfifo\n";
-          $OUT .= "\t\tserver sip\n";
-          $OUT .= "\t\tclient sip\n";
-          $OUT .= "\t\tserver rtp\n";
-          $OUT .= "\t\tclient stun\n";
-      }
-
-      if ($tos eq 'enabled') {
-          $OUT .= "\n"; 
-          $OUT .= "\tclass interactive commit 20%\n";
-          $OUT .= "\t\tmatch tos interactive\n";
-          $OUT .= "\t\tmatch proto icmp\n";
-          my $prio = scalar(@classes) + 3; # number of classes + 1 for interactive + for default class
-          $prio = $prio + 1 if ($voip ne ''); # + 1 voip if enabled
-          $OUT .= "\n"; 
-          $OUT .= "\tclass bulk prio $prio\n";
-          $OUT .= "\t\tmatch tos bulk\n";
-      }
-     
       foreach my $class (@classes) {
           my $name = $class->key;
           my $mark = $class->prop('Mark') || next;
