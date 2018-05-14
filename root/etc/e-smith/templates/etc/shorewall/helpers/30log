@@ -1,0 +1,11 @@
+#
+# While not actually helpers, these are included here so that
+# LOG_BACKEND can work correctly. Not all of them will be
+# loaded, since at least one of them will be an alias on any
+# given system.
+#
+loadmodule ipt_LOG
+loadmodule nf_log_ipv4
+loadmodule xt_LOG
+loadmodule xt_NFLOG
+loadmodule nfnetlink_log
