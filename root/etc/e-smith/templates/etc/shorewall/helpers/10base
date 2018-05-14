@@ -1,0 +1,15 @@
+#
+# Shorewall version 5 - Helpers File
+#
+# /usr/share/shorewall/helpers
+#
+#	This file loads the kernel helper modules.
+#
+#	THE ORDER OF THE COMMANDS BELOW IS IMPORTANT!!!!!! You MUST load in
+#	dependency order. i.e., if M2 depends on M1 then you must load M1
+#	before you load M2.
+#
+#  If you need to modify this file, copy it to /etc/shorewall and modify the
+#  copy.
+#
+###############################################################################

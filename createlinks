@@ -43,6 +43,7 @@ my @templates = qw(
     /etc/shorewall/tcinterfaces
     /etc/shorewall/tcpri
     /etc/shorewall/nat
+    /etc/shorewall/helpers
     /etc/lsm/lsm.conf
     /etc/firehol/fireqos.conf
 );
