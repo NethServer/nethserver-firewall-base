@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.3.2
+Version: 3.4.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -60,6 +60,11 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Wed May 16 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.4.0-1
+- Change of defaults for NS 7.5 - NethServer/dev#5490
+- nDPI: support CentOS 7.5 - NethServer/dev#5482
+- Advanced traffic shaping (QoS) - NethServer/dev#5484
+
 * Thu Apr 26 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.3.2-1
 - Shorewall: remove obsolete masq file - NethServer/dev#5467
 
