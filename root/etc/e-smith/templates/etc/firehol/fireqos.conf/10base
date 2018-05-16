@@ -1,6 +1,6 @@
 FIREQOS_CONNMARK_RESTORE=""
 
-modinfo act_connmark &>/dev/nul
+modinfo act_connmark &>/dev/null
 
 if [ $? -eq 0 ]; then
     FIREQOS_CONNMARK_RESTORE="act_connmark"
