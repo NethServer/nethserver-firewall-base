@@ -82,11 +82,19 @@ class CreateService extends \Nethgui\Controller\Collection\AbstractAction
         }
 
         if ($this->getRequest()->isMutation()) {
-            $ports = explode(',', $this->parameters['Ports']);
-            $v = $this->createValidator(Validate::PORTNUMBER);
-            foreach ($ports as $port) {
-                if ( ! $v->evaluate($port)) {
-                    $report->addValidationErrorMessage($this, 'Ports', 'Ports_validator');
+            if ( strpos($this->parameters['Ports'], ",") !== false ) { # list of ports
+                $ports = explode(',',$this->parameters['Ports']);
+                $v = $this->createValidator(Validate::PORTNUMBER);
+                foreach($ports as $port) {
+                    if(!$v->evaluate($port)) {
+                        $report->addValidationErrorMessage($this, 'Ports', 'Ports_validator');
+                    }
+                }
+            } else if ( strpos($this->parameters['Ports'], "-") !== false ) { # port range
+                $tmp = explode("-",$this->parameters['Ports']);
+                # two non-zero integers, right number must be greater then left one
+                if ( !isset($tmp[0], $tmp[1]) || !(int)$tmp[0] || !(int)$tmp[1] || (int)$tmp[0] >= (int)$tmp[1] ) {
+                    $report->addValidationErrorMessage($this, 'Ports', 'Port_range_validator');
                 }
             }
         }
