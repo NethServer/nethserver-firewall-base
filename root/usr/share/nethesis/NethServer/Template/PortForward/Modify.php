@@ -22,6 +22,7 @@ echo $view->panel()
     ->insert($view->textInput('Dst'))
     ->insert($dstHost)
     ->insert($view->textInput('Allow'))
+    ->insert($view->checkbox('Log', 'info')->setAttribute('uncheckedValue', 'none'))
     ->insert($view->textInput('Description'));
 
 
