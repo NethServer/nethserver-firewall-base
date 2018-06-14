@@ -92,7 +92,7 @@ class CreateService extends \Nethgui\Controller\Collection\AbstractAction
                 }
             } else if ( strpos($this->parameters['Ports'], "-") !== false ) { # port range
                 $tmp = explode("-",$this->parameters['Ports']);
-                # two non-zero integers, left number must be greater then right one
+                # two non-zero integers, right number must be greater then left one
                 if ( !isset($tmp[0], $tmp[1]) || !(int)$tmp[0] || !(int)$tmp[1] || (int)$tmp[0] >= (int)$tmp[1] ) {
                     $report->addValidationErrorMessage($this, 'Ports', 'Port_range_validator');
                 }
