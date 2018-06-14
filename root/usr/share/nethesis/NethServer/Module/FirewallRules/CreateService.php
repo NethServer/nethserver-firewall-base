@@ -90,9 +90,10 @@ class CreateService extends \Nethgui\Controller\Collection\AbstractAction
                         $report->addValidationErrorMessage($this, 'Ports', 'Ports_validator');
                     }
                 }
-            } else if ( strpos($this->parameters['Ports'], "-") !== false ) {
+            } else if ( strpos($this->parameters['Ports'], "-") !== false ) { # port range
                 $tmp = explode("-",$this->parameters['Ports']);
-                if ( !isset($tmp[0]) || !isset($tmp[1]) || !(int)$tmp[0] || !(int)$tmp[1] || (int)$tmp[0] >= (int)$tmp[1] ) {
+                # two non-zero integers, left number must be greater then right one
+                if ( !isset($tmp[0], $tmp[1]) || !(int)$tmp[0] || !(int)$tmp[1] || (int)$tmp[0] >= (int)$tmp[1] ) {
                     $report->addValidationErrorMessage($this, 'Ports', 'Port_range_validator');
                 }
             }
