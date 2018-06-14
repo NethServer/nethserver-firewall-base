@@ -87,6 +87,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
             $this->wanips = $this->readWanIPs();
         }
 
+        $logValidator = $this->createValidator()->memberOf(array("none","info"));
+
         $parameterSchema = array(
             array('id', FALSE, \Nethgui\Controller\Table\Modify::KEY),
             array('Proto', $protoValidator, \Nethgui\Controller\Table\Modify::FIELD),
@@ -97,6 +99,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('status', Validate::SERVICESTATUS, \Nethgui\Controller\Table\Modify::FIELD),
             array('Allow', Validate::ANYTHING, \Nethgui\Controller\Table\Modify::FIELD),
             array('Description', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
+            array('Log', $this->createValidator()->maxLength(35), \Nethgui\Controller\Table\Modify::FIELD),
         );
 
 
