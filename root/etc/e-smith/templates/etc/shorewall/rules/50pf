@@ -32,6 +32,7 @@
     foreach my $pf ( $db->get_all_by_prop('type' => 'pf') ) {
         $proto = $pf->prop('Proto') || 'tcp,udp';
         $status = $pf->prop('status') || "disabled";
+        $log = $pf->prop('Log') || "";
         next unless ($status eq "enabled");
         $src = $pf->prop('Src') || next;
         $dstHost = $pf->prop('DstHost') || next;
@@ -70,13 +71,18 @@
         $target_host = $fw->getZone($dstHost);
         $OUT.="#\n# PF $oriDst:$src -> $dstHost$target_port $allow_cmt \n#\n";
         foreach (@sources) {
+            if ($log ne '') {
+               $logAction = ":$log";
+             } else {
+               $logAction = "";
+             }
             $OUT.="?COMMENT $description from $_\n";
             if ($nfqueue eq 'enabled') {
-                $OUT.="DNAT-\t$_$allow\t$dstHost$target_port\t$proto\t$src$srcHost$oriDst\n";
+                $OUT.="DNAT-$logAction\t$_$allow\t$dstHost$target_port\t$proto\t$src$srcHost$oriDst\n";
                 @z = split(/:/,$target_host);
                 $OUT.="NFQBY\t$_$allow\t".$z[0]."\t$proto\t$dst$srcHost$oriDst\n";
             } else {
-                $OUT.="DNAT\t$_$allow\t$target_host$target_port\t$proto\t$src$srcHost$oriDst\n";
+                $OUT.="DNAT$logAction\t$_$allow\t$target_host$target_port\t$proto\t$src$srcHost$oriDst\n";
             }
         }
     }
