@@ -1,27 +1,29 @@
-#
-# 20providers
-#
 {
+    #
+    # Prepare an array of providers.
+    # Each provider as an options key which can be
+    # overridden by following fragments.
+    #
     use NethServer::Firewall;
-
     use esmith::NetworksDB;
-    my $ndb = esmith::NetworksDB->open_ro();
-    my $fw = new NethServer::Firewall();
-    my @providers = $fw->getProviders();
-    if (scalar(@providers) < 2) {
-        return '';
-    }
 
-    foreach my $p ( @providers ) {
-        my $name = $p->{'name'};
-        my $weight = $p->{'weight'};
-        my $number = $p->{'number'};
+    my $fw = new NethServer::Firewall();
+    my $ndb = esmith::NetworksDB->open_ro();
+    my @tmp = $fw->getProviders();
+    our @providers;
+
+    foreach my $p ( @tmp ) {
         my $interface_name = $p->{'interface'} || next;
         my $interface = $ndb->get($interface_name);
         next if (!$interface);
-        my $gateway = $interface->prop('gateway') || 'detect';
-        my $mask = $p->{'mask'};
-        $OUT .= "$name\t$number\t$mask\t-\t$interface_name\t$gateway\ttrack,balance=$weight,persistent\t-\n";
+        $p->{'gateway'} = $interface->prop('gateway') || 'detect';
+        my %options = (
+            "track" => "",
+            "balance" => $p->{'weight'},
+            "persistent" => ""
+        );
+        $p->{'options'} = \%options;
+        push(@providers,$p);
     }
 
 }

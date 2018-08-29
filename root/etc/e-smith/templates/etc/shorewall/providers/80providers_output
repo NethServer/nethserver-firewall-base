@@ -1,0 +1,31 @@
+#
+# 80providers_output
+#
+{
+    use esmith::NetworksDB;
+    my $ndb = esmith::NetworksDB->open_ro();
+    if (scalar(@providers) < 2) {
+        return '';
+    }
+
+    foreach my $p ( @providers ) {
+        my $name = $p->{'name'};
+        my $number = $p->{'number'};
+        my $interface_name = $p->{'interface'};
+        my $gateway = $p->{'gateway'};
+        my $mask = $p->{'mask'};
+        my $options = $p->{'options'};
+        $OUT .= "$name\t$number\t$mask\t-\t$interface_name\t$gateway\t";
+        my @line;
+        while(my($k, $v) = each %$options) {
+            if ($v) {
+                push(@line,"$k=$v");
+            } else {
+                push(@line,"$k");
+            }
+        }
+        $OUT .= join(",", @line);
+        $OUT .= "\n";
+    }
+
+}
