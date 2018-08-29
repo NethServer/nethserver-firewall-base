@@ -1,8 +1,8 @@
 {
     #
-    # Prepare a providers array.
+    # Prepare an array of providers.
     # Each provider as an options key which can be
-    # overridden by nex fragments
+    # overridden by following fragments.
     #
     use NethServer::Firewall;
     use esmith::NetworksDB;
