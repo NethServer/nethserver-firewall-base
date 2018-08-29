@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.4.1
+Version: 3.4.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -60,6 +60,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Wed Aug 29 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.4.2-1
+- Refactor provider template: allow override of provider options
+
 * Fri Jun 15 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.4.1-1
 - Firewall objects: services with port range - NethServer/dev#5531
 - Firewall: log port forwarding - NethServer/dev#5529
