@@ -475,9 +475,14 @@ sub getZone($)
     # sanitize the list:
     $value = join(",", grep { $_ ne '' } split(/,/, $value));
 
-    # protect built-in zone from name resolution Refs #3056
+    # protect built-in zones from name resolution Refs #3056
     if ($value =~ /loc|net|blue|orang|ivpn|ovpn/) {
         return $value;
+    }
+    # protect extra zones from name resolution NethServer/dev#5625
+    my $z = $self->{'ndb'}->get($value);
+    if (defined($z) && $z->prop('type') eq 'zone') {
+         return $z->key;
     }
 
     # ip range
