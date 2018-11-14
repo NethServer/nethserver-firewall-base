@@ -39,8 +39,9 @@ $findButtonTarget = $view->getClientEventTarget('Find');
 
 $ndpiProtocolIcons = '';
 
-foreach(\NethServer\Module\FirewallRules\Index::$ndpiProtocolIcons as $proto => $values) {
-    $ndpiProtocolIcons .= "'#${viewId} .Selector input[value=\"ndpi;$proto\"] + label::before { content: \"\\\\${values[1]}\\\\20\" }',\n";
+foreach(\NethServer\Module\FirewallRules\Index::listNdpiProtocols() as $id => $name) {
+    $icon = \NethServer\Module\FirewallRules\Index::getNdpiIcon($name);
+    $ndpiProtocolIcons .= "'#${viewId} .Selector input[value=\"ndpi;$id\"] + label::before { content: \"\\\\${icon}\\\\20\" }',\n";
 }
 
 $view->includeJavascript("

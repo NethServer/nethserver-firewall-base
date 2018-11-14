@@ -99,8 +99,16 @@ class RuleGenericController extends \Nethgui\Controller\AbstractController
 
     public static function translateFirewallObjectTitle(\Nethgui\View\ViewInterface $view, $raw)
     {
+        $props = array();
         list($type, $key) = is_string($raw) ? array_merge(explode(';', $raw), array('', '')) : array('', '');
-        $o = new \NethServer\Tool\FirewallObject($key, $type, array(), array($view, 'translate'));
+        # Resolve ndpi protocol name
+        if ($type == 'ndpi') {
+            $protocols = \NethServer\Module\FirewallRules\Index::listNdpiProtocols();
+            if (isset($protocols[$key])) {
+                $props = array("name" => $protocols[$key]);
+            }
+        }
+        $o = new \NethServer\Tool\FirewallObject($key, $type, $props, array($view, 'translate'));
         return $o->getTitle();
     }
 
