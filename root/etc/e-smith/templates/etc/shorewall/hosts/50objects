@@ -9,8 +9,8 @@
     my $fw = NethServer::Firewall->new();
 
     foreach (grep { !$fw->isDanglingZoneRecord($_) } $ndb->zones()) {
-        my $i = $_->prop('Interface') || next;
-        my $n = $_->prop('Network') || next;
+        my $i = $_->prop('Interface') or next;
+        my $n = $_->prop('Network') or next;
         $OUT .= substr($_->key, 0, 5)."\t$i:$n\n";;
     } 
 }
