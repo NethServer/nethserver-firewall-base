@@ -3,12 +3,14 @@
 #
 {
     use esmith::NetworksDB;
-    my $ndb = esmith::NetworksDB->open_ro();
+    use NethServer::Firewall;
 
-    foreach ($ndb->zones()) {
-        my $i = $_->prop('Interface') || "";
-        my $n = $_->prop('Network') || "";
-        next if ($i eq '' || $n eq '');
+    my $ndb = esmith::NetworksDB->open_ro();
+    my $fw = NethServer::Firewall->new();
+
+    foreach (grep { !$fw->isDanglingZoneRecord($_) } $ndb->zones()) {
+        my $i = $_->prop('Interface') or next;
+        my $n = $_->prop('Network') or next;
         $OUT .= substr($_->key, 0, 5)."     ipv4\n";;
     }
 }

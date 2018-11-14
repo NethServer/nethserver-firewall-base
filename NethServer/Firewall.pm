@@ -222,7 +222,8 @@ sub getAddress($)
             }
 
         } elsif ( $db eq 'zone' ) {
-            if ($expand_zone) {
+            my $z = $self->{'ndb'}->get($key);
+            if ($expand_zone || ($z && $self->isDanglingZoneRecord($z))) {
                 return $self->getZoneCIDR($key);
             } else { 
                 return substr($key, 0, 5); # truncate zone name to 5 chars
@@ -451,6 +452,24 @@ sub getAliasZone($)
     }
 }
 
+=head2 isDanglingZoneRecord(zone)
+
+Check if the given zone record references an invalid Interface record or
+an Interface record that is part of a logical interface.
+
+=cut
+sub isDanglingZoneRecord
+{
+    my $self = shift;
+    my $z = shift;
+    my $i = $self->{'ndb'}->get($z->prop('Interface'));
+    if(! $i || $i->prop('role') =~ m/^(bridged|slave|)$/) {
+        return 1;
+    }
+    return 0;
+}
+
+
 =head2 getZone(value)
 
 Return the given value prefixed with its own zone.
@@ -502,7 +521,7 @@ sub getZone($)
     }
 
     # check zones
-    my @zones =  $self->{'ndb'}->zones;
+    my @zones = grep { ! $self->isDanglingZoneRecord($_) } $self->{'ndb'}->zones;
     foreach my $z (@zones) { 
         next unless ($z->prop('Network') ne '');
         my $haystack = NetAddr::IP->new($z->prop('Network'));
