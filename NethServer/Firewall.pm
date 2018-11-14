@@ -303,25 +303,6 @@ sub isValidNdpiProtocol($)
     return exists $ndpi{$protocol} ? 1 : 0;
 }
 
-=head2 getNdpiProtocol(id)
-
-Return the nDPI protocol for the service id, only if the protocol
-is defined in /proc/net/xt_ndpi/proto .
-Otherwise return undef
-
-=cut
-sub getNdpiProtocol($)
-{
-    my $self = shift;
-    my $id = shift;
-
-    my $protocol = (split(/;/, $id))[1];
-    if ($self->isValidNdpiProtocol($protocol)) {
-        return $protocol;
-    }
-    return undef;
-}
-
 sub __localToUtc($)
 {
     my $self = shift;
@@ -579,11 +560,8 @@ sub outMangleRule($)
     delete($params->{'service'});
 
     if ($self->isNdpiService($service)) {
-        my $proto = $self->getNdpiProtocol($service) || '';
-        if ($proto ne '') {
-            $params->{'test'} = $self->getNdpiMark($proto);
-            $str .= $self->_compactRuleFormat($params);
-        }
+        $params->{'test'} = $self->getNdpiMark($service);
+        $str .= $self->_compactRuleFormat($params);
     } else {
         my %ports = $self->getPorts($service);
         foreach my $protocol (keys %ports) {
@@ -631,11 +609,8 @@ sub outRule($)
     delete($params->{'comment'});
     if ($service ne '-') { # handle special services
         if ($self->isNdpiService($service)) {
-            my $proto = $self->getNdpiProtocol($service) || '';
-            if ($proto ne '') {
-                $params->{'mark'} = $self->getNdpiMark($proto);
-                $str .= $self->_compactRuleFormat($params);
-            }
+            $params->{'mark'} = $self->getNdpiMark($service);
+            $str .= $self->_compactRuleFormat($params);
         } else {
             my %ports = $self->getPorts($service);
             foreach my $protocol (keys %ports) {
@@ -710,10 +685,9 @@ sub isNdpiService($)
     return ($key =~ /^ndpi;/);
 }
 
-
 =head2 getNdpiMark
 
-Return ndpi mark shifted by 8
+Return ndpi mark
 
 =cut
 
@@ -721,18 +695,10 @@ sub getNdpiMark($)
 {
     my $self = shift;
     my $key = shift;
-    tie my %udb, 'NethServer::Database::Ndpi';
 
-    my $proto = $key;
-    if ($key =~ /^ndpi;(.*)/) {
-        $proto = $1;
-    }
-    my $mark  = esmith::db::db_get_prop(\%udb, $proto, 'mark') || return '';
-    my $dec = hex($mark)<<8;
-    $mark = sprintf("0x%X", $dec);
-    return "$mark/0xff00";
+    $key =~ /^ndpi;(.*)/;
+    return sprintf("0x%s/0xff00", $1);
 }
-
 
 =head2 isZone
 
