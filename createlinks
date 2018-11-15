@@ -152,9 +152,10 @@ event_actions($_, qw(
 
 $event = 'interface-update';
 
-event_actions($event,
-    'interface-config-write-pppoe' => '40'
-);
+event_actions($event, qw(
+    interface-config-write-pppoe 40
+    nethserver-firewall-adjustdb 60
+));
 event_templates($event,
     '/etc/ppp/chap-secrets',
     '/etc/ppp/pap-secrets'
