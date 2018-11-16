@@ -1,3 +1,0 @@
-# 80qos_fw
-# save priority packet marks for traffic from the firewall itself
-SAVE          $FW               -               -     -       -       -       !0x00/0xff

@@ -16,7 +16,5 @@
    $OUT .= "IPTABLES(NDPI --ndpi-id-p --set-mark):T\n";
 
    $OUT .= "# Restore the connection mark into the current packet.\n";
-   $OUT .= "RESTORE:F       -               -               -\n";
-   $OUT .= "# Save the parkcet mark into the connection\n";
-   $OUT .= "SAVE:T          -               -               -     -       -       -       !0x000/0xff00\n";
+   $OUT .= "RESTORE:P       -               -               -\n";
 }
