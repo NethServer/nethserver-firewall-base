@@ -55,6 +55,9 @@ my %defaults = (qw(
     synchronous no
 ));
 
+# Configure pppd plugin for high-speed PPPoE connections
+$defaults{'plugin'} =  glob("/usr/lib64/pppd/*/rp-pppoe.so");
+
 my $file = "$output_dir/ifcfg-ppp0";
 my %props = $ndb->get('ppp0') ? $ndb->get('ppp0')->props : ();
 my %attrs = (%defaults, %props,
