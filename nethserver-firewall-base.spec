@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.4.2
+Version: 3.4.3
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -60,6 +60,11 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Tue Nov 20 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.4.3-1
+- Ingress QoS not working for squid (http) traffic - Bug NethServer/dev#5642
+- Firewall: bad zone resolution - Bug NethServer/dev#5625
+- Server unreachable after creating a logical interface - Bug NethServer/dev#5637
+
 * Wed Aug 29 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.4.2-1
 - Refactor provider template: allow override of provider options
 
