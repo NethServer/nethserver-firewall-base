@@ -695,9 +695,16 @@ sub getNdpiMark($)
 {
     my $self = shift;
     my $key = shift;
+    tie my %udb, 'NethServer::Database::Ndpi';
 
-    $key =~ /^ndpi;(.*)/;
-    return sprintf("0x%s/0xff00", $1);
+    my $proto = $key;
+    if ($key =~ /^ndpi;(.*)/) {
+        $proto = $1;
+    }
+    my $mark  = esmith::db::db_get_prop(\%udb, $proto, 'mark') || return '';
+    my $dec = hex($mark);
+    $mark = sprintf("0x%X", $dec);
+    return "$mark/0xff00";
 }
 
 =head2 isZone
