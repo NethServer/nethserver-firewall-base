@@ -71,7 +71,7 @@
                 $chain = '';
             }
             my $params = {
-                'action' => "CONNMARK($mask)$chain",
+                'action' => "MARK($mask)$chain",
                 'source' => $_,
                 'dest' => $dst_addr,
                 'comment' => $description,
