@@ -11,10 +11,10 @@
    return '' if (!$fw->isNdpiEnabled());
 
    $OUT .= "# Mark all NDPI traffic\n";
-   $OUT .= "INLINE - - ; -m ndpi --all\n";
+   $OUT .= "INLINE():F - - ; -m ndpi --all\n";
    $OUT .= "INLINE \$FW - ; -m ndpi --all\n";
    $OUT .= "IPTABLES(NDPI --ndpi-id-p --set-mark):T\n";
 
    $OUT .= "# Restore the connection mark into the current packet.\n";
-   $OUT .= "RESTORE:P       -               -               -\n";
+   $OUT .= "RESTORE:F       -               -               -\n";
 }
