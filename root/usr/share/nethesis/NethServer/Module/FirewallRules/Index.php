@@ -188,7 +188,7 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         'viber' => array('fa-volume-control-phone', 'F2A0'),
         'apple_itunes' => array('fa-apple', 'F179'),
         'radius' => array('fa-cogs', 'F085'),
-        'windows_update' => array('fa-windows', 'F17A'),
+        'windowsupdate' => array('fa-windows', 'F17A'),
         'teamviewer' => array('fa-desktop', 'F108'),
         'tuenti' => array('fa-volume-control-phone', 'F2A0'),
         'lotus_notes' => array('fa-folder-open', 'F07C'),
@@ -247,7 +247,11 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         'starcraft' => array('fa-gamepad', 'F11B'),
         'teredo' => array('fa-file-text', 'F15C'),
         'hotspot_shield' => array('fa-lock', 'F023'),
+        'git' => array('fa-git', 'f1d3'),
+        'github' => array('fa-github', 'f09b'),
     );
+
+    private static $ndpiProtocols = null;
 
     public function initialize()
     {
@@ -422,25 +426,83 @@ class Index extends \Nethgui\Controller\Collection\AbstractAction
         }
     }
 
+    private static function loadNdpiProtocols() {
+        if (!file_exists("/proc/net/xt_ndpi/proto")) {
+            self::$ndpiProtocols = array("fake","fake");
+        }
+        foreach (file("/proc/net/xt_ndpi/proto") as $row) {
+            $parts = preg_split('/\s+/', $row);
+            self::$ndpiProtocols[$parts[0]] = $parts[2];
+        }
+    }
+
+    public static function listNdpiProtocols() {
+        if (!self::$ndpiProtocols) {
+            self::loadNdpiProtocols();
+        }
+        return self::$ndpiProtocols;
+    }
+
+    public function resolveNdpiName($id) {
+        if (!self::$ndpiProtocols) {
+            self::loadNdpiProtocols();
+        }
+        return isset(self::$ndpiProtocols[$id]) ? self::$ndpiProtocols[$id] : $id;
+    }
+
     private function resolveName($dbValue , $view)
     {
-        $icon = sprintf('<i class="fa">&#x%s;</i>', $this->getObjectIcon($dbValue));
         list($type, $value) = array_merge(explode(';', $dbValue), array(NULL));
 
-        if($value) {
-            $label = $value;
+        if ($type == 'ndpi') {
+            $label = $this->resolveNdpiName($value);
+            $icon = sprintf('<i class="fa">&#x%s;</i>', self::getNdpiIcon($label));
         } else {
-            $label = $view->translate("Type_${type}_label", array($dbValue));
+            $icon = sprintf('<i class="fa">&#x%s;</i>', $this->getObjectIcon($dbValue));
+            if($value) {
+                $label = $value;
+            } else {
+                $label = $view->translate("Type_${type}_label", array($dbValue));
+            }
         }
-
         return $icon . ' ' . $label;
+    }
+
+    # $v is name of protocol
+    public static function getNdpiIconName($v)
+    {
+        $v = strtolower($v);
+        if (isset(self::$ndpiProtocolIcons[$v])) {
+            return self::$ndpiProtocolIcons[$v][0];
+        }
+        foreach (array_keys(self::$ndpiProtocolIcons) as $key) {
+            if (preg_match("/$key/",$v)) {
+                return self::$ndpiProtocolIcons[$key][0];
+            }
+        }
+        return 'fa-circle';  //circle
+    }
+
+    # $v is name of protocol
+    public static function getNdpiIcon($v)
+    {
+        $v = strtolower($v);
+        if (isset(self::$ndpiProtocolIcons[$v])) {
+            return self::$ndpiProtocolIcons[$v][1];
+        }
+        foreach (array_keys(self::$ndpiProtocolIcons) as $key) {
+            if (preg_match("/$key/",$v)) {
+                return self::$ndpiProtocolIcons[$key][1];
+            }
+        }
+        return 'f111';  //circle
     }
 
     private function getObjectIcon($v)
     {
         list($type, $value) = array_merge(explode(';', $v), array(NULL));
-        if($type === 'ndpi' && array_key_exists($value, self::$ndpiProtocolIcons)) {
-            return self::$ndpiProtocolIcons[$value][1];
+        if($type === 'ndpi' && array_key_exists(strtolower($value), self::$ndpiProtocolIcons)) {
+            return self::$ndpiProtocolIcons[strtolower($value)][1];
         } elseif (array_key_exists($type, self::$objectIcons)) {
             return self::$objectIcons[$type][1];
         }

@@ -38,7 +38,7 @@ sub _read_db
     while ($line = <$fh>) {
         chomp($line);
         my ($id, $mark, $mask, $name, $count) = split(m([\s#/]+), $line);
-        $db->{$name} = "ndpi|id|$id|mark|$mark|mask|$mask|count|$count";
+        $db->{$id} = "ndpi|name|$name|mark|$mark|mask|$mask|count|$count";
     }
     close($fh);
     return $db;
