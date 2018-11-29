@@ -7,7 +7,10 @@
             "title": "WAN"
         },
         "logs": {
-            "title": "Logs"
+            "title": "Logs",
+            "follow": "Follow",
+            "stop_follow": "Stop follow",
+            "process_terminated": "Process terminated"
         },
         "about": {
             "title": "About",
