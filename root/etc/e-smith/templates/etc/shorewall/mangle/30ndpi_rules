@@ -1,0 +1,124 @@
+#
+# 30ndpi_rules
+#
+{
+    use NethServer::Firewall;
+    use esmith::NetworksDB;
+
+    my $ndb = esmith::NetworksDB->open_ro();
+    my $fw = new NethServer::Firewall();
+
+    # skip ndpi rules if ndpi is not enabled
+    if (! $fw->isNdpiEnabled()) {
+        return "# NDPI is disabled";
+    }
+    foreach my $rule ( $fw->getRules() ) {
+        my @sources;
+        my @destinations;
+
+        my $service = $rule->prop("Service") || 'any';
+
+        # skip all non-ndpi rules
+        next if (! $fw->isNdpiService($service));
+
+        my $status = $rule->prop("status") || "disabled";
+        next unless ($status eq 'enabled');
+
+        # source can't be 'any' nor 'fw'
+        # DROP in input chain is not allowed by shorewall, firewall src skipped
+        my $src = $rule->prop("Src") || next;
+        next if ($src eq 'any' || $src eq 'fw');
+
+        # destination can't be 'any' nor 'fw'
+        my $dst = $rule->prop("Dst") || next;
+        next if ($dst eq 'fw');
+        # force red role instead of any
+        # avoid breaking old rules
+        if ($dst eq 'any') {
+            $dst = "role;red";
+        }
+
+        my $action= $rule->prop("Action") || next;
+        $action = uc($action);
+
+        # ACCEPT is NOT supported, mapping to CONTINUE
+        if ($action eq 'ACCEPT') {
+            $action = "CONTINUE";
+        }
+
+        # REJECT NOT supported, mapping to DROP
+        if ($action eq 'REJECT') {
+            $action = "DROP";
+        }
+
+        # All actions should be done in FORWARD chain
+        $action = "$action:F";
+
+        # Rule logging is not supported
+        #
+        my $time =  $fw->getTime( $rule->prop('Time') || "" );
+        $time = '-' if ($time eq '');
+
+        my $description = "NDPI RULE#" . $rule->key . " " . ($rule->prop('Description') || '');
+
+        # Handle sources
+        if ( $src =~ m/role;(.*)$/) {
+            # transform into a list of interfaces
+            @sources = $fw->getZoneInterface($1)
+        } elsif ($src =~ m/zone;(.*)$/) {
+            # transform zone in the interface name
+            my $z = $ndb->get($1) || next;
+            push(@sources, $z->prop('Interface').":".$z->prop('Network'));
+        } else {
+            # src is IP address, host, host-group or range
+            push(@sources, $fw->getAddress($src));
+        }
+
+        # Handle destinations
+        if ( $dst =~ m/role;(.*)$/) {
+            # transform into a list of interfaces
+            @destinations = $fw->getZoneInterface($1)
+        } elsif ($dst =~ m/zone;(.*)$/) {
+            # transform zone in the interface name
+            my $z = $ndb->get($1) || next;
+            push(@destinations, $z->prop('Interface').":".$z->prop('Network'));
+        } else {
+            # src is IP address, host, host-group or range
+            push(@destinations, $fw->getAddress($dst));
+        }
+
+
+        # Generate rules for all destinations and for all sources
+        foreach my $src (@sources) {
+             foreach my $dst (@destinations) {
+                 # 2 rules are needed to correctly match NDPI traffic
+                 # src -> dst
+                 # dst -> src
+                 my $params = {
+                     'action' => $action,
+                     'source' => $src,
+                     'dest' => $dst,
+                     'comment' => $description,
+                     'time' => $time,
+                     'service' => $service
+                 };
+                 my $params_rev = {
+                     'action' => $action,
+                     'source' => $dst,
+                     'dest' => $src,
+                     'comment' => "Reverse " . $description,
+                     'time' => $time,
+                     'service' => $service
+                 };
+
+                 # Output normal rule
+                 $OUT .= $fw->outMangleRule($params);
+                 # Output reverse rule
+                 $OUT .= $fw->outMangleRule($params_rev);
+             }
+        }
+
+
+    }
+}
+
