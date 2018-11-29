@@ -1,0 +1,18 @@
+{
+    "en": {
+        "dashboard": {
+            "title": "Dashboard"
+        },
+        "wan": {
+            "title": "WAN"
+        },
+        "logs": {
+            "title": "Logs"
+        },
+        "about": {
+            "title": "About",
+            "website": "Website",
+            "bug_tracker": "Bug tracker"
+        }
+    }
+}

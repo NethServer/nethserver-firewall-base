@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Prepare source for RPM build
+
+# download langs from transifex
+
+# tar directory
+pushd ui
+npm run build
+cd dist; tar cvzf ../../nethserver-firewall-base.tar.gz *
+popd ui
