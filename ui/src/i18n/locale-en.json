@@ -1,7 +1,14 @@
 {
     "en": {
         "dashboard": {
-            "title": "Dashboard"
+            "title": "Dashboard",
+            "green": "LAN (green)",
+            "red": "Internet (red)",
+            "blue": "Guests (blue)",
+            "orange": "DMZ (orange)",
+            "empty": "Empty (no role)",
+            "free": "Unassigned",
+            "missing": "Missing"
         },
         "wan": {
             "title": "WAN"
