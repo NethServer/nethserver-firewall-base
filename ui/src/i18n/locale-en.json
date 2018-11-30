@@ -7,7 +7,7 @@
         "dashboard": {
             "title": "Dashboard",
             "green": "LAN (green)",
-            "red": "Internet (red)",
+            "red": "WAN (red)",
             "blue": "Guests (blue)",
             "orange": "DMZ (orange)",
             "empty": "Empty (no role)",

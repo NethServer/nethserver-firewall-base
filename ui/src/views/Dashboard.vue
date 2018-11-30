@@ -2,7 +2,7 @@
   <div>
     <h2>{{$t('dashboard.title')}}</h2>
 
-     <h3>{{$t('dashboard.topology')}}</h3>
+    <h3>{{$t('dashboard.topology')}}</h3>
     <div v-if="!view.graphLoaded" class="spinner spinner-lg view-spinner"></div>
     <div id="network-graph" class="divider"></div>
 
@@ -49,7 +49,7 @@ import vis from "vis";
 export default {
   name: "Dashboard",
   mounted() {
-    $("#network-graph").height(window.innerHeight / 2.5);
+    $("#network-graph").height(window.innerHeight / 2);
 
     var context = this;
     context.getInterfaces(function() {
@@ -403,23 +403,14 @@ export default {
                   "<b>" +
                   eth.name +
                   "</b>" +
-                  (eth.nslabel.length > 0 ? " (" + eth.nslabel + ")" : "") +
-                  "\n<code>IP:     " +
-                  (eth.ipaddr ||
+                  (eth.nslabel && eth.nslabel.length > 0
+                    ? " (" + eth.nslabel + ")"
+                    : "") +
+                  "\n<code>CIDR:   " +
+                  (eth.cidr ||
                     (success.status[eth.name] &&
-                      success.status[eth.name].ippaddr) ||
-                    "-") +
-                  "</code>\n<code>MASK:   " +
-                  (eth.netmask ||
-                    (success.status[eth.name] &&
-                      success.status[eth.name].netmask) ||
-                    "-") +
-                  "</code>\n<code>GW:     " +
-                  (eth.gateway ||
-                    (success.status[eth.name] &&
-                      success.status[eth.name].gateway) ||
-                    "-") +
-                  "</code>",
+                      success.status[eth.name].cidr) ||
+                    "-"),
                 group: role + "Int",
                 level: context.levelMap(role, false)
               });
