@@ -183,4 +183,5 @@ validator_actions('fwrule-modify', qw(
     fwrule-route2provider 20
     fwrule-trafficshaping 20
     fwrule-localservice   30
+    fwrule-ndpi   40
 ));
