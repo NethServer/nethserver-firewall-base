@@ -34,18 +34,27 @@ my $fw = new NethServer::Firewall();
 
 my $props = JSON->new->utf8->decode($rule);
 
-if($props->{'Action'} !~ /^provider;/) {
-    # ignore non-route actions
+if($props->{'ServiceRaw'} !~ /^ndpi;/) {
+    # ignore non-ndpi actions
     exit(0);
 }
 
-if($props->{'SrcRaw'} eq 'role;red') {
-    print "The red zone cannot be set as Source.\n";
+if($props->{'SrcRaw'} eq 'any' || $props->{'DstRaw'} eq 'any') {
+    print "The 'any' target cannot be set as Source or Destination.\n";
     exit(3);
 }
 
-if($props->{'DstRaw'} !~ m/^(role;red$|host;|iprange;|zone;|cidr;)/) {
-    print "The Destination type must be one of zone, host, ip range, cidr, red.\n";
+if($props->{'SrcRaw'} eq 'fw' || $props->{'DstRaw'} eq 'fw') {
+    print "The firewall cannot be set as Source or Destination.\n";
     exit(4);
 }
 
+if($props->{'Action'} =~ m/^provider;/) {
+    print "DPI protocol is not allowed with route rules.\n";
+    exit(5);
+}
+
+if($props->{'Action'} =~ m/^reject/) {
+    print "Reject action is not supported for NDPI.\n";
+    exit(6);
+}
