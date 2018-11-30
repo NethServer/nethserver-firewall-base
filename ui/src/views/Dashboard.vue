@@ -1,8 +1,45 @@
 <template>
   <div>
     <h2>{{$t('dashboard.title')}}</h2>
-    <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
-    <div id="network-graph"></div>
+
+     <h3>{{$t('dashboard.topology')}}</h3>
+    <div v-if="!view.graphLoaded" class="spinner spinner-lg view-spinner"></div>
+    <div id="network-graph" class="divider"></div>
+
+    <h3>{{$t('dashboard.providers')}}</h3>
+    <div v-if="!view.providersLoaded" class="spinner spinner-lg view-spinner"></div>
+    <div class="row divider row-status" v-if="view.providersLoaded">
+      <div v-for="(s,i) in providers" :key="i" class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2">
+        <span :class="['card-pf-utilization-card-details-count stats-count', s ? 'pficon pficon-ok' : 'pficon-error-circle-o']"
+          data-toggle="tooltip" data-placement="top" :title="$t('dashboard.status')+': '+ (s ? $t('up') : $t('down'))"></span>
+        <span class="card-pf-utilization-card-details-description stats-description">
+          <span class="card-pf-utilization-card-details-line-2 stats-text">{{i}}</span>
+        </span>
+      </div>
+    </div>
+
+    <h3>{{$t('dashboard.statistics')}}</h3>
+    <div v-if="!view.statsLoaded" class="spinner spinner-lg view-spinner"></div>
+    <div class="row divider row-stat" v-if="view.statsLoaded">
+      <div v-for="(s,i) in stats" :key="i" class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2">
+        <span class="card-pf-utilization-card-details-count stats-count">{{s}}</span>
+        <span class="card-pf-utilization-card-details-description stats-description">
+          <span class="card-pf-utilization-card-details-line-2 stats-text">{{$t('dashboard.'+i)}}</span>
+        </span>
+      </div>
+    </div>
+
+    <h3>{{$t('dashboard.statuses')}}</h3>
+    <div v-if="!view.statusesLoaded" class="spinner spinner-lg view-spinner"></div>
+    <div class="row row-status" v-if="view.statusesLoaded">
+      <div v-for="(s,i) in statuses" :key="i" class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2">
+        <span :class="['card-pf-utilization-card-details-count stats-count', s ? 'pficon pficon-ok' : 'pficon-error-circle-o']"
+          data-toggle="tooltip" data-placement="top" :title="$t('dashboard.status')+': '+ (s ? $t('enabled') : $t('disabled'))"></span>
+        <span class="card-pf-utilization-card-details-description stats-description">
+          <span class="card-pf-utilization-card-details-line-2 stats-text">{{$t('dashboard.'+i)}}</span>
+        </span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -12,17 +49,47 @@ import vis from "vis";
 export default {
   name: "Dashboard",
   mounted() {
-    $("#network-graph").height(window.innerHeight / 2);
+    $("#network-graph").height(window.innerHeight / 2.5);
 
     var context = this;
     context.getInterfaces(function() {
       context.initGraph();
     });
+
+    setTimeout(function() {
+      context.getProviders();
+      context.getStats();
+      context.getStatuses();
+    }, 2000);
   },
   data() {
     return {
       view: {
-        isLoaded: false
+        graphLoaded: false,
+        providersLoaded: false,
+        statsLoaded: false,
+        statusesLoaded: false
+      },
+      stats: {
+        rules: 0,
+        port_forwards: 0,
+        objects: 0,
+        source_nat: 0,
+        routes: 0,
+        hosts: 0,
+        vpns: 0
+      },
+      statuses: {
+        web_proxy: true,
+        web_filter: true,
+        ips: true,
+        fail2ban: true,
+        hotspot: false,
+        flashstart: false
+      },
+      providers: {
+        fast1: true,
+        fast2: false
       },
       nodes: [
         {
@@ -33,24 +100,51 @@ export default {
         }
       ],
       edges: [
-        { from: "green", to: 0 },
-        { from: "blue", to: 0 },
-        { from: "orange", to: 0 },
-        { from: "other", to: 0, dashes: true },
-        { from: "empty", to: 0, dashes: true },
-        { from: "free", to: 0, dashes: true },
-        { from: "missing", to: 0, dashes: true },
-        { from: 0, to: "red" }
+        {
+          from: "green",
+          to: 0
+        },
+        {
+          from: "blue",
+          to: 0
+        },
+        {
+          from: "orange",
+          to: 0
+        },
+        {
+          from: "other",
+          to: 0,
+          dashes: true
+        },
+        {
+          from: "empty",
+          to: 0,
+          dashes: true
+        },
+        {
+          from: "free",
+          to: 0,
+          dashes: true
+        },
+        {
+          from: "missing",
+          to: 0,
+          dashes: true
+        },
+        {
+          from: 0,
+          to: "red"
+        }
       ],
       options: {
         nodes: {
           shape: "box",
-          size: 20,
           font: {
+            multi: "html",
             size: 25,
             align: "left",
-            color: "white",
-            face: "Monospace"
+            color: "white"
           },
           borderWidth: 2,
           color: "#363636"
@@ -278,7 +372,7 @@ export default {
     },
     getInterfaces(callback) {
       var context = this;
-      context.view.isLoaded = false;
+      context.view.graphLoaded = false;
       nethserver.exec(
         ["system-network/read"],
         {
@@ -291,7 +385,7 @@ export default {
           } catch (e) {
             console.error(e);
           }
-          context.view.isLoaded = true;
+          context.view.graphLoaded = true;
 
           for (var role in success.configuration) {
             if (success.configuration[role].length > 0)
@@ -306,29 +400,39 @@ export default {
               context.nodes.push({
                 id: eth.name,
                 label:
+                  "<b>" +
                   eth.name +
-                  "\nIP:   " +
+                  "</b>" +
+                  (eth.nslabel.length > 0 ? " (" + eth.nslabel + ")" : "") +
+                  "\n<code>IP:     " +
                   (eth.ipaddr ||
                     (success.status[eth.name] &&
                       success.status[eth.name].ippaddr) ||
                     "-") +
-                  "\nMASK: " +
+                  "</code>\n<code>MASK:   " +
                   (eth.netmask ||
                     (success.status[eth.name] &&
                       success.status[eth.name].netmask) ||
                     "-") +
-                  "\nGW:   " +
+                  "</code>\n<code>GW:     " +
                   (eth.gateway ||
                     (success.status[eth.name] &&
                       success.status[eth.name].gateway) ||
-                    "-"),
+                    "-") +
+                  "</code>",
                 group: role + "Int",
                 level: context.levelMap(role, false)
               });
               context.edges.push({
                 from: eth.name,
                 to: role,
-                dashes: role == "other" ? true : false
+                dashes:
+                  role == "other" ||
+                  role == "empty" ||
+                  role == "free" ||
+                  role == "missing"
+                    ? true
+                    : false
               });
             }
           }
@@ -337,8 +441,27 @@ export default {
         },
         function(error) {
           console.error(error);
+          context.view.graphLoaded = true;
         }
       );
+    },
+    getProviders() {
+      var context = this;
+      context.view.providersLoaded = true;
+      setTimeout(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+      }, 250);
+    },
+    getStats() {
+      var context = this;
+      context.view.statsLoaded = true;
+    },
+    getStatuses() {
+      var context = this;
+      context.view.statusesLoaded = true;
+      setTimeout(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+      }, 250);
     }
   }
 };
@@ -347,6 +470,45 @@ export default {
 <style>
 #network-graph {
   width: 100%;
+}
+
+.divider {
   border-bottom: 1px solid #d1d1d1;
+}
+
+.stats-container {
+  padding: 20px !important;
+  border-width: initial !important;
+  border-style: none !important;
+  border-color: initial !important;
+  border-image: initial !important;
+}
+
+.stats-text {
+  margin-top: 10px !important;
+  display: block;
+}
+
+.stats-description {
+  float: left;
+  line-height: 1;
+}
+
+.stats-count {
+  font-size: 26px;
+  font-weight: 300;
+  margin-right: 10px;
+  float: left;
+  line-height: 1;
+}
+
+.row-stat {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.row-status {
+  margin-left: -5px;
+  margin-right: 0px;
 }
 </style>

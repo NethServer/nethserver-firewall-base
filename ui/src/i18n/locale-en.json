@@ -1,5 +1,9 @@
 {
     "en": {
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "up": "Up",
+        "down": "Down",
         "dashboard": {
             "title": "Dashboard",
             "green": "LAN (green)",
@@ -8,10 +12,31 @@
             "orange": "DMZ (orange)",
             "empty": "Empty (no role)",
             "free": "Unassigned",
-            "missing": "Missing"
+            "missing": "Missing",
+            "rules": "Rules",
+            "port_forwards": "Port forwards",
+            "objects": "Objects",
+            "source_nat": "Source NAT",
+            "routes": "Routes",
+            "hosts": "Hosts",
+            "vpns": "VPNs",
+            "web_proxy": "Web proxy",
+            "web_filter": "Web filter",
+            "ips": "IPS",
+            "fail2ban": "Fail2Ban",
+            "hotspot": "Hotspot",
+            "flashstart": "FlashStart",
+            "providers": "Providers",
+            "statistics": "Statistics",
+            "statuses": "Statuses",
+            "status": "Status",
+            "topology": "Topology"
         },
         "wan": {
             "title": "WAN"
+        },
+        "traffic_shaping": {
+            "title": "Traffic Shaping"
         },
         "logs": {
             "title": "Logs",

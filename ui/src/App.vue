@@ -18,6 +18,12 @@
             <span class="list-group-item-value">{{$t('wan.title')}}</span>
           </a>
         </li>
+        <li id="traffic-shaping-item" :class="[getCurrentPath('traffic-shaping') ? 'active' : '', 'list-group-item']">
+          <a href="#/traffic-shaping">
+            <span class="fa fa-crosshairs"></span>
+            <span class="list-group-item-value">{{$t('traffic_shaping.title')}}</span>
+          </a>
+        </li>
 
         <li class="li-empty"></li>
 
