@@ -13,6 +13,7 @@
             "empty": "Empty (no role)",
             "free": "Unassigned",
             "missing": "Missing",
+            "other": "Other",
             "rules": "Rules",
             "port_forwards": "Port forwards",
             "objects": "Objects",

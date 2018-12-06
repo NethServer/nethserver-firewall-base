@@ -324,6 +324,9 @@ export default {
               top: 20
             }
           }
+        },
+        interaction: {
+          zoomView: false
         }
       }
     };
