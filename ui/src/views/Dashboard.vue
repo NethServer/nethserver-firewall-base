@@ -180,8 +180,11 @@ export default {
               top: 20
             }
           },
-          greenInt: {
-            color: "#3f9c35"
+          greenIntUP: {
+            color: { background: "#3f9c35", border: "#2d7623" }
+          },
+          greenIntDOWN: {
+            color: { background: "#363636", border: "#3f9c35" }
           },
           red: {
             shape: "icon",
@@ -198,8 +201,11 @@ export default {
               top: 20
             }
           },
-          redInt: {
-            color: "#cc0000"
+          redIntUP: {
+            color: { background: "#cc0000", border: "#8b0000" }
+          },
+          redIntDOWN: {
+            color: { background: "#363636", border: "#cc0000" }
           },
           blue: {
             shape: "icon",
@@ -216,8 +222,11 @@ export default {
               top: 20
             }
           },
-          blueInt: {
-            color: "#0088ce"
+          blueIntUP: {
+            color: { background: "#0088ce", border: "#008bad" }
+          },
+          blueIntDOWN: {
+            color: { background: "#363636", border: "#0088ce" }
           },
           orange: {
             shape: "icon",
@@ -234,8 +243,11 @@ export default {
               top: 20
             }
           },
-          orangeInt: {
-            color: "#ec7a08"
+          orangeIntUP: {
+            color: { background: "#ec7a08", border: "#b35c00" }
+          },
+          orangeIntDOWN: {
+            color: { background: "#363636", border: "#ec7a08" }
           },
           other: {
             shape: "icon",
@@ -252,8 +264,11 @@ export default {
               top: 20
             }
           },
-          otherInt: {
-            color: "#703fec"
+          otherIntUP: {
+            color: { background: "#703fec", border: "#582fc0" }
+          },
+          otherIntDOWN: {
+            color: { background: "#363636", border: "#703fec" }
           },
           empty: {
             shape: "icon",
@@ -413,8 +428,16 @@ export default {
                   (eth.cidr ||
                     (success.status[eth.name] &&
                       success.status[eth.name].cidr) ||
-                    "-"),
-                group: role + "Int",
+                    "-") +
+                  "\n<code>LINK:   " +
+                  (success.status[eth.name] &&
+                  success.status[eth.name].link == 1
+                    ? "UP"
+                    : "DOWN"),
+                group:
+                  role +
+                  "Int" +
+                  (success.status[eth.name].link == 1 ? "UP" : "DOWN"),
                 level: context.levelMap(role, false)
               });
               context.edges.push({

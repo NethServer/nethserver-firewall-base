@@ -42,7 +42,7 @@
         "logs": {
             "title": "Logs",
             "follow": "Follow",
-            "stop_follow": "Stop follow",
+            "stop_follow": "Stop following",
             "process_terminated": "Process terminated"
         },
         "about": {
