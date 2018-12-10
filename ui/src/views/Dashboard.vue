@@ -181,7 +181,11 @@ export default {
             }
           },
           greenIntUP: {
-            color: { background: "#3f9c35", border: "#2d7623" }
+            color: {
+              background: "#3f9c35",
+              border: "#2d7623",
+              highlight: { background: "#6ec664", border: "#2d7623" }
+            }
           },
           greenIntDOWN: {
             color: { background: "#363636", border: "#3f9c35" }
@@ -202,7 +206,11 @@ export default {
             }
           },
           redIntUP: {
-            color: { background: "#cc0000", border: "#8b0000" }
+            color: {
+              background: "#cc0000",
+              border: "#8b0000",
+              highlight: { background: "#470000", border: "#8b0000" }
+            }
           },
           redIntDOWN: {
             color: { background: "#363636", border: "#cc0000" }
@@ -223,7 +231,11 @@ export default {
             }
           },
           blueIntUP: {
-            color: { background: "#0088ce", border: "#008bad" }
+            color: {
+              background: "#0088ce",
+              border: "#008bad",
+              highlight: { background: "#39a5dc", border: "#008bad" }
+            }
           },
           blueIntDOWN: {
             color: { background: "#363636", border: "#0088ce" }
@@ -244,7 +256,11 @@ export default {
             }
           },
           orangeIntUP: {
-            color: { background: "#ec7a08", border: "#b35c00" }
+            color: {
+              background: "#ec7a08",
+              border: "#b35c00",
+              highlight: { background: "#f39d3c", border: "#b35c00" }
+            }
           },
           orangeIntDOWN: {
             color: { background: "#363636", border: "#ec7a08" }
@@ -265,7 +281,11 @@ export default {
             }
           },
           otherIntUP: {
-            color: { background: "#703fec", border: "#582fc0" }
+            color: {
+              background: "#703fec",
+              border: "#582fc0",
+              highlight: { background: "#a18fff", border: "#582fc0" }
+            }
           },
           otherIntDOWN: {
             color: { background: "#363636", border: "#703fec" }
