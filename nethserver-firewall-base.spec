@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 2.11.5
+Version: 2.11.6
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -49,6 +49,11 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 %doc COPYING
 
 %changelog
+* Tue Jan 08 2019 Davide Principi <davide.principi@nethesis.it> - 2.11.6-1
+- Backport of logical interface integrity checks - Bug #3447 [NethServer 6]
+- Adjust zone record references - NethServer/nethserver-firewall-base#78 
+- Server unreachable after creating a logical interface - Bug NethServer/dev#5637
+
 * Mon Oct 16 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.11.5-1
 - PPPoE connect timeout - NethServer/dev#5358
 
