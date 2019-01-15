@@ -29,9 +29,20 @@
             "flashstart": "FlashStart",
             "providers": "Providers",
             "statistics": "Statistics",
-            "statuses": "Statuses",
+            "services": "Services",
+            "connections": "Connections",
             "status": "Status",
-            "topology": "Topology"
+            "topology": "Topology",
+            "tc": "Traffic shaping",
+            "portforward": "Port forwards",
+            "fwrules": "Rules",
+            "fwtimes": "Time conditions",
+            "fwservices": "Services",
+            "zones": "Zones",
+            "no_info_found": "No info found",
+            "tcp": "TCP",
+            "udp": "UDP",
+            "icmp": "ICMP"
         },
         "wan": {
             "title": "WAN"

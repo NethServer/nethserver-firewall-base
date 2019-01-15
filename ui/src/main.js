@@ -5,6 +5,7 @@ import VueI18n from "vue-i18n";
 import App from './App.vue'
 import router from './router'
 import languages from "./i18n/lang";
+import "./filters/filters";
 
 Vue.config.productionTip = false
 Vue.use(VueI18n);

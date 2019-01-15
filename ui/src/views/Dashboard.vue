@@ -7,38 +7,95 @@
     <div id="network-graph" class="divider"></div>
 
     <h3>{{$t('dashboard.providers')}}</h3>
-    <div v-if="!view.providersLoaded" class="spinner spinner-lg view-spinner"></div>
-    <div class="row divider row-status" v-if="view.providersLoaded">
-      <div v-for="(s,i) in providers" :key="i" class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2">
-        <span :class="['card-pf-utilization-card-details-count stats-count', s ? 'pficon pficon-ok' : 'pficon-error-circle-o']"
-          data-toggle="tooltip" data-placement="top" :title="$t('dashboard.status')+': '+ (s ? $t('up') : $t('down'))"></span>
+    <div v-if="!view.statsLoaded" class="spinner spinner-lg view-spinner"></div>
+    <div class="row divider row-status" v-if="view.statsLoaded">
+      <div
+        v-for="(s,i) in providers"
+        :key="i"
+        class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2"
+      >
+        <span
+          :class="['card-pf-utilization-card-details-count stats-count', s ? 'pficon pficon-ok' : 'pficon-error-circle-o']"
+          data-toggle="tooltip"
+          data-placement="top"
+          :title="$t('dashboard.status')+': '+ (s ? $t('up') : $t('down'))"
+        ></span>
         <span class="card-pf-utilization-card-details-description stats-description">
           <span class="card-pf-utilization-card-details-line-2 stats-text">{{i}}</span>
         </span>
       </div>
+      <div class="stats-container" v-if="!providers">{{$t('dashboard.no_info_found')}}</div>
     </div>
 
     <h3>{{$t('dashboard.statistics')}}</h3>
     <div v-if="!view.statsLoaded" class="spinner spinner-lg view-spinner"></div>
     <div class="row divider row-stat" v-if="view.statsLoaded">
-      <div v-for="(s,i) in stats" :key="i" class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2">
+      <div class="row-inline-block">
+        <div
+          v-for="(s,i) in stats"
+          :key="i"
+          v-if="i != 'objects'"
+          class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2"
+        >
+          <span class="card-pf-utilization-card-details-count stats-count">{{s}}</span>
+          <span class="card-pf-utilization-card-details-description stats-description">
+            <span class="card-pf-utilization-card-details-line-2 stats-text">{{$t('dashboard.'+i)}}</span>
+          </span>
+        </div>
+        <div class="stats-container" v-if="!stats">{{$t('dashboard.no_info_found')}}</div>
+      </div>
+      <h3>{{$t('dashboard.objects')}}</h3>
+      <div class="row-inline-block">
+        <div
+          v-for="(o,i) in stats.objects"
+          :key="i"
+          class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2"
+        >
+          <span class="card-pf-utilization-card-details-count stats-count">{{o}}</span>
+          <span class="card-pf-utilization-card-details-description stats-description">
+            <span class="card-pf-utilization-card-details-line-2 stats-text">{{$t('dashboard.'+i)}}</span>
+          </span>
+        </div>
+        <div class="stats-container" v-if="!stats.objects">{{$t('dashboard.no_info_found')}}</div>
+      </div>
+    </div>
+
+    <h3>{{$t('dashboard.services')}}</h3>
+    <div v-if="!view.statsLoaded" class="spinner spinner-lg view-spinner"></div>
+    <div class="row divider row-status" v-if="view.statsLoaded">
+      <div
+        v-for="(s,i) in services"
+        :key="i"
+        class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2"
+      >
+        <span
+          :class="['card-pf-utilization-card-details-count stats-count', s ? 'pficon pficon-ok' : 'pficon-error-circle-o']"
+          data-toggle="tooltip"
+          data-placement="top"
+          :title="$t('dashboard.status')+': '+ (s ? $t('enabled') : $t('disabled'))"
+        ></span>
+        <span class="card-pf-utilization-card-details-description stats-description">
+          <span class="card-pf-utilization-card-details-line-2 stats-text">{{$t('dashboard.'+i)}}</span>
+        </span>
+      </div>
+      <div class="stats-container" v-if="!services">{{$t('dashboard.no_info_found')}}</div>
+    </div>
+
+    <h3>{{$t('dashboard.connections')}}</h3>
+    <div v-if="!view.statsLoaded" class="spinner spinner-lg view-spinner"></div>
+    <div class="row row-stat" v-if="view.statsLoaded">
+      <div
+        v-for="(s,i) in connections"
+        :key="i"
+        v-if="i != 'total'"
+        class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2"
+      >
         <span class="card-pf-utilization-card-details-count stats-count">{{s}}</span>
         <span class="card-pf-utilization-card-details-description stats-description">
           <span class="card-pf-utilization-card-details-line-2 stats-text">{{$t('dashboard.'+i)}}</span>
         </span>
       </div>
-    </div>
-
-    <h3>{{$t('dashboard.statuses')}}</h3>
-    <div v-if="!view.statusesLoaded" class="spinner spinner-lg view-spinner"></div>
-    <div class="row row-status" v-if="view.statusesLoaded">
-      <div v-for="(s,i) in statuses" :key="i" class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2">
-        <span :class="['card-pf-utilization-card-details-count stats-count', s ? 'pficon pficon-ok' : 'pficon-error-circle-o']"
-          data-toggle="tooltip" data-placement="top" :title="$t('dashboard.status')+': '+ (s ? $t('enabled') : $t('disabled'))"></span>
-        <span class="card-pf-utilization-card-details-description stats-description">
-          <span class="card-pf-utilization-card-details-line-2 stats-text">{{$t('dashboard.'+i)}}</span>
-        </span>
-      </div>
+      <div class="stats-container" v-if="!connections">{{$t('dashboard.no_info_found')}}</div>
     </div>
   </div>
 </template>
@@ -55,42 +112,18 @@ export default {
     context.getInterfaces(function() {
       context.initGraph();
     });
-
-    setTimeout(function() {
-      context.getProviders();
-      context.getStats();
-      context.getStatuses();
-    }, 2000);
+    context.getStats();
   },
   data() {
     return {
       view: {
         graphLoaded: false,
-        providersLoaded: false,
-        statsLoaded: false,
-        statusesLoaded: false
+        statsLoaded: false
       },
-      stats: {
-        rules: 0,
-        port_forwards: 0,
-        objects: 0,
-        source_nat: 0,
-        routes: 0,
-        hosts: 0,
-        vpns: 0
-      },
-      statuses: {
-        web_proxy: true,
-        web_filter: true,
-        ips: true,
-        fail2ban: true,
-        hotspot: false,
-        flashstart: false
-      },
-      providers: {
-        fast1: true,
-        fast2: false
-      },
+      stats: {},
+      services: {},
+      providers: {},
+      connections: {},
       nodes: [
         {
           id: 0,
@@ -124,12 +157,10 @@ export default {
         },
         {
           from: "free",
-          to: 0,
           dashes: true
         },
         {
           from: "missing",
-          to: 0,
           dashes: true
         },
         {
@@ -482,23 +513,48 @@ export default {
         }
       );
     },
-    getProviders() {
-      var context = this;
-      context.view.providersLoaded = true;
-      setTimeout(function() {
-        $('[data-toggle="tooltip"]').tooltip();
-      }, 250);
-    },
     getStats() {
       var context = this;
-      context.view.statsLoaded = true;
-    },
-    getStatuses() {
-      var context = this;
-      context.view.statusesLoaded = true;
-      setTimeout(function() {
-        $('[data-toggle="tooltip"]').tooltip();
-      }, 250);
+      nethserver.exec(
+        ["nethserver-firewall-base/read"],
+        {
+          action: "info"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.stats =
+            success.statistics && Object.keys(success.statistics).length > 0
+              ? success.statistics
+              : false;
+          context.providers =
+            success.providers && Object.keys(success.providers).length > 0
+              ? success.providers
+              : false;
+          context.services =
+            success.services && Object.keys(success.services).length > 0
+              ? success.services
+              : false;
+          context.connections =
+            success.connections && Object.keys(success.connections).length > 0
+              ? success.connections
+              : false;
+
+          context.view.statsLoaded = true;
+
+          setTimeout(function() {
+            $('[data-toggle="tooltip"]').tooltip();
+          }, 250);
+        },
+        function(error) {
+          console.error(error);
+          context.view.statsLoaded = true;
+        }
+      );
     }
   }
 };
@@ -547,5 +603,10 @@ export default {
 .row-status {
   margin-left: -5px;
   margin-right: 0px;
+}
+
+.row-inline-block {
+  display: inline-block;
+  width: 100%;
 }
 </style>
