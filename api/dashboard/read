@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2018 Nethesis S.r.l.
+# Copyright (C) 2019 Nethesis S.r.l.
 # http://www.nethesis.it - nethserver@nethesis.it
 #
 # This script is part of NethServer.
@@ -56,7 +56,8 @@ my $cdb = esmith::ConfigDB->open_ro();
 foreach ($ndb->get_all_by_prop('type' => 'provider')) {
     my $i = $_->prop('interface') || next;
     my $w = $_->prop('weight') || 0;
-    $ret->{'providers'}{$_->key} = {"status" => read_provider_status($i), "interface" => $i, "weight" => $w};
+    my $label= $ndb->get_prop($i, 'nslabel') || '';
+    $ret->{'providers'}{$_->key} = {"status" => read_provider_status($i), "interface" => $i, "weight" => $w, "nslabel" => $label};
 }
 
 # General statistics
