@@ -1,0 +1,87 @@
+#!/usr/bin/php
+<?php
+/*
+ * Copyright (C) 2019 Nethesis S.r.l.
+ * http://www.nethesis.it - nethserver@nethesis.it
+ *
+ * This script is part of NethServer.
+ *
+ * NethServer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or any later version.
+ *
+ * NethServer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with NethServer.  If not, see COPYING.
+*/
+
+require_once("/usr/libexec/nethserver/api/lib/dhcp_functions.php");
+
+function fail($parameter, $error)
+{
+    $error = array(
+        "id" => time(),
+        "type" => 'NotValid',
+        "message" => "validation_failed",
+        "attributes" => array(array("parameter" => $parameter, "value" => '', "error" => $error))
+    );
+
+    echo json_encode($error);
+    exit(1);
+
+}
+
+$data = readInput();
+$action = $data['action'];
+
+if ($action == "wan") {
+    # Validate multiwan settings
+    $v = new LegacyValidator($data);
+    $mnplv = $v->createValidator()->integer()->greatThan(2)->lessThan(99);
+    $mpplv = $v->createValidator()->integer()->greatThan(0)->lessThan(100);
+    $piv = $v->createValidator()->integer()->greatThan(0)->lessThan(60);
+    $ipv =  $v->createValidator(Validate::IPv4);
+    $v->declareParameter('WanMode', $v->createValidator()->memberOf(array('balance','backup')));
+    $v->declareParameter('CheckIP', Validate::ANYTHING);
+    foreach ($data['CheckIP'] as $ip) {
+        if (!$ipv->evaluate($ip)) {
+            $v->addValidationError('CheckIP', "valid_ipV4Address");
+        }
+    }
+    $v->declareParameter('NotifyWan', Validate::SERVICESTATUS);
+    $v->declareParameter('MaxNumberPacketLoss', $mnplv);
+    $v->declareParameter('MaxPercentPacketLoss', $mpplv);
+    $v->declareParameter('PingInterval', $piv);
+} else if ($action == "provider") {
+    # Validate provider configuration
+    $v = new LegacyValidator($data);
+    $bv = $v->createValidator()->orValidator($v->createValidator()->integer()->greatThan(0), $v->createValidator(Validate::EMPTYSTRING));
+    $wv = $v->createValidator()->integer()->greatThan(0)->lessThan(256);
+    if ($data['FwOutBandwidth']) {
+        $v->declareParameter('FwOutBandwidth', $bv);
+    }
+    if ($data['FwInBandwidth']) {
+        $v->declareParameter('FwInBandwidth', $bv);
+    }
+    $v->declareParameter('weight', $wv);
+    $db = new EsmithDatabase('networks');
+    $r = $db->getKey($data['name']);
+    if (!$r) {
+        $v->addValidationError('name', "invalid_interface");
+    }
+} else {
+    error();
+}
+
+# Validate the input
+if ($v->validate()) {
+    success();
+} else {
+    error($v);
+}
+
