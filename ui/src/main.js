@@ -1,6 +1,6 @@
 import Vue from 'vue'
-
 import VueI18n from "vue-i18n";
+import VueToggleButton from 'vue-js-toggle-button';
 
 import App from './App.vue'
 import router from './router'
@@ -9,6 +9,7 @@ import "./filters/filters";
 
 Vue.config.productionTip = false
 Vue.use(VueI18n);
+Vue.use(VueToggleButton)
 
 import UtilService from "./services/util"
 Vue.mixin(UtilService)
@@ -30,4 +31,3 @@ var ns = new Vue({
     return h(App)
   }
 }).$mount('#app')
-global.ns = ns;

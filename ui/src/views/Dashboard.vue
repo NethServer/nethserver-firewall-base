@@ -120,10 +120,10 @@ export default {
         graphLoaded: false,
         statsLoaded: false
       },
-      stats: {},
-      services: {},
-      providers: {},
-      connections: {},
+      stats: false,
+      services: false,
+      providers: false,
+      connections: false,
       nodes: [
         {
           id: 0,
@@ -516,10 +516,8 @@ export default {
     getStats() {
       var context = this;
       nethserver.exec(
-        ["nethserver-firewall-base/read"],
-        {
-          action: "info"
-        },
+        ["nethserver-firewall-base/dashboard/read"],
+        null,
         null,
         function(success) {
           try {

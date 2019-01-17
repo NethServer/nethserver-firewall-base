@@ -1,8 +1,10 @@
 <template>
   <div id="app">
-    <nav id="navbar-left" class="nav-pf-vertical nav-pf-vertical-with-sub-menus nav-pf-persistent-secondary panel-group">
+    <nav
+      id="navbar-left"
+      class="nav-pf-vertical nav-pf-vertical-with-sub-menus nav-pf-persistent-secondary panel-group"
+    >
       <ul class="list-group panel">
-
         <li id="dashboard-item" :class="[getCurrentPath('') ? 'active' : '', 'list-group-item']">
           <a href="#/">
             <span class="fa fa-cube"></span>
@@ -18,7 +20,10 @@
             <span class="list-group-item-value">{{$t('wan.title')}}</span>
           </a>
         </li>
-        <li id="traffic-shaping-item" :class="[getCurrentPath('traffic-shaping') ? 'active' : '', 'list-group-item']">
+        <li
+          id="traffic-shaping-item"
+          :class="[getCurrentPath('traffic-shaping') ? 'active' : '', 'list-group-item']"
+        >
           <a href="#/traffic-shaping">
             <span class="fa fa-crosshairs"></span>
             <span class="list-group-item-value">{{$t('traffic_shaping.title')}}</span>
@@ -31,7 +36,6 @@
           <a href="#/logs">
             <span class="fa fa-list"></span>
             <span class="list-group-item-value">{{$t('logs.title')}}</span>
-
           </a>
         </li>
 
@@ -41,10 +45,8 @@
           <a href="#/about">
             <span class="fa fa-info"></span>
             <span class="list-group-item-value">{{$t('about.title')}}</span>
-
           </a>
         </li>
-
       </ul>
     </nav>
     <div class="container-fluid container-cards-pf main-container">
@@ -75,4 +77,40 @@ export default {
 </script>
 
 <style>
+.span-right-margin {
+  margin-right: 4px;
+}
+
+.no-mg-top {
+  margin-top: 0px !important;
+}
+
+.no-mg-left {
+  margin-left: 0px !important;
+}
+
+.mg-top-5 {
+  margin-top: 5px !important;
+}
+
+.mg-bottom-10 {
+  margin-bottom: 10px !important;
+}
+
+.no-shadow {
+  box-shadow: none !important;
+}
+
+.text-align-left {
+  text-align: left !important;
+}
+
+.popover-content {
+  max-height: 350px;
+  overflow: auto;
+}
+
+.cursor-initial {
+  cursor: initial;
+}
 </style>

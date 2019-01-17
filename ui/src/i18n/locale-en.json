@@ -4,6 +4,9 @@
         "disabled": "Disabled",
         "up": "Up",
         "down": "Down",
+        "actions": "Actions",
+        "save": "Save",
+        "cancel": "Cancel",
         "dashboard": {
             "title": "Dashboard",
             "green": "LAN (green)",
@@ -45,7 +48,37 @@
             "icmp": "ICMP"
         },
         "wan": {
-            "title": "WAN"
+            "title": "WAN",
+            "list": "Interface list",
+            "provider": "Provider",
+            "weight": "Weight",
+            "inbound_bandwidth": "Inbound bandwidth (kbps)",
+            "outbound_bandwidth": "Outbound bandwidth (kbps)",
+            "no_interfaces_found": "No interfaces found",
+            "no_interfaces_found_text": "It seems that you are not configured any interfaces. Go to Network page and configure it",
+            "go_to_network": "Go to Network settings",
+            "speedtest": "Speedtest",
+            "release_wan": "Release WAN",
+            "configure_wan": "Configure WAN",
+            "mode": "Mode",
+            "balance": "Balance",
+            "backup": "Active backup",
+            "check_ip": "Check IP (one per line)",
+            "max_number_packet_loss": "Disable provider after # lost pings (2-99)",
+            "max_percent_packet_loss": "Disable provider over % lost pings (1-100)",
+            "ping_interval": "Ping interval in seconds (1-60)",
+            "download": "Download",
+            "upload": "Upload",
+            "ping": "Ping",
+            "speed_info": "Speedtest information",
+            "notify_status_change": "Notify status change",
+            "notify_to": "Notify to",
+            "advanced_mode": "Advanced options",
+            "use_this_set": "Use this settings",
+            "provider_configured_ok": "Multi WAN provider configured successfully!",
+            "provider_configured_error": "Multi WAN provider not configured.",
+            "multiwan_configured_ok": "Multi WAN options saved successfully!",
+            "multiwan_configured_error": "Multi WAN options not saved"
         },
         "traffic_shaping": {
             "title": "Traffic Shaping"
