@@ -15,13 +15,15 @@
         class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2"
       >
         <span
-          :class="['card-pf-utilization-card-details-count stats-count', s ? 'pficon pficon-ok' : 'pficon-error-circle-o']"
+          :class="['card-pf-utilization-card-details-count stats-count', s.status ? 'pficon pficon-ok' : 'pficon-error-circle-o']"
           data-toggle="tooltip"
           data-placement="top"
-          :title="$t('dashboard.status')+': '+ (s ? $t('up') : $t('down'))"
+          :title="$t('dashboard.status')+': '+ (s.status ? $t('up') : $t('down'))"
         ></span>
         <span class="card-pf-utilization-card-details-description stats-description">
-          <span class="card-pf-utilization-card-details-line-2 stats-text">{{i}}</span>
+          <span
+            class="card-pf-utilization-card-details-line-2 stats-text"
+          >{{s.nslabel.length > 0 ? (s.nslabel+' ('+i+')') : i}}</span>
         </span>
       </div>
       <div class="stats-container" v-if="!providers">{{$t('dashboard.no_info_found')}}</div>

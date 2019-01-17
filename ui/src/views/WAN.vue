@@ -18,14 +18,18 @@
       <h1>{{$t('wan.no_interfaces_found')}}</h1>
       <p>{{$t('wan.no_interfaces_found_text')}}.</p>
       <div class="blank-slate-pf-main-action">
-        <a @click="jumpToNetwork()" href class="btn btn-primary btn-lg">{{$t('wan.go_to_network')}}</a>
+        <a
+          target="_blank"
+          href="/nethserver#/network"
+          class="btn btn-primary btn-lg"
+        >{{$t('wan.go_to_network')}}</a>
       </div>
     </div>
 
     <div
       v-if="interfaces.length > 0 && view.isLoaded"
       id="pf-list-simple-expansion"
-      class="list-group list-view-pf list-view-pf-view wizard-pf-contents-title white"
+      class="list-group list-view-pf list-view-pf-view wizard-pf-contents-title white no-mg-top"
     >
       <div
         v-for="i in interfaces"
@@ -55,7 +59,10 @@
             </div>
             <div class="list-view-pf-body">
               <div class="list-view-pf-description">
-                <div class="list-group-item-heading red">{{i.name}}</div>
+                <div class="list-group-item-heading red">
+                  {{i.name}}
+                  <span class="gray">({{i.provider.name}})</span>
+                </div>
                 <div class="list-group-item-text">{{i.nslabel}}</div>
               </div>
               <div class="list-view-pf-additional-info">
@@ -76,18 +83,16 @@
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
               <form class="form-horizontal" v-on:submit.prevent="saveInterface(i)">
                 <div class="modal-body">
-                  <div
-                    :class="['form-group', i.errors.provider.nslabel.hasError ? 'has-error' : '']"
-                  >
+                  <div :class="['form-group', i.errors.nslabel.hasError ? 'has-error' : '']">
                     <label
                       class="col-sm-3 control-label"
                       for="textInput-modal-markup"
                     >{{$t('wan.provider')}}</label>
                     <div class="col-sm-8">
-                      <input required type="text" v-model="i.provider.nslabel" class="form-control">
-                      <span v-if="i.errors.provider.nslabel.hasError" class="help-block">
+                      <input required type="text" v-model="i.nslabel" class="form-control">
+                      <span v-if="i.errors.nslabel.hasError" class="help-block">
                         {{$t('validation.validation_failed')}}:
-                        {{$t('validation.'+i.errors.provider.nslabel.message)}}
+                        {{$t('validation.'+i.errors.nslabel.message)}}
                       </span>
                     </div>
                   </div>
@@ -122,6 +127,7 @@
                         required
                         type="number"
                         class="form-control"
+                        v-model="i.FwInBandwidth"
                       >
                       <span v-if="i.errors.FwInBandwidth.hasError" class="help-block">
                         {{$t('validation.validation_failed')}}:
@@ -140,6 +146,7 @@
                         required
                         type="number"
                         class="form-control"
+                        v-model="i.FwOutBandwidth"
                       >
                       <span v-if="i.errors.FwOutBandwidth.hasError" class="help-block">
                         {{$t('validation.validation_failed')}}:
@@ -327,6 +334,10 @@ export default {
   mounted() {
     this.getProviders();
   },
+  beforeRouteLeave(to, from, next) {
+    $(".modal").modal("hide");
+    next();
+  },
   methods: {
     toggleAdvancedMode() {
       this.wan.advanced = !this.wan.advanced;
@@ -342,11 +353,11 @@ export default {
           hasError: false,
           message: ""
         },
+        nslabel: {
+          hasError: false,
+          message: ""
+        },
         provider: {
-          nslabel: {
-            hasError: false,
-            message: ""
-          },
           weight: {
             hasError: false,
             message: ""
@@ -406,6 +417,16 @@ export default {
               isLoaded: false
             };
             iface.errors = context.initErrors();
+            $(
+              "#" +
+                context.$options.filters.sanitize(iface.name) +
+                "-FwOutBandwidth"
+            ).val(iface.FwOutBandwidth);
+            $(
+              "#" +
+                context.$options.filters.sanitize(iface.name) +
+                "-FwInBandwidth"
+            ).val(iface.FwInBandwidth);
             interfaces.push(iface);
           }
           context.interfaces = interfaces;
@@ -434,9 +455,6 @@ export default {
           context.view.isLoaded = true;
         }
       );
-    },
-    jumpToNetwork() {
-      cockpit.jump("/nethserver#/network");
     },
     speedTest(iface) {
       var popover = $(
@@ -508,13 +526,13 @@ export default {
             popover.show();
           },
           function(error) {
+            iface.speedtest.isLoaded = true;
             console.error(error);
           }
         );
       }
     },
     saveInterface(iface) {
-      console.log("prov");
       var context = this;
 
       iface.FwInBandwidth = parseInt(
@@ -533,7 +551,7 @@ export default {
         FwOutBandwidth: iface.FwOutBandwidth,
         FwInBandwidth: iface.FwInBandwidth,
         nslabel: iface.nslabel,
-        weight: iface.weight,
+        weight: iface.provider.weight,
         name: iface.name
       };
 
@@ -721,6 +739,10 @@ export default {
 
 .other-list {
   border-left: 3px solid black !important;
+}
+
+.gray {
+  color: #72767b !important;
 }
 
 .border-red {
