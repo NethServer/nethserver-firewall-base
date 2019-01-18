@@ -6,10 +6,10 @@
   my $ndb = esmith::NetworksDB->open_ro() || die("Can't open networks db");
   my $tdb = esmith::ConfigDB->open_ro('tc') || die("Can't open networks TC db");
   my $fw = new NethServer::Firewall();
-  my $linklayer = $firewall{'TCLinklayer'} || 'ethernet';
 
   my @providers = $fw->getProviders();
   my @classes = $tdb->get_all_by_prop('type' => 'class');
+  our $unit = $firewall{'TCUnit'} || '%';
 
   sub getProviderName
   {
@@ -32,10 +32,10 @@
       if ($min || $max) {
           $out .= "$direction";
           if ($min > 0) {
-              $out .= " commit $min%";
+              $out .= " commit $min$unit";
           }
           if ($max > 0) {
-              $out .= " ceil $max%";
+              $out .= " ceil $max$unit";
           }
       }
 
@@ -46,6 +46,7 @@
       my $interface = $red->key;
       my $in = $red->prop('FwInBandwidth') || next;
       my $out = $red->prop('FwOutBandwidth') || next;
+      my $linklayer = $red->prop('TCLinklayer') || 'ethernet';
 
       $OUT .= "\n\n";
 
@@ -58,6 +59,11 @@
           my $max_out = $class->prop('MaxOutputRate') || 0;
           my $min_in = $class->prop('MinInputRate') || 0;
           my $max_in = $class->prop('MaxInputRate') || 0;
+          my $bindto = $class->prop('BindTo') || '';
+          if ($bindto ne '') {
+              my %binds = map { $_ => 1 } split(",",$bindto);
+              next if (!exists($binds{$interface}));
+          }
 
           # skip empty classes
           next if (!$min_out && !$max_out && !$min_in && !$max_in);
