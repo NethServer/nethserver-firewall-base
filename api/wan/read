@@ -92,6 +92,22 @@ if($cmd eq 'providers') {
         print $out;
     }
 
+} elsif ($cmd eq 'stats') {
+    my $ret = {};
+
+    my $ndb = esmith::NetworksDB->open_ro();
+    foreach ($ndb->red()) {
+        $ret->{$_->key} = undef;
+        my $api = "/api/v1/data?chart=net.".$_->key."&format=csv&before=-1&after=1&options=abs";
+        my $txt = `curl --no-buffer --unix-socket /run/netdata/netdata.sock 'http:$api' 2>/dev/null`;
+        if ($txt) {
+            my @lines = split("\r\n",$txt);
+            my @values = split(",",$lines[1]);
+            $ret->{$_->key} = {"in" => $values[1], "out" => $values[2]};
+        }
+    }
+    print encode_json($ret);
+
 } else {
     error()
 }
