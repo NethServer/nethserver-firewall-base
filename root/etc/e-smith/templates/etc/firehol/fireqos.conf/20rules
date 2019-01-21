@@ -9,7 +9,6 @@
 
   my @providers = $fw->getProviders();
   my @classes = $tdb->get_all_by_prop('type' => 'class');
-  our $unit = $firewall{'TCUnit'} || '%';
 
   sub getProviderName
   {
@@ -27,6 +26,7 @@
       my $direction = shift;
       my $min = shift;
       my $max = shift;
+      my $unit = shift;
       my $out = '';
 
       if ($min || $max) {
@@ -59,6 +59,7 @@
           my $max_out = $class->prop('MaxOutputRate') || 0;
           my $min_in = $class->prop('MinInputRate') || 0;
           my $max_in = $class->prop('MaxInputRate') || 0;
+          my $unit = $class->prop('Unit') || '%';
           my $bindto = $class->prop('BindTo') || '';
           if ($bindto ne '') {
               my %binds = map { $_ => 1 } split(",",$bindto);
@@ -69,7 +70,7 @@
           next if (!$min_out && !$max_out && !$min_in && !$max_in);
 
           $OUT .= "\n";
-          $OUT .= "\tclass $name ".outRate('input',$min_in,$max_in)." ".outRate('output',$min_out,$max_out)."\n";
+          $OUT .= "\tclass $name ".outRate('input',$min_in,$max_in,$unit)." ".outRate('output',$min_out,$max_out,$unit)."\n";
           $OUT .= "\t\tmatch connmark 0x$mark\n";
       }
 

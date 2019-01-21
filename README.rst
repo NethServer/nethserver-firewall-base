@@ -74,7 +74,6 @@ Properties of ``firewall`` key inside ``configuration`` db:
 * ``NotifyWan``: can be ``enabled`` or ``disabled``, if ``enabled`` a mail is sent every time a provider changes its own state
 * ``NotifyWanFrom``: sender address for mails sent if NotifyWAN is set to enabled
 * ``NotifyWanTo``: recipient address for mails sent if NotifyWAN is set to enabled
-* ``TCUnit``: bandwidth unit of measeure for TC classes, default to ``%``, supported values are from FireQoS doc
 
 Example
 
@@ -420,6 +419,7 @@ Each tc class has the following properties:
 - ``MaxOutputRate``: maximum upload rate, expressed in percentage of the total upload bandwidth
 - ``MinInputRate``: reserved download rate, expressed in percentage of the total download bandwidth
 - ``MinOutputRate``: reserved upload rate, expressed in percentage of the total upload bandwidth
+- ``Unit``: bandwidth unit of measure for TC classes, default to ``%``, supported values are from FireQoS doc
 
 
 Example: ::
@@ -432,6 +432,7 @@ Example: ::
     MaxOutputRate=
     MinInputRate=10
     MinOutputRate=10
+    Unit=%
 
  low=class
     BindTo=ens1
@@ -441,6 +442,7 @@ Example: ::
     MaxOutputRate=
     MinInputRate=10
     MinOutputRate=10
+    Unit=kbps
 
 Assumptions and limitations
 ---------------------------
