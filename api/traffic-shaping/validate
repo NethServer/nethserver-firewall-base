@@ -1,0 +1,69 @@
+#!/usr/bin/php
+<?php
+/*
+ * Copyright (C) 2019 Nethesis S.r.l.
+ * http://www.nethesis.it - nethserver@nethesis.it
+ *
+ * This script is part of NethServer.
+ *
+ * NethServer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or any later version.
+ *
+ * NethServer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with NethServer.  If not, see COPYING.
+*/
+
+require_once("/usr/libexec/nethserver/api/lib/Helpers.php");
+
+$data = readInput();
+$action = $data['action'];
+
+$v = new LegacyValidator($data);
+$db = new EsmithDatabase('tc');
+
+if ($action == "create") {
+    if ($db->getKey($data['name'])) {
+        $v->addValidationError('name', 'class_key_exists', $data['name']);
+    }
+} else if ($action == "edit") {
+    if (!$db->getKey($data['name'])) {
+        $v->addValidationError('name', 'non_existing_class', $data['name']);
+    }
+}
+
+$rateValidator = $v->createValidator()
+    ->orValidator(
+        $v->createValidator()->integer()->greatThan(0),
+        $v->createValidator()->isEmpty()
+    );
+
+
+$v->declareParameter('MaxInputRate', $rateValidator);
+$v->declareParameter('MaxOutputRate', $rateValidator);
+$v->declareParameter('MinInputRate', $rateValidator);
+$v->declareParameter('MinOutputRate', $rateValidator);
+$v->declareParameter('Unit', $v->createValidator()->memberOf(array('%','kbps')));
+if ($data['BindTo']) {
+    $ndb = new EsmithDatabase('networks');
+    foreach ($data['BindTo'] as $i) {
+        $r = $ndb->getKey($i);
+        if (!$r) {
+            $v->addValidationError('name', "invalid_interface");
+        }
+    }
+}
+
+# Validate the input
+if ($v->validate()) {
+    success();
+} else {
+    error($v);
+}
+
