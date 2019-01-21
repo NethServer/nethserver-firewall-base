@@ -98,8 +98,7 @@ if($cmd eq 'providers') {
     my $ndb = esmith::NetworksDB->open_ro();
     foreach ($ndb->red()) {
         $ret->{$_->key} = undef;
-        my $api = "/api/v1/data?chart=net.".$_->key."&format=csv&before=-1&after=1&options=abs";
-        my $txt = `curl --no-buffer --unix-socket /run/netdata/netdata.sock 'http:$api' 2>/dev/null`;
+        my $txt = read_netdata("/api/v1/data?chart=net.".$_->key."&format=csv&before=-1&after=1&options=abs");
         if ($txt) {
             my @lines = split("\r\n",$txt);
             my @values = split(",",$lines[1]);

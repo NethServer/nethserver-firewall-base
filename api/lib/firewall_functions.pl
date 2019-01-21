@@ -50,4 +50,10 @@ sub read_addresses
     return \%ret;
 }
 
+sub read_netdata
+{
+    my $api = shift;
+    return `curl --no-buffer --unix-socket /run/netdata/netdata.sock 'http:$api' 2>/dev/null`;
+}
+
 1;
