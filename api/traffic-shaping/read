@@ -82,6 +82,7 @@ if($cmd eq 'classes') {
                         my $k = 0;
                         foreach (@values) {
                             my $arr = $ret->{$name}{$direction}{$headers[$k]};
+                            $_ = int($_) + 0.01; # hack for better graph
                             push(@$arr, $_);
                             $k++;
                         }
