@@ -85,12 +85,20 @@ export default {
   margin-top: 0px !important;
 }
 
+.no-mg-bottom {
+  margin-bottom: 0px !important;
+}
+
 .no-mg-left {
   margin-left: 0px !important;
 }
 
 .mg-top-5 {
   margin-top: 5px !important;
+}
+
+.mg-left-5 {
+  margin-left: 5px !important;
 }
 
 .mg-bottom-10 {
@@ -112,5 +120,14 @@ export default {
 
 .cursor-initial {
   cursor: initial;
+}
+
+.remove-item-inline {
+  color: white;
+  margin-left: 4px;
+}
+
+.compact {
+  margin-bottom: 0px !important;
 }
 </style>

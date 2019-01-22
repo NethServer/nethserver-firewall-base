@@ -2,14 +2,37 @@
   <div>
     <h2>{{$t('wan.title')}}</h2>
 
-    <h3>{{$t('actions')}}</h3>
+    <h3 v-if="interfaces.length > 0">{{$t('charts')}}</h3>
+    <div v-if="!view.isLoaded && interfaces.length > 0" class="spinner spinner-lg view-spinner"></div>
+
+    <div
+      v-if="view.invalidChartsData && interfaces.length > 0"
+      class="alert alert-warning alert-dismissable col-sm-12"
+    >
+      <span class="pficon pficon-warning-triangle-o"></span>
+      <strong>{{$t('warning')}}!</strong>
+      {{$t('charts_not_updated')}}.
+    </div>
+    <div v-show="interfaces.length > 0 && view.isLoaded" class="row">
+      <div v-for="i in interfaces" v-bind:key="i" class="col-sm-4 stats-divider">
+        <h4>
+          {{i.name}}
+          <span class="gray">({{i.provider.name}})</span>
+        </h4>
+        <div :id="'chart-in-'+i.name | sanitize" class="col-sm-12"></div>
+        <div :id="'chart-out-'+i.name | sanitize" class="col-sm-12"></div>
+      </div>
+    </div>
+
+    <h3 v-if="interfaces.length > 0">{{$t('actions')}}</h3>
     <button
+      v-if="interfaces.length > 0"
       data-toggle="modal"
       data-target="#configureWAN"
       class="btn btn-primary btn-lg"
     >{{$t('wan.configure_wan')}}</button>
 
-    <h3>{{$t('wan.list')}}</h3>
+    <h3 v-if="interfaces.length > 0">{{$t('list')}}</h3>
     <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
     <div v-if="interfaces.length == 0 && view.isLoaded" class="blank-slate-pf white">
       <div class="blank-slate-pf-icon">
@@ -47,7 +70,7 @@
               data-html="true"
               data-trigger="focus"
               :title="$t('wan.speed_info')"
-              class="btn btn-default btn-primary"
+              class="btn btn-default"
             >
               <span class="fa fa-bolt span-right-margin"></span>
               {{$t('wan.speedtest')}}
@@ -218,7 +241,7 @@
                 <label
                   class="col-sm-4 control-label"
                   for="textInput-modal-markup"
-                >{{$t('wan.advanced_mode')}}</label>
+                >{{$t('advanced_mode')}}</label>
                 <div class="col-sm-8">
                   <toggle-button
                     class="min-toggle"
@@ -315,7 +338,8 @@ export default {
   data() {
     return {
       view: {
-        isLoaded: false
+        isLoaded: false,
+        invalidChartsData: false
       },
       interfaces: [],
       wan: {
@@ -328,7 +352,9 @@ export default {
         errors: this.initWANErrors(),
         advanced: false,
         isLoading: false
-      }
+      },
+      charts: {},
+      pollingIntervalId: 0
     };
   },
   mounted() {
@@ -336,12 +362,121 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     $(".modal").modal("hide");
+    clearInterval(this.pollingIntervalId);
     next();
   },
   methods: {
     toggleAdvancedMode() {
       this.wan.advanced = !this.wan.advanced;
       this.$forceUpdate();
+    },
+    initCharts() {
+      for (var i in this.interfaces) {
+        var iface = this.interfaces[i];
+
+        var inName = this.$i18n.t("wan.inbound_bandwidth");
+
+        var inBoundChart = c3.generate({
+          bindto:
+            "#" + this.$options.filters.sanitize("chart-in-" + iface.name),
+          data: {
+            columns: [[inName, 0]],
+            type: "gauge"
+          },
+          gauge: {
+            max: iface.FwInBandwidth <= 0 ? 100 : iface.FwInBandwidth,
+            units: ""
+          },
+          color: {
+            pattern: ["#60B044", "#F97600", "#FF0000"],
+            threshold: {
+              values: [
+                iface.FwInBandwidth / 3,
+                iface.FwInBandwidth / 1.5,
+                iface.FwInBandwidth / 1.25
+              ]
+            }
+          },
+          size: {
+            height: 100
+          }
+        });
+
+        var outName = this.$i18n.t("wan.outbound_bandwidth");
+
+        var outBoundChart = c3.generate({
+          bindto:
+            "#" + this.$options.filters.sanitize("chart-out-" + iface.name),
+          data: {
+            columns: [[outName, 0]],
+            type: "gauge"
+          },
+          gauge: {
+            max: iface.FwOutBandwidth <= 0 ? 100 : iface.FwOutBandwidth,
+            units: ""
+          },
+          color: {
+            pattern: ["#60B044", "#F97600", "#FF0000"],
+            threshold: {
+              values: [
+                iface.FwOutBandwidth / 3,
+                iface.FwOutBandwidth / 1.5,
+                iface.FwOutBandwidth / 1.25
+              ]
+            }
+          },
+          size: {
+            height: 100
+          }
+        });
+
+        this.charts[iface.name] = { in: inBoundChart, out: outBoundChart };
+      }
+
+      // start polling
+      var context = this;
+      context.pollingIntervalId = setInterval(function() {
+        context.updateCharts();
+      }, 2500);
+    },
+    updateCharts() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/wan/read"],
+        {
+          action: "stats"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          for (var i in success) {
+            var iface = success[i];
+            if (iface) {
+              var inName = context.$i18n.t("wan.inbound_bandwidth");
+              var outName = context.$i18n.t("wan.outbound_bandwidth");
+
+              context.view.invalidChartsData = false;
+
+              context.charts[i].in.load({
+                columns: [[inName, iface.in]]
+              });
+              context.charts[i].out.load({
+                columns: [[outName, iface.out]]
+              });
+            } else {
+              context.view.invalidChartsData = true;
+              context.$forceUpdate();
+            }
+          }
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
     },
     initErrors() {
       return {
@@ -448,6 +583,7 @@ export default {
               .on("hidden.bs.popover", function(e) {
                 $(e.target).data("bs.popover").inState.click = false;
               });
+            context.initCharts();
           }, 250);
         },
         function(error) {
@@ -482,7 +618,7 @@ export default {
 
             popover.options.content =
               '<b class="col-sm-6">' +
-              context.$i18n.t("wan.download") +
+              context.$i18n.t("download") +
               '</b><span class="col-sm-6">' +
               ((success.download &&
                 context.$options.filters.byteFormat(success.download)) ||
@@ -491,7 +627,7 @@ export default {
 
             popover.options.content +=
               '<b class="col-sm-6">' +
-              context.$i18n.t("wan.upload") +
+              context.$i18n.t("upload") +
               '</b><span class="col-sm-6">' +
               ((success.upload &&
                 context.$options.filters.byteFormat(success.upload)) ||
@@ -780,5 +916,9 @@ export default {
 .spinner-speed {
   float: left;
   margin-top: 5px;
+}
+
+.stats-divider:not(:last-child) {
+  border-right: 1px solid #d1d1d1;
 }
 </style>

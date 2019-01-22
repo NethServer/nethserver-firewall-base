@@ -7,6 +7,10 @@ import router from './router'
 import languages from "./i18n/lang";
 import "./filters/filters";
 
+window.c3 = require('c3');
+window.d3 = require('d3');
+window.moment = require("moment");
+
 Vue.config.productionTip = false
 Vue.use(VueI18n);
 Vue.use(VueToggleButton)
@@ -20,7 +24,6 @@ const i18n = new VueI18n({
   locale: langConf.locale,
   messages: langConf.messages
 });
-var moment = require("moment");
 moment.locale(langConf.locale);
 
 var ns = new Vue({
