@@ -13,11 +13,7 @@
       {{$t('charts_not_updated')}}.
     </div>
     <div v-show="interfaces.length > 0 && view.isChartLoaded && tc.length > 0" class="row">
-      <div
-        v-for="i in interfaces"
-        v-bind:key="i"
-        :class="['col-sm-'+(12/interfaces.length), 'stats-divider']"
-      >
+      <div v-for="i in interfaces" v-bind:key="i" class="col-sm-6">
         <h4>
           {{i.provider.name}}
           <span class="gray">({{$t('download_low')}})</span>
@@ -486,6 +482,9 @@ export default {
                 context.charts["chart-out-" + i] = c3.generate({
                   bindto:
                     "#" + context.$options.filters.sanitize("chart-out-" + i),
+                  transition: {
+                    duration: 0
+                  },
                   data: {
                     x: "x",
                     xFormat: "%H:%M:%S",
@@ -496,12 +495,24 @@ export default {
                     x: {
                       type: "timeseries",
                       tick: {
-                        format: "%H:%M:%S"
+                        format: "%H:%M:%S",
+                        count: 7
+                      }
+                    },
+                    y: {
+                      tick: {
+                        format: function(y) {
+                          return context.$options.filters.byteFormat(
+                            Math.round(y * 100) / 100 * 1000
+                          );
+                        },
+                        count: 5
                       }
                     }
                   },
                   size: {
-                    height: 250
+                    height: 150,
+                    width: window.innerWidth / Object.keys(success).length - 100
                   }
                 });
               }
@@ -514,6 +525,9 @@ export default {
                 context.charts["chart-in-" + i] = c3.generate({
                   bindto:
                     "#" + context.$options.filters.sanitize("chart-in-" + i),
+                  transition: {
+                    duration: 0
+                  },
                   data: {
                     x: "x",
                     xFormat: "%H:%M:%S",
@@ -524,12 +538,24 @@ export default {
                     x: {
                       type: "timeseries",
                       tick: {
-                        format: "%H:%M:%S"
+                        format: "%H:%M:%S",
+                        count: 7
+                      }
+                    },
+                    y: {
+                      tick: {
+                        format: function(y) {
+                          return context.$options.filters.byteFormat(
+                            Math.round(y * 100) / 100 * 1000
+                          );
+                        },
+                        count: 5
                       }
                     }
                   },
                   size: {
-                    height: 250
+                    height: 150,
+                    width: window.innerWidth / Object.keys(success).length - 100
                   }
                 });
               }
@@ -537,47 +563,75 @@ export default {
               context.view.invalidChartsData = false;
               context.view.isChartLoaded = true;
             } else {
-              context.charts["chart-out-" + i] = c3.generate({
-                bindto:
-                  "#" + context.$options.filters.sanitize("chart-out-" + i),
-                data: {
-                  x: "x",
-                  xFormat: "%H:%M:%S",
-                  columns: [[]]
-                },
-                axis: {
-                  x: {
-                    type: "timeseries",
-                    tick: {
-                      format: "%H:%M:%S"
+              if (!context.charts["chart-out-" + i]) {
+                context.charts["chart-out-" + i] = c3.generate({
+                  bindto:
+                    "#" + context.$options.filters.sanitize("chart-out-" + i),
+                  data: {
+                    x: "x",
+                    xFormat: "%H:%M:%S",
+                    columns: [[]]
+                  },
+                  axis: {
+                    x: {
+                      type: "timeseries",
+                      tick: {
+                        format: "%H:%M:%S",
+                        count: 7
+                      }
+                    },
+                    y: {
+                      tick: {
+                        format: function(y) {
+                          return context.$options.filters.byteFormat(
+                            Math.round(y * 100) / 100 * 1000
+                          );
+                        },
+                        count: 5
+                      }
                     }
+                  },
+                  size: {
+                    height: 150,
+                    width: window.innerWidth / Object.keys(success).length - 100
                   }
-                },
-                size: {
-                  height: 250
-                }
-              });
+                });
+              }
 
-              context.charts["chart-in-" + i] = c3.generate({
-                bindto:
-                  "#" + context.$options.filters.sanitize("chart-in-" + i),
-                data: {
-                  x: "x",
-                  xFormat: "%H:%M:%S",
-                  columns: [[]]
-                },
-                axis: {
-                  x: {
-                    type: "timeseries",
-                    tick: {
-                      format: "%H:%M:%S"
+              if (!context.charts["chart-in-" + i]) {
+                context.charts["chart-in-" + i] = c3.generate({
+                  bindto:
+                    "#" + context.$options.filters.sanitize("chart-in-" + i),
+                  data: {
+                    x: "x",
+                    xFormat: "%H:%M:%S",
+                    columns: [[]]
+                  },
+                  axis: {
+                    x: {
+                      type: "timeseries",
+                      tick: {
+                        format: "%H:%M:%S",
+                        count: 7
+                      }
+                    },
+                    y: {
+                      tick: {
+                        format: function(y) {
+                          return context.$options.filters.byteFormat(
+                            Math.round(y * 100) / 100 * 1000
+                          );
+                        },
+                        count: 5
+                      }
                     }
+                  },
+                  size: {
+                    height: 150,
+                    width: window.innerWidth / Object.keys(success).length - 100
                   }
-                },
-                size: {
-                  height: 250
-                }
-              });
+                });
+              }
 
               context.view.invalidChartsData = true;
               context.view.isChartLoaded = true;
@@ -592,7 +646,7 @@ export default {
       if (context.pollingIntervalId == 0) {
         context.pollingIntervalId = setInterval(function() {
           context.initCharts();
-        }, 5000);
+        }, 2500);
       }
     },
 
