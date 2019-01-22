@@ -373,71 +373,76 @@ export default {
     initCharts() {
       for (var i in this.interfaces) {
         var iface = this.interfaces[i];
+        this.charts[iface.name] = {};
 
-        var inName = this.$i18n.t("wan.inbound_bandwidth");
+        if (!this.charts[iface.name].in) {
+          var inName = this.$i18n.t("wan.inbound_bandwidth");
 
-        var inBoundChart = c3.generate({
-          bindto:
-            "#" + this.$options.filters.sanitize("chart-in-" + iface.name),
-          data: {
-            columns: [[inName, 0]],
-            type: "gauge"
-          },
-          gauge: {
-            max: iface.FwInBandwidth <= 0 ? 100 : iface.FwInBandwidth,
-            units: ""
-          },
-          color: {
-            pattern: ["#60B044", "#F97600", "#FF0000"],
-            threshold: {
-              values: [
-                iface.FwInBandwidth / 3,
-                iface.FwInBandwidth / 1.5,
-                iface.FwInBandwidth / 1.25
-              ]
+          this.charts[iface.name].in = c3.generate({
+            bindto:
+              "#" + this.$options.filters.sanitize("chart-in-" + iface.name),
+            data: {
+              columns: [[inName, 0]],
+              type: "gauge"
+            },
+            gauge: {
+              max: iface.FwInBandwidth <= 0 ? 100000 : iface.FwInBandwidth,
+              units: ""
+            },
+            color: {
+              pattern: ["#60B044", "#F97600", "#FF0000"],
+              threshold: {
+                values: [
+                  iface.FwInBandwidth / 3,
+                  iface.FwInBandwidth / 1.5,
+                  iface.FwInBandwidth / 1.25
+                ]
+              }
+            },
+            size: {
+              height: 100
             }
-          },
-          size: {
-            height: 100
-          }
-        });
+          });
+        }
 
-        var outName = this.$i18n.t("wan.outbound_bandwidth");
+        if (!this.charts[iface.name].out) {
+          var outName = this.$i18n.t("wan.outbound_bandwidth");
 
-        var outBoundChart = c3.generate({
-          bindto:
-            "#" + this.$options.filters.sanitize("chart-out-" + iface.name),
-          data: {
-            columns: [[outName, 0]],
-            type: "gauge"
-          },
-          gauge: {
-            max: iface.FwOutBandwidth <= 0 ? 100 : iface.FwOutBandwidth,
-            units: ""
-          },
-          color: {
-            pattern: ["#60B044", "#F97600", "#FF0000"],
-            threshold: {
-              values: [
-                iface.FwOutBandwidth / 3,
-                iface.FwOutBandwidth / 1.5,
-                iface.FwOutBandwidth / 1.25
-              ]
+          this.charts[iface.name].out = c3.generate({
+            bindto:
+              "#" + this.$options.filters.sanitize("chart-out-" + iface.name),
+            data: {
+              columns: [[outName, 0]],
+              type: "gauge"
+            },
+            gauge: {
+              max: iface.FwOutBandwidth <= 0 ? 100000 : iface.FwOutBandwidth,
+              units: ""
+            },
+            color: {
+              pattern: ["#60B044", "#F97600", "#FF0000"],
+              threshold: {
+                values: [
+                  iface.FwOutBandwidth / 3,
+                  iface.FwOutBandwidth / 1.5,
+                  iface.FwOutBandwidth / 1.25
+                ]
+              }
+            },
+            size: {
+              height: 100
             }
-          },
-          size: {
-            height: 100
-          }
-        });
-
-        this.charts[iface.name] = { in: inBoundChart, out: outBoundChart };
+          });
+        }
       }
 
       // start polling
       var context = this;
-      context.pollingIntervalId = setInterval(function() {
-        context.updateCharts();
-      }, 2500);
+      if (context.pollingIntervalId == 0) {
+        context.pollingIntervalId = setInterval(function() {
+          context.updateCharts();
+        }, 2500);
+      }
     },
     updateCharts() {
       var context = this;

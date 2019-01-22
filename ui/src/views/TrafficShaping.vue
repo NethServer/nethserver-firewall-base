@@ -3,7 +3,7 @@
     <h2>{{$t('traffic_shaping.title')}}</h2>
 
     <h3 v-if="tc.length > 0">{{$t('charts')}}</h3>
-    <div v-if="!view.isLoaded && tc.length > 0" class="spinner spinner-lg view-spinner"></div>
+    <div v-if="!view.isChartLoaded && tc.length > 0" class="spinner spinner-lg view-spinner"></div>
     <div
       v-if="view.invalidChartsData && tc.length > 0"
       class="alert alert-warning alert-dismissable col-sm-12"
@@ -12,8 +12,12 @@
       <strong>{{$t('warning')}}!</strong>
       {{$t('charts_not_updated')}}.
     </div>
-    <div v-show="interfaces.length > 0 && view.isLoaded && tc.length > 0" class="row">
-      <div v-for="i in interfaces" v-bind:key="i" class="col-sm-6 stats-divider">
+    <div v-show="interfaces.length > 0 && view.isChartLoaded && tc.length > 0" class="row">
+      <div
+        v-for="i in interfaces"
+        v-bind:key="i"
+        :class="['col-sm-'+(12/interfaces.length), 'stats-divider']"
+      >
         <h4>
           {{i.provider.name}}
           <span class="gray">({{$t('download_low')}})</span>
@@ -29,7 +33,7 @@
 
     <h3 v-if="tc.length > 0">{{$t('actions')}}</h3>
     <button
-    v-if="tc.length > 0"
+      v-if="tc.length > 0"
       @click="openCreateTc()"
       class="btn btn-primary btn-lg"
     >{{$t('traffic_shaping.create_class')}}</button>
@@ -45,12 +49,12 @@
       <p>{{$t('traffic_shaping.no_tc_found_text')}}.</p>
       <div class="blank-slate-pf-main-action">
         <button
-          class="btn btn-primary"
+          class="btn btn-primary btn-lg"
           @click="openCreateTc()"
         >{{$t('traffic_shaping.create_class')}}</button>
 
         <button
-          class="btn btn-default mg-left-5"
+          class="btn btn-default btn-lg mg-left-5"
           @click="defaultTc()"
         >{{$t('traffic_shaping.create_default_class')}}</button>
       </div>
@@ -380,6 +384,7 @@ export default {
     return {
       view: {
         isLoaded: false,
+        isChartLoaded: false,
         invalidChartsData: false
       },
       tc: [],
@@ -420,63 +425,125 @@ export default {
           } catch (e) {
             console.error(e);
           }
+
           for (var i in success) {
             var provider = success[i];
 
             if (provider) {
-              context.view.invalidChartsData = false;
-
               // out classes
               var outColumns = [];
-              for (var c in provider.out) {
-                var classVal = provider.out[c];
+              var typesOutClass = {};
+              if (provider.out && provider.out.time) {
+                for (var c in provider.out) {
+                  var classVal = provider.out[c];
 
-                if (c != "time") {
-                  outColumns.push([c].concat(classVal.reverse()));
-                } else {
-                  outColumns.push(
-                    ["x"].concat(
-                      classVal
-                        .map(function(i) {
-                          return moment.unix(i).format("HH:mm:ss");
-                        })
-                        .reverse()
-                    )
-                  );
+                  if (c != "time") {
+                    typesOutClass[c] = "area-spline";
+                    outColumns.push([c].concat(classVal.reverse()));
+                  } else {
+                    outColumns.push(
+                      ["x"].concat(
+                        classVal
+                          .map(function(i) {
+                            return moment.unix(i).format("HH:mm:ss");
+                          })
+                          .reverse()
+                      )
+                    );
+                  }
                 }
               }
 
               // in classes
               var inColumns = [];
-              for (var c in provider.in) {
-                var classVal = provider.in[c];
+              var typesInClass = {};
+              if (provider.in && provider.in.time) {
+                for (var c in provider.in) {
+                  var classVal = provider.in[c];
 
-                if (c != "time") {
-                  inColumns.push([c].concat(classVal.reverse()));
-                } else {
-                  inColumns.push(
-                    ["x"].concat(
-                      classVal
-                        .map(function(i) {
-                          return moment.unix(i).format("HH:mm:ss");
-                        })
-                        .reverse()
-                    )
-                  );
+                  if (c != "time") {
+                    typesInClass[c] = "area-spline";
+                    inColumns.push([c].concat(classVal.reverse()));
+                  } else {
+                    inColumns.push(
+                      ["x"].concat(
+                        classVal
+                          .map(function(i) {
+                            return moment.unix(i).format("HH:mm:ss");
+                          })
+                          .reverse()
+                      )
+                    );
+                  }
                 }
               }
 
-              var chart = c3.generate({
+              if (context.charts["chart-out-" + i]) {
+                context.charts["chart-out-" + i].load({
+                  columns: outColumns
+                });
+              } else {
+                context.charts["chart-out-" + i] = c3.generate({
+                  bindto:
+                    "#" + context.$options.filters.sanitize("chart-out-" + i),
+                  data: {
+                    x: "x",
+                    xFormat: "%H:%M:%S",
+                    columns: outColumns,
+                    types: typesOutClass
+                  },
+                  axis: {
+                    x: {
+                      type: "timeseries",
+                      tick: {
+                        format: "%H:%M:%S"
+                      }
+                    }
+                  },
+                  size: {
+                    height: 250
+                  }
+                });
+              }
+
+              if (context.charts["chart-in-" + i]) {
+                context.charts["chart-in-" + i].load({
+                  columns: inColumns
+                });
+              } else {
+                context.charts["chart-in-" + i] = c3.generate({
+                  bindto:
+                    "#" + context.$options.filters.sanitize("chart-in-" + i),
+                  data: {
+                    x: "x",
+                    xFormat: "%H:%M:%S",
+                    columns: inColumns,
+                    types: typesInClass
+                  },
+                  axis: {
+                    x: {
+                      type: "timeseries",
+                      tick: {
+                        format: "%H:%M:%S"
+                      }
+                    }
+                  },
+                  size: {
+                    height: 250
+                  }
+                });
+              }
+
+              context.view.invalidChartsData = false;
+              context.view.isChartLoaded = true;
+            } else {
+              context.charts["chart-out-" + i] = c3.generate({
                 bindto:
                   "#" + context.$options.filters.sanitize("chart-out-" + i),
                 data: {
                   x: "x",
                   xFormat: "%H:%M:%S",
-                  columns: outColumns
-                  /* types: {
-                    data1: "area-spline",
-                    data2: "area-spline"
-                  } */
+                  columns: [[]]
                 },
                 axis: {
                   x: {
@@ -491,17 +558,13 @@ export default {
                 }
               });
 
-              var chart = c3.generate({
+              context.charts["chart-in-" + i] = c3.generate({
                 bindto:
                   "#" + context.$options.filters.sanitize("chart-in-" + i),
                 data: {
                   x: "x",
                   xFormat: "%H:%M:%S",
-                  columns: inColumns
-                  /* types: {
-                    data1: "area-spline",
-                    data2: "area-spline"
-                  } */
+                  columns: [[]]
                 },
                 axis: {
                   x: {
@@ -515,8 +578,9 @@ export default {
                   height: 250
                 }
               });
-            } else {
+
               context.view.invalidChartsData = true;
+              context.view.isChartLoaded = true;
             }
           }
         },
@@ -776,6 +840,8 @@ export default {
       );
     },
     defaultTc() {
+      var context = this;
+
       // notification
       nethserver.notifications.success = context.$i18n.t(
         "traffic_shaping.tc_default_created_ok"
