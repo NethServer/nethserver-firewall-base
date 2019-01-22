@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+use strict;
+use warnings;
+use esmith::NetworksDB;
+use esmith::ConfigDB;
+
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
+
+my $input = readInput();
+my $cmd = $input->{'action'} || 'info';
+
+if($cmd eq 'provider') {
+
+    my $ndb = esmith::NetworksDB->open();
+
+    $ndb->set_prop($input->{'name'}, 'FwOutBandwidth', $input->{'FwOutBandwidth'});
+    $ndb->set_prop($input->{'name'}, 'FwInBandwidth', $input->{'FwInBandwidth'});
+    $ndb->set_prop($input->{'name'}, 'nslabel', $input->{'nslabel'});
+
+    my @provider = $ndb->get_all_by_prop('interface' => $input->{'name'});
+    $provider[0]->set_prop('weight', $input->{'weight'});
+
+} elsif ($cmd eq 'wan') {
+
+    my $db = esmith::ConfigDB->open();
+
+    foreach (qw(WanMode NotifyWan MaxNumberPacketLoss MaxPercentPacketLoss PingInterval)) {
+        $db->set_prop('firewall', $_, $input->{$_});
+    }
+    my $ips = $input->{'CheckIP'};
+    $db->set_prop('firewall', 'CheckIP', join(",",@$ips));
+
+    $db->set_prop('firewall','NotifyWanTo', $db->get_prop('root','EmailAddress'));
+    $db->set_prop('firewall','NotifyWanFrom', $db->get_prop('root','SenderAddress'));
+
+} else {
+    error()
+}
+    
+system("/sbin/e-smith/signal-event -j firewall-adjust");

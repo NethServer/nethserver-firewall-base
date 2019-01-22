@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+use strict;
+use warnings;
+use esmith::ConfigDB;
+use esmith::NetworksDB;
+use NethServer::Service;
+use JSON;
+
+require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
+
+sub is_running
+{
+    my $service = shift || 0;
+    my $db = shift || 0;
+    my $s = NethServer::Service->new($service, $db) || return 0;
+    return $s->is_running() ? 1 : 0;
+}
+
+sub count_all
+{
+    my $name = shift;
+    my $db = esmith::ConfigDB->open_ro($name) || return 0;
+    return scalar $db->get_all();
+}
+
+# 
+# Read stats for dashboard 
+#
+my $ret = {};
+my $ndb = esmith::NetworksDB->open_ro();
+my $hdb = esmith::ConfigDB->open_ro('hosts');
+my $cdb = esmith::ConfigDB->open_ro();
+
+# Providers
+foreach ($ndb->get_all_by_prop('type' => 'provider')) {
+    my $i = $_->prop('interface') || next;
+    my $w = $_->prop('weight') || 0;
+    my $label= $ndb->get_prop($i, 'nslabel') || '';
+    $ret->{'providers'}{$_->key} = {"status" => read_provider_status($i), "interface" => $i, "weight" => $w, "nslabel" => $label};
+}
+
+# General statistics
+$ret->{'statistics'}{'fwrules'} = count_all('fwrules');
+$ret->{'statistics'}{'portforward'} = count_all('portforward');
+$ret->{'statistics'}{'routes'} = count_all('routes');
+$ret->{'statistics'}{'tc'} = count_all('tc');
+$ret->{'statistics'}{'vpn'} = count_all('vpn');
+
+# sNAT
+foreach ($ndb->get_all_by_prop('type', 'alias')) {
+    my $n = $_->prop('FwObjectNat') || next;
+    $ret->{'statistics'}{'snat'}++;
+}
+
+# Objects
+foreach ($hdb->get_all()) {
+    my $type = $_->prop('type');
+    if ($type eq' local' || $type eq 'remote' || $type eq 'host') {
+        $ret->{'statistics'}{'objects'}{'hosts'}++;
+    } else {
+        $ret->{'statistics'}{'objects'}{$type}++;
+    }
+}
+$ret->{'statistics'}{'objects'}{'zones'} = scalar $ndb->get_all_by_prop('type' => 'zone');
+$ret->{'statistics'}{'objects'}{'fwtimes'} = count_all('fwtimes');
+$ret->{'statistics'}{'objects'}{'fwservices'} = count_all('fwservices');
+
+# Host on the network
+my $hn = `cat /proc/net/arp | wc -l`;
+chomp $hn;
+$ret->{'statistics'}{'hosts'} = int($hn);
+
+# Services
+$ret->{'services'} = {};
+my @services = ("squid", "suricata", "ufdb", "fail2ban", "chilli", 'clamd@squidclamav');
+foreach (@services) {
+    my $s = $cdb->get($_) || next;
+    $ret->{'services'}{$_} = is_running($_, $cdb);
+}
+
+# Connections
+open my $fh, '<', "/proc/net/nf_conntrack";
+while( my $line = <$fh>)  {
+    my @tmp = split(/\s+/,$line);
+    $ret->{'connections'}{$tmp[2]}++;
+    $ret->{'connections'}{'total'}++;
+}
+close $fh;
+
+print encode_json($ret);

@@ -1,0 +1,112 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+use strict;
+use warnings;
+use esmith::ConfigDB;
+use esmith::NetworksDB;
+use JSON;
+
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
+
+sub get_provider
+{
+    my $interface = shift;
+    my $db = shift;
+    my $ret = {};
+    foreach ($db->get_all_by_prop('type' => 'provider')) {
+        my $i = $_->prop('interface') || '';
+        if ($interface eq $i) {
+            $ret = {"name" => $_->key, "weight" => $_->prop('weight')}
+        }
+    }
+    return $ret;
+}
+
+my $input = readInput();
+my $cmd = $input->{'action'} || 'info';
+
+if($cmd eq 'providers') {
+
+    my $ret = {};
+    my $ndb = esmith::NetworksDB->open_ro();
+    my $cdb = esmith::ConfigDB->open_ro();
+
+    foreach ($ndb->get_all_by_prop('type' => 'provider')) {
+        $ret->{'status'}{$_->key} =  read_provider_status($_->key);
+    }
+
+    my @interfaces;
+    foreach ($ndb->red()) {
+        my $addr = read_addresses($_->key);
+        my $p = get_provider($_->key, $ndb);
+        push(@interfaces, {
+                "name" => $_->key,
+                "provider" => $p,
+                'FwInBandwidth' => $_->prop('FwInBandwidth') || 0,
+                'FwOutBandwidth' => $_->prop('FwOutBandwidth') || 0,
+                'nslabel' => $_->prop('nslabel') || '',
+                'cidr' => $addr->{'cidr'},
+                'ipaddr' => $addr->{'ipaddr'},
+                'gateway' => $addr->{'gateway'}
+            });
+    }
+    $ret->{'configuration'}{'interfaces'} = \@interfaces;
+    my @tmp = split(",",$cdb->get_prop('firewall','CheckIP'));
+    $ret->{'configuration'}{'multiwan'}{'CheckIP'} = \@tmp; 
+    foreach (qw(MaxNumberPacketLoss MaxPercentPacketLoss NotifyWan PingInterval WanMode)) {
+        $ret->{'configuration'}{'multiwan'}{$_} = $cdb->get_prop('firewall',$_);
+    }
+
+    print encode_json($ret);
+} elsif ($cmd eq 'speedtest') {
+
+    my $i = $input->{'interface'} || '';
+    my $addr = read_addresses($i);
+    my $ip = $addr->{'ipaddr'} || '';
+    my $out = `speedtest-cli --json --source $ip 2>/dev/null`;
+
+    if ($? > 0) {
+        error();
+    } else {
+        print $out;
+    }
+
+} elsif ($cmd eq 'stats') {
+    my $ret = {};
+
+    my $ndb = esmith::NetworksDB->open_ro();
+    foreach ($ndb->red()) {
+        $ret->{$_->key} = undef;
+        my $txt = read_netdata("/api/v1/data?chart=net.".$_->key."&format=csv&before=-1&after=1&options=abs");
+        if ($txt) {
+            my @lines = split("\r\n",$txt);
+            my @values = split(",",$lines[1]);
+            $ret->{$_->key} = {"in" => $values[1], "out" => $values[2]};
+        }
+    }
+    print encode_json($ret);
+
+} else {
+    error()
+}

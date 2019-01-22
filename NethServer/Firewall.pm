@@ -560,7 +560,7 @@ sub outMangleRule($)
     delete($params->{'service'});
 
     if ($self->isNdpiService($service)) {
-        $params->{'test'} = $self->getNdpiMark($service);
+        $params->{'test'} = $self->getNdpiMark($service).":C";
         $str .= $self->_compactRuleFormat($params);
     } else {
         my %ports = $self->getPorts($service);
