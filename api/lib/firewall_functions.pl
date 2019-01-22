@@ -53,7 +53,7 @@ sub read_addresses
 sub read_netdata
 {
     my $api = shift;
-    return `curl --no-buffer --unix-socket /run/netdata/netdata.sock 'http:$api' 2>/dev/null`;
+    return `curl 'http://localhost:19999/$api' 2>/dev/null`;
 }
 
 1;
