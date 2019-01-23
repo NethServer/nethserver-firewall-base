@@ -37,7 +37,7 @@ case $action in
         /usr/libexec/nethserver/initialize-tc-database
         success
         ;;
-    "create")
+    "create"|"update")
         bindto=$(echo $data | jq -rc '.BindTo | map(tostring) | join(",")')
         /sbin/e-smith/db tc set "$(_get name)" class MinOutputRate "$(_get MinOutputRate)" MaxOutputRate "$(_get MaxOutputRate)" MaxInputRate "$(_get MaxInputRate)" MinInputRate "$(_get MinInputRate)" \
             Description "$(_get Description)" Unit "$(_get Unit)" BindTo "$bindto"
