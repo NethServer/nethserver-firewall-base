@@ -32,7 +32,8 @@ if ($action == "create") {
     if ($db->getKey($data['name'])) {
         $v->addValidationError('name', 'class_key_exists', $data['name']);
     }
-} else if ($action == "edit") {
+    $v->declareParameter('name', Validate::USERNAME);
+} else if ($action == "update") {
     if (!$db->getKey($data['name'])) {
         $v->addValidationError('name', 'non_existing_class', $data['name']);
     }
