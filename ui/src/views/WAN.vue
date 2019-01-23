@@ -3,7 +3,10 @@
     <h2>{{$t('wan.title')}}</h2>
 
     <h3 v-if="interfaces.length > 0">{{$t('charts')}}</h3>
-    <div v-if="!view.isLoaded && interfaces.length > 0" class="spinner spinner-lg view-spinner"></div>
+    <div
+      v-if="!view.isChartLoaded && interfaces.length > 0"
+      class="spinner spinner-lg view-spinner"
+    ></div>
 
     <div
       v-if="view.invalidChartsData && interfaces.length > 0"
@@ -13,8 +16,8 @@
       <strong>{{$t('warning')}}!</strong>
       {{$t('charts_not_updated')}}.
     </div>
-    <div v-show="interfaces.length > 0 && view.isLoaded" class="row">
-      <div v-for="i in interfaces" v-bind:key="i" class="col-sm-4 stats-divider">
+    <div v-show="interfaces.length > 0 && view.isChartLoaded" class="row">
+      <div v-for="i in interfaces" v-bind:key="i" class="col-sm-4">
         <h4>
           {{i.name}}
           <span class="gray">({{i.provider.name}})</span>
@@ -339,6 +342,7 @@ export default {
     return {
       view: {
         isLoaded: false,
+        isChartLoaded: false,
         invalidChartsData: false
       },
       interfaces: [],
@@ -400,7 +404,8 @@ export default {
               }
             },
             size: {
-              height: 100
+              height: 100,
+              width: window.innerWidth / 3 - 100
             }
           });
         }
@@ -430,10 +435,13 @@ export default {
               }
             },
             size: {
-              height: 100
+              height: 100,
+              width: window.innerWidth / 3 - 100
             }
           });
         }
+
+        this.view.isChartLoaded = true;
       }
 
       // start polling
@@ -921,9 +929,5 @@ export default {
 .spinner-speed {
   float: left;
   margin-top: 5px;
-}
-
-.stats-divider:not(:last-child) {
-  border-right: 1px solid #d1d1d1;
 }
 </style>

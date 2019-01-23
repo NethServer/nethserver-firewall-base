@@ -512,7 +512,7 @@ export default {
                   },
                   size: {
                     height: 150,
-                    width: window.innerWidth / Object.keys(success).length - 100
+                    width: window.innerWidth / 2 - 100
                   }
                 });
               }
@@ -555,7 +555,7 @@ export default {
                   },
                   size: {
                     height: 150,
-                    width: window.innerWidth / Object.keys(success).length - 100
+                    width: window.innerWidth / 2 - 100
                   }
                 });
               }
@@ -593,7 +593,7 @@ export default {
                   },
                   size: {
                     height: 150,
-                    width: window.innerWidth / Object.keys(success).length - 100
+                    width: window.innerWidth / 2 - 100
                   }
                 });
               }
@@ -628,7 +628,7 @@ export default {
                   },
                   size: {
                     height: 150,
-                    width: window.innerWidth / Object.keys(success).length - 100
+                    width: window.innerWidth / 2 - 100
                   }
                 });
               }
