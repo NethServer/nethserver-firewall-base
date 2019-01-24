@@ -26,7 +26,6 @@ $data = readInput();
 $action = $data['action'];
 
 $v = new LegacyValidator($data);
-$db = new EsmithDatabase('tc');
 
 switch ($action) {
 
