@@ -19,7 +19,7 @@
     <div v-show="interfaces.length > 0 && view.isChartLoaded" class="row">
       <div v-for="i in interfaces" v-bind:key="i" class="col-sm-4">
         <h4>
-          {{i.name}}
+          {{i.nslabel}}
           <span class="gray">({{i.provider.name}})</span>
         </h4>
         <div :id="'chart-in-'+i.name | sanitize" class="col-sm-12"></div>
@@ -27,15 +27,32 @@
       </div>
     </div>
 
-    <h3 v-if="interfaces.length > 0">{{$t('actions')}}</h3>
-    <button
+    <div v-if="view.isLoaded">
+      <h3>{{$t('wan.configuration')}}</h3>
+      <div class="panel panel-default" id="provider-markup">
+        <div class="panel-heading">
+          <button
+            id="change-provider-btn"
+            data-toggle="modal"
+            data-target="#configureWAN"
+            class="btn btn-primary"
+          >{{$t('configure')}}</button>
+          <span class="panel-title">
+            <span>{{$t('wan.mode')}}: {{wan.WanMode == 'balance' ? $t('wan.balance') : $t('wan.backup')}}</span>
+          </span>
+        </div>
+      </div>
+      <div class="divider"></div>
+    </div>
+
+    <!-- <h3 v-if="interfaces.length > 0">{{$t('actions')}}</h3>
+     <button
       v-if="interfaces.length > 0"
       data-toggle="modal"
       data-target="#configureWAN"
       class="btn btn-primary btn-lg"
-    >{{$t('wan.configure_wan')}}</button>
-
-    <h3 v-if="interfaces.length > 0">{{$t('list')}}</h3>
+    >{{$t('wan.configure_wan')}}</button>-->
+    <h3 v-if="interfaces.length > 0">{{$t('wan.interface_list')}}</h3>
     <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
     <div v-if="interfaces.length == 0 && view.isLoaded" class="blank-slate-pf white">
       <div class="blank-slate-pf-icon">
@@ -62,7 +79,7 @@
         v-bind:key="i"
         class="list-group-item red-list list-view-pf-expand-active no-shadow mg-bottom-10"
       >
-        <div class="list-group-item-header cursor-initial">
+        <div class="list-group-item-header">
           <div class="list-view-pf-actions">
             <a
               tabindex="0"
@@ -71,7 +88,6 @@
               data-placement="left"
               data-toggle="popover"
               data-html="true"
-              data-trigger="focus"
               :title="$t('wan.speed_info')"
               class="btn btn-default"
             >
@@ -79,19 +95,33 @@
               {{$t('wan.speedtest')}}
             </a>
           </div>
-          <div class="list-view-pf-main-info">
+          <div @click="openInterfaceDetails(i)" class="list-view-pf-main-info">
             <div class="list-view-pf-left">
               <span class="fa fa-globe list-view-pf-icon-sm border-red"></span>
             </div>
             <div class="list-view-pf-body">
-              <div class="list-view-pf-description">
+              <div class="list-view-pf-description more-space">
                 <div class="list-group-item-heading red">
                   {{i.name}}
                   <span class="gray">({{i.provider.name}})</span>
                 </div>
-                <div class="list-group-item-text">{{i.nslabel}}</div>
+                <div class="list-group-item-text more-space-description">{{i.nslabel}}</div>
               </div>
               <div class="list-view-pf-additional-info">
+                <div class="list-view-pf-additional-info-item">
+                  <span class="pficon pficon-warning-triangle-o"></span>
+                  <span v-if="i.FwInBandwidth == 0 || i.FwOutBandwidth == 0">
+                    <span
+                      v-if="i.FwInBandwidth == 0 && i.FwOutBandwidth != 0"
+                    >{{$t('wan.inbound_zero')}}</span>
+                    <span
+                      v-if="i.FwOutBandwidth == 0 && i.FwInBandwidth != 0"
+                    >{{$t('wan.outbound_zero')}}</span>
+                    <span
+                      v-if="i.FwInBandwidth == 0 && i.FwOutBandwidth == 0"
+                    >{{$t('wan.in_out_bound_zero')}}</span>
+                  </span>
+                </div>
                 <div class="list-view-pf-additional-info-item">
                   <span class="pficon pficon-screen"></span>
                   <strong>{{i.cidr}}</strong> CIDR
@@ -104,7 +134,7 @@
             </div>
           </div>
         </div>
-        <div class="list-group-item-container container-fluid active">
+        <div :class="['list-group-item-container container-fluid', i.opened ? 'active':'hidden']">
           <div class="row">
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
               <form class="form-horizontal" v-on:submit.prevent="saveInterface(i)">
@@ -202,7 +232,7 @@
           <form class="form-horizontal" v-on:submit.prevent="configureWAN()">
             <div class="modal-body">
               <div :class="['form-group', wan.errors.WanMode.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label" for="WanMode-1">{{$t('wan.mode')}}</label>
+                <label class="col-sm-4 control-label">{{$t('wan.mode')}}</label>
                 <div class="col-sm-8">
                   <input
                     id="WanMode-1"
@@ -213,7 +243,7 @@
                   >
                   <label
                     class="col-sm-10 col-xs-10 control-label text-align-left"
-                    for="WanMode-2"
+                    for="WanMode-1"
                   >{{$t('wan.balance')}}</label>
                   <input
                     id="WanMode-2"
@@ -224,6 +254,7 @@
                   >
                   <label
                     class="col-sm-10 col-xs-10 control-label text-align-left"
+                    for="WanMode-2"
                   >{{$t('wan.backup')}}</label>
                 </div>
               </div>
@@ -390,7 +421,7 @@ export default {
               type: "gauge"
             },
             gauge: {
-              max: iface.FwInBandwidth <= 0 ? 100000 : iface.FwInBandwidth,
+              max: iface.FwInBandwidth <= 0 ? 1 : iface.FwInBandwidth,
               units: ""
             },
             color: {
@@ -421,7 +452,7 @@ export default {
               type: "gauge"
             },
             gauge: {
-              max: iface.FwOutBandwidth <= 0 ? 100000 : iface.FwOutBandwidth,
+              max: iface.FwOutBandwidth <= 0 ? 1 : iface.FwOutBandwidth,
               units: ""
             },
             color: {
@@ -565,6 +596,7 @@ export default {
               isLoaded: false
             };
             iface.errors = context.initErrors();
+            iface.opened = false;
             $(
               "#" +
                 context.$options.filters.sanitize(iface.name) +
@@ -680,6 +712,9 @@ export default {
           }
         );
       }
+    },
+    openInterfaceDetails(iface) {
+      iface.opened = !iface.opened;
     },
     saveInterface(iface) {
       var context = this;
@@ -834,96 +869,24 @@ export default {
   border-left: 3px solid #cc0000 !important;
 }
 
-.green {
-  color: #3f9c35;
-}
-
-.green-list {
-  border-left: 3px solid #3f9c35 !important;
-}
-
-.yellow {
-  color: #f0ab00;
-}
-
-.yellow-list {
-  border-left: 3px solid #f0ab00 !important;
-}
-
-.free {
-  color: #72767b;
-}
-
-.free-list {
-  border-left: 3px solid #72767b !important;
-}
-
-.missing {
-  color: #703fec;
-}
-
-.missing-list {
-  border-left: 3px solid #703fec !important;
-}
-
-.orange {
-  color: #ec7a08;
-}
-
-.orange-list {
-  border-left: 3px solid #ec7a08 !important;
-}
-
-.blue {
-  color: #0088ce;
-}
-
-.blue-list {
-  border-left: 3px solid #0088ce !important;
-}
-
-.other {
-  color: black;
-}
-
-.other-list {
-  border-left: 3px solid black !important;
-}
-
 .gray {
-  color: #72767b !important;
+  color: #72767b;
 }
 
 .border-red {
   border: 2px solid #cc0000 !important;
 }
 
-.border-gray {
-  border: 2px solid #72767b !important;
-}
-
-.border-free {
-  border: 2px solid #72767b !important;
-}
-
-.border-missing {
-  border: 2px solid #703fec !important;
-}
-
-.border-empty {
-  border: 2px solid black !important;
-}
-
-.border-blue {
-  border: 2px solid #0088ce !important;
-}
-
-.border-orange {
-  border: 2px solid #ec7a08 !important;
-}
-
 .white {
   background-color: #fff !important;
+}
+
+.more-space {
+  flex: 1 0 20% !important;
+}
+
+.more-space-description {
+  width: calc(40% - 40px) !important;
 }
 
 .spinner-speed {

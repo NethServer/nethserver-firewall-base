@@ -8,7 +8,7 @@
         <li id="dashboard-item" :class="[getCurrentPath('') ? 'active' : '', 'list-group-item']">
           <a href="#/">
             <span class="fa fa-cube"></span>
-            <span class="list-group-item-value">{{$t('dashboard.title')}}</span>
+            <span class="list-group-item-value">{{$t('dashboard.app')}}</span>
           </a>
         </li>
 
@@ -27,6 +27,21 @@
           <a href="#/traffic-shaping">
             <span class="fa fa-crosshairs"></span>
             <span class="list-group-item-value">{{$t('traffic_shaping.title')}}</span>
+          </a>
+        </li>
+        <li id="snat-item" :class="[getCurrentPath('snat') ? 'active' : '', 'list-group-item']">
+          <a href="#/snat">
+            <span class="fa fa-random"></span>
+            <span class="list-group-item-value">{{$t('snat.title')}}</span>
+          </a>
+        </li>
+        <li
+          id="port-forward-item"
+          :class="[getCurrentPath('port-forward') ? 'active' : '', 'list-group-item']"
+        >
+          <a href="#/port-forward">
+            <span class="fa fa-exchange"></span>
+            <span class="list-group-item-value">{{$t('port_forward.title')}}</span>
           </a>
         </li>
 
@@ -81,6 +96,10 @@ export default {
   margin-right: 4px;
 }
 
+.no-pd-bottom {
+  padding-bottom: 0px !important;
+}
+
 .no-mg-top {
   margin-top: 0px !important;
 }
@@ -100,6 +119,13 @@ export default {
 .mg-left-5 {
   margin-left: 5px !important;
 }
+.mg-right-5 {
+  margin-right: 5px !important;
+}
+
+.mg-top-10 {
+  margin-top: 10px !important;
+}
 
 .mg-bottom-10 {
   margin-bottom: 10px !important;
@@ -107,6 +133,10 @@ export default {
 
 .no-shadow {
   box-shadow: none !important;
+}
+
+.no-border-top {
+  border-top: 0px !important;
 }
 
 .text-align-left {
@@ -129,5 +159,66 @@ export default {
 
 .compact {
   margin-bottom: 0px !important;
+}
+
+#providerDetails {
+  padding: 10px;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.provider-details {
+  color: #0088ce;
+  text-decoration: none;
+}
+
+#change-provider-btn {
+  float: right;
+}
+
+#provider-markup {
+  border: none;
+  box-shadow: none;
+}
+
+.provider-details:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.list-view-pf .list-group-item {
+  border-top: 1px solid #ededec;
+}
+
+.list-group.list-view-pf {
+  border-top: 0px;
+}
+
+.transparent:hover {
+  background-color: transparent !important;
+}
+
+.search-pf {
+  width: 50%;
+}
+
+.small-list {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.small-li {
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+}
+
+.multi-line {
+  display: unset;
+  text-align: unset;
+}
+
+.adjust-line {
+  line-height: 26px;
 }
 </style>

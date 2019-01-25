@@ -89,6 +89,26 @@ var Filters = {
     },
     sanitize: function (value) {
         return value.replace(/^[^a-z]+|[^\w-]+/gi, "");
+    },
+    parseObj: function (value) {
+        var parts = value.split(';')
+        if (parts.length > 1) {
+            var type = parts[0] && parts[0].toString().charAt(0).toUpperCase() + parts[0].toString().slice(1);
+            var name = parts[1]
+            return name
+            //return type + ': ' + name
+        } else {
+            return value
+        }
+    },
+    objLength: function (value) {
+        return Object.keys(value).length
+    },
+    prettyNewLine: function (value) {
+        if (value == '-') {
+            return '-'
+        }
+        return value.length > 0 ? value.split(',').join('\n') : '-'
     }
 };
 

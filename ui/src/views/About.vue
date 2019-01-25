@@ -2,7 +2,7 @@
   <div>
     <h2>{{$t('about.title')}}</h2>
 
-    <div v-if="!view.isLoaded" class="spinner"></div>
+    <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
     <div v-if="view.isLoaded">
       <img class="logo" src="logo.png">
       <h2>{{info.name}}</h2>

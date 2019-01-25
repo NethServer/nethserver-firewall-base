@@ -15,12 +15,12 @@
     <div v-show="interfaces.length > 0 && view.isChartLoaded && tc.length > 0" class="row">
       <div v-for="i in interfaces" v-bind:key="i" class="col-sm-6">
         <h4>
-          {{i.provider.name}}
+          {{i.nslabel}}
           <span class="gray">({{$t('download_low')}})</span>
         </h4>
         <div :id="'chart-in-'+i.provider.name | sanitize" class="col-sm-12"></div>
         <h4>
-          {{i.provider.name}}
+          {{i.nslabel}}
           <span class="gray">({{$t('upload_low')}})</span>
         </h4>
         <div :id="'chart-out-'+i.provider.name | sanitize" class="col-sm-12"></div>
@@ -85,7 +85,7 @@
               </ul>
             </div>
           </div>
-          <div class="list-view-pf-main-info">
+          <div class="list-view-pf-main-info small-list">
             <div class="list-view-pf-left">
               <span class="fa fa-crosshairs list-view-pf-icon-sm"></span>
             </div>
@@ -503,7 +503,7 @@ export default {
                       tick: {
                         format: function(y) {
                           return context.$options.filters.byteFormat(
-                            Math.round(y * 100) / 100 * 1000
+                            (Math.round(y * 100) / 100) * 1000
                           );
                         },
                         count: 5
@@ -546,7 +546,7 @@ export default {
                       tick: {
                         format: function(y) {
                           return context.$options.filters.byteFormat(
-                            Math.round(y * 100) / 100 * 1000
+                            (Math.round(y * 100) / 100) * 1000
                           );
                         },
                         count: 5
@@ -584,7 +584,7 @@ export default {
                       tick: {
                         format: function(y) {
                           return context.$options.filters.byteFormat(
-                            Math.round(y * 100) / 100 * 1000
+                            (Math.round(y * 100) / 100) * 1000
                           );
                         },
                         count: 5
@@ -619,7 +619,7 @@ export default {
                       tick: {
                         format: function(y) {
                           return context.$options.filters.byteFormat(
-                            Math.round(y * 100) / 100 * 1000
+                            (Math.round(y * 100) / 100) * 1000
                           );
                         },
                         count: 5
@@ -925,12 +925,4 @@ export default {
 </script>
 
 <style>
-.multi-line {
-  display: unset;
-  text-align: unset;
-}
-
-.adjust-line {
-  line-height: 26px;
-}
 </style>
