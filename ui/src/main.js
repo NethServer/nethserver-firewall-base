@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueI18n from "vue-i18n";
 import VueToggleButton from 'vue-js-toggle-button';
+import VueSuggestions from 'v-suggestions'
 
 import App from './App.vue'
 import router from './router'
@@ -14,6 +15,7 @@ window.moment = require("moment");
 Vue.config.productionTip = false
 Vue.use(VueI18n);
 Vue.use(VueToggleButton)
+Vue.component('suggestions', VueSuggestions)
 
 import UtilService from "./services/util"
 Vue.mixin(UtilService)

@@ -115,7 +115,9 @@ export default {
 .mg-top-5 {
   margin-top: 5px !important;
 }
-
+.mg-bottom-5 {
+  margin-bottom: 5px !important;
+}
 .mg-left-5 {
   margin-left: 5px !important;
 }
@@ -220,5 +222,28 @@ export default {
 
 .adjust-line {
   line-height: 26px;
+}
+
+.v-suggestions .items {
+  max-height: 290px;
+  overflow-y: auto;
+  border: 1px solid #bbb;
+  border-width: 1px;
+}
+
+.v-suggestions .suggestions {
+  top: 23px;
+  background-color: #fff;
+  border-radius: 1px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  font-size: 12px;
+  text-align: left;
+}
+
+.item:hover {
+  background-color: #def3ff !important;
+  color: #4d5258;
+  text-decoration: none;
+  border-color: #bee1f4 !important;
 }
 </style>

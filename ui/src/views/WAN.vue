@@ -2,28 +2,33 @@
   <div>
     <h2>{{$t('wan.title')}}</h2>
 
-    <h3 v-if="interfaces.length > 0">{{$t('charts')}}</h3>
+    <h3 v-if="view.isChartLoaded && interfaces.length > 0">{{$t('charts')}}</h3>
+    <a
+      v-if="view.isChartLoaded && interfaces.length > 0"
+      @click="toggleCharts()"
+    >{{view.chartsShowed ? $t('hide_charts') : $t('show_charts')}}</a>
     <div
       v-if="!view.isChartLoaded && interfaces.length > 0"
       class="spinner spinner-lg view-spinner"
     ></div>
-
-    <div
-      v-if="view.invalidChartsData && interfaces.length > 0"
-      class="alert alert-warning alert-dismissable col-sm-12"
-    >
-      <span class="pficon pficon-warning-triangle-o"></span>
-      <strong>{{$t('warning')}}!</strong>
-      {{$t('charts_not_updated')}}.
-    </div>
-    <div v-show="interfaces.length > 0 && view.isChartLoaded" class="row">
-      <div v-for="i in interfaces" v-bind:key="i" class="col-sm-4">
-        <h4>
-          {{i.nslabel}}
-          <span class="gray">({{i.provider.name}})</span>
-        </h4>
-        <div :id="'chart-in-'+i.name | sanitize" class="col-sm-12"></div>
-        <div :id="'chart-out-'+i.name | sanitize" class="col-sm-12"></div>
+    <div :class="view.chartsShowed ? '' : 'hidden'">
+      <div
+        v-if="view.invalidChartsData && interfaces.length > 0"
+        class="alert alert-warning alert-dismissable col-sm-12"
+      >
+        <span class="pficon pficon-warning-triangle-o"></span>
+        <strong>{{$t('warning')}}!</strong>
+        {{$t('charts_not_updated')}}.
+      </div>
+      <div v-show="interfaces.length > 0 && view.isChartLoaded" class="row">
+        <div v-for="i in interfaces" v-bind:key="i" class="col-sm-4">
+          <h4>
+            {{i.nslabel}}
+            <span class="gray">({{i.provider.name}})</span>
+          </h4>
+          <div :id="'chart-in-'+i.name | sanitize" class="col-sm-12"></div>
+          <div :id="'chart-out-'+i.name | sanitize" class="col-sm-12"></div>
+        </div>
       </div>
     </div>
 
@@ -100,28 +105,33 @@
               <span class="fa fa-globe list-view-pf-icon-sm border-red"></span>
             </div>
             <div class="list-view-pf-body">
-              <div class="list-view-pf-description more-space">
+              <div class="list-view-pf-description">
                 <div class="list-group-item-heading red">
                   {{i.name}}
                   <span class="gray">({{i.provider.name}})</span>
                 </div>
-                <div class="list-group-item-text more-space-description">{{i.nslabel}}</div>
-              </div>
-              <div class="list-view-pf-additional-info">
-                <div class="list-view-pf-additional-info-item">
-                  <span class="pficon pficon-warning-triangle-o"></span>
+                <div class="list-group-item-text more-space-description">
+                  {{i.nslabel}}
+                  <br>
+                  <br>
                   <span v-if="i.FwInBandwidth == 0 || i.FwOutBandwidth == 0">
+                    <span class="pficon pficon-warning-triangle-o span-right-margin"></span>
                     <span
+                      class="semi-bold"
                       v-if="i.FwInBandwidth == 0 && i.FwOutBandwidth != 0"
                     >{{$t('wan.inbound_zero')}}</span>
                     <span
+                      class="semi-bold"
                       v-if="i.FwOutBandwidth == 0 && i.FwInBandwidth != 0"
                     >{{$t('wan.outbound_zero')}}</span>
                     <span
+                      class="semi-bold"
                       v-if="i.FwInBandwidth == 0 && i.FwOutBandwidth == 0"
                     >{{$t('wan.in_out_bound_zero')}}</span>
                   </span>
                 </div>
+              </div>
+              <div class="list-view-pf-additional-info">
                 <div class="list-view-pf-additional-info-item">
                   <span class="pficon pficon-screen"></span>
                   <strong>{{i.cidr}}</strong> CIDR
@@ -374,7 +384,8 @@ export default {
       view: {
         isLoaded: false,
         isChartLoaded: false,
-        invalidChartsData: false
+        invalidChartsData: false,
+        chartsShowed: false
       },
       interfaces: [],
       wan: {
@@ -404,6 +415,9 @@ export default {
     toggleAdvancedMode() {
       this.wan.advanced = !this.wan.advanced;
       this.$forceUpdate();
+    },
+    toggleCharts() {
+      this.view.chartsShowed = !this.view.chartsShowed;
     },
     initCharts() {
       for (var i in this.interfaces) {
@@ -892,5 +906,9 @@ export default {
 .spinner-speed {
   float: left;
   margin-top: 5px;
+}
+
+.semi-bold {
+  font-weight: 600;
 }
 </style>

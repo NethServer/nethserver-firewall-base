@@ -2,28 +2,35 @@
   <div>
     <h2>{{$t('traffic_shaping.title')}}</h2>
 
-    <h3 v-if="tc.length > 0">{{$t('charts')}}</h3>
+    <h3 v-if="view.isChartLoaded && tc.length > 0">{{$t('charts')}}</h3>
+    <a
+      v-if="view.isChartLoaded && tc.length > 0"
+      @click="toggleCharts()"
+    >{{view.chartsShowed ? $t('hide_charts') : $t('show_charts')}}</a>
     <div v-if="!view.isChartLoaded && tc.length > 0" class="spinner spinner-lg view-spinner"></div>
-    <div
-      v-if="view.invalidChartsData && tc.length > 0"
-      class="alert alert-warning alert-dismissable col-sm-12"
-    >
-      <span class="pficon pficon-warning-triangle-o"></span>
-      <strong>{{$t('warning')}}!</strong>
-      {{$t('charts_not_updated')}}.
-    </div>
-    <div v-show="interfaces.length > 0 && view.isChartLoaded && tc.length > 0" class="row">
-      <div v-for="i in interfaces" v-bind:key="i" class="col-sm-6">
-        <h4>
-          {{i.nslabel}}
-          <span class="gray">({{$t('download_low')}})</span>
-        </h4>
-        <div :id="'chart-in-'+i.provider.name | sanitize" class="col-sm-12"></div>
-        <h4>
-          {{i.nslabel}}
-          <span class="gray">({{$t('upload_low')}})</span>
-        </h4>
-        <div :id="'chart-out-'+i.provider.name | sanitize" class="col-sm-12"></div>
+
+    <div :class="view.chartsShowed ? '' : 'hidden'">
+      <div
+        v-if="view.invalidChartsData && tc.length > 0"
+        class="alert alert-warning alert-dismissable col-sm-12 mg-bottom-5"
+      >
+        <span class="pficon pficon-warning-triangle-o"></span>
+        <strong>{{$t('warning')}}!</strong>
+        {{$t('charts_not_updated')}}.
+      </div>
+      <div v-show="interfaces.length > 0 && view.isChartLoaded && tc.length > 0" class="row">
+        <div v-for="i in interfaces" v-bind:key="i" class="col-sm-6">
+          <h4>
+            {{i.nslabel}}
+            <span class="gray">({{$t('download_low')}})</span>
+          </h4>
+          <div :id="'chart-in-'+i.provider.name | sanitize" class="col-sm-12"></div>
+          <h4>
+            {{i.nslabel}}
+            <span class="gray">({{$t('upload_low')}})</span>
+          </h4>
+          <div :id="'chart-out-'+i.provider.name | sanitize" class="col-sm-12"></div>
+        </div>
       </div>
     </div>
 
@@ -92,9 +99,12 @@
             <div class="list-view-pf-body">
               <div class="list-view-pf-description">
                 <div class="list-group-item-heading">
-                  <a @click="openEditTc(t)">{{t.name}}</a>
+                  <a @click="openEditTc(t)">
+                    {{t.name}}
+                    <span class="gray">({{t.BindTo.join(',')}})</span>
+                  </a>
                 </div>
-                <div class="list-group-item-text">{{t.Description}}</div>
+                <div class="list-group-item-text more-space-description">{{t.Description}}</div>
               </div>
               <div class="list-view-pf-additional-info">
                 <div class="list-view-pf-additional-info-item multi-line adjust-line">
@@ -381,7 +391,8 @@ export default {
       view: {
         isLoaded: false,
         isChartLoaded: false,
-        invalidChartsData: false
+        invalidChartsData: false,
+        chartsShowed: false
       },
       tc: [],
       newTc: this.initTc(),
@@ -407,6 +418,12 @@ export default {
       this.newTc.advanced = !this.newTc.advanced;
       this.$forceUpdate();
     },
+    toggleCharts() {
+      this.view.chartsShowed = !this.view.chartsShowed;
+      if (this.view.chartsShowed) {
+        this.initCharts();
+      }
+    },
     initCharts() {
       var context = this;
       nethserver.exec(
@@ -430,6 +447,7 @@ export default {
               var outColumns = [];
               var typesOutClass = {};
               if (provider.out && provider.out.time) {
+                context.view.invalidChartsData = false;
                 for (var c in provider.out) {
                   var classVal = provider.out[c];
 
@@ -448,12 +466,16 @@ export default {
                     );
                   }
                 }
+              } else {
+                context.view.invalidChartsData = true;
               }
 
               // in classes
               var inColumns = [];
               var typesInClass = {};
               if (provider.in && provider.in.time) {
+                context.view.invalidChartsData = false;
+
                 for (var c in provider.in) {
                   var classVal = provider.in[c];
 
@@ -472,6 +494,8 @@ export default {
                     );
                   }
                 }
+              } else {
+                context.view.invalidChartsData = true;
               }
 
               if (context.charts["chart-out-" + i]) {
@@ -560,7 +584,6 @@ export default {
                 });
               }
 
-              context.view.invalidChartsData = false;
               context.view.isChartLoaded = true;
             } else {
               if (!context.charts["chart-out-" + i]) {
@@ -816,10 +839,14 @@ export default {
 
           // notification
           nethserver.notifications.success = context.$i18n.t(
-            "traffic_shaping.tc_created_ok"
+            "traffic_shaping.tc_" + context.newTc.isEdit
+              ? "updated"
+              : "created" + "_ok"
           );
           nethserver.notifications.error = context.$i18n.t(
-            "traffic_shaping.tc_created_error"
+            "traffic_shaping.tc_" + context.newTc.isEdit
+              ? "updated"
+              : "created" + "_error"
           );
 
           // update values
