@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueI18n from "vue-i18n";
+import VueGoodTable from "vue-good-table";
 import VueToggleButton from 'vue-js-toggle-button';
 
 import "v-suggestions/dist/v-suggestions.css";
@@ -16,6 +17,7 @@ window.moment = require("moment");
 
 Vue.config.productionTip = false
 Vue.use(VueI18n);
+Vue.use(VueGoodTable);
 Vue.use(VueToggleButton)
 Vue.component('suggestions', VueSuggestions)
 Vue.directive('focus', {

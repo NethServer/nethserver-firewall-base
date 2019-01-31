@@ -36,6 +36,15 @@
           </a>
         </li>
         <li
+          id="objects-item"
+          :class="[getCurrentPath('objects') ? 'active' : '', 'list-group-item']"
+        >
+          <a href="#/objects">
+            <span class="fa fa-cubes"></span>
+            <span class="list-group-item-value">{{$t('objects.title')}}</span>
+          </a>
+        </li>
+        <li
           id="port-forward-item"
           :class="[getCurrentPath('port-forward') ? 'active' : '', 'list-group-item']"
         >

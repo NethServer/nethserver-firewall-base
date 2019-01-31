@@ -884,7 +884,7 @@ export default {
 }
 
 .gray {
-  color: #72767b;
+  color: #72767b !important;
 }
 
 .border-red {

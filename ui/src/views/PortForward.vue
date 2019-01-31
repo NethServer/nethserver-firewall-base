@@ -217,6 +217,10 @@
                       <span>{{props.item.Ports.join(', ')}} ({{props.item.name}})</span>
                     </div>
                   </suggestions>
+                  <span
+                    v-if="newPf.SrcType && newPf.SrcType.length > 0"
+                    class="help-block gray"
+                  >{{newPf.SrcType}}</span>
                   <span v-if="newPf.errors.Src.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newPf.errors.Src.message)}}
@@ -240,6 +244,10 @@
                       <span>{{props.item.name}} ({{props.item.IpAddress}})</span>
                     </div>
                   </suggestions>
+                  <span
+                    v-if="newPf.DstHostIp && newPf.DstHostIp.length > 0"
+                    class="help-block gray"
+                  >{{newPf.DstHostIp}}</span>
                   <span v-if="newPf.errors.DstHost.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newPf.errors.DstHost.message)}}
@@ -619,6 +627,7 @@ export default {
     },
     selectHostsAuto(item) {
       this.newPf.DstHost = item.name;
+      this.newPf.DstHostIp = item.IpAddress;
     },
     filterSrcAuto(query) {
       if (query.trim().length === 0) {
@@ -637,6 +646,7 @@ export default {
     },
     selectSrcAuto(item) {
       this.newPf.Src = item.Ports.join(", ");
+      this.newPf.SrcType = item.name;
       this.newPf.Proto = item.Protocol;
       this.newPf.DstDisabled = this.newPf.Src.includes(",");
     },
@@ -670,7 +680,9 @@ export default {
         name: null,
         Description: "",
         Src: null,
+        SrcType: "",
         DstHost: "",
+        DstHostIp: "",
         Dst: null,
         DstDisabled: false,
         Proto: "tcp",
@@ -857,8 +869,6 @@ export default {
         })
       };
 
-      console.log(hostObj);
-
       context.newHost.isLoading = true;
       context.$forceUpdate();
       nethserver.exec(
@@ -923,6 +933,8 @@ export default {
       this.newPf.isLoading = false;
       this.newPf.isEdit = !duplicate;
       this.newPf.isDuplicate = duplicate;
+      this.newPf.SrcType = "";
+      this.newPf.DstHostIp = "";
       this.newPf.advanced = false;
       this.newPf.Log = this.newPf.Log == "info";
       this.newPf.Allow =
@@ -945,7 +957,9 @@ export default {
       var pfObj = {
         action: context.newPf.isEdit ? "update" : "create",
         name: context.newPf.isEdit ? context.newPf.name : null,
-        Src: context.newPf.Src,
+        Src: context.newPf.Src.split(",").map(function(item) {
+          return item.trim();
+        }),
         DstHost: "host;" + context.newPf.DstHost,
         Dst: context.newPf.Dst ? context.newPf.Dst : "",
         Proto: context.newPf.Proto,

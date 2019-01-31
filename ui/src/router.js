@@ -5,6 +5,7 @@ import Dashboard from './views/Dashboard.vue'
 import WAN from './views/WAN.vue'
 import TrafficShaping from './views/TrafficShaping.vue'
 import sNAT from './views/sNAT.vue'
+import Objects from './views/Objects.vue'
 import PortForward from './views/PortForward.vue'
 
 import Logs from './views/Logs.vue'
@@ -27,6 +28,11 @@ export default new Router({
       path: '/traffic-shaping',
       name: 'traffic-shaping',
       component: TrafficShaping
+    },
+    {
+      path: '/objects',
+      name: 'objects',
+      component: Objects
     },
     {
       path: '/port-forward',
