@@ -65,7 +65,41 @@
       </ul>
     </nav>
     <div class="container-fluid container-cards-pf main-container">
+      <div v-if="needRestart" class="alert alert-warning alert-dismissable mg-top-10">
+        <button
+          class="btn btn-primary pull-right"
+          data-toggle="modal"
+          data-target="#restartFirewallModal"
+        >{{$t('dashboard.apply_changes')}}</button>
+        <span class="pficon pficon-warning-triangle-o"></span>
+        <strong>{{$t('warning')}}.</strong>
+        {{$t('dashboard.firewall_settings_change')}}.
+      </div>
       <router-view/>
+    </div>
+
+    <div class="modal" id="restartFirewallModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{$t('dashboard.firewall_restart')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="restartFirewall()">
+            <div class="modal-body">
+              <div class="form-group">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('are_you_sure')}}?</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('restart')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -76,7 +110,8 @@ export default {
   mounted() {},
   data() {
     return {
-      title: ""
+      title: "",
+      needRestart: true
     };
   },
   methods: {
@@ -86,7 +121,8 @@ export default {
       } else {
         return this.$route.path.split("/")[1] === route;
       }
-    }
+    },
+    restartFirewall() {}
   }
 };
 </script>
@@ -226,7 +262,7 @@ export default {
 
 .v-suggestions .items {
   max-height: 290px;
-  overflow-y: auto;
+  overflow-y: hidden;
   border: 1px solid #bbb;
   border-width: 1px;
 }
@@ -245,5 +281,10 @@ export default {
   color: #4d5258;
   text-decoration: none;
   border-color: #bee1f4 !important;
+}
+
+.highlight-mark {
+  background: #ec7a08;
+  color: #fff;
 }
 </style>

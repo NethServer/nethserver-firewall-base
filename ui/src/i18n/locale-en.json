@@ -10,6 +10,7 @@
         "edit": "Edit",
         "delete": "Delete",
         "cancel": "Cancel",
+        "restart": "Restart",
         "charts": "Charts",
         "list": "List",
         "details": "Details",
@@ -68,7 +69,10 @@
             "no_info_found": "No info found",
             "tcp": "TCP",
             "udp": "UDP",
-            "icmp": "ICMP"
+            "icmp": "ICMP",
+            "firewall_settings_change": "Firewall settings are changed but the firewall has not been restarted. Click 'Restart now' to apply changes",
+            "apply_changes": "Restart now",
+            "firewall_restart": "Firewall restart"
         },
         "wan": {
             "title": "WAN",
@@ -175,6 +179,11 @@
             "duplicate": "Duplicate",
             "select_protocol": "Select protocol",
             "other": "Other",
+            "add_host": "Add host",
+            "hostname": "Hostname",
+            "ip_address": "IP Address",
+            "host_created_ok": "Host created successfully!",
+            "host_created_error": "Host not created.",
             "pf_created_ok": "Port forward created successfully!",
             "pf_created_error": "Port forward not created.",
             "pf_updated_ok": "Port forward updated successfully!",
