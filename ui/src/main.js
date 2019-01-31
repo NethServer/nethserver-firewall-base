@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import VueI18n from "vue-i18n";
 import VueToggleButton from 'vue-js-toggle-button';
+
+import "v-suggestions/dist/v-suggestions.css";
 import VueSuggestions from 'v-suggestions'
 
 import App from './App.vue'
@@ -16,6 +18,11 @@ Vue.config.productionTip = false
 Vue.use(VueI18n);
 Vue.use(VueToggleButton)
 Vue.component('suggestions', VueSuggestions)
+Vue.directive('focus', {
+  inserted: function (el) {
+    el.focus()
+  }
+})
 
 import UtilService from "./services/util"
 Vue.mixin(UtilService)

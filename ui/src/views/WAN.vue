@@ -911,4 +911,8 @@ export default {
 .semi-bold {
   font-weight: 600;
 }
+
+.normal {
+  font-weight: 500;
+}
 </style>

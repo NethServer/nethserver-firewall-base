@@ -25,7 +25,8 @@
         class="btn btn-primary btn-lg"
       >{{$t('port_forward.create_pf')}}</button>
     </div>
-    <div v-if="pfList && view.isLoaded">
+
+    <div class="pf-container" v-if="pfList && view.isLoaded">
       <h3>{{$t('list')}}</h3>
 
       <form v-if="pfList" role="form" class="search-pf has-button search">
@@ -33,10 +34,13 @@
           <div class="search-pf-input-group">
             <label class="sr-only">Search</label>
             <input
+              v-focus
               type="search"
               v-model="searchString"
               class="form-control input-lg"
               :placeholder="$t('search')+'...'"
+              @keyup="highlight"
+              id="pf-search-list"
             >
           </div>
         </div>
@@ -60,7 +64,8 @@
                 <div class="list-view-pf-body">
                   <div class="list-view-pf-description">
                     <div class="list-group-item-heading flex-50">
-                      {{$t('port_forward.destination')}}: {{host | parseObj}}
+                      <span class="normal">{{$t('port_forward.destination')}}:</span>
+                      {{host | parseObj}}
                       <span
                         class="gray"
                         v-if="data.info.IpAddress && data.info.IpAddress.length > 0"
@@ -73,9 +78,7 @@
                     <div v-if="data.info.type == 'ip'" class="list-group-item-text">
                       {{$t('port_forward.no_host_found')}}.
                       <a
-                        href="#"
-                        data-toggle="modal"
-                        data-target="#createHostModal"
+                        @click="openCreateHost(host, data.rules)"
                       >{{$t('create')}}</a>
                     </div>
                   </div>
@@ -116,7 +119,11 @@
                     <strong>{{$t('actions')}}</strong>
                   </span>
                 </li>
-                <li v-for="p in data.rules" v-bind:key="p" class="list-group-item small-li">
+                <li
+                  v-for="p in data.rules"
+                  v-bind:key="p"
+                  :class="['list-group-item small-li', p.status == 'disabled' ? 'gray' : '']"
+                >
                   <div class="col-sm-10">
                     <span class="col-sm-2">
                       {{p.Src || '-'}}
@@ -129,13 +136,14 @@
                     <span class="col-sm-2">{{p.Allow || '-' | prettyNewLine}}</span>
                   </div>
                   <div class="col-sm-2">
-                    <!-- <button
-                      @click="openEditPF(p, host)"
-                      class="btn btn-default btn-sm"
-                    >{{$t('edit')}}</button>-->
-                    <button @click="openEditPF(p, host)" class="btn btn-default">
-                      <span class="fa fa-edit span-right-margin"></span>
-                      {{$t('edit')}}
+                    <button
+                      @click="p.status == 'disabled' ? enablePF(p, host) : openEditPF(p, host, false)"
+                      :class="['btn btn-default', p.status == 'disabled' ? 'btn-primary' : '']"
+                    >
+                      <span
+                        :class="['fa', p.status == 'disabled' ? 'fa-check' : 'fa-edit', 'span-right-margin']"
+                      ></span>
+                      {{p.status == 'disabled' ? $t('enable') : $t('edit')}}
                     </button>
                     <div class="dropup pull-right dropdown-kebab-pf">
                       <button
@@ -150,15 +158,15 @@
                       </button>
                       <ul class="dropdown-menu dropdown-menu-right">
                         <li>
-                          <a @click="toggleEnable(p, host)">
+                          <a @click="enablePF(p, host)">
                             <span
-                              :class="['fa', p.status == 'enabled' ? 'fa-lock' : 'fa-unlock', 'span-right-margin']"
+                              :class="['fa', p.status == 'enabled' ? 'fa-lock' : 'fa-check', 'span-right-margin']"
                             ></span>
                             {{p.status == 'enabled' ? $t('disable') : $t('enable')}}
                           </a>
                         </li>
                         <li>
-                          <a @click="openDuplicatePF(p, host)">
+                          <a @click="openEditPF(p, host, true)">
                             <span class="fa fa-clone span-right-margin"></span>
                             {{$t('port_forward.duplicate')}}
                           </a>
@@ -181,6 +189,7 @@
       </div>
     </div>
 
+    <!-- MODALS -->
     <div class="modal" id="createPFModal" tabindex="-1" role="dialog" data-backdrop="static">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -208,7 +217,6 @@
                       <span>{{props.item.Ports.join(', ')}} ({{props.item.name}})</span>
                     </div>
                   </suggestions>
-                  <!-- <input required type="number" v-model="newPf.Src" class="form-control"> -->
                   <span v-if="newPf.errors.Src.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newPf.errors.Src.message)}}
@@ -293,7 +301,7 @@
                     class="col-sm-2 col-xs-2"
                     type="radio"
                     v-model="newPf.Proto"
-                    value="tcpudp"
+                    value="tcp,udp"
                   >
                   <div class="col-sm-10">
                     <label
@@ -425,8 +433,66 @@
       </div>
     </div>
 
-    <!-- MODALS -->
-    <div class="modal" id="deletePF" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal" id="createHostModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{$t('port_forward.add_host')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="saveHost(newHost)">
+            <div class="modal-body">
+              <div :class="['form-group', newHost.errors.name.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('port_forward.hostname')}}</label>
+                <div class="col-sm-9">
+                  <input required type="text" v-model="newHost.name" class="form-control">
+                  <span
+                    v-if="newHost.errors.name.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newHost.errors.name.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newHost.errors.IpAddress.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('port_forward.ip_address')}}</label>
+                <div class="col-sm-9">
+                  <input required type="text" v-model="newHost.IpAddress" class="form-control">
+                  <span
+                    v-if="newHost.errors.IpAddress.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newHost.errors.IpAddress.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newHost.errors.Description.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('port_forward.description')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="newHost.Description" class="form-control">
+                  <span
+                    v-if="newHost.errors.Description.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newHost.errors.Description.message)}}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <div v-if="newHost.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="deletePFModal" tabindex="-1" role="dialog" data-backdrop="static">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -454,10 +520,10 @@
 </template>
 
 <script>
-import "v-suggestions/dist/v-suggestions.css";
+var Mark = require("mark.js");
 
 export default {
-  name: "NAT",
+  name: "PortForward",
   mounted() {
     this.getPF();
     this.getHosts();
@@ -481,11 +547,13 @@ export default {
       protocols: [],
       services: [],
       newPf: this.initPf(),
+      newHost: this.initHost(),
       currentPf: {},
       searchString: "",
       autoOptions: {
         inputClass: "form-control"
-      }
+      },
+      highlightInstance: null
     };
   },
   computed: {
@@ -524,6 +592,18 @@ export default {
     }
   },
   methods: {
+    highlight() {
+      if (!this.highlightInstance) {
+        this.highlightInstance = new Mark("div.pf-container");
+      }
+      var options = {
+        element: "span",
+        className: "highlight-mark",
+        accuracy: "partially"
+      };
+      this.highlightInstance.unmark(options);
+      this.highlightInstance.mark(this.searchString.toLowerCase(), options);
+    },
     filterHostsAuto(query) {
       if (query.trim().length === 0) {
         return null;
@@ -560,8 +640,34 @@ export default {
       this.newPf.Proto = item.Protocol;
       this.newPf.DstDisabled = this.newPf.Src.includes(",");
     },
+    initHost() {
+      return {
+        name: null,
+        Description: "",
+        IpAddress: "",
+        isLoading: false,
+        errors: this.initHostErrors()
+      };
+    },
+    initHostErrors() {
+      return {
+        name: {
+          hasError: false,
+          message: ""
+        },
+        Description: {
+          hasError: false,
+          message: ""
+        },
+        IpAddress: {
+          hasError: false,
+          message: ""
+        }
+      };
+    },
     initPf() {
       return {
+        name: null,
         Description: "",
         Src: null,
         DstHost: "",
@@ -581,6 +687,10 @@ export default {
     },
     initErrors() {
       return {
+        name: {
+          hasError: false,
+          message: ""
+        },
         Description: {
           hasError: false,
           message: ""
@@ -622,7 +732,7 @@ export default {
     getWans() {
       var context = this;
       nethserver.exec(
-        ["nethserver-firewall-base/nat/read"],
+        ["nethserver-firewall-base/objects/read"],
         {
           action: "wan"
         },
@@ -643,7 +753,7 @@ export default {
     getProtocols() {
       var context = this;
       nethserver.exec(
-        ["nethserver-firewall-base/nat/read"],
+        ["nethserver-firewall-base/objects/read"],
         {
           action: "protocols"
         },
@@ -664,7 +774,7 @@ export default {
     getServices() {
       var context = this;
       nethserver.exec(
-        ["nethserver-firewall-base/nat/read"],
+        ["nethserver-firewall-base/objects/read"],
         {
           action: "services"
         },
@@ -708,9 +818,9 @@ export default {
 
       context.view.isLoaded = false;
       nethserver.exec(
-        ["nethserver-firewall-base/nat/read"],
+        ["nethserver-firewall-base/port-forward/read"],
         {
-          action: "portforward"
+          action: "list"
         },
         null,
         function(success) {
@@ -729,32 +839,99 @@ export default {
         }
       );
     },
+    openCreateHost(host) {
+      this.newHost = this.initHost();
+      this.newHost.IpAddress = host;
+      $("#createHostModal").modal("show");
+    },
+    saveHost(newHost, rules) {
+      var context = this;
+
+      var hostObj = {
+        action: "create-host",
+        name: context.newHost.name,
+        IpAddress: context.newHost.IpAddress,
+        Description: context.newHost.Description,
+        portforwards: rules.map(function(pf) {
+          return pf.name;
+        })
+      };
+
+      console.log(hostObj);
+
+      context.newHost.isLoading = true;
+      context.$forceUpdate();
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/validate"],
+        hostObj,
+        null,
+        function(success) {
+          context.newHost.isLoading = false;
+          $("#createHostModal").modal("hide");
+
+          // notification
+          nethserver.notifications.success = context.$i18n.t(
+            "port_forward.host_created_ok"
+          );
+          nethserver.notifications.error = context.$i18n.t(
+            "port_forward.host_created_error"
+          );
+
+          // update values
+          nethserver.exec(
+            ["nethserver-firewall-base/objects/create"],
+            hostObj,
+            function(stream) {
+              console.info("firewall-base-update", stream);
+            },
+            function(success) {
+              // get tc
+              context.getHosts();
+              context.getPF();
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
+        },
+        function(error, data) {
+          var errorData = {};
+          context.newHost.isLoading = false;
+          context.newHost.errors = context.initHostErrors();
+
+          try {
+            errorData = JSON.parse(data);
+            for (var e in errorData.attributes) {
+              var attr = errorData.attributes[e];
+              context.newHost.errors[attr.parameter].hasError = true;
+              context.newHost.errors[attr.parameter].message = attr.error;
+            }
+          } catch (e) {
+            console.error(e);
+          }
+          context.$forceUpdate();
+        }
+      );
+    },
     openCreatePF() {
       this.newPf = this.initPf();
       $("#createPFModal").modal("show");
     },
-    openDuplicatePF(pf, host) {
-      this.newPf = pf;
+    openEditPF(pf, host, duplicate) {
+      this.newPf = Object.assign({}, pf);
       this.newPf.errors = this.initErrors();
       this.newPf.isLoading = false;
-      this.newPf.isEdit = false;
-      this.newPf.isDuplicate = true;
+      this.newPf.isEdit = !duplicate;
+      this.newPf.isDuplicate = duplicate;
       this.newPf.advanced = false;
-      this.name = "";
-      this.$forceUpdate();
-      $("#createPFModal").modal("show");
-    },
-    openEditPF(pf, host) {
-      this.newPf = pf;
-      this.newPf.errors = this.initErrors();
-      this.newPf.isLoading = false;
-      this.newPf.isEdit = true;
-      this.newPf.isDuplicate = false;
-      this.newPf.advanced = false;
+      this.newPf.Log = this.newPf.Log == "info";
       this.newPf.Allow =
         this.newPf.Allow.length > 0
           ? this.newPf.Allow.split(",").join("\n")
           : "";
+      this.newPf.OriDst = this.newPf.OriDst == "" ? "any" : this.newPf.OriDst;
+      this.newPf.DstHost = this.newPf.DstHost.split(";")[1];
+      this.newPf.name = duplicate ? "" : this.newPf.name;
       this.$forceUpdate();
       $("#createPFModal").modal("show");
     },
@@ -769,19 +946,24 @@ export default {
         action: context.newPf.isEdit ? "update" : "create",
         name: context.newPf.isEdit ? context.newPf.name : null,
         Src: context.newPf.Src,
-        DstHost: context.newPf.DstHost,
-        Dst: context.newPf.Dst,
+        DstHost: "host;" + context.newPf.DstHost,
+        Dst: context.newPf.Dst ? context.newPf.Dst : "",
         Proto: context.newPf.Proto,
         Description: context.newPf.Description,
-        OriDst: context.newPf.OriDst,
+        OriDst: context.newPf.OriDst == "any" ? "" : context.newPf.OriDst,
         Allow: context.newPf.Allow,
-        Log: context.newPf.Log
+        Log: context.newPf.Log ? "info" : "none",
+        status: context.newPf.isEdit
+          ? context.newPf.status
+            ? "enabled"
+            : "disabled"
+          : "enabled"
       };
 
       context.newPf.isLoading = true;
       context.$forceUpdate();
       nethserver.exec(
-        ["nethserver-firewall-base/nat/validate"],
+        ["nethserver-firewall-base/port-forward/validate"],
         pfObj,
         null,
         function(success) {
@@ -790,20 +972,20 @@ export default {
 
           // notification
           nethserver.notifications.success = context.$i18n.t(
-            "port_forward.pf_" + context.newPf.isEdit
-              ? "updated"
-              : "created" + "_ok"
+            "port_forward.pf_" +
+              (context.newPf.isEdit ? "updated" : "created") +
+              "_ok"
           );
           nethserver.notifications.error = context.$i18n.t(
-            "port_forward.pf_" + context.newPf.isEdit
-              ? "updated"
-              : "created" + "_error"
+            "port_forward.pf_" +
+              (context.newPf.isEdit ? "updated" : "created") +
+              "_error"
           );
 
           // update values
           nethserver.exec(
             [
-              "nethserver-firewall-base/nat/" +
+              "nethserver-firewall-base/port-forward/" +
                 (context.newPf.isEdit ? "update" : "create")
             ],
             pfObj,
@@ -838,9 +1020,50 @@ export default {
         }
       );
     },
+    enablePF(p, host) {
+      var context = this;
+
+      var pfObj = {
+        action: "update",
+        name: p.name,
+        Src: p.Src,
+        DstHost: host,
+        Dst: p.Dst,
+        Proto: p.Proto,
+        Description: p.Description,
+        OriDst: p.OriDst == "any" ? "" : p.OriDst,
+        Allow: p.Allow,
+        Log: p.Log ? "info" : "none",
+        status: p.status == "enabled" ? "disabled" : "enabled"
+      };
+
+      // notification
+      nethserver.notifications.success = context.$i18n.t(
+        "port_forward.pf_updated_ok"
+      );
+      nethserver.notifications.error = context.$i18n.t(
+        "port_forward.pf_updated_ok"
+      );
+
+      // update values
+      nethserver.exec(
+        ["nethserver-firewall-base/port-forward/update"],
+        pfObj,
+        function(stream) {
+          console.info("firewall-base-update", stream);
+        },
+        function(success) {
+          // get tc
+          context.getPF();
+        },
+        function(error, data) {
+          console.error(error, data);
+        }
+      );
+    },
     openDeletePF(pf, host) {
       this.currentPf = Object.assign({}, pf);
-      $("#deletePF").modal("show");
+      $("#deletePFModal").modal("show");
     },
     deletePF() {
       var context = this;
@@ -853,10 +1076,11 @@ export default {
         "port_forward.pf_deleted_error"
       );
 
-      $("#deletePF").modal("hide");
+      $("#deletePFModal").modal("hide");
       nethserver.exec(
-        ["nethserver-firewall-base/nat/delete"],
+        ["nethserver-firewall-base/port-forward/delete"],
         {
+          action: "delete",
           name: context.currentPf.name
         },
         function(stream) {

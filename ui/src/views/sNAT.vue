@@ -50,7 +50,7 @@
 
 <script>
 export default {
-  name: "NAT",
+  name: "sNAT",
   mounted() {
     this.getSN();
     this.getHosts();
@@ -95,9 +95,9 @@ export default {
 
       context.view.isLoaded = false;
       nethserver.exec(
-        ["nethserver-firewall-base/nat/read"],
+        ["nethserver-firewall-base/snat/read"],
         {
-          action: "snat"
+          action: "list"
         },
         null,
         function(success) {
@@ -127,7 +127,7 @@ export default {
       var context = this;
 
       var snObj = {
-        action: "update-snat",
+        action: "update",
         FwObjectNat: s.FwObjectNat == "-" ? "" : "host;" + s.FwObjectNat,
         name: s.name
       };
@@ -135,7 +135,7 @@ export default {
       s.isLoading = true;
       context.$forceUpdate();
       nethserver.exec(
-        ["nethserver-firewall-base/nat/validate"],
+        ["nethserver-firewall-base/snat/validate"],
         snObj,
         null,
         function(success) {
@@ -143,15 +143,15 @@ export default {
 
           // notifications
           nethserver.notifications.success = context.$i18n.t(
-            "nat.source_nat_configured_ok"
+            "snat.source_nat_configured_ok"
           );
           nethserver.notifications.error = context.$i18n.t(
-            "nat.source_nat_configured_error"
+            "snat.source_nat_configured_error"
           );
 
           // update values
           nethserver.exec(
-            ["nethserver-firewall-base/nat/update"],
+            ["nethserver-firewall-base/snat/update"],
             snObj,
             function(stream) {
               console.info("firewall-base-update", stream);
