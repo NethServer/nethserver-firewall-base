@@ -36,8 +36,14 @@ case $action in
 
     "delete-host")
         /sbin/e-smith/db hosts delete "$(_get name)"
-        /sbin/e-smith/signal-event -j host-delete
         ;;
+    "delete-service")
+        /sbin/e-smith/db service delete "$(_get name)"
+        ;;
+    *)
+        error
+        ;;
+
 esac
 
 if [ $? -gt 0 ]; then

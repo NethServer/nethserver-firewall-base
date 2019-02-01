@@ -30,24 +30,119 @@ use JSON;
 require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
 require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
 
+sub list_services
+{
+    my $fdb = esmith::ConfigDB->open_ro('fwservices');
+    my @services;
+    foreach ($fdb->get_all()) {
+        my %props = $_->props;
+        $props{'name'} = $_->key;
+        my @ports = split(",",$props{'Ports'});
+        $props{'Ports'} = \@ports;
+        push(@services, \%props);
+    }
+
+    return \@services;
+}
+
 my $input = readInput();
 my $cmd = $input->{'action'};
 
 my $ndb = esmith::NetworksDB->open_ro();
-if($cmd eq 'hosts') {
+if($cmd eq 'hosts' || $cmd eq 'cidr-subs'  || $cmd eq 'host-groups' || $cmd eq 'ip-ranges') {
 
-    my @hosts;
-    my $ret = {"hosts" => \@hosts};
+    my @objects;
+    my $ret = {"$cmd" => \@objects};
     my $hdb = esmith::HostsDB->open_ro();
     # Objects
     foreach ($hdb->get_all()) {
         my $type = $_->prop('type');
-        if ($type eq' local' || $type eq 'remote' || $type eq 'host') {
-            my $ip = $_->prop('IpAddress') || next;
-            my $desc = $_->prop('Description') || '';
-            push(@hosts, {"name" => $_->key, "IpAddress" => $ip, "Description" => $desc});
+        if ($cmd eq 'hosts') {
+            if ($type eq' local' || $type eq 'remote' || $type eq 'host') {
+                my $ip = $_->prop('IpAddress') || next;
+                my $desc = $_->prop('Description') || '';
+                push(@objects, {"name" => $_->key, "IpAddress" => $ip, "Description" => $desc});
+            }
+        } elsif ($cmd eq 'cidr-subs') {
+            if ($type eq 'cidr') {
+                my $cidr = $_->prop('Address') || next;
+                my $desc = $_->prop('Description') || '';
+                push(@objects, {"name" => $_->key, "Address" => $cidr, "Description" => $desc});
+            }
+        } elsif ($cmd eq 'host-groups') {
+            if ($type eq 'host-group') {
+                my $members = $_->prop('Members') || next;
+                my @members = split(",",$members);
+                my $desc = $_->prop('Description') || '';
+                push(@objects, {"name" => $_->key, "Members" => \@members, "Description" => $desc});
+            }
+        } elsif ($cmd eq 'ip-ranges') {
+            if ($type eq 'iprange') {
+                my $start = $_->prop('Start') || next;
+                my $end = $_->prop('End') || next;
+                my $desc = $_->prop('Description') || '';
+                push(@objects, {"name" => $_->key, "Start" => $start, "End" => $start, "Description" => $desc});
+            }
+
+       }
+
+    }
+
+    print encode_json($ret);
+
+} elsif ($cmd eq 'services') {
+
+    my $ret = {'services' => list_services()};
+    print encode_json($ret);
+
+} elsif ($cmd eq 'wans') {
+
+    my $ndb = esmith::NetworksDB->open_ro();
+    my @wans;
+    my $ret = {"wans" => \@wans};
+    foreach ($ndb->get_all()) {
+        my $type = $_->prop('type');
+        my $role = $_->prop('role') || next;
+
+        if ($type eq 'alias') {
+            my @tmp = split(":",$_->key);
+            my $parent_role = $ndb->get_prop($tmp[0], 'role') || '';
+            next if ($parent_role ne 'red');
+            push(@wans, $_->prop('ipaddr'));
+        } else {
+            next if ($role ne 'red');
+            my $bootproto = $_->prop('bootproto') || next;
+
+            if ($bootproto eq 'dhcp') {
+                my $iname = $_->key;
+                my $cidr = `/sbin/ip -o -4 address show $iname primary 2>/dev/null| head -1 | awk '{print \$4}'`;
+                $cidr =~ /^(.*)\/(.*)$/;
+                push(@wans, $1);
+            } else {
+                push(@wans, $_->prop('ipaddr'));
+            }
         }
     }
+
+    print encode_json($ret);
+
+} elsif ($cmd eq 'protocols') {
+
+    my @protocols;
+
+    open (my $fh, "<:encoding(utf8)", "/etc/protocols") || error();
+    if ($fh) {
+        while (<$fh>) {
+            next if ($_ =~ /^#/);
+            chomp($_);
+            my @tmp = split(/\t/,$_);
+            if ($tmp[0]) {
+                push(@protocols, $tmp[0]);
+            }
+        }
+        close $fh;
+    }
+    my $ret = {'protocols' => \@protocols};
 
     print encode_json($ret);
 

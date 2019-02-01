@@ -31,15 +31,22 @@ function _get
     echo $data | jq -r ".$field"
 }
 
+function _get_array
+{
+    field=$1
+    echo $data | jq -r ".$field | join(\",\")"
+}
+
 case $action in
 
     "create-host"|"update-host")
         /sbin/e-smith/db hosts set "$(_get name)" host IpAddress "$(_get IpAddress)" Description "$(_get Description)"
-        if [ $? -gt 0 ]; then
-            error "EventFailed" "See /var/log/messages"
-        fi
-        /sbin/e-smith/signal-event -j firewall-objects-modify
-
+        ;;
+    "create-service"|"update-service")
+        /sbin/e-smith/db fwservice set "$(_get name)" fwservice Ports "$(_get_array Ports)" Protocol  "$(_get Protocol)" Description "$(_get Description)"
+        ;;
+    *)
+        error
         ;;
 esac
 
