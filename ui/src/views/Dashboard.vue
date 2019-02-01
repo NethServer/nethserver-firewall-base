@@ -490,7 +490,10 @@ export default {
                 group:
                   role +
                   "Int" +
-                  (success.status[eth.name].link == 1 ? "UP" : "DOWN"),
+                  (success.status[eth.name] &&
+                  success.status[eth.name].link == 1
+                    ? "UP"
+                    : "DOWN"),
                 level: context.levelMap(role, false)
               });
               context.edges.push({

@@ -93,7 +93,7 @@
               </a>
             </td>
             <td class="fancy">
-              <span class="fa fa-desktop"></span>
+              <span class="pficon pficon-screen"></span>
               {{props.row.IpAddress}}
             </td>
             <td class="fancy">{{ props.row.Description}}</td>
@@ -233,9 +233,11 @@
               </a>
             </td>
             <td class="fancy">
-              {{$t('objects.start')}}: {{ props.row.start_ip}}
+              <span class="col-sm-1">{{$t('objects.start')}}:</span>
+              <b class="col-sm-2">{{ props.row.Start}}</b>
               <br>
-              {{$t('objects.end')}}: {{ props.row.end_ip}}
+              <span class="col-sm-1">{{$t('objects.end')}}:</span>
+              <b class="col-sm-2">{{ props.row.End}}</b>
             </td>
             <td class="fancy">{{ props.row.Description}}</td>
             <td>
@@ -306,8 +308,8 @@
               </a>
             </td>
             <td class="fancy">
-              <span class="fa fa-desktop"></span>
-              {{props.row.network}}
+              <span class="pficon pficon-screen"></span>
+              {{props.row.Address}}
             </td>
             <td class="fancy">{{ props.row.Description}}</td>
             <td>
@@ -370,12 +372,12 @@
               </a>
             </td>
             <td class="fancy">
-              <span class="fa fa-desktop"></span>
-              {{props.row.interface}}
+              <span class="pficon pficon-plugged"></span>
+              {{props.row.Interface}}
             </td>
             <td class="fancy">
-              <span class="fa fa-desktop"></span>
-              {{props.row.network}}
+              <span class="pficon pficon-screen"></span>
+              {{props.row.Network}}
             </td>
             <td class="fancy">{{ props.row.Description}}</td>
             <td>
@@ -513,7 +515,7 @@
                 <strong>{{ props.row.name}}</strong>
               </a>
             </td>
-            <td class="fancy">{{ props.row.Protocol}}</td>
+            <td class="fancy">{{ props.row.Protocol | uppercase}}</td>
             <td class="fancy">{{ props.row.Ports.join(', ')}}</td>
             <td class="fancy">{{ props.row.Description}}</td>
             <td>
@@ -547,6 +549,7 @@
       <!-- END SERVICES -->
     </div>
 
+    <!-- CREATE MODALS -->
     <div class="modal" id="newHostModal" tabindex="-1" role="dialog" data-backdrop="static">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -555,7 +558,7 @@
               class="modal-title"
             >{{newHost.isEdit ? $t('objects.edit_host') + ' '+ newHost.name : $t('objects.add_host')}}</h4>
           </div>
-          <form class="form-horizontal" v-on:submit.prevent="saveHost()">
+          <form class="form-horizontal" v-on:submit.prevent="saveHost(newHost)">
             <div class="modal-body">
               <div :class="['form-group', newHost.errors.name.hasError ? 'has-error' : '']">
                 <label
@@ -612,7 +615,551 @@
         </div>
       </div>
     </div>
-
+    <div class="modal" id="newHostGroupModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4
+              class="modal-title"
+            >{{newHostGroup.isEdit ? $t('objects.edit_host_group') + ' '+ newHostGroup.name : $t('objects.add_host_group')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="saveHostGroup(newHostGroup)">
+            <div class="modal-body">
+              <div :class="['form-group', newHostGroup.errors.name.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.name')}}</label>
+                <div class="col-sm-9">
+                  <input
+                    :disabled="newHostGroup.isEdit"
+                    required
+                    type="text"
+                    v-model="newHostGroup.name"
+                    class="form-control"
+                  >
+                  <span
+                    v-if="newHostGroup.errors.name.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newHostGroup.errors.name.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newHostGroup.errors.Members.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.members')}}</label>
+                <div class="col-sm-9">
+                  <select
+                    @change="addHostToGroup(newHostGroup.hostToAdd)"
+                    v-model="newHostGroup.hostToAdd"
+                    class="combobox form-control"
+                    required
+                  >
+                    <option>-</option>
+                    <option
+                      :value="i.name"
+                      v-for="(i, ki) in hostsRows"
+                      v-bind:key="ki"
+                    >{{i.name}} | {{i.IpAddress}}</option>
+                  </select>
+                  <span
+                    v-if="newHostGroup.errors.Members.hasError"
+                    class="help-block"
+                  >{{newHostGroup.errors.Members.message}}</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label" for="textInput-modal-markup"></label>
+                <div class="col-sm-9">
+                  <ul class="list-inline compact">
+                    <li v-for="(i, ki) in newHostGroup.Members" v-bind:key="i" class="mg-bottom-5">
+                      <span class="label label-info">
+                        {{i}}
+                        <a @click="removeHostToGroup(ki)" class="remove-item-inline">
+                          <span class="fa fa-times"></span>
+                        </a>
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div
+                :class="['form-group', newHostGroup.errors.Description.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.description')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="newHostGroup.Description" class="form-control">
+                  <span
+                    v-if="newHostGroup.errors.Description.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newHostGroup.errors.Description.message)}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div v-if="newHostGroup.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="newIPRangeModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4
+              class="modal-title"
+            >{{newIPRange.isEdit ? $t('objects.edit_ip_range') + ' '+ newIPRange.name : $t('objects.add_ip_range')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="saveIPRange(newIPRange)">
+            <div class="modal-body">
+              <div :class="['form-group', newIPRange.errors.name.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.name')}}</label>
+                <div class="col-sm-9">
+                  <input
+                    :disabled="newIPRange.isEdit"
+                    required
+                    type="text"
+                    v-model="newIPRange.name"
+                    class="form-control"
+                  >
+                  <span
+                    v-if="newIPRange.errors.name.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newIPRange.errors.name.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newIPRange.errors.Start.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.start_ip')}}</label>
+                <div class="col-sm-9">
+                  <input required type="text" v-model="newIPRange.Start" class="form-control">
+                  <span
+                    v-if="newIPRange.errors.Start.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newIPRange.errors.Start.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newIPRange.errors.End.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.end_ip')}}</label>
+                <div class="col-sm-9">
+                  <input required type="text" v-model="newIPRange.End" class="form-control">
+                  <span
+                    v-if="newIPRange.errors.End.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newIPRange.errors.End.message)}}</span>
+                </div>
+              </div>
+              <div
+                :class="['form-group', newIPRange.errors.Description.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.description')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="newIPRange.Description" class="form-control">
+                  <span
+                    v-if="newIPRange.errors.Description.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newIPRange.errors.Description.message)}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div v-if="newIPRange.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="newCIDRSubModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4
+              class="modal-title"
+            >{{newCIDRSub.isEdit ? $t('objects.edit_cidr_sub') + ' '+ newCIDRSub.name : $t('objects.add_cidr_sub')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="saveCIDRSub(newCIDRSub)">
+            <div class="modal-body">
+              <div :class="['form-group', newCIDRSub.errors.name.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.name')}}</label>
+                <div class="col-sm-9">
+                  <input
+                    :disabled="newCIDRSub.isEdit"
+                    required
+                    type="text"
+                    v-model="newCIDRSub.name"
+                    class="form-control"
+                  >
+                  <span
+                    v-if="newCIDRSub.errors.name.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newCIDRSub.errors.name.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newCIDRSub.errors.Address.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.network')}}</label>
+                <div class="col-sm-9">
+                  <input required type="text" v-model="newCIDRSub.Address" class="form-control">
+                  <span
+                    v-if="newCIDRSub.errors.Address.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newCIDRSub.errors.Address.message)}}</span>
+                </div>
+              </div>
+              <div
+                :class="['form-group', newCIDRSub.errors.Description.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.description')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="newCIDRSub.Description" class="form-control">
+                  <span
+                    v-if="newCIDRSub.errors.Description.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newCIDRSub.errors.Description.message)}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div v-if="newCIDRSub.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="newZoneModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4
+              class="modal-title"
+            >{{newZone.isEdit ? $t('objects.edit_zone') + ' '+ newZone.name : $t('objects.add_zone')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="saveZone(newZone)">
+            <div class="modal-body">
+              <div :class="['form-group', newZone.errors.name.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.name')}}</label>
+                <div class="col-sm-9">
+                  <input
+                    :disabled="newZone.isEdit"
+                    required
+                    type="text"
+                    v-model="newZone.name"
+                    class="form-control"
+                  >
+                  <span
+                    v-if="newZone.errors.name.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newZone.errors.name.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newZone.errors.Network.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.network')}}</label>
+                <div class="col-sm-9">
+                  <input required type="text" v-model="newZone.Network" class="form-control">
+                  <span
+                    v-if="newZone.errors.Network.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newZone.errors.Network.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newZone.errors.Interface.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.interface')}}</label>
+                <div class="col-sm-9">
+                  <select required type="text" v-model="newZone.Interface" class="form-control">
+                    <option v-for="i in interfaces" v-bind:key="i" :value="i">{{i}}</option>
+                  </select>
+                  <span
+                    v-if="newZone.errors.Interface.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newZone.errors.Interface.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newZone.errors.Description.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.description')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="newZone.Description" class="form-control">
+                  <span
+                    v-if="newZone.errors.Description.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newZone.errors.Description.message)}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div v-if="newZone.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal"
+      id="newTimeConditionModal"
+      tabindex="-1"
+      role="dialog"
+      data-backdrop="static"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4
+              class="modal-title"
+            >{{newTimeCondition.isEdit ? $t('objects.edit_time_condition') + ' '+ newTimeCondition.name : $t('objects.add_time_condition')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="saveTimeCondition(newTimeCondition)">
+            <div class="modal-body">
+              <div
+                :class="['form-group', newTimeCondition.errors.name.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.name')}}</label>
+                <div class="col-sm-9">
+                  <input
+                    :disabled="newTimeCondition.isEdit"
+                    required
+                    type="text"
+                    v-model="newTimeCondition.name"
+                    class="form-control"
+                  >
+                  <span
+                    v-if="newTimeCondition.errors.name.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newTimeCondition.errors.name.message)}}</span>
+                </div>
+              </div>
+              <div
+                :class="['form-group', newTimeCondition.errors.TimeStart.hasError || newTimeCondition.errors.TimeStop.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.range')}}</label>
+                <div class="col-sm-4">
+                  <label>{{$t('objects.time_start')}}</label>
+                  <input
+                    required
+                    class="col-sm-3 form-control"
+                    type="text"
+                    placeholder="00:15"
+                    v-model="newTimeCondition.TimeStart"
+                  >
+                  <span v-if="newTimeCondition.errors.TimeStart.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newTimeCondition.errors.TimeStart.message)}}
+                  </span>
+                </div>
+                <div class="col-sm-4">
+                  <label>{{$t('objects.time_stop')}}</label>
+                  <input
+                    required
+                    class="col-sm-3 form-control"
+                    type="text"
+                    placeholder="23:30"
+                    v-model="newTimeCondition.TimeStop"
+                  >
+                  <span v-if="newTimeCondition.errors.TimeStop.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newTimeCondition.errors.TimeStop.message)}}
+                  </span>
+                </div>
+              </div>
+              <div
+                :class="['form-group', newTimeCondition.errors.WeekDays.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.weekdays')}}</label>
+                <div class="col-sm-9">
+                  <select
+                    @change="addDayToWeekdays(newTimeCondition.dayToAdd)"
+                    v-model="newTimeCondition.dayToAdd"
+                    class="combobox form-control"
+                    required
+                  >
+                    <option>-</option>
+                    <option :value="d" v-for="d in weekdays" v-bind:key="d">{{$t(d)}}</option>
+                  </select>
+                  <span
+                    v-if="newTimeCondition.errors.WeekDays.hasError"
+                    class="help-block"
+                  >{{newTimeCondition.errors.WeekDays.message}}</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label" for="textInput-modal-markup"></label>
+                <div class="col-sm-9">
+                  <ul class="list-inline compact">
+                    <li
+                      v-for="(i, ki) in newTimeCondition.WeekDays"
+                      v-bind:key="i"
+                      class="mg-bottom-5"
+                    >
+                      <span class="label label-info">
+                        {{$t(i)}}
+                        <a @click="removeDayToWeekdays(ki)" class="remove-item-inline">
+                          <span class="fa fa-times"></span>
+                        </a>
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div
+                :class="['form-group', newTimeCondition.errors.Description.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.description')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="newTimeCondition.Description" class="form-control">
+                  <span
+                    v-if="newTimeCondition.errors.Description.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newTimeCondition.errors.Description.message)}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div v-if="newTimeCondition.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="newServiceModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4
+              class="modal-title"
+            >{{newService.isEdit ? $t('objects.edit_service') + ' '+ newService.name : $t('objects.add_service')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="saveService(newService)">
+            <div class="modal-body">
+              <div :class="['form-group', newService.errors.name.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.name')}}</label>
+                <div class="col-sm-9">
+                  <input
+                    :disabled="newService.isEdit"
+                    required
+                    type="text"
+                    v-model="newService.name"
+                    class="form-control"
+                  >
+                  <span
+                    v-if="newService.errors.name.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newService.errors.name.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newService.errors.Protocol.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.protocol')}}</label>
+                <div class="col-sm-9">
+                  <select required type="text" v-model="newService.Protocol" class="form-control">
+                    <option v-for="p in protocols" v-bind:key="p" :value="p">{{p | uppercase}}</option>
+                  </select>
+                  <span
+                    v-if="newService.errors.Protocol.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newService.errors.Protocol.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newService.errors.Ports.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.ports')}}</label>
+                <div class="col-sm-9">
+                  <input required type="text" v-model="newService.Ports" class="form-control">
+                  <span
+                    v-if="newService.errors.Ports.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newService.errors.Ports.message)}}</span>
+                </div>
+              </div>
+              <div
+                :class="['form-group', newService.errors.Description.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.description')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="newService.Description" class="form-control">
+                  <span
+                    v-if="newService.errors.Description.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newService.errors.Description.message)}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div v-if="newService.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- END CREATE MODALS -->
+    <!-- DELETE MODALS -->
     <div class="modal" id="deleteHostModal" tabindex="-1" role="dialog" data-backdrop="static">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -640,7 +1187,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title">{{$t('objects.delete_host')}} {{currentHostGroup.name}}</h4>
+            <h4 class="modal-title">{{$t('objects.delete_host_group')}} {{currentHostGroup.name}}</h4>
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteHostGroup(currentHostGroup)">
             <div class="modal-body">
@@ -663,7 +1210,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title">{{$t('objects.delete_host')}} {{currentIPRange.name}}</h4>
+            <h4 class="modal-title">{{$t('objects.delete_ip_range')}} {{currentIPRange.name}}</h4>
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteIPRange(currentIPRange)">
             <div class="modal-body">
@@ -686,7 +1233,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title">{{$t('objects.delete_host')}} {{currentCIDRSub.name}}</h4>
+            <h4 class="modal-title">{{$t('objects.delete_cidr_sub')}} {{currentCIDRSub.name}}</h4>
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteCIDRSub(currentCIDRSub)">
             <div class="modal-body">
@@ -709,7 +1256,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title">{{$t('objects.delete_host')}} {{currentZone.name}}</h4>
+            <h4 class="modal-title">{{$t('objects.delete_zone')}} {{currentZone.name}}</h4>
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteZone(currentZone)">
             <div class="modal-body">
@@ -738,7 +1285,9 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title">{{$t('objects.delete_host')}} {{currentTimeCondition.name}}</h4>
+            <h4
+              class="modal-title"
+            >{{$t('objects.delete_time_condition')}} {{currentTimeCondition.name}}</h4>
           </div>
           <form
             class="form-horizontal"
@@ -764,7 +1313,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title">{{$t('objects.delete_host')}} {{currentService.name}}</h4>
+            <h4 class="modal-title">{{$t('objects.delete_service')}} {{currentService.name}}</h4>
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteService(currentService)">
             <div class="modal-body">
@@ -783,6 +1332,7 @@
         </div>
       </div>
     </div>
+    <!-- DELETE END MODALS -->
   </div>
 </template>
 
@@ -801,6 +1351,8 @@ export default {
     this.getZones();
     this.getTimeConditions();
     this.getServices();
+    this.getProtocols();
+    this.getInterfaces();
     $("#hosts-tab-parent").click();
   },
   data() {
@@ -909,7 +1461,7 @@ export default {
         },
         {
           label: this.$i18n.t("objects.network"),
-          field: "Network",
+          field: "Address",
           filterable: true
         },
         {
@@ -1018,10 +1570,39 @@ export default {
       currentTimeCondition: {},
       newTimeCondition: this.initTimeCondition(),
       currentService: {},
-      newService: this.initService()
+      newService: this.initService(),
+      protocols: [],
+      interfaces: [],
+      weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     };
   },
   methods: {
+    hostAlreadyAdded(bind) {
+      return this.newHostGroup.Members.indexOf(bind) > -1;
+    },
+    addHostToGroup(host) {
+      if (host.length > 0 && host != "-") {
+        if (!this.hostAlreadyAdded(host)) {
+          this.newHostGroup.Members.push(host);
+        }
+      }
+    },
+    removeHostToGroup(index) {
+      this.newHostGroup.Members.splice(index, 1);
+    },
+    dayAlreadyAdded(bind) {
+      return this.newTimeCondition.WeekDays.indexOf(bind) > -1;
+    },
+    addDayToWeekdays(day) {
+      if (day.length > 0 && day != "-") {
+        if (!this.dayAlreadyAdded(day)) {
+          this.newTimeCondition.WeekDays.push(day);
+        }
+      }
+    },
+    removeDayToWeekdays(index) {
+      this.newTimeCondition.WeekDays.splice(index, 1);
+    },
     initHost() {
       return {
         isLoading: false,
@@ -1038,6 +1619,8 @@ export default {
         isEdit: false,
         name: "",
         Description: "",
+        Members: [],
+        hostToAdd: {},
         errors: this.initHostGroupErrors()
       };
     },
@@ -1046,8 +1629,8 @@ export default {
         isLoading: false,
         isEdit: false,
         name: "",
-        startIp: "",
-        endIp: "",
+        Start: "",
+        End: "",
         Description: "",
         errors: this.initIPRangeErrors()
       };
@@ -1057,7 +1640,7 @@ export default {
         isLoading: false,
         isEdit: false,
         name: "",
-        network: "",
+        Address: "",
         Description: "",
         errors: this.initCIDRSubErrors()
       };
@@ -1067,8 +1650,8 @@ export default {
         isLoading: false,
         isEdit: false,
         name: "",
-        interface: "",
-        network: "",
+        Interface: "",
+        Network: "",
         Description: "",
         errors: this.initZoneErrors()
       };
@@ -1078,7 +1661,11 @@ export default {
         isLoading: false,
         isEdit: false,
         name: "",
+        TimeStart: "",
+        TimeStop: "",
+        WeekDays: [],
         Description: "",
+        dayToAdd: {},
         errors: this.initTimeConditionErrors()
       };
     },
@@ -1115,6 +1702,10 @@ export default {
           hasError: false,
           message: ""
         },
+        Members: {
+          hasError: false,
+          message: ""
+        },
         Description: {
           hasError: false,
           message: ""
@@ -1127,11 +1718,11 @@ export default {
           hasError: false,
           message: ""
         },
-        start_ip: {
+        Start: {
           hasError: false,
           message: ""
         },
-        end_ip: {
+        End: {
           hasError: false,
           message: ""
         },
@@ -1147,7 +1738,7 @@ export default {
           hasError: false,
           message: ""
         },
-        network: {
+        Address: {
           hasError: false,
           message: ""
         },
@@ -1163,11 +1754,11 @@ export default {
           hasError: false,
           message: ""
         },
-        interface: {
+        Interface: {
           hasError: false,
           message: ""
         },
-        network: {
+        Network: {
           hasError: false,
           message: ""
         },
@@ -1183,6 +1774,18 @@ export default {
           hasError: false,
           message: ""
         },
+        TimeStart: {
+          hasError: false,
+          message: ""
+        },
+        TimeStop: {
+          hasError: false,
+          message: ""
+        },
+        WeekDays: {
+          hasError: false,
+          message: ""
+        },
         Description: {
           hasError: false,
           message: ""
@@ -1195,11 +1798,11 @@ export default {
           hasError: false,
           message: ""
         },
-        protocol: {
+        Protocol: {
           hasError: false,
           message: ""
         },
-        ports: {
+        Ports: {
           hasError: false,
           message: ""
         },
@@ -1208,6 +1811,54 @@ export default {
           message: ""
         }
       };
+    },
+    getInterfaces() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "interfaces"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.interfaces = success["interfaces"].sort();
+
+          context.$forceUpdate();
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getProtocols() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "protocols"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.protocols = success["protocols"].sort();
+
+          context.$forceUpdate();
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
     },
     getHosts() {
       var context = this;
@@ -1226,7 +1877,7 @@ export default {
             console.error(e);
           }
           context.view.hosts.isLoaded = true;
-          context.hostsRows = success.hosts;
+          context.hostsRows = success["hosts"];
 
           context.$forceUpdate();
         },
@@ -1252,7 +1903,7 @@ export default {
             console.error(e);
           }
           context.view.hostGroups.isLoaded = true;
-          context.hostGroupsRows = success.hostGroups;
+          context.hostGroupsRows = success["host-groups"];
 
           context.$forceUpdate();
         },
@@ -1278,7 +1929,7 @@ export default {
             console.error(e);
           }
           context.view.ipRanges.isLoaded = true;
-          context.ipRangesRows = success.ipRanges;
+          context.ipRangesRows = success["ip-ranges"];
 
           context.$forceUpdate();
         },
@@ -1304,7 +1955,7 @@ export default {
             console.error(e);
           }
           context.view.cidrSubs.isLoaded = true;
-          context.cidrSubsRows = success.cidrSubs;
+          context.cidrSubsRows = success["cidr-subs"];
 
           context.$forceUpdate();
         },
@@ -1330,7 +1981,7 @@ export default {
             console.error(e);
           }
           context.view.zones.isLoaded = true;
-          context.zonesRows = success.zones;
+          context.zonesRows = success["zones"];
 
           context.$forceUpdate();
         },
@@ -1356,7 +2007,7 @@ export default {
             console.error(e);
           }
           context.view.timeConditions.isLoaded = true;
-          context.timeConditionsRows = success.timeConditions;
+          context.timeConditionsRows = success["time-conditions"];
 
           context.$forceUpdate();
         },
@@ -1382,7 +2033,7 @@ export default {
             console.error(e);
           }
           context.view.services.isLoaded = true;
-          context.servicesRows = success.services;
+          context.servicesRows = success["services"];
 
           context.$forceUpdate();
         },
@@ -1402,10 +2053,11 @@ export default {
       this.newHost.isEdit = true;
       $("#newHostModal").modal("show");
     },
-    saveHost() {
+    saveHost(host) {
       var context = this;
 
       var hostObj = Object.assign({}, host);
+      hostObj.action = host.isEdit ? "update-host" : "create-host";
 
       context.newHost.isLoading = true;
       nethserver.exec(
@@ -1419,12 +2071,12 @@ export default {
           // notification
           nethserver.notifications.success = context.$i18n.t(
             "objects.host_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newHost.isEdit ? "updated" : "created") +
               "_ok"
           );
           nethserver.notifications.error = context.$i18n.t(
             "objects.host_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newHost.isEdit ? "updated" : "created") +
               "_error"
           );
 
@@ -1498,7 +2150,8 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/objects/delete"],
         {
-          name: host.name
+          name: host.name,
+          action: "delete-host"
         },
         function(stream) {
           console.info("hosts", stream);
@@ -1524,10 +2177,13 @@ export default {
       this.newHostGroup.isEdit = true;
       $("#newHostGroupModal").modal("show");
     },
-    saveHostGroup() {
+    saveHostGroup(hostGroup) {
       var context = this;
 
       var hostGroupObj = Object.assign({}, hostGroup);
+      hostGroupObj.action = hostGroup.isEdit
+        ? "update-host-group"
+        : "create-host-group";
 
       context.newHostGroup.isLoading = true;
       nethserver.exec(
@@ -1541,12 +2197,12 @@ export default {
           // notification
           nethserver.notifications.success = context.$i18n.t(
             "objects.host_group_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newHostGroup.isEdit ? "updated" : "created") +
               "_ok"
           );
           nethserver.notifications.error = context.$i18n.t(
             "objects.host_group_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newHostGroup.isEdit ? "updated" : "created") +
               "_error"
           );
 
@@ -1620,7 +2276,8 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/objects/delete"],
         {
-          name: hostGroup.name
+          name: hostGroup.name,
+          action: "delete-host-group"
         },
         function(stream) {
           console.info("hostGroups", stream);
@@ -1646,10 +2303,13 @@ export default {
       this.newIPRange.isEdit = true;
       $("#newIPRangeModal").modal("show");
     },
-    saveIPRange() {
+    saveIPRange(ipRange) {
       var context = this;
 
       var ipRangeObj = Object.assign({}, ipRange);
+      ipRangeObj.action = ipRange.isEdit
+        ? "update-ip-range"
+        : "create-ip-range";
 
       context.newIPRange.isLoading = true;
       nethserver.exec(
@@ -1663,12 +2323,12 @@ export default {
           // notification
           nethserver.notifications.success = context.$i18n.t(
             "objects.ip_range_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newIPRange.isEdit ? "updated" : "created") +
               "_ok"
           );
           nethserver.notifications.error = context.$i18n.t(
             "objects.ip_range_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newIPRange.isEdit ? "updated" : "created") +
               "_error"
           );
 
@@ -1742,7 +2402,8 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/objects/delete"],
         {
-          name: ipRange.name
+          name: ipRange.name,
+          action: "delete-ip-range"
         },
         function(stream) {
           console.info("ipRanges", stream);
@@ -1768,10 +2429,13 @@ export default {
       this.newCIDRSub.isEdit = true;
       $("#newCIDRSubModal").modal("show");
     },
-    saveCIDRSub() {
+    saveCIDRSub(cidrSub) {
       var context = this;
 
       var cidrSubObj = Object.assign({}, cidrSub);
+      cidrSubObj.action = cidrSub.isEdit
+        ? "update-cidr-sub"
+        : "create-cidr-sub";
 
       context.newCIDRSub.isLoading = true;
       nethserver.exec(
@@ -1785,12 +2449,12 @@ export default {
           // notification
           nethserver.notifications.success = context.$i18n.t(
             "objects.cidr_sub_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newCIDRSub.isEdit ? "updated" : "created") +
               "_ok"
           );
           nethserver.notifications.error = context.$i18n.t(
             "objects.cidr_sub_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newCIDRSub.isEdit ? "updated" : "created") +
               "_error"
           );
 
@@ -1864,7 +2528,8 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/objects/delete"],
         {
-          name: cidrSub.name
+          name: cidrSub.name,
+          action: "delete-cidr-sub"
         },
         function(stream) {
           console.info("cidrSubs", stream);
@@ -1890,10 +2555,11 @@ export default {
       this.newZone.isEdit = true;
       $("#newZoneModal").modal("show");
     },
-    saveZone() {
+    saveZone(zone) {
       var context = this;
 
       var zoneObj = Object.assign({}, zone);
+      zoneObj.action = zone.isEdit ? "update-zone" : "create-zone";
 
       context.newZone.isLoading = true;
       nethserver.exec(
@@ -1907,12 +2573,12 @@ export default {
           // notification
           nethserver.notifications.success = context.$i18n.t(
             "objects.zone_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newZone.isEdit ? "updated" : "created") +
               "_ok"
           );
           nethserver.notifications.error = context.$i18n.t(
             "objects.zone_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newZone.isEdit ? "updated" : "created") +
               "_error"
           );
 
@@ -1986,7 +2652,8 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/objects/delete"],
         {
-          name: zone.name
+          name: zone.name,
+          action: "delete-zone"
         },
         function(stream) {
           console.info("zones", stream);
@@ -2012,10 +2679,13 @@ export default {
       this.newTimeCondition.isEdit = true;
       $("#newTimeConditionModal").modal("show");
     },
-    saveTimeCondition() {
+    saveTimeCondition(timeCondition) {
       var context = this;
 
       var timeConditionObj = Object.assign({}, timeCondition);
+      timeConditionObj.action = timeCondition.isEdit
+        ? "update-time-condition"
+        : "create-time-condition";
 
       context.newTimeCondition.isLoading = true;
       nethserver.exec(
@@ -2029,12 +2699,12 @@ export default {
           // notification
           nethserver.notifications.success = context.$i18n.t(
             "objects.time_condition_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newTimeCondition.isEdit ? "updated" : "created") +
               "_ok"
           );
           nethserver.notifications.error = context.$i18n.t(
             "objects.time_condition_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newTimeCondition.isEdit ? "updated" : "created") +
               "_error"
           );
 
@@ -2108,7 +2778,8 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/objects/delete"],
         {
-          name: timeCondition.name
+          name: timeCondition.name,
+          action: "delete-time-condition"
         },
         function(stream) {
           console.info("timeConditions", stream);
@@ -2134,10 +2805,11 @@ export default {
       this.newService.isEdit = true;
       $("#newServiceModal").modal("show");
     },
-    saveService() {
+    saveService(service) {
       var context = this;
 
       var serviceObj = Object.assign({}, service);
+      serviceObj.action = service.isEdit ? "update-service" : "create-service";
 
       context.newService.isLoading = true;
       nethserver.exec(
@@ -2151,12 +2823,12 @@ export default {
           // notification
           nethserver.notifications.success = context.$i18n.t(
             "objects.service_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newService.isEdit ? "updated" : "created") +
               "_ok"
           );
           nethserver.notifications.error = context.$i18n.t(
             "objects.service_" +
-              (context.newPf.isEdit ? "updated" : "created") +
+              (context.newService.isEdit ? "updated" : "created") +
               "_error"
           );
 
@@ -2230,7 +2902,8 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/objects/delete"],
         {
-          name: service.name
+          name: service.name,
+          action: "delete-service"
         },
         function(stream) {
           console.info("services", stream);

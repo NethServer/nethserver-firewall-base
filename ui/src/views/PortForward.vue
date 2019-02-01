@@ -773,7 +773,7 @@ export default {
         function(success) {
           try {
             success = JSON.parse(success);
-            context.protocols = success.protocols;
+            context.protocols = success.protocols.sort();
           } catch (e) {
             console.error(e);
           }
