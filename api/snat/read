@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+use strict;
+use warnings;
+use esmith::ConfigDB;
+use esmith::NetworksDB;
+use esmith::HostsDB;
+use JSON;
+
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
+
+my $input = readInput();
+my $cmd = $input->{'action'};
+
+if ($cmd eq 'list') {
+
+    my $ndb = esmith::NetworksDB->open_ro();
+    my @aliases;
+    my $ret = {"aliases" => \@aliases};
+    foreach ($ndb->get_all_by_prop('type' => 'alias')) {
+        my @tmp = split(":",$_->key);
+        my $parent = $ndb->get($tmp[0]);
+        my $role = $parent->prop('role') || next;
+        next if ($role ne 'red');
+        my $obj = $_->prop('FwObjectNat') || undef;
+        push(@aliases, {"name" => $_->key, "ipaddr" => $_->prop('ipaddr'), 'FwObjectNat' => $obj});
+    }
+
+    print encode_json($ret);
+
+} else {
+    error()
+}
