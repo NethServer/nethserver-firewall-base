@@ -65,23 +65,7 @@ sub find_service
 my $input = readInput();
 my $cmd = $input->{'action'};
 
-if ($cmd eq 'snat') {
-
-    my $ndb = esmith::NetworksDB->open_ro();
-    my @aliases;
-    my $ret = {"aliases" => \@aliases};
-    foreach ($ndb->get_all_by_prop('type' => 'alias')) {
-        my @tmp = split(":",$_->key);
-        my $parent = $ndb->get($tmp[0]);
-        my $role = $parent->prop('role') || next;
-        next if ($role ne 'red');
-        my $obj = $_->prop('FwObjectNat') || undef;
-        push(@aliases, {"name" => $_->key, "ipaddr" => $_->prop('ipaddr'), 'FwObjectNat' => $obj});
-    }
-
-    print encode_json($ret);
-
-} elsif ($cmd eq 'portforward') {
+if ($cmd eq 'list') {
 
     my $db = esmith::ConfigDB->open_ro('portforward');
     my $hdb = esmith::HostsDB->open_ro();
@@ -115,62 +99,6 @@ if ($cmd eq 'snat') {
     }
     print encode_json($ret);
 
-} elsif ($cmd eq 'services') {
-
-    my $ret = {'services' => list_services()};
-    print encode_json($ret);
-
-} elsif ($cmd eq 'wans') {
-
-    my $ndb = esmith::NetworksDB->open_ro();
-    my @wans;
-    my $ret = {"wans" => \@wans};
-    foreach ($ndb->get_all()) {
-        my $type = $_->prop('type');
-        my $role = $_->prop('role') || next;
-
-        if ($type eq 'alias') {
-            my @tmp = split(":",$_->key);
-            my $parent_role = $ndb->get_prop($tmp[0], 'role') || '';
-            next if ($parent_role ne 'red');
-            push(@wans, $_->prop('ipaddr'));
-        } else {
-            next if ($role ne 'red');
-            my $bootproto = $_->prop('bootproto') || next;
-
-            if ($bootproto eq 'dhcp') {
-                my $iname = $_->key;
-                my $cidr = `/sbin/ip -o -4 address show $iname primary 2>/dev/null| head -1 | awk '{print \$4}'`;
-                $cidr =~ /^(.*)\/(.*)$/;
-                push(@wans, $1);
-            } else {
-                push(@wans, $_->prop('ipaddr'));
-            }
-        }
-    }
-
-    print encode_json($ret);
-
-
-} elsif ($cmd eq 'protocols') {
-
-    my @protocols;
-
-    open (my $fh, "<:encoding(utf8)", "/etc/protocols") || error();
-    if ($fh) {
-        while (<$fh>) {
-            next if ($_ =~ /^#/);
-            chomp($_);
-            my @tmp = split(/\t/,$_);
-            if ($tmp[0]) {
-                push(@protocols, $tmp[0]);
-            }
-        }
-        close $fh;
-    }
-    my $ret = {'protocols' => \@protocols};
-
-    print encode_json($ret);
 } else {
     error()
 }

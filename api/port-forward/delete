@@ -20,31 +20,4 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-. /usr/libexec/nethserver/api/lib/helper_functions
-
-data=$(cat /dev/stdin)
-action=$(echo $data | jq -r '.action')
-
-function _get
-{
-    field=$1
-    echo $data | jq -r ".$field"
-}
-
-case $action in
-
-    "update-snat")
-        /sbin/e-smith/db networks setprop "$(_get name)" FwObjectNat "$(_get FwObjectNat)"
-        if [ $? -gt 0 ]; then
-            error "EventFailed" "See /var/log/messages"
-        fi
-        /sbin/e-smith/signal-event -j firewall-adjust
-
-        ;;
-esac
-
-if [ $? -gt 0 ]; then
-    error "EventFailed" "See /var/log/messages"
-else
-    success
-fi
+. /usr/libexec/nethserver/api/nethserver-firewall-base/port-forward/create

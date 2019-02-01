@@ -1,0 +1,76 @@
+#!/usr/bin/php
+<?php
+/*
+ * Copyright (C) 2019 Nethesis S.r.l.
+ * http://www.nethesis.it - nethserver@nethesis.it
+ *
+ * This script is part of NethServer.
+ *
+ * NethServer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or any later version.
+ *
+ * NethServer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with NethServer.  If not, see COPYING.
+*/
+
+require_once("/usr/libexec/nethserver/api/lib/Helpers.php");
+
+$data = readInput();
+$action = $data['action'];
+
+$v = new LegacyValidator($data);
+$db = new EsmithDatabase('portforward');
+
+if ($action == "update" || $action == "delete" ) {
+
+    if (!$db->getKey($data['name'])) {
+        $v->addValidationError('name', 'non_existing_port-forward', $data['name']);
+    }
+
+} elseif ($action == "update" || $action == "create" ) {
+
+    $protocols = array('tcp','udp','tcp,udp');
+    $protoValidator = $v->createValidator()->memberOf($protocols);
+
+    $portRangeValidator = $v->createValidator()
+        ->orValidator(
+            $v->createValidator(Validate::PORTNUMBER),
+            $v->createValidator()->regexp('/^[0-9]+\:[0-9]+$/') #port range, no check on maximum value
+        );
+
+    $dstValidator = $v->createValidator()
+        ->orValidator(
+            $v->createValidator(Validate::PORTNUMBER),
+            $v->createValidator()->isEmpty()
+        );
+
+    $logValidator = $v->createValidator()->memberOf(array("none","info"));
+
+
+    $v->declareParameter('Proto', $protoValidator);
+    $v->declareParameter('Src',  $portRangeValidator);
+    $v->declareParameter('Dst', $dstValidator);
+    $v->declareParameter('DstHost', $v->createValidator()->platform('firewall-object-exists'));
+    $v->declareParameter('OriDst', Validate::IPv4_OR_EMPTY);
+    $v->declareParameter('status', Validate::SERVICESTATUS);
+    $v->declareParameter('Allow', Validate::ANYTHING);
+    $v->declareParameter('Description', $v->createValidator()->maxLength(35));
+    $v->declareParameter('Log', $logValidator);
+
+} else {
+    error();
+}
+
+# Validate the input
+if ($v->validate()) {
+    success();
+} else {
+    error($v);
+}

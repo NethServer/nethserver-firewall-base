@@ -20,5 +20,4 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-. /usr/libexec/nethserver/api/nethserver-firewall-base/nat/create
-
+. /usr/libexec/nethserver/api/nethserver-firewall-base/port-forward/create
