@@ -90,6 +90,38 @@ if($cmd eq 'hosts' || $cmd eq 'cidr-subs'  || $cmd eq 'host-groups' || $cmd eq '
 
     print encode_json($ret);
 
+} elsif ($cmd eq 'zones') {
+    my @objects;
+    my $ret = {"$cmd" => \@objects};
+    foreach ($ndb->get_all_by_prop('type' => 'zone')) {
+        my %props = $_->props;
+        $props{'name'} = $_->key;
+        delete($props{'type'});
+        push(@objects, \%props);
+    }
+    print encode_json($ret);
+} elsif ($cmd eq 'time-conditions') {
+    my $db = esmith::ConfigDB->open_ro('fwtimes');
+    my @objects;
+    my $ret = {"$cmd" => \@objects};
+    foreach ($db->get_all_by_prop('type' => 'time')) {
+        my %props = $_->props;
+        $props{'name'} = $_->key;
+        my @tmp = split(",",$props{'WeekDays'});
+        $props{'WeekDays'} = \@tmp;
+        delete($props{'type'});
+        push(@objects, \%props);
+    }
+    print encode_json($ret);
+} elsif ($cmd eq 'interfaces') {
+    my @objects;
+    my $ret = {"$cmd" => \@objects};
+    my %types = ('bridge' => 1, 'bond' => 1, 'vlan' => 1, 'ethernet' => 1, 'xdsl' => 1);
+    foreach ($ndb->get_all()) {
+        next if (!exists($types{$_->prop('type')}));
+        push(@objects, $_->key);
+    }
+    print encode_json($ret);
 } elsif ($cmd eq 'services') {
 
     my $ret = {'services' => list_services()};
