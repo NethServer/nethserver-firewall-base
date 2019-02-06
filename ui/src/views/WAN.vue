@@ -50,13 +50,6 @@
       <div class="divider"></div>
     </div>
 
-    <!-- <h3 v-if="interfaces.length > 0">{{$t('actions')}}</h3>
-     <button
-      v-if="interfaces.length > 0"
-      data-toggle="modal"
-      data-target="#configureWAN"
-      class="btn btn-primary btn-lg"
-    >{{$t('wan.configure_wan')}}</button>-->
     <h3 v-if="interfaces.length > 0">{{$t('wan.interface_list')}}</h3>
     <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
     <div v-if="interfaces.length == 0 && view.isLoaded" class="blank-slate-pf white">

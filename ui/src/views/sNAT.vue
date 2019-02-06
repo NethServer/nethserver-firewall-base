@@ -3,9 +3,26 @@
     <h2>{{$t('snat.title')}}</h2>
 
     <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
+    <div v-if="snList.length == 0 && view.isLoaded" class="blank-slate-pf white">
+      <div class="blank-slate-pf-icon">
+        <span class="fa fa-random"></span>
+      </div>
+      <h1>{{$t('snat.no_aliases_found')}}</h1>
+      <p>{{$t('snat.no_aliases_found_text')}}.</p>
+      <div class="blank-slate-pf-main-action">
+        <a
+          target="_blank"
+          href="/nethserver#/network"
+          class="btn btn-primary btn-lg"
+        >{{$t('snat.go_to_network')}}</a>
+      </div>
+    </div>
 
-    <h3 v-if="view.isLoaded">{{$t('list')}}</h3>
-    <div v-if="view.isLoaded" class="list-group list-view-pf list-view-pf-view no-mg-top">
+    <h3 v-if="snList.length > 0 && view.isLoaded">{{$t('list')}}</h3>
+    <div
+      v-if="snList.length > 0 && view.isLoaded"
+      class="list-group list-view-pf list-view-pf-view no-mg-top"
+    >
       <div class="list-group-item" v-for="s in snList" v-bind:key="s">
         <div class="list-view-pf-actions">
           <div v-if="s.isLoading" class="spinner spinner-sm form-spinner-loader"></div>

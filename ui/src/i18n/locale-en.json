@@ -168,7 +168,10 @@
             "source_nat_configured": "sNAT configured",
             "local_host": "Local host",
             "source_nat_configured_ok": "Source NAT configured successfully!",
-            "source_nat_configured_error": "Source NAT not configured."
+            "source_nat_configured_error": "Source NAT not configured.",
+            "no_aliases_found": "No aliases found",
+            "no_aliases_found_text": "It seems that you are not configured any aliases. Go to Network page and configure it",
+            "go_to_network": "Go to Network settings"
         },
         "objects": {
             "title": "Objects",

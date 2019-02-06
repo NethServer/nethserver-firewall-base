@@ -101,7 +101,10 @@
                 <div class="list-group-item-heading">
                   <a @click="openEditTc(t)">
                     {{t.name}}
-                    <span class="gray">({{t.BindTo.join(',')}})</span>
+                    <span
+                      v-if="t.BindTo && t.BindTo.length > 0"
+                      class="gray"
+                    >({{t.BindTo.join(',')}})</span>
                   </a>
                 </div>
                 <div class="list-group-item-text more-space-description">{{t.Description}}</div>
