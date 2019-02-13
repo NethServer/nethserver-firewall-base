@@ -84,13 +84,16 @@ if($cmd eq 'providers') {
     my $i = $input->{'interface'} || '';
     my $addr = read_addresses($i);
     my $ip = $addr->{'ipaddr'} || '';
+    system("fireqos stop &>/dev/null");
     my $out = `speedtest-cli --json --source $ip 2>/dev/null`;
 
     if ($? > 0) {
+        system("fireqos start &>/dev/null");
         error();
     } else {
         print $out;
     }
+    system("fireqos start &>/dev/null");
 
 } elsif ($cmd eq 'stats') {
     my $ret = {};
