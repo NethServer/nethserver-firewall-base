@@ -160,7 +160,7 @@ if($cmd eq 'hosts' || $cmd eq 'cidr-subs'  || $cmd eq 'host-groups' || $cmd eq '
 
 } elsif ($cmd eq 'protocols') {
 
-    my @protocols;
+    my @protocols = ('tcpudp');
 
     open (my $fh, "<:encoding(utf8)", "/etc/protocols") || error();
     if ($fh) {
