@@ -79,6 +79,7 @@ if ($cmd eq 'list') {
             $props{'Log'} = "none";
         }
 
+        $props{'Proto'} =~ s/,//; # UI uses tcpudp as protocol instead of tcp,udp
         $props{'Service'} = find_service($props{'Src'}, $props{'Proto'}, $services);
         if (!exists($pf{$props{'DstHost'}})) {
             $pf{$props{'DstHost'}}{'rules'} = [];

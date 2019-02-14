@@ -35,22 +35,30 @@ case $action in
     create)
        new_name=$(expr $(/sbin/e-smith/db portforward showjson | jq -r '[.[].name] | max') + 1)
        src=$(echo $data | jq -rc '.Src | map(tostring) | join(",")')
+       proto=$(_get Proto)
+       if [ "$proto" == "tcpudp" ]; then
+           proto="tcp,udp"
+       fi
 
        /sbin/e-smith/db portforward set "$new_name"  pf Allow "$(_get Allow)" \
            Description "$(_get Description)" Dst "$(_get Dst)" \
            DstHost "$(_get DstHost)" Log "$(_get Log)" \
-           OriDst "$(_get OriDst)" Proto "$(_get Proto)" \
+           OriDst "$(_get OriDst)" Proto "$proto" \
            Src "$src" status "$(_get status)"
 
         ;;
 
    update)
        src=$(echo $data | jq -rc '.Src | map(tostring) | join(",")')
+       proto=$(_get Proto)
+       if [ "$proto" == "tcpudp" ]; then
+           proto="tcp,udp"
+       fi
 
        /sbin/e-smith/db portforward setprop "$(_get name)"  Allow "$(_get Allow)" \
            Description "$(_get Description)" Dst "$(_get Dst)" \
            DstHost "$(_get DstHost)" Log "$(_get Log)" \
-           OriDst "$(_get OriDst)" Proto "$(_get Proto)" \
+           OriDst "$(_get OriDst)" Proto "$proto" \
            Src "$src" status "$(_get status)"
        ;;
 
