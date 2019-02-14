@@ -160,21 +160,7 @@ if($cmd eq 'hosts' || $cmd eq 'cidr-subs'  || $cmd eq 'host-groups' || $cmd eq '
 
 } elsif ($cmd eq 'protocols') {
 
-    my @protocols = ('tcpudp');
-
-    open (my $fh, "<:encoding(utf8)", "/etc/protocols") || error();
-    if ($fh) {
-        while (<$fh>) {
-            next if ($_ =~ /^#/);
-            chomp($_);
-            my @tmp = split(/\t/,$_);
-            if ($tmp[0]) {
-                push(@protocols, $tmp[0]);
-            }
-        }
-        close $fh;
-    }
-    my $ret = {'protocols' => \@protocols};
+    my $ret = {'protocols' => ['tcpudp', 'tcp', 'udp', 'gre', 'ah', 'esp']};
 
     print encode_json($ret);
 

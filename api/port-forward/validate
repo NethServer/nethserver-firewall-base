@@ -36,7 +36,7 @@ if ($action == "update" || $action == "delete" ) {
 
 } elseif ($action == "update" || $action == "create" ) {
 
-    $protocols = array('tcp','udp','tcp,udp');
+    $protocols = array('tcpudp', 'tcp', 'udp', 'gre', 'ah', 'esp');
     $protoValidator = $v->createValidator()->memberOf($protocols);
 
     $portRangeValidator = $v->createValidator()
@@ -54,7 +54,7 @@ if ($action == "update" || $action == "delete" ) {
     $logValidator = $v->createValidator()->memberOf(array("none","info"));
 
 
-    #$v->declareParameter('Proto', $protoValidator);
+    $v->declareParameter('Proto', $protoValidator);
     $v->declareParameter('Dst', $dstValidator);
     $v->declareParameter('DstHost', $v->createValidator()->platform('firewall-object-exists'));
     $v->declareParameter('OriDst', Validate::IPv4_OR_EMPTY);
@@ -63,9 +63,16 @@ if ($action == "update" || $action == "delete" ) {
     $v->declareParameter('Description', $v->createValidator()->maxLength(35));
     $v->declareParameter('Log', $logValidator);
 
-    foreach ($data['Src'] as $el) {
-        if (!$portRangeValidator->evaluate($el)) {
-            $v->addValidationError('Src', 'port_number_or_port_range');
+    if (is_array($data['Src'])) {
+        foreach ($data['Src'] as $el) {
+            if (!$portRangeValidator->evaluate($el)) {
+                $v->addValidationError('Src', 'port_number_or_port_range');
+            }
+        }
+    }
+    if (!preg_match("/tcp|udp/", $data['Proto'])) {
+        if ($data['Src'] || $data['Dst']) {
+            $v->addValidationError('Src', 'protocol_doesnt_support_ports');
         }
     }
 } else {
