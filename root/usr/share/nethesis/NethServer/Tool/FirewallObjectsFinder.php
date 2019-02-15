@@ -105,9 +105,10 @@ class FirewallObjectsFinder implements \IteratorAggregate, \Countable
 
     private function addSearchRoles(\Nethgui\System\PlatformInterface $platform, $text)
     {
+        $roles = array('green', 'red', 'blue', 'orange');
         $tmp = array();
         foreach ($platform->getDatabase('networks')->getAll() as $key => $props) {
-            if (isset($props['role'])) {
+            if (isset($props['role']) && in_array($props['role'], $roles)) {
                 $tmp[$props['role']] = '';
             }
         }
