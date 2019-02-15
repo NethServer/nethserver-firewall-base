@@ -46,7 +46,7 @@
 
     <div v-if="tc.length == 0 && view.isLoaded" class="blank-slate-pf white">
       <div class="blank-slate-pf-icon">
-        <span class="fa fa-crosshairs"></span>
+        <span class="fa fa-balance-scale"></span>
       </div>
       <h1>{{$t('traffic_shaping.no_tc_found')}}</h1>
       <p>{{$t('traffic_shaping.no_tc_found_text')}}.</p>
@@ -94,7 +94,7 @@
           </div>
           <div class="list-view-pf-main-info small-list">
             <div class="list-view-pf-left">
-              <span class="fa fa-crosshairs list-view-pf-icon-sm"></span>
+              <span class="fa fa-balance-scale list-view-pf-icon-sm"></span>
             </div>
             <div class="list-view-pf-body">
               <div class="list-view-pf-description">

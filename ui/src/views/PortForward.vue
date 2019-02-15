@@ -130,7 +130,7 @@
                       <span v-if="p.Service.length > 0">({{p.Service}})</span>
                     </span>
                     <span class="col-sm-2">{{p.Dst || '-'}}</span>
-                    <span class="col-sm-2">{{p.Proto | uppercase}}</span>
+                    <span class="col-sm-2">{{$t('protocols.'+p.Proto)}}</span>
                     <span class="col-sm-2">{{p.Description || '-'}}</span>
                     <span class="col-sm-2">{{p.OriDst || '-'}}</span>
                     <span class="col-sm-2">{{p.Allow || '-' | prettyNewLine}}</span>
@@ -200,6 +200,19 @@
           </div>
           <form class="form-horizontal" v-on:submit.prevent="savePF()">
             <div class="modal-body">
+              <div :class="['form-group', newPf.errors.Proto.hasError ? 'has-error' : '']">
+                <label class="col-sm-4 control-label">{{$t('port_forward.protocol')}}</label>
+                <div class="col-sm-8">
+                  <select
+                    @change="handleProto()"
+                    v-model="newPf.Proto"
+                    required
+                    class="form-control"
+                  >
+                    <option v-for="p in protocols" v-bind:key="p" :value="p">{{$t('protocols.'+p)}}</option>
+                  </select>
+                </div>
+              </div>
               <div :class="['form-group', newPf.errors.Src.hasError ? 'has-error' : '']">
                 <label
                   class="col-sm-4 control-label"
@@ -208,6 +221,7 @@
                 <div class="col-sm-8">
                   <suggestions
                     v-model="newPf.Src"
+                    :disabled="newPf.SrcDisabled"
                     required
                     :options="autoOptions"
                     :onInputChange="filterSrcAuto"
@@ -271,77 +285,6 @@
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newPf.errors.Dst.message)}}
                   </span>
-                </div>
-              </div>
-              <div :class="['form-group', newPf.errors.Proto.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('port_forward.protocol')}}</label>
-                <div class="col-sm-8">
-                  <input
-                    id="protocol-1"
-                    class="col-sm-2 col-xs-2"
-                    type="radio"
-                    v-model="newPf.Proto"
-                    value="tcp"
-                  >
-                  <div class="col-sm-10">
-                    <label
-                      class="control-label text-align-left"
-                      for="protocol-1"
-                    >{{$t('port_forward.tcp')}}</label>
-                  </div>
-
-                  <input
-                    id="protocol-2"
-                    class="col-sm-2 col-xs-2"
-                    type="radio"
-                    v-model="newPf.Proto"
-                    value="udp"
-                  >
-                  <div class="col-sm-10">
-                    <label
-                      class="control-label text-align-left"
-                      for="protocol-2"
-                    >{{$t('port_forward.udp')}}</label>
-                  </div>
-
-                  <input
-                    id="protocol-3"
-                    class="col-sm-2 col-xs-2"
-                    type="radio"
-                    v-model="newPf.Proto"
-                    value="tcp,udp"
-                  >
-                  <div class="col-sm-10">
-                    <label
-                      class="control-label text-align-left"
-                      for="protocol-3"
-                    >{{$t('port_forward.tcp_udp')}}</label>
-                  </div>
-
-                  <input
-                    id="protocol-4"
-                    class="col-sm-2 col-xs-2"
-                    type="radio"
-                    v-model="newPf.Proto"
-                    value="other"
-                  >
-                  <div class="col-sm-10">
-                    <label
-                      class="control-label text-align-left"
-                      for="protocol-4"
-                    >{{$t('port_forward.other')}}</label>
-                  </div>
-
-                  <label v-if="newPf.Proto == 'other'" class="col-sm-2"></label>
-                  <div v-show="newPf.Proto == 'other'" class="col-sm-5 mg-top-5">
-                    <select
-                      v-model="newPf.ProtoOther"
-                      :required="newPf.Proto == 'other' ? true : false"
-                      class="form-control"
-                    >
-                      <option v-for="p in protocols" v-bind:key="p" :value="p">{{p | uppercase}}</option>
-                    </select>
-                  </div>
                 </div>
               </div>
               <div :class="['form-group', newPf.errors.Description.hasError ? 'has-error' : '']">
@@ -600,6 +543,16 @@ export default {
     }
   },
   methods: {
+    handleProto() {
+      this.newPf.SrcDisabled = !(
+        this.newPf.Proto.toLowerCase().includes("tcp") ||
+        this.newPf.Proto.toLowerCase().includes("udp")
+      );
+      this.newPf.DstDisabled = !(
+        this.newPf.Proto.toLowerCase().includes("tcp") ||
+        this.newPf.Proto.toLowerCase().includes("udp")
+      );
+    },
     highlight() {
       if (!this.highlightInstance) {
         this.highlightInstance = new Mark("div.pf-container");
@@ -680,13 +633,13 @@ export default {
         name: null,
         Description: "",
         Src: null,
+        SrcDisabled: false,
         SrcType: "",
         DstHost: "",
         DstHostIp: "",
         Dst: null,
         DstDisabled: false,
-        Proto: "tcp",
-        ProtoOther: "",
+        Proto: "tcpudp",
         OriDst: "any",
         Allow: "",
         Log: false,
@@ -950,15 +903,11 @@ export default {
     savePF() {
       var context = this;
 
-      if (context.newPf.Proto == "other") {
-        context.newPf.Proto = context.newPf.ProtoOther;
-      }
-
       var pfObj = {
         action: context.newPf.isEdit ? "update" : "create",
         name: context.newPf.isEdit ? context.newPf.name : null,
         Src: context.newPf.Src.split(",").map(function(item) {
-          return item.trim();
+          return parseInt(item.trim());
         }),
         DstHost: "host;" + context.newPf.DstHost,
         Dst: context.newPf.Dst ? context.newPf.Dst : "",

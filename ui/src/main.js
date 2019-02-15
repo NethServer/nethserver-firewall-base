@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueI18n from "vue-i18n";
 import VueGoodTable from "vue-good-table";
 import VueToggleButton from 'vue-js-toggle-button';
+import Sortable from 'sortablejs'
 
 import "v-suggestions/dist/v-suggestions.css";
 import VueSuggestions from 'v-suggestions'
@@ -18,8 +19,13 @@ window.moment = require("moment");
 Vue.config.productionTip = false
 Vue.use(VueI18n);
 Vue.use(VueGoodTable);
-Vue.use(VueToggleButton)
+Vue.use(VueToggleButton);
 Vue.component('suggestions', VueSuggestions)
+Vue.directive('sortable', {
+  inserted: function (el, binding) {
+    new Sortable(el, binding.value || {})
+  }
+})
 Vue.directive('focus', {
   inserted: function (el) {
     el.focus()

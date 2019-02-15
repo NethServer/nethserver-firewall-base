@@ -25,7 +25,7 @@
           :class="[getCurrentPath('traffic-shaping') ? 'active' : '', 'list-group-item']"
         >
           <a href="#/traffic-shaping">
-            <span class="fa fa-crosshairs"></span>
+            <span class="fa fa-balance-scale"></span>
             <span class="list-group-item-value">{{$t('traffic_shaping.title')}}</span>
           </a>
         </li>
@@ -51,6 +51,12 @@
           <a href="#/port-forward">
             <span class="fa fa-exchange"></span>
             <span class="list-group-item-value">{{$t('port_forward.title')}}</span>
+          </a>
+        </li>
+        <li id="rules-item" :class="[getCurrentPath('rules') ? 'active' : '', 'list-group-item']">
+          <a href="#/rules">
+            <span class="fa fa-ban"></span>
+            <span class="list-group-item-value">{{$t('rules.title')}}</span>
           </a>
         </li>
 
@@ -176,6 +182,9 @@ export default {
 
 .mg-bottom-10 {
   margin-bottom: 10px !important;
+}
+.mg-right-10 {
+  margin-right: 10px !important;
 }
 
 .no-shadow {

@@ -57,6 +57,9 @@ var Filters = {
     uppercase: function (value) {
         return value && value.toUpperCase()
     },
+    lowercase: function (value) {
+        return value && value.toLowerCase()
+    },
     isEmpty: function (value) {
         return jQuery.isEmptyObject(value);
     },
