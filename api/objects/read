@@ -187,6 +187,37 @@ if($cmd eq 'hosts' || $cmd eq 'cidr-subs'  || $cmd eq 'host-groups' || $cmd eq '
     }
     print encode_json({"applications" => \@applications});
 
+} elsif ($cmd eq 'local-services') {
+
+    my $db = esmith::ConfigDB->open_ro();
+    my @services;
+    foreach ($db->get_all_by_prop('type' => 'service')) {
+        my %props = $_->props;
+        my $props_names = join("",keys %props);
+        next if ($props_names !~ /Port/);
+
+        my $proto = '';
+        if ($props_names =~ m/UDP/ and $props_names =~ m/TCP/) {
+            $proto = 'tcpudp';
+        } elsif ($props_names =~ m/UDP/) {
+            $proto = 'udp';
+        } elsif ($props_names =~ m/TCP/) {
+            $proto = 'tcp';
+        }
+
+        my @ports;
+        foreach my $k (keys %props) {
+            if ($k =~ m/Port/) {
+                push(@ports, split(",",$props{$k}));
+            }
+        }
+
+        push(@services, { 'name' => $_->key, 'type' => 'service', 'Protocol' => $proto, 'Ports' => \@ports, 'Description' => '' });
+    }
+
+    print encode_json({"local-services" => \@services});
+
+
 } else {
     error()
 }

@@ -72,7 +72,7 @@ if ($cmd eq 'list') {
                     'Position' => $i,
                     'id' => $i,
                     'Action' => 'accept',
-                    'Dst' => {'name' => 'fw', 'type' => 'role', 'zone' => 'fw'},
+                    'Dst' => {'name' => 'fw', 'type' => 'fw', 'zone' => 'fw'},
                     'Src' => {'name' => get_zone_name($role), 'type' => 'role', 'zone' => get_zone_name($role)}
                 });
             $i++;
