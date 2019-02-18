@@ -72,7 +72,9 @@ sub get_target_info
     my $fw = shift;
     my $expand = shift;
     my %ret = ("name" => $key, "type" => $key);
-    if (index($key,';') >= 0) {
+    if ($key eq 'fw') {
+        $ret{'type'} = 'fw';
+    } elsif (index($key,';') >= 0) {
         my ($type, $name) = split(';', $key);
         $ret{'name'} = $name;
         $ret{'type'} = $type;
@@ -145,7 +147,7 @@ sub get_service_info
 sub get_policy_type
 {
     my $key = shift || return '';
-    my %roles = ('loc' => 1, 'net' => 1, 'blue' => 1, 'orang' => 1, 'all' => 1, 'vpn' => 1, 'ivpn' => 1, 'ovpn' => 1);
+    my %roles = ('loc' => 1, 'net' => 1, 'blue' => 1, 'orang' => 1, 'all' => 1, 'vpn' => 1, 'ivpn' => 1, 'ovpn' => 1, 'fw' => 1);
     return $roles{$key} ? 'role' : 'zone';
 }
 

@@ -1,0 +1,94 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+use strict;
+use warnings;
+use esmith::ConfigDB;
+use JSON;
+
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
+
+my $input = readInput();
+my $cmd = $input->{'action'};
+
+if ($cmd eq 'list') {
+
+    print encode_json({"rules" => list_fwrules($input->{'expand'} || 0, 0)});
+
+} elsif ($cmd eq 'services') {
+
+    my $db = esmith::ConfigDB->open_ro();
+    my @services;
+    my $i = 1;
+    foreach ($db->get_all_by_prop('type' => 'service')) {
+        my $name = $_->key;
+        my %props = $_->props;
+        my $props_names = join("",keys %props);
+        next if ($props_names !~ /Port/);
+        my $proto;
+
+        if ($props_names =~ m/UDP/ and $props_names =~ m/TCP/) {
+            $proto = 'tcpudp';
+        } elsif ($props_names =~ m/UDP/) {
+            $proto = 'udp';
+        } elsif ($props_names =~ m/TCP/) {
+            $proto = 'tcp';
+        }
+
+        my @ports;
+        foreach my $k (keys %props) {
+            if ($k =~ m/Port/) {
+                push(@ports, split(",",$props{$k}));
+            }
+        }
+
+        foreach my $role (split(",", $props{'access'})) {
+            push(@services, {
+                    'Log' => 'none',
+                    'Time' => undef,
+                    'Service' => { 'name' => $name, 'type' => 'service', 'Protocol' => $proto, 'Ports' => \@ports },
+                    'type' => 'service',
+                    'status' => 'enabled',
+                    'Position' => $i,
+                    'id' => $i,
+                    'Action' => 'accept',
+                    'Dst' => {'name' => 'fw', 'type' => 'role', 'zone' => 'fw'},
+                    'Src' => {'name' => get_zone_name($role), 'type' => 'role', 'zone' => get_zone_name($role)}
+                });
+            $i++;
+        }
+    }
+
+    print encode_json({"services" => \@services});
+
+} elsif ($cmd eq 'roles') {
+
+    print encode_json({"roles" => list_roles_for_fwrules()});
+
+} elsif ($cmd eq 'policies') {
+
+    print encode_json({"policies" => list_policies(0)});
+
+} else {
+    error()
+}
