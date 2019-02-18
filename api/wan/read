@@ -110,6 +110,10 @@ if($cmd eq 'providers') {
     }
     print encode_json($ret);
 
+} elsif ($cmd eq 'rules') {
+
+    print encode_json({'rules' => list_tc_rules($input->{'expand'} || 0, 'provider')});
+
 } else {
     error()
 }

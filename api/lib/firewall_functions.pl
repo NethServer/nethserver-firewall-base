@@ -174,6 +174,32 @@ sub list_roles_for_fwrules
     return \@tmp;
 }
 
+sub list_tc_rules
+{
+    my $expand = shift;
+    my $filter = shift || 'provider';
+    my $fw = new NethServer::Firewall();
+    my @rules;
+    foreach ($fw->getTcRules()) {
+        my %props = $_->props;
+        my ($t, $v) = split(";",$props{'Action'});
+
+        next if ($t ne $filter);
+
+        $props{'id'} = $_->key;
+
+        $props{'Position'} = int($props{'Position'});
+        $props{'Src'} = get_target_info($props{'Src'}, $fw, $expand);
+        $props{'Dst'} = get_target_info($props{'Dst'}, $fw, $expand);
+        $props{'Time'} = get_time_info($props{'Time'}, $fw->{'ftdb'}, $expand);
+        $props{'Service'} = get_service_info($props{'Service'}, $fw->{'sdb'}, $expand);
+
+        push(@rules, \%props);
+    }
+
+    return \@rules;
+}
+
 sub list_fwrules
 {
     my $expand = shift;

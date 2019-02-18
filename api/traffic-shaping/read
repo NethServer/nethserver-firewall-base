@@ -93,6 +93,9 @@ if($cmd eq 'classes') {
         }
     }
     print encode_json($ret);
+} elsif ($cmd eq 'rules') {
+
+    print encode_json({'rules' => list_tc_rules($input->{'expand'} || 0, 'class')});
 
 } else {
     error()
