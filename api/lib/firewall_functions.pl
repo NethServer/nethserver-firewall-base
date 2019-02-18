@@ -119,20 +119,49 @@ sub get_time_info
     return \%ret;
 }
 
-sub get_service_info
+sub get_local_service_info
 {
     my $key = shift || return undef;
     my $db = shift;
     my $expand = shift;
 
-    if ($key eq 'any') {
-        return {'name' => 'any', 'type' => 'fwservice'};
-    }
+    my $service = $db->get($key);
+    my %props = $service->props;
+    my $props_names = join("",keys %props);
+    return undef if ($props_names !~ /Port/);
 
-    my ($t, $v) = split(";",$key);
-    my %ret = ('name' => $v, 'type' => $t);
     if ($expand) {
-        my $r = $db->get($v);
+        my $proto = '';
+        if ($props_names =~ m/UDP/ and $props_names =~ m/TCP/) {
+            $proto = 'tcpudp';
+        } elsif ($props_names =~ m/UDP/) {
+            $proto = 'udp';
+        } elsif ($props_names =~ m/TCP/) {
+            $proto = 'tcp';
+        }
+
+        my @ports;
+        foreach my $k (keys %props) {
+            if ($k =~ m/Port/) {
+                push(@ports, split(",",$props{$k}));
+            }
+        }
+
+        return { 'name' => $key, 'type' => 'service', 'Protocol' => $proto, 'Ports' => \@ports, 'Description' => '' };
+    } else {
+        return { 'name' => $key, 'type' => 'service' };
+    }
+}
+
+sub get_fwservice_service_info
+{
+    my $key = shift || return undef;
+    my $db = shift;
+    my $expand = shift;
+
+    my %ret = ('name' => $key, 'type' => 'fwservice');
+    if ($expand) {
+        my $r = $db->get($key);
         if ($r) {
             my %tprops = $r->props;
             my @ports = split(",",$tprops{'Ports'});
@@ -143,6 +172,26 @@ sub get_service_info
 
     return \%ret;
 }
+
+sub get_service_info
+{
+    my $id = shift || return undef;
+    my $fw = shift;
+    my $expand = shift;
+
+    if ($id eq 'any') {
+        return {'name' => 'any', 'type' => 'fwservice'};
+    }
+
+    my ($db, $key) = split(';', $id);
+
+    if ($db eq 'fwservice') {
+        return get_fwservice_service_info($key, $fw->{'sdb'},$expand);
+    } else {
+        return get_local_service_info($key, $fw->{'cdb'},$expand);
+    }
+}
+
 
 sub get_policy_type
 {
@@ -223,7 +272,7 @@ sub list_fwrules
         $props{'Src'} = get_target_info($props{'Src'}, $fw, $expand);
         $props{'Dst'} = get_target_info($props{'Dst'}, $fw, $expand);
         $props{'Time'} = get_time_info($props{'Time'}, $fw->{'ftdb'}, $expand);
-        $props{'Service'} = get_service_info($props{'Service'}, $fw->{'sdb'}, $expand);
+        $props{'Service'} = get_service_info($props{'Service'}, $fw, $expand);
 
         # normalize position
         $props{'Position'} = $i;
