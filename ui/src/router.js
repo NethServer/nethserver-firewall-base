@@ -7,7 +7,9 @@ import TrafficShaping from './views/TrafficShaping.vue'
 import sNAT from './views/sNAT.vue'
 import Objects from './views/Objects.vue'
 import PortForward from './views/PortForward.vue'
+
 import Rules from './views/Rules.vue'
+import LocalRules from './views/LocalRules.vue'
 
 import Logs from './views/Logs.vue'
 import About from './views/About.vue'
@@ -44,6 +46,11 @@ export default new Router({
       path: '/rules',
       name: 'rules',
       component: Rules
+    },
+    {
+      path: '/local-rules',
+      name: 'local-rules',
+      component: LocalRules
     },
     {
       path: '/snat',

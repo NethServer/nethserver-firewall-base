@@ -275,7 +275,8 @@
             "service_updated_ok": "Service updated successfully!",
             "service_updated_error": "Service not updated.",
             "service_deleted_ok": "Service deleted successfully!",
-            "service_deleted_error": "Service not deleted."
+            "service_deleted_error": "Service not deleted.",
+            "fw": "Firewall"
         },
         "port_forward": {
             "title": "Port forward",
@@ -319,6 +320,7 @@
         },
         "rules": {
             "title": "Rules",
+            "title_local": "Local rules",
             "list": "List (drag to sort rules)",
             "no_rules_found": "No rules found",
             "no_rules_found_text": "To create a new rule use the button below",
@@ -340,7 +342,10 @@
             "log": "Log",
             "quick_rule": "Quick rule (acts immediatly on every connection)",
             "log_enabled": "Log enabled",
-            "duplicate": "Duplicate"
+            "duplicate": "Duplicate",
+            "expand": "Expand info",
+            "to_firewall": "To Firewall",
+            "from_firewall": "From Firewall"
         },
         "protocols": {
             "ah": "AH",

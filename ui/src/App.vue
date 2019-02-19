@@ -59,6 +59,15 @@
             <span class="list-group-item-value">{{$t('rules.title')}}</span>
           </a>
         </li>
+        <li
+          id="local-rules-item"
+          :class="[getCurrentPath('local-rules') ? 'active' : '', 'list-group-item']"
+        >
+          <a href="#/local-rules">
+            <span class="fa fa-fire"></span>
+            <span class="list-group-item-value">{{$t('rules.title_local')}}</span>
+          </a>
+        </li>
 
         <li class="li-empty"></li>
 
@@ -253,6 +262,10 @@ export default {
 
 .transparent:hover {
   background-color: transparent !important;
+}
+
+.right {
+  float: right;
 }
 
 .search-pf {

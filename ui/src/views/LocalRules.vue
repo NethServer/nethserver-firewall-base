@@ -1,11 +1,11 @@
 <template>
   <div>
-    <h2>{{$t('rules.title')}}</h2>
+    <h2>{{$t('rules.title_local')}}</h2>
 
     <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
     <div v-if="rules.length == 0 && view.isLoaded" class="blank-slate-pf white">
       <div class="blank-slate-pf-icon">
-        <span class="fa fa-ban"></span>
+        <span class="fa fa-fire"></span>
       </div>
       <h1>{{$t('rules.no_rules_found')}}</h1>
       <p>{{$t('rules.no_rules_found_text')}}.</p>
@@ -136,7 +136,7 @@
                     <span :class="mapObjectIcon(r.Src)"></span>
                     <span
                       :class="[r.Src.name.toLowerCase(),'mg-left-5']"
-                    >{{r.Src.type == 'role' || r.Src.type == 'any' ? (r.Src.name.toUpperCase()): r.Src.name}}</span>
+                    >{{r.Src.type == 'fw' || r.Src.type == 'role' || r.Src.type == 'any' ? (r.Src.name.toUpperCase()): r.Src.name}}</span>
                   </span>
                 </div>
                 <div class="list-group-item-text">
@@ -151,7 +151,7 @@
                     <span :class="mapObjectIcon(r.Dst)"></span>
                     <span
                       :class="[r.Dst.name.toLowerCase(),'mg-left-5']"
-                    >{{r.Dst.type == 'role' || r.Dst.type == 'any' ? (r.Dst.name.toUpperCase()): r.Dst.name}}</span>
+                    >{{r.Dst.type == 'fw' || r.Dst.type == 'role' || r.Dst.type == 'any' ? (r.Dst.name.toUpperCase()): r.Dst.name}}</span>
                   </span>
                 </div>
               </div>
@@ -196,7 +196,37 @@
           </div>
           <form class="form-horizontal" v-on:submit.prevent="saveRule()">
             <div class="modal-body">
-              <div :class="['form-group', newRule.errors.Src.hasError ? 'has-error' : '']">
+              <div class="form-group">
+                <label class="col-sm-4 control-label"></label>
+                <input
+                  id="to-fw-radio"
+                  class="col-sm-2"
+                  type="radio"
+                  v-model="newRule.fwTarget"
+                  value="to-fw"
+                >
+                <label
+                  class="col-sm-6 control-label text-align-left"
+                  for="to-fw-radio"
+                >{{$t("rules.to_firewall")}}</label>
+
+                <label class="col-sm-4 control-label"></label>
+                <input
+                  id="from-fw-radio"
+                  class="col-sm-2"
+                  type="radio"
+                  v-model="newRule.fwTarget"
+                  value="from-fw"
+                >
+                <label
+                  class="col-sm-6 control-label text-align-left"
+                  for="from-fw-radio"
+                >{{$t("rules.from_firewall")}}</label>
+              </div>
+              <div
+                v-show="newRule.fwTarget == 'to-fw'"
+                :class="['form-group', newRule.errors.Src.hasError ? 'has-error' : '']"
+              >
                 <label class="col-sm-4 control-label">{{$t('rules.source')}}</label>
                 <div class="col-sm-8">
                   <suggestions
@@ -233,7 +263,10 @@
                 </div>
               </div>
 
-              <div :class="['form-group', newRule.errors.Dst.hasError ? 'has-error' : '']">
+              <div
+                v-show="newRule.fwTarget == 'from-fw'"
+                :class="['form-group', newRule.errors.Dst.hasError ? 'has-error' : '']"
+              >
                 <label class="col-sm-4 control-label">{{$t('rules.destination')}}</label>
                 <div class="col-sm-8">
                   <suggestions
@@ -429,10 +462,6 @@ export default {
     this.getServices();
     this.getApplications();
     this.getRoles();
-    setTimeout(function() {
-      console.log("tooltip");
-      $('[data-toggle="tooltip"]').tooltip();
-    }, 3000);
   },
   beforeRouteLeave(to, from, next) {
     $(".modal").modal("hide");
@@ -523,7 +552,9 @@ export default {
     mapTitleSrc(rule) {
       var html =
         "<b>" +
-        (rule.Src.type == "role" || rule.Src.type == "any"
+        (rule.Src.type == "fw" ||
+        rule.Src.type == "role" ||
+        rule.Src.type == "any"
           ? rule.Src.name.toUpperCase()
           : rule.Src.name) +
         "</b>";
@@ -606,7 +637,9 @@ export default {
     mapTitleDst(rule) {
       var html =
         "<b>" +
-        (rule.Dst.type == "role" || rule.Dst.type == "any"
+        (rule.Dst.type == "fw" ||
+        rule.Dst.type == "role" ||
+        rule.Dst.type == "any"
           ? rule.Dst.name.toUpperCase()
           : rule.Dst.name) +
         "</b>";
@@ -794,6 +827,9 @@ export default {
         case "any":
           return "fa fa-globe";
           break;
+        case "fw":
+          return "fa fa-fire";
+          break;
       }
     },
     mapArrow(action) {
@@ -852,6 +888,7 @@ export default {
         Quick: false,
         Time: "",
         Description: "",
+        fwTarget: "to-fw",
         isLoading: false,
         isEdit: false,
         isDuplicate: false,
@@ -1266,7 +1303,7 @@ export default {
 
       context.view.isLoaded = false;
       nethserver.exec(
-        ["nethserver-firewall-base/rules/read"],
+        ["nethserver-firewall-base/local-rules/read"],
         {
           action: "list",
           expand: context.expandInfo
@@ -1285,7 +1322,7 @@ export default {
 
             setTimeout(function() {
               $('[data-toggle="tooltip"]').tooltip();
-            }, 250);
+            }, 750);
           } catch (e) {
             console.error(e);
             context.view.isLoaded = true;

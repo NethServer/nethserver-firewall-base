@@ -45,185 +45,355 @@
           <span class="panel-title">
             <span>{{$t('wan.mode')}}: {{wan.WanMode == 'balance' ? $t('wan.balance') : $t('wan.backup')}}</span>
           </span>
+          <a
+            class="mg-left-5 provider-details"
+            data-toggle="collapse"
+            data-parent="#provider-markup"
+            href="#providerDetails"
+          >{{$t('details')}}</a>
+        </div>
+        <div id="providerDetails" class="panel-collapse collapse in">
+          <div v-show="!view.isLoadedInterface" class="spinner spinner-lg view-spinner"></div>
+          <div
+            v-show="interfaces.length == 0 && view.isLoadedInterface"
+            class="blank-slate-pf white"
+          >
+            <div class="blank-slate-pf-icon">
+              <span class="fa fa-globe"></span>
+            </div>
+            <h1>{{$t('wan.no_interfaces_found')}}</h1>
+            <p>{{$t('wan.no_interfaces_found_text')}}.</p>
+            <div class="blank-slate-pf-main-action">
+              <a
+                target="_blank"
+                href="/nethserver#/network"
+                class="btn btn-primary btn-lg"
+              >{{$t('wan.go_to_network')}}</a>
+            </div>
+          </div>
+
+          <div
+            v-if="interfaces.length > 0 && view.isLoadedInterface"
+            id="pf-list-simple-expansion"
+            class="list-group list-view-pf list-view-pf-view wizard-pf-contents-title white no-mg-top"
+          >
+            <div
+              v-for="i in interfaces"
+              v-bind:key="i"
+              class="list-group-item wan-list list-view-pf-expand-active no-shadow mg-bottom-10"
+            >
+              <div class="list-group-item-header">
+                <div class="list-view-pf-actions">
+                  <a
+                    tabindex="0"
+                    @click="speedTest(i)"
+                    :id="'popover-'+i.name | sanitize"
+                    data-placement="left"
+                    data-toggle="popover"
+                    data-html="true"
+                    :title="$t('wan.speed_info')"
+                    class="btn btn-default"
+                  >
+                    <span class="fa fa-bolt span-right-margin"></span>
+                    {{$t('wan.speedtest')}}
+                  </a>
+                </div>
+                <div @click="openInterfaceDetails(i)" class="list-view-pf-main-info">
+                  <div class="list-view-pf-left">
+                    <span class="fa fa-globe list-view-pf-icon-sm border-red"></span>
+                  </div>
+                  <div class="list-view-pf-body">
+                    <div class="list-view-pf-description">
+                      <div class="list-group-item-heading red">
+                        {{i.name}}
+                        <span class="gray">({{i.provider.name}})</span>
+                      </div>
+                      <div class="list-group-item-text more-space-description">
+                        {{i.nslabel || '-'}}
+                        <!-- <br>
+                        <br>
+                        <span v-if="i.FwInBandwidth == 0 || i.FwOutBandwidth == 0">
+                          <span class="pficon pficon-warning-triangle-o span-right-margin"></span>
+                          <span
+                            class="semi-bold small-font"
+                            v-if="i.FwInBandwidth == 0 && i.FwOutBandwidth != 0"
+                          >{{$t('wan.inbound_zero')}}</span>
+                          <span
+                            class="semi-bold small-font"
+                            v-if="i.FwOutBandwidth == 0 && i.FwInBandwidth != 0"
+                          >{{$t('wan.outbound_zero')}}</span>
+                          <span
+                            class="semi-bold small-font"
+                            v-if="i.FwInBandwidth == 0 && i.FwOutBandwidth == 0"
+                          >{{$t('wan.in_out_bound_zero')}}</span>
+                        </span>-->
+                      </div>
+                    </div>
+                    <div class="list-view-pf-additional-info">
+                      <div class="list-view-pf-additional-info-item">
+                        <span class="pficon pficon-screen"></span>
+                        <strong>{{i.cidr}}</strong> CIDR
+                      </div>
+                      <div class="list-view-pf-additional-info-item">
+                        <span class="pficon pficon-middleware"></span>
+                        <strong>{{i.gateway}}</strong> GW
+                      </div>
+                      <div
+                        v-if="i.FwInBandwidth == 0 || i.FwOutBandwidth == 0"
+                        class="list-view-pf-additional-info-item"
+                      >
+                        <span
+                          data-toggle="tooltip"
+                          data-placement="top"
+                          data-html="true"
+                          :title="i.FwInBandwidth == 0 && i.FwOutBandwidth == 0 ? $t('wan.in_out_bound_zero') : i.FwOutBandwidth == 0 && i.FwInBandwidth != 0 ? $t('wan.outbound_zero') : $t('wan.inbound_zero')"
+                          class="pficon pficon-warning-triangle-o"
+                        ></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                :class="['list-group-item-container container-fluid', i.opened ? 'active':'hidden']"
+              >
+                <div class="row">
+                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <form class="form-horizontal" v-on:submit.prevent="saveInterface(i)">
+                      <div class="modal-body">
+                        <div :class="['form-group', i.errors.nslabel.hasError ? 'has-error' : '']">
+                          <label
+                            class="col-sm-3 control-label"
+                            for="textInput-modal-markup"
+                          >{{$t('wan.provider')}}</label>
+                          <div class="col-sm-8">
+                            <input required type="text" v-model="i.nslabel" class="form-control">
+                            <span v-if="i.errors.nslabel.hasError" class="help-block">
+                              {{$t('validation.validation_failed')}}:
+                              {{$t('validation.'+i.errors.nslabel.message)}}
+                            </span>
+                          </div>
+                        </div>
+                        <div
+                          :class="['form-group', i.errors.provider.weight.hasError ? 'has-error' : '']"
+                        >
+                          <label
+                            class="col-sm-3 control-label"
+                            for="textInput-modal-markup"
+                          >{{$t('wan.weight')}}</label>
+                          <div class="col-sm-8">
+                            <input
+                              required
+                              type="number"
+                              v-model="i.provider.weight"
+                              class="form-control"
+                            >
+                            <span v-if="i.errors.provider.weight.hasError" class="help-block">
+                              {{$t('validation.validation_failed')}}:
+                              {{$t('validation.'+i.errors.provider.weight.message)}}
+                            </span>
+                          </div>
+                        </div>
+                        <div
+                          :class="['form-group', i.errors.FwInBandwidth.hasError ? 'has-error' : '']"
+                        >
+                          <label
+                            class="col-sm-3 control-label"
+                            for="textInput-modal-markup"
+                          >{{$t('wan.inbound_bandwidth')}}</label>
+                          <div class="col-sm-8">
+                            <input
+                              :id="i.name + '-FwInBandwidth' | sanitize"
+                              required
+                              type="number"
+                              class="form-control"
+                              v-model="i.FwInBandwidth"
+                            >
+                            <span v-if="i.errors.FwInBandwidth.hasError" class="help-block">
+                              {{$t('validation.validation_failed')}}:
+                              {{$t('validation.'+i.errors.FwInBandwidth.message)}}
+                            </span>
+                          </div>
+                        </div>
+                        <div
+                          :class="['form-group', i.errors.FwOutBandwidth.hasError ? 'has-error' : '']"
+                        >
+                          <label
+                            class="col-sm-3 control-label"
+                            for="textInput-modal-markup"
+                          >{{$t('wan.outbound_bandwidth')}}</label>
+                          <div class="col-sm-8">
+                            <input
+                              :id="i.name + '-FwOutBandwidth' | sanitize"
+                              required
+                              type="number"
+                              class="form-control"
+                              v-model="i.FwOutBandwidth"
+                            >
+                            <span v-if="i.errors.FwOutBandwidth.hasError" class="help-block">
+                              {{$t('validation.validation_failed')}}:
+                              {{$t('validation.'+i.errors.FwOutBandwidth.message)}}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer no-mg-top">
+                        <div v-if="i.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+                        <button class="btn btn-primary" type="submit">{{$t('save')}}</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="divider"></div>
     </div>
 
-    <h3 v-if="interfaces.length > 0">{{$t('wan.interface_list')}}</h3>
+    <h3 v-if="view.isLoaded">{{$t('rules.title')}}</h3>
     <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
-    <div v-if="interfaces.length == 0 && view.isLoaded" class="blank-slate-pf white">
+    <div v-if="rules.length == 0 && view.isLoaded" class="blank-slate-pf white">
       <div class="blank-slate-pf-icon">
         <span class="fa fa-globe"></span>
       </div>
-      <h1>{{$t('wan.no_interfaces_found')}}</h1>
-      <p>{{$t('wan.no_interfaces_found_text')}}.</p>
+      <h1>{{$t('rules.no_rules_found')}}</h1>
+      <p>{{$t('rules.no_rules_found_text')}}.</p>
       <div class="blank-slate-pf-main-action">
-        <a
-          target="_blank"
-          href="/nethserver#/network"
-          class="btn btn-primary btn-lg"
-        >{{$t('wan.go_to_network')}}</a>
+        <button class="btn btn-primary">{{$t('rules.create_rule')}}</button>
       </div>
     </div>
-
-    <div
-      v-if="interfaces.length > 0 && view.isLoaded"
-      id="pf-list-simple-expansion"
-      class="list-group list-view-pf list-view-pf-view wizard-pf-contents-title white no-mg-top"
+    <ul
+      v-if="rules.length > 0 && view.isLoaded"
+      v-sortable="{onEnd: reorder, handle: '.drag-here'}"
+      class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10"
     >
-      <div
-        v-for="i in interfaces"
-        v-bind:key="i"
-        class="list-group-item red-list list-view-pf-expand-active no-shadow mg-bottom-10"
-      >
-        <div class="list-group-item-header">
-          <div class="list-view-pf-actions">
-            <a
-              tabindex="0"
-              @click="speedTest(i)"
-              :id="'popover-'+i.name | sanitize"
-              data-placement="left"
-              data-toggle="popover"
-              data-html="true"
-              :title="$t('wan.speed_info')"
-              class="btn btn-default"
+      <li :class="[mapList(r.Action), 'list-group-item']" v-for="r in rules" v-bind:key="r">
+        <div class="drag-size">
+          <span class="gray mg-right-5">{{r.Action.split(';')[1] | uppercase}}</span>
+        </div>
+        <div class="list-view-pf-checkbox drag-here">
+          <span class="fa fa-bars"></span>
+        </div>
+        <div class="list-view-pf-actions">
+          <button class="btn btn-default">
+            <span class="fa fa-edit span-right-margin"></span>
+            {{$t('edit')}}
+          </button>
+          <div class="dropdown pull-right dropdown-kebab-pf">
+            <button
+              class="btn btn-link dropdown-toggle"
+              type="button"
+              id="dropdownKebabRight9"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="true"
             >
-              <span class="fa fa-bolt span-right-margin"></span>
-              {{$t('wan.speedtest')}}
-            </a>
+              <span class="fa fa-ellipsis-v"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownKebabRight9">
+              <li>
+                <a href="#">
+                  <span class="fa fa-lock span-right-margin"></span>
+                  {{$t('disable')}}
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <span class="fa fa-clone span-right-margin"></span>
+                  {{$t('rules.duplicate')}}
+                </a>
+              </li>
+              <li role="separator" class="divider"></li>
+              <li>
+                <a href="#">
+                  <span class="fa fa-times span-right-margin"></span>
+                  {{$t('delete')}}
+                </a>
+              </li>
+            </ul>
           </div>
-          <div @click="openInterfaceDetails(i)" class="list-view-pf-main-info">
-            <div class="list-view-pf-left">
-              <span class="fa fa-globe list-view-pf-icon-sm border-red"></span>
+        </div>
+        <div class="list-view-pf-main-info small-list">
+          <div class="list-view-pf-left">
+            <span
+              data-toggle="tooltip"
+              data-placement="top"
+              data-html="true"
+              :title="mapTitleAction(r)"
+              :class="[mapIcon(r.Action), 'list-view-pf-icon-sm']"
+            ></span>
+            <span
+              data-toggle="tooltip"
+              data-placement="top"
+              data-html="true"
+              :title="$t('rules.log_enabled')"
+              v-show="r.Log"
+              class="fa fa-bookmark-o log-icon"
+            ></span>
+          </div>
+          <div class="list-view-pf-body">
+            <div class="list-view-pf-description rules-src-dst">
+              <div class="list-group-item-heading">
+                <span
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  data-html="true"
+                  :title="mapTitleSrc(r)"
+                  class="handle-overflow"
+                >
+                  <span :class="mapObjectIcon(r.Src)"></span>
+                  <span
+                    :class="[r.Src.name.toLowerCase(),'mg-left-5']"
+                  >{{r.Src.type == 'fw' || r.Src.type == 'role' || r.Src.type == 'any' ? (r.Src.name.toUpperCase()): r.Src.name}}</span>
+                </span>
+              </div>
+              <div class="list-group-item-text">
+                <span :class="[mapArrow(r.Action), 'mg-right-10 big-icon']"></span>
+                <span
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  data-html="true"
+                  :title="mapTitleDst(r)"
+                  class="handle-overflow"
+                >
+                  <span :class="mapObjectIcon(r.Dst)"></span>
+                  <span
+                    :class="[r.Dst.name.toLowerCase(),'mg-left-5']"
+                  >{{r.Dst.type == 'fw' || r.Dst.type == 'role' || r.Dst.type == 'any' ? (r.Dst.name.toUpperCase()): r.Dst.name}}</span>
+                </span>
+              </div>
             </div>
-            <div class="list-view-pf-body">
-              <div class="list-view-pf-description">
-                <div class="list-group-item-heading red">
-                  {{i.name}}
-                  <span class="gray">({{i.provider.name}})</span>
-                </div>
-                <div class="list-group-item-text more-space-description">
-                  {{i.nslabel}}
-                  <br>
-                  <br>
-                  <span v-if="i.FwInBandwidth == 0 || i.FwOutBandwidth == 0">
-                    <span class="pficon pficon-warning-triangle-o span-right-margin"></span>
-                    <span
-                      class="semi-bold"
-                      v-if="i.FwInBandwidth == 0 && i.FwOutBandwidth != 0"
-                    >{{$t('wan.inbound_zero')}}</span>
-                    <span
-                      class="semi-bold"
-                      v-if="i.FwOutBandwidth == 0 && i.FwInBandwidth != 0"
-                    >{{$t('wan.outbound_zero')}}</span>
-                    <span
-                      class="semi-bold"
-                      v-if="i.FwInBandwidth == 0 && i.FwOutBandwidth == 0"
-                    >{{$t('wan.in_out_bound_zero')}}</span>
-                  </span>
-                </div>
+            <div class="list-view-pf-additional-info rules-info">
+              <div
+                v-show="r.Service"
+                data-toggle="tooltip"
+                data-placement="top"
+                data-html="true"
+                :title="mapTitleService(r)"
+                class="list-view-pf-additional-info-item"
+              >
+                <span class="fa fa-fighter-jet"></span>
+                <strong>{{r.Service && r.Service.name}}</strong>
               </div>
-              <div class="list-view-pf-additional-info">
-                <div class="list-view-pf-additional-info-item">
-                  <span class="pficon pficon-screen"></span>
-                  <strong>{{i.cidr}}</strong> CIDR
-                </div>
-                <div class="list-view-pf-additional-info-item">
-                  <span class="pficon pficon-middleware"></span>
-                  <strong>{{i.gateway}}</strong> GW
-                </div>
+              <div
+                v-show="r.Time"
+                data-toggle="tooltip"
+                data-placement="top"
+                data-html="true"
+                :title="mapTitleTime(r)"
+                class="list-view-pf-additional-info-item"
+              >
+                <span class="fa fa-clock-o"></span>
+                <strong>{{r.Time && r.Time.name}}</strong>
               </div>
+              <div class="list-view-pf-additional-info-item">{{r.Description}}</div>
             </div>
           </div>
         </div>
-        <div :class="['list-group-item-container container-fluid', i.opened ? 'active':'hidden']">
-          <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-              <form class="form-horizontal" v-on:submit.prevent="saveInterface(i)">
-                <div class="modal-body">
-                  <div :class="['form-group', i.errors.nslabel.hasError ? 'has-error' : '']">
-                    <label
-                      class="col-sm-3 control-label"
-                      for="textInput-modal-markup"
-                    >{{$t('wan.provider')}}</label>
-                    <div class="col-sm-8">
-                      <input required type="text" v-model="i.nslabel" class="form-control">
-                      <span v-if="i.errors.nslabel.hasError" class="help-block">
-                        {{$t('validation.validation_failed')}}:
-                        {{$t('validation.'+i.errors.nslabel.message)}}
-                      </span>
-                    </div>
-                  </div>
-                  <div
-                    :class="['form-group', i.errors.provider.weight.hasError ? 'has-error' : '']"
-                  >
-                    <label
-                      class="col-sm-3 control-label"
-                      for="textInput-modal-markup"
-                    >{{$t('wan.weight')}}</label>
-                    <div class="col-sm-8">
-                      <input
-                        required
-                        type="number"
-                        v-model="i.provider.weight"
-                        class="form-control"
-                      >
-                      <span v-if="i.errors.provider.weight.hasError" class="help-block">
-                        {{$t('validation.validation_failed')}}:
-                        {{$t('validation.'+i.errors.provider.weight.message)}}
-                      </span>
-                    </div>
-                  </div>
-                  <div :class="['form-group', i.errors.FwInBandwidth.hasError ? 'has-error' : '']">
-                    <label
-                      class="col-sm-3 control-label"
-                      for="textInput-modal-markup"
-                    >{{$t('wan.inbound_bandwidth')}}</label>
-                    <div class="col-sm-8">
-                      <input
-                        :id="i.name + '-FwInBandwidth' | sanitize"
-                        required
-                        type="number"
-                        class="form-control"
-                        v-model="i.FwInBandwidth"
-                      >
-                      <span v-if="i.errors.FwInBandwidth.hasError" class="help-block">
-                        {{$t('validation.validation_failed')}}:
-                        {{$t('validation.'+i.errors.FwInBandwidth.message)}}
-                      </span>
-                    </div>
-                  </div>
-                  <div :class="['form-group', i.errors.FwOutBandwidth.hasError ? 'has-error' : '']">
-                    <label
-                      class="col-sm-3 control-label"
-                      for="textInput-modal-markup"
-                    >{{$t('wan.outbound_bandwidth')}}</label>
-                    <div class="col-sm-8">
-                      <input
-                        :id="i.name + '-FwOutBandwidth' | sanitize"
-                        required
-                        type="number"
-                        class="form-control"
-                        v-model="i.FwOutBandwidth"
-                      >
-                      <span v-if="i.errors.FwOutBandwidth.hasError" class="help-block">
-                        {{$t('validation.validation_failed')}}:
-                        {{$t('validation.'+i.errors.FwOutBandwidth.message)}}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div class="modal-footer no-mg-top">
-                  <div v-if="i.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
-                  <button class="btn btn-primary" type="submit">{{$t('save')}}</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      </li>
+    </ul>
 
     <!-- MODALS -->
     <div class="modal" id="configureWAN" tabindex="-1" role="dialog" data-backdrop="static">
@@ -376,6 +546,7 @@ export default {
     return {
       view: {
         isLoaded: false,
+        isLoadedInterface: false,
         isChartLoaded: false,
         invalidChartsData: false,
         chartsShowed: false
@@ -393,11 +564,35 @@ export default {
         isLoading: false
       },
       charts: {},
-      pollingIntervalId: 0
+      pollingIntervalId: 0,
+      rules: [],
+      hosts: [],
+      hostGroups: [],
+      ipRanges: [],
+      cidrSubs: [],
+      zones: [],
+      timeConditions: [],
+      services: [],
+      applications: [],
+      roles: [],
+      autoOptions: {
+        inputClass: "form-control"
+      },
+      newRule: this.initRule()
     };
   },
   mounted() {
     this.getProviders();
+    this.getRules();
+    this.getHosts();
+    this.getHostGroups();
+    this.getIPRanges();
+    this.getCIDRSubs();
+    this.getZones();
+    this.getTimeConditions();
+    this.getServices();
+    this.getApplications();
+    this.getRoles();
   },
   beforeRouteLeave(to, from, next) {
     $(".modal").modal("hide");
@@ -408,6 +603,789 @@ export default {
     toggleAdvancedMode() {
       this.wan.advanced = !this.wan.advanced;
       this.$forceUpdate();
+    },
+    reorder({ oldIndex, newIndex }) {
+      const movedItem = this.rules.splice(oldIndex, 1)[0];
+      this.rules.splice(newIndex, 0, movedItem);
+
+      this.rules = this.rules.map(function(r, i) {
+        r.Position = i + 1;
+        return r;
+      });
+
+      console.log(this.rules);
+    },
+    mapTitleAction(rule) {
+      var html = "<b>" + rule.Action.split(";")[1].toUpperCase() + "</b><br>";
+
+      if (rule.Log) {
+        html +=
+          '<div class="type-info"><span class="fa fa-bookmark-o mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          this.$i18n.t("rules.log_enabled") +
+          "</span></div>";
+      }
+
+      return html;
+    },
+    mapTitleSrc(rule) {
+      var html =
+        "<b>" +
+        (rule.Src.type == "fw" ||
+        rule.Src.type == "role" ||
+        rule.Src.type == "any"
+          ? rule.Src.name.toUpperCase()
+          : rule.Src.name) +
+        "</b>";
+
+      // host zone
+      if (rule.Src.zone && rule.Src.zone.length > 0) {
+        html +=
+          ' | <span class="' +
+          this.mapZoneIcon(rule.Src.zone) +
+          ' mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Src.zone.toUpperCase() +
+          "</span>";
+      }
+
+      html += "<br>";
+
+      // host
+      if (rule.Src.IpAddress) {
+        html +=
+          '<div><span class="pficon pficon-screen mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Src.IpAddress +
+          "</span></div>";
+      }
+
+      // cidr
+      if (rule.Src.Address) {
+        html +=
+          '<div><span class="pficon pficon-screen mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Src.Address +
+          "</span></div>";
+      }
+
+      // ip range
+      if (rule.Src.Start || rule.Src.End) {
+        html +=
+          '<div><span class="pficon pficon-screen mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Src.Start +
+          " - " +
+          rule.Src.End +
+          "</span></div>";
+      }
+
+      // zone
+      if (rule.Src.Network || rule.Src.Interface) {
+        html +=
+          '<div><span class="pficon pficon-screen mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Src.Network +
+          "</span></div>";
+
+        html +=
+          '<div><span class="pficon pficon-plugged mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Src.Interface +
+          "</span></div>";
+      }
+
+      // role
+      if (rule.Src.type == "role") {
+        if (rule.Src.Interfaces && rule.Src.Interfaces.length > 0) {
+          html +=
+            '<div><span class="pficon pficon-plugged mg-right-5 mg-top-5 detail-icon"></span>' +
+            "<span>" +
+            rule.Src.Interfaces.join(", ") +
+            "</span></div>";
+        }
+      }
+
+      html +=
+        '<span class="type-info"><b>' +
+        this.$i18n.t("objects." + rule.Src.type) +
+        "</b></span>";
+
+      return html;
+    },
+    mapTitleDst(rule) {
+      var html =
+        "<b>" +
+        (rule.Dst.type == "fw" ||
+        rule.Dst.type == "role" ||
+        rule.Dst.type == "any"
+          ? rule.Dst.name.toUpperCase()
+          : rule.Dst.name) +
+        "</b>";
+
+      // host zone
+      if (rule.Dst.zone && rule.Dst.zone.length > 0) {
+        html +=
+          ' | <span class="' +
+          this.mapZoneIcon(rule.Dst.zone) +
+          ' mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Dst.zone.toUpperCase() +
+          "</span>";
+      }
+
+      html += "<br>";
+
+      // host
+      if (rule.Dst.IpAddress) {
+        html +=
+          '<div><span class="pficon pficon-screen mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Dst.IpAddress.split(",").join("\n") +
+          "</span></div>";
+      }
+
+      // cidr
+      if (rule.Dst.Address) {
+        html +=
+          '<div><span class="pficon pficon-screen mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Dst.Address +
+          "</span></div>";
+      }
+
+      // ip range
+      if (rule.Dst.Start || rule.Dst.End) {
+        html +=
+          '<div><span class="pficon pficon-screen mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Dst.Start +
+          " - " +
+          rule.Dst.End +
+          "</span></div>";
+      }
+
+      // zone
+      if (rule.Dst.Network || rule.Dst.Interface) {
+        html +=
+          '<div><span class="pficon pficon-screen mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Dst.Network +
+          "</span></div>";
+
+        html +=
+          '<div><span class="pficon pficon-plugged mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Dst.Interface +
+          "</span></div>";
+      }
+
+      // role
+      if (rule.Dst.type == "role") {
+        if (rule.Dst.Interfaces && rule.Dst.Interfaces.length > 0) {
+          html +=
+            '<div><span class="pficon pficon-plugged mg-right-5 mg-top-5 detail-icon"></span>' +
+            "<span>" +
+            rule.Dst.Interfaces.join(", ") +
+            "</span></div>";
+        }
+      }
+
+      html +=
+        '<span class="type-info"><b>' +
+        this.$i18n.t("objects." + rule.Dst.type) +
+        "</b></span>";
+
+      return html;
+    },
+    mapTitleService(rule) {
+      if (!rule.Service) {
+        return "";
+      }
+      var html =
+        "<b>" +
+        rule.Service.name +
+        (rule.Service.Description && rule.Service.Description.length > 0
+          ? " | " + rule.Service.Description
+          : "") +
+        "</b><br>";
+
+      if (rule.Service.Protocol) {
+        html +=
+          '<div><span class="fa fa-arrows-h mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          (rule.Service.Protocol ? rule.Service.Protocol.toUpperCase() : "") +
+          "</span></div>";
+      }
+
+      if (rule.Service.Ports) {
+        html +=
+          '<div><span class="pficon pficon-template mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          (rule.Service.Ports ? rule.Service.Ports.join(", ") : "") +
+          "</span></div>";
+      }
+
+      html +=
+        "<span class='type-info'><b>" +
+        this.$i18n.t("objects.service") +
+        "</b></span>";
+
+      return html;
+    },
+    mapTitleTime(rule) {
+      if (!rule.Time) {
+        return "";
+      }
+      var html =
+        "<b>" +
+        rule.Time.name +
+        (rule.Time.Description && rule.Time.Description.length > 0
+          ? " | " + rule.Time.Description
+          : "") +
+        "</b><br>";
+
+      if (rule.Time.TimeStart && rule.Time.TimeSto) {
+        html +=
+          '<div><span class="fa fa-clock-o mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Time.TimeStart +
+          " - " +
+          rule.Time.TimeStop +
+          "</span></div>";
+      }
+
+      if (rule.Time.WeekDays && rule.Time.WeekDays.length > 0) {
+        html +=
+          '<div><span class="fa fa-calendar mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          rule.Time.WeekDays.join(", ") +
+          "</span></div>";
+      }
+
+      html +=
+        "<span class='type-info'><b>" +
+        this.$i18n.t("objects.time_condition") +
+        "</b></span>";
+
+      return html;
+    },
+    mapZoneIcon(zone) {
+      switch (zone) {
+        case "red":
+        case "green":
+        case "orange":
+        case "blue":
+          return "square-" + zone.toUpperCase();
+          break;
+        default:
+          return "square-OTHER";
+          break;
+      }
+    },
+    mapObjectIcon(obj) {
+      switch (obj.type) {
+        case "host":
+          return "fa fa-desktop";
+          break;
+        case "host-group":
+          return "fa fa-cubes";
+          break;
+        case "iprange":
+          return "pficon pficon-network";
+          break;
+        case "cidr":
+          return "pficon pficon-network";
+          break;
+        case "zone":
+          return "pficon pficon-zone";
+          break;
+        case "role":
+          return "square-" + obj.name.toUpperCase();
+          break;
+        case "any":
+          return "fa fa-globe";
+          break;
+        case "fw":
+          return "fa fa-fire";
+          break;
+      }
+    },
+    mapArrow(action) {
+      return "gray fa fa-arrow-right";
+    },
+    mapList(action) {
+      return "gray-list";
+    },
+    mapIcon(action) {
+      return "fa fa-share gray border-gray";
+    },
+    toggleAdvancedRuleMode() {
+      this.newRule.advanced = !this.newRule.advanced;
+      this.$forceUpdate();
+    },
+    initRule() {
+      return {
+        Src: "",
+        SrcType: "",
+        Dst: "",
+        DstType: "",
+        Service: "",
+        ServiceType: "",
+        Action: "accept",
+        Log: false,
+        Quick: false,
+        Time: "",
+        Description: "",
+        fwTarget: "to-fw",
+        isLoading: false,
+        isEdit: false,
+        isDuplicate: false,
+        advanced: false,
+        errors: this.initRuleErrors()
+      };
+    },
+    initRuleErrors() {
+      return {
+        Src: {
+          hasError: false,
+          message: ""
+        },
+        Dst: {
+          hasError: false,
+          message: ""
+        },
+        Service: {
+          hasError: false,
+          message: ""
+        },
+        Action: {
+          hasError: false,
+          message: ""
+        },
+        Log: {
+          hasError: false,
+          message: ""
+        },
+        Quick: {
+          hasError: false,
+          message: ""
+        },
+        Time: {
+          hasError: false,
+          message: ""
+        },
+        Description: {
+          hasError: false,
+          message: ""
+        }
+      };
+    },
+    filterSrcAuto(query) {
+      if (query.trim().length === 0) {
+        return null;
+      }
+
+      var objects = this.roles.concat(
+        this.hosts.concat(
+          this.hostGroups.concat(
+            this.ipRanges.concat(this.cidrSubs.concat(this.zones))
+          )
+        )
+      );
+
+      this.newRule.Src = null;
+      this.newRule.SrcType = "";
+
+      return objects.filter(function(service) {
+        return (
+          service.typeId.toLowerCase().includes(query.toLowerCase()) ||
+          service.name.toLowerCase().includes(query.toLowerCase()) ||
+          service.Description.toLowerCase().includes(query.toLowerCase()) ||
+          (service.IpAddress &&
+            service.IpAddress.toLowerCase().includes(query.toLowerCase()))
+        );
+      });
+    },
+    selectSrcAuto(item) {
+      this.newRule.Src = item.name;
+      this.newRule.SrcType =
+        item.name +
+        " " +
+        (item.IpAddress ? item.IpAddress + " " : "") +
+        "(" +
+        item.type +
+        ")";
+    },
+    filterDstAuto(query) {
+      if (query.trim().length === 0) {
+        return null;
+      }
+
+      var objects = this.roles.concat(
+        this.hosts.concat(
+          this.hostGroups.concat(
+            this.ipRanges.concat(this.cidrSubs.concat(this.zones))
+          )
+        )
+      );
+
+      this.newRule.Dst = null;
+      this.newRule.DstType = "";
+
+      return objects.filter(function(service) {
+        return (
+          service.typeId.toLowerCase().includes(query.toLowerCase()) ||
+          (service.IpAddress &&
+            service.IpAddress.toLowerCase().includes(query.toLowerCase())) ||
+          service.name.toLowerCase().includes(query.toLowerCase()) ||
+          service.Description.toLowerCase().includes(query.toLowerCase())
+        );
+      });
+    },
+    selectDstAuto(item) {
+      this.newRule.Dst = item.name;
+      this.newRule.DstType =
+        item.name +
+        " " +
+        (item.IpAddress ? item.IpAddress + " " : "") +
+        "(" +
+        item.type +
+        ")";
+    },
+    filterServiceAuto(query) {
+      if (query.trim().length === 0) {
+        return null;
+      }
+
+      var objects = this.services.concat(this.applications);
+
+      this.newRule.Service = null;
+      this.newRule.ServiceType = "";
+
+      return objects.filter(function(service) {
+        return (
+          service.typeId.toLowerCase().includes(query.toLowerCase()) ||
+          (service.Ports &&
+            service.Ports.join(" ")
+              .toLowerCase()
+              .includes(query.toLowerCase())) ||
+          service.name.toLowerCase().includes(query.toLowerCase()) ||
+          service.Description.toLowerCase().includes(query.toLowerCase())
+        );
+      });
+    },
+    selectServiceAuto(item) {
+      this.newRule.Service = item.name;
+      this.newRule.ServiceType = item.name + " (" + item.Ports.join(", ") + ")";
+    },
+    filterTimeAuto(query) {
+      if (query.trim().length === 0) {
+        return null;
+      }
+
+      var objects = this.timeConditions;
+
+      this.newRule.Time = null;
+      this.newRule.TimeType = "";
+
+      return objects.filter(function(service) {
+        return (
+          service.name.toLowerCase().includes(query.toLowerCase()) ||
+          service.Description.toLowerCase().includes(query.toLowerCase())
+        );
+      });
+    },
+    selectTimeAuto(item) {
+      this.newRule.Time = item.name;
+      this.newRule.TimeType = item.name + " (" + item.Description + ")";
+    },
+    getHosts() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "hosts"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.hosts = success["hosts"];
+          context.hosts = context.hosts.map(function(i) {
+            i.type = context.$i18n.t("objects.host");
+            i.typeId = "host";
+            return i;
+          });
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getHostGroups() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "host-groups"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.hostGroups = success["host-groups"];
+          context.hostGroups = context.hostGroups.map(function(i) {
+            i.type = context.$i18n.t("objects.host_group");
+            i.typeId = "host-group";
+            return i;
+          });
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getIPRanges() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "ip-ranges"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.ipRanges = success["ip-ranges"];
+          context.ipRanges = context.ipRanges.map(function(i) {
+            i.type = context.$i18n.t("objects.ip_range");
+            i.typeId = "iprange";
+            return i;
+          });
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getCIDRSubs() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "cidr-subs"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.cidrSubs = success["cidr-subs"];
+          context.cidrSubs = context.cidrSubs.map(function(i) {
+            i.type = context.$i18n.t("objects.cidr_sub");
+            i.typeId = "cidr";
+            return i;
+          });
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getZones() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "zones"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.zones = success["zones"];
+          context.zones = context.zones.map(function(i) {
+            i.type = context.$i18n.t("objects.zone");
+            i.typeId = "zone";
+            return i;
+          });
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getTimeConditions() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "time-conditions"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.timeConditions = success["time-conditions"];
+          context.timeConditions = context.timeConditions.map(function(i) {
+            i.type = context.$i18n.t("objects.time_condition");
+            i.typeId = "time";
+            return i;
+          });
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getServices() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "services"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.services = success["services"];
+          context.services = context.services.map(function(i) {
+            i.type = context.$i18n.t("objects.service");
+            i.typeId = "service";
+            return i;
+          });
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getApplications() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "applications"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.applications = success["applications"];
+          context.applications = context.applications.map(function(i) {
+            i.type = context.$i18n.t("objects.application");
+            i.typeId = "application";
+            return i;
+          });
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getRoles() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/rules/read"],
+        {
+          action: "roles"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.roles = success["roles"];
+          context.roles = context.roles.map(function(r) {
+            var i = {};
+            i.name = r.toUpperCase();
+            i.Description =
+              r.toUpperCase() + " " + context.$i18n.t("objects.role");
+            i.type = context.$i18n.t("objects.role");
+            i.typeId = "role";
+            return i;
+          });
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getRules() {
+      var context = this;
+
+      context.view.isLoaded = false;
+      nethserver.exec(
+        ["nethserver-firewall-base/wan/read"],
+        {
+          action: "rules",
+          expand: true
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+            var rules = success.rules.map(function(r) {
+              r.Log = r.Log == "none" ? false : true;
+              return r;
+            });
+            context.rules = rules;
+
+            context.view.isLoaded = true;
+
+            setTimeout(function() {
+              $('[data-toggle="tooltip"]').tooltip();
+            }, 750);
+          } catch (e) {
+            console.error(e);
+            context.view.isLoaded = true;
+          }
+        },
+        function(error) {
+          console.error(error);
+          context.view.isLoaded = true;
+        }
+      );
+    },
+    openCreateRule() {
+      this.newRule = this.initRule();
+      $("#createRuleModal").modal("show");
     },
     toggleCharts() {
       this.view.chartsShowed = !this.view.chartsShowed;
@@ -582,7 +1560,7 @@ export default {
     getProviders() {
       var context = this;
 
-      context.view.isLoaded = false;
+      context.view.isLoadedInterface = false;
       nethserver.exec(
         ["nethserver-firewall-base/wan/read"],
         {
@@ -626,7 +1604,7 @@ export default {
           context.wan.isLoading = false;
           context.wan.errors = context.initWANErrors();
 
-          context.view.isLoaded = true;
+          context.view.isLoadedInterface = true;
 
           setTimeout(function() {
             $("[data-toggle=popover]")
@@ -637,10 +1615,14 @@ export default {
               });
             context.initCharts();
           }, 250);
+
+          setTimeout(function() {
+            $('[data-toggle="tooltip"]').tooltip();
+          }, 500);
         },
         function(error) {
           console.error(error);
-          context.view.isLoaded = true;
+          context.view.isLoadedInterface = true;
         }
       );
     },
@@ -872,8 +1854,10 @@ export default {
   color: #cc0000;
 }
 
-.red-list {
+.wan-list {
   border-left: 3px solid #cc0000 !important;
+  border-bottom: 1px solid #bbbbbb !important;
+  border-right: 1px solid #bbbbbb !important;
 }
 
 .gray {
@@ -907,5 +1891,9 @@ export default {
 
 .normal {
   font-weight: 500;
+}
+
+.small-font {
+  font-size: 12px;
 }
 </style>

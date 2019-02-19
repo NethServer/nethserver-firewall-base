@@ -654,7 +654,7 @@
                     @change="addHostToGroup(newHostGroup.hostToAdd)"
                     v-model="newHostGroup.hostToAdd"
                     class="combobox form-control"
-                    required
+                    :required="newHostGroup.Members.length == 0"
                   >
                     <option>-</option>
                     <option
@@ -1021,7 +1021,7 @@
                     @change="addDayToWeekdays(newTimeCondition.dayToAdd)"
                     v-model="newTimeCondition.dayToAdd"
                     class="combobox form-control"
-                    required
+                    :required="newTimeCondition.WeekDays.length == 0"
                   >
                     <option>-</option>
                     <option :value="d" v-for="d in weekdays" v-bind:key="d">{{$t(d)}}</option>
