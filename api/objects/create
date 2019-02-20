@@ -27,6 +27,13 @@ case $action in
     "create-host"|"update-host")
         save_db hosts
         /sbin/e-smith/db hosts set "$(_get name)" host IpAddress "$(_get IpAddress)" Description "$(_get Description)"
+        if [ -n "$(_get  portforwards)" ]; then
+            portforwards_list=$(echo $(_get_array portforwards) | sed -e 's/,/ /g')
+            for pf in $portforwards_list
+            do
+                 /sbin/e-smith/db portforward setprop $pf DstHost "host;""$(_get name)"
+            done
+        fi
         ;;
     "create-service"|"update-service")
         save_db fwservice
