@@ -20,30 +20,17 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-. /usr/libexec/nethserver/api/lib/helper_functions
-
-data=$(cat /dev/stdin)
-action=$(echo $data | jq -r '.action')
-
-function _get
-{
-    field=$1
-    echo $data | jq -r ".$field"
-}
-
-function _get_array
-{
-    field=$1
-    echo $data | jq -r ".$field | join(\",\")"
-}
+. /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
 
 case $action in
 
     "create-host"|"update-host")
+        save_db hosts
         /sbin/e-smith/db hosts set "$(_get name)" host IpAddress "$(_get IpAddress)" Description "$(_get Description)"
         ;;
     "create-service"|"update-service")
-        /sbin/e-smith/db fwservice set "$(_get name)" fwservice Ports "$(_get_array Ports)" Protocol  "$(_get Protocol)" Description "$(_get Description)"
+        save_db fwservice
+        /sbin/e-smith/db fwservices set "$(_get name)" fwservice Ports "$(_get_array Ports)" Protocol  "$(_get Protocol)" Description "$(_get Description)"
         ;;
     *)
         error
@@ -51,7 +38,7 @@ case $action in
 esac
 
 if [ $? -gt 0 ]; then
-    error "EventFailed" "See /var/log/messages"
+    error "SaveFailed" "check_logs"
 else
     success
 fi
