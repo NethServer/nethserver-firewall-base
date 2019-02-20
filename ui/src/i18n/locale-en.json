@@ -87,8 +87,8 @@
             "tcp": "TCP",
             "udp": "UDP",
             "icmp": "ICMP",
-            "firewall_settings_change": "Firewall settings are changed but the firewall has not been restarted. Click 'Restart now' to apply changes",
-            "apply_changes": "Restart now",
+            "firewall_settings_change": "Firewall settings are changed but the firewall has not been restarted. Click 'Apply changes' to apply changes",
+            "apply_changes": "Apply changes",
             "firewall_restart": "Firewall restart",
             "snat": "sNAT",
             "iprange": "IP Ranges",
@@ -158,7 +158,9 @@
             "tc_default_created_ok": "Traffic shaping default classes created successfully!",
             "tc_default_created_error": "Traffic shaping default classes not created.",
             "tc_deleted_ok": "Traffic shaping class deleted successfully!",
-            "tc_deleted_error": "Traffic shaping class not deleted."
+            "tc_deleted_error": "Traffic shaping class not deleted.",
+            "configuration": "Configuration",
+            "classes": "Classes"
         },
         "snat": {
             "title": "sNAT",
@@ -325,6 +327,8 @@
             "no_rules_found": "No rules found",
             "no_rules_found_text": "To create a new rule use the button below",
             "create_rule": "Create rule",
+            "create_divert_rule": "Create divert rule",
+            "create_routing_rule": "Create routing rule",
             "edit_rule": "Edit rule",
             "duplicate_rule": "Duplicate rule",
             "source": "Source",
@@ -345,7 +349,9 @@
             "duplicate": "Duplicate",
             "expand": "Expand info",
             "to_firewall": "To Firewall",
-            "from_firewall": "From Firewall"
+            "from_firewall": "From Firewall",
+            "provider": "Provider",
+            "class": "Class"
         },
         "protocols": {
             "ah": "AH",

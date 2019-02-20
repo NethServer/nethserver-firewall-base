@@ -20,7 +20,10 @@
         <strong>{{$t('warning')}}!</strong>
         {{$t('charts_not_updated')}}.
       </div>
-      <div v-show="interfaces.length > 0 && view.isChartLoaded" class="row">
+      <div
+        v-show="interfaces.length > 0 && view.isChartLoaded && !view.invalidChartsData"
+        class="row"
+      >
         <div v-for="i in interfaces" v-bind:key="i" class="col-sm-4">
           <h4>
             {{i.nslabel}}
@@ -32,7 +35,7 @@
       </div>
     </div>
 
-    <div v-if="view.isLoaded">
+    <div v-if="view.isLoadedInterface">
       <h3>{{$t('wan.configuration')}}</h3>
       <div class="panel panel-default" id="provider-markup">
         <div class="panel-heading">
@@ -46,7 +49,7 @@
             <span>{{$t('wan.mode')}}: {{wan.WanMode == 'balance' ? $t('wan.balance') : $t('wan.backup')}}</span>
           </span>
           <a
-            class="mg-left-5 provider-details"
+            class="mg-left-5"
             data-toggle="collapse"
             data-parent="#provider-markup"
             href="#providerDetails"
@@ -108,26 +111,7 @@
                         {{i.name}}
                         <span class="gray">({{i.provider.name}})</span>
                       </div>
-                      <div class="list-group-item-text more-space-description">
-                        {{i.nslabel || '-'}}
-                        <!-- <br>
-                        <br>
-                        <span v-if="i.FwInBandwidth == 0 || i.FwOutBandwidth == 0">
-                          <span class="pficon pficon-warning-triangle-o span-right-margin"></span>
-                          <span
-                            class="semi-bold small-font"
-                            v-if="i.FwInBandwidth == 0 && i.FwOutBandwidth != 0"
-                          >{{$t('wan.inbound_zero')}}</span>
-                          <span
-                            class="semi-bold small-font"
-                            v-if="i.FwOutBandwidth == 0 && i.FwInBandwidth != 0"
-                          >{{$t('wan.outbound_zero')}}</span>
-                          <span
-                            class="semi-bold small-font"
-                            v-if="i.FwInBandwidth == 0 && i.FwOutBandwidth == 0"
-                          >{{$t('wan.in_out_bound_zero')}}</span>
-                        </span>-->
-                      </div>
+                      <div class="list-group-item-text more-space-description">{{i.nslabel || '-'}}</div>
                     </div>
                     <div class="list-view-pf-additional-info">
                       <div class="list-view-pf-additional-info-item">
@@ -253,15 +237,20 @@
     </div>
 
     <h3 v-if="view.isLoaded">{{$t('rules.title')}}</h3>
+    <button
+      v-if="view.isLoaded && rules.length > 0"
+      @click="openCreateRule()"
+      class="btn btn-primary btn-lg"
+    >{{$t('rules.create_divert_rule')}}</button>
     <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
     <div v-if="rules.length == 0 && view.isLoaded" class="blank-slate-pf white">
       <div class="blank-slate-pf-icon">
-        <span class="fa fa-globe"></span>
+        <span class="fa fa-share"></span>
       </div>
       <h1>{{$t('rules.no_rules_found')}}</h1>
       <p>{{$t('rules.no_rules_found_text')}}.</p>
       <div class="blank-slate-pf-main-action">
-        <button class="btn btn-primary">{{$t('rules.create_rule')}}</button>
+        <button @click="openCreateRule()" class="btn btn-primary">{{$t('rules.create_divert_rule')}}</button>
       </div>
     </div>
     <ul
@@ -530,6 +519,232 @@
               <div v-if="wan.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
               <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
               <button class="btn btn-primary" type="submit">{{$t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="createRuleModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4
+              class="modal-title"
+            >{{newRule.isEdit ? $t('rules.edit_rule') : newRule.isDuplicate ? $t('rules.duplicate_rule') : $t('rules.create_divert_rule')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="saveRule()">
+            <div class="modal-body">
+              <div :class="['form-group', newRule.errors.Action.hasError ? 'has-error' : '']">
+                <label class="col-sm-4 control-label">{{$t('rules.provider')}}</label>
+                <div class="col-sm-8">
+                  <select v-model="newRule.Action" class="form-control" required>
+                    <option
+                      v-for="i in interfaces"
+                      v-bind:key="i"
+                      :value="'provider;'+i.provider.name"
+                    >{{i.provider.name}}</option>
+                  </select>
+                  <span v-if="newRule.errors.Action.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newRule.errors.Action.message)}}
+                  </span>
+                </div>
+              </div>
+              <div :class="['form-group', newRule.errors.Src.hasError ? 'has-error' : '']">
+                <label class="col-sm-4 control-label">{{$t('rules.source')}}</label>
+                <div class="col-sm-8">
+                  <suggestions
+                    v-model="newRule.Src"
+                    required
+                    :options="autoOptions"
+                    :onInputChange="filterSrcAuto"
+                    :onItemSelected="selectSrcAuto"
+                  >
+                    <div slot="item" slot-scope="props" class="single-item">
+                      <span>
+                        <span
+                          v-show="props.item.typeId == 'role'"
+                          :class="['square-'+ props.item.name]"
+                        ></span>
+                        {{props.item.name}}
+                        <span
+                          v-show="props.item.IpAddress"
+                          class="gray"
+                        >({{props.item.IpAddress}})</span>
+                        <i class="mg-left-5">{{props.item.Description}}</i>
+                        <b class="mg-left-5">{{props.item.type | capitalize}}</b>
+                      </span>
+                    </div>
+                  </suggestions>
+                  <span
+                    v-if="newRule.SrcType && newRule.SrcType.length > 0"
+                    class="help-block gray"
+                  >{{newRule.SrcType}}</span>
+                  <span v-if="newRule.errors.Src.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newRule.errors.Src.message)}}
+                  </span>
+                </div>
+              </div>
+
+              <div :class="['form-group', newRule.errors.Dst.hasError ? 'has-error' : '']">
+                <label class="col-sm-4 control-label">{{$t('rules.destination')}}</label>
+                <div class="col-sm-8">
+                  <suggestions
+                    v-model="newRule.Dst"
+                    required
+                    :options="autoOptions"
+                    :onInputChange="filterDstAuto"
+                    :onItemSelected="selectDstAuto"
+                  >
+                    <div slot="item" slot-scope="props" class="single-item">
+                      <span>
+                        <span
+                          v-show="props.item.typeId == 'role'"
+                          :class="['square-'+ props.item.name]"
+                        ></span>
+                        {{props.item.name}}
+                        <span
+                          v-show="props.item.IpAddress"
+                          class="gray"
+                        >({{props.item.IpAddress}})</span>
+                        <i class="mg-left-5">{{props.item.Description}}</i>
+                        <b class="mg-left-5">{{props.item.type | capitalize}}</b>
+                      </span>
+                    </div>
+                  </suggestions>
+                  <span
+                    v-if="newRule.DstType && newRule.DstType.length > 0"
+                    class="help-block gray"
+                  >{{newRule.DstType}}</span>
+                  <span v-if="newRule.errors.Dst.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newRule.errors.Dst.message)}}
+                  </span>
+                </div>
+              </div>
+
+              <div :class="['form-group', newRule.errors.Service.hasError ? 'has-error' : '']">
+                <label class="col-sm-4 control-label">{{$t('rules.service')}}</label>
+                <div class="col-sm-8">
+                  <suggestions
+                    v-model="newRule.Service"
+                    required
+                    :options="autoOptions"
+                    :onInputChange="filterServiceAuto"
+                    :onItemSelected="selectServiceAuto"
+                  >
+                    <div slot="item" slot-scope="props" class="single-item">
+                      <span>
+                        <span
+                          v-show="props.item.typeId == 'application'"
+                          :class="['square-'+ props.item.name]"
+                        ></span>
+                        {{props.item.name}}
+                        <span
+                          v-show="props.item.Ports"
+                          class="gray"
+                        >({{props.item.Ports.join(', ')}})</span>
+                        <i class="mg-left-5">{{props.item.Description}}</i>
+                      </span>
+                    </div>
+                  </suggestions>
+                  <span
+                    v-if="newRule.ServiceType && newRule.ServiceType.length > 0"
+                    class="help-block gray"
+                  >{{newRule.ServiceType}}</span>
+                  <span v-if="newRule.errors.Service.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newRule.errors.Service.message)}}
+                  </span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label
+                  class="col-sm-4 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('advanced_mode')}}</label>
+                <div class="col-sm-8">
+                  <toggle-button
+                    class="min-toggle"
+                    :width="40"
+                    :height="20"
+                    :color="{checked: '#0088ce', unchecked: '#bbbbbb'}"
+                    :value="newRule.advanced"
+                    :sync="true"
+                    @change="toggleAdvancedRuleMode()"
+                  />
+                </div>
+              </div>
+
+              <div
+                v-show="newRule.advanced"
+                :class="['form-group', newRule.errors.Description.hasError ? 'has-error' : '']"
+              >
+                <label class="col-sm-4 control-label">{{$t('rules.description')}}</label>
+                <div class="col-sm-8">
+                  <input class="form-control" type="text" v-model="newRule.Description">
+                  <span v-if="newRule.errors.Description.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newRule.errors.Description.message)}}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                v-show="newRule.advanced"
+                :class="['form-group', newRule.errors.Log.hasError ? 'has-error' : '']"
+              >
+                <label class="col-sm-4 control-label">{{$t('rules.log')}}</label>
+                <div class="col-sm-8">
+                  <input class="form-control" type="checkbox" v-model="newRule.Log">
+                  <span v-if="newRule.errors.Log.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newRule.errors.Log.message)}}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                v-show="newRule.advanced"
+                :class="['form-group', newRule.errors.Time.hasError ? 'has-error' : '']"
+              >
+                <label class="col-sm-4 control-label">{{$t('rules.time_condition')}}</label>
+                <div class="col-sm-8">
+                  <suggestions
+                    v-model="newRule.Time"
+                    required
+                    :options="autoOptions"
+                    :onInputChange="filterTimeAuto"
+                    :onItemSelected="selectTimeAuto"
+                  >
+                    <div slot="item" slot-scope="props" class="single-item">
+                      <span>
+                        {{props.item.name}}
+                        <i class="mg-left-5">{{props.item.Description}}</i>
+                      </span>
+                    </div>
+                  </suggestions>
+                  <span
+                    v-if="newRule.TimeType && newRule.TimeType.length > 0"
+                    class="help-block gray"
+                  >{{newRule.TimeType}}</span>
+                  <span v-if="newRule.errors.Time.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newRule.errors.Time.message)}}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer no-mg-top">
+              <div v-if="newRule.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button
+                class="btn btn-primary"
+                type="submit"
+              >{{newRule.isEdit ? $t('edit') : newRule.isDuplicate ? $t('rules.duplicate') : $t('save')}}</button>
             </div>
           </form>
         </div>
