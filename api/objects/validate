@@ -168,6 +168,32 @@ case "delete-time-condition":
     }
     break;
 
+case "create-cidr-sub":
+case "update-cidr-sub":
+    $db = new EsmithDatabase('hosts');
+
+    $v->declareParameter('name', Validate::USERNAME);
+    $v->declareParameter('Address', Validate::CIDR_BLOCK);
+    $v->declareParameter('Description', Validate::ANYTHING);
+
+    if( $action == 'create-cidr-sub' && $db->getKey($data['name']) ) {
+        $v->addValidationError('name', 'cidr_sub_exists', $data['name']);
+    } elseif ( $action == 'update-cidr-sub' && !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_cidr_sub', $data['name']);
+    }
+    break;
+case "delete-cidr-sub":
+    $db = new EsmithDatabase('hosts');
+
+    if ( !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_cidr_sub', $data['name']);
+    } else {
+        $deleteCidrValidator = $v->createValidator()->platform('fwobject-cidr-delete', 'hosts');
+        if( !$deleteCidrValidator->evaluate($data['name']) ) {
+            $v->addValidationError('name', 'cidr_sub_cannot_be_delete', $data['name']);
+        }
+    }
+    break;
 default:
     error();
     break;
