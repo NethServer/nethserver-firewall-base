@@ -138,6 +138,36 @@ case "delete-zone":
         }
     }
     break;
+case "create-time-condition":
+case "update-time-condition":
+    $db = new EsmithDatabase('fwtimes');
+    $weekDays = array('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun');
+    $weekDaysValidator = $weekDaysValidator = $v->createValidator()->notEmpty()->collectionValidator($v->createValidator()->memberOf($weekDays));
+
+    $v->declareParameter('name', Validate::USERNAME);
+    $v->declareParameter('Description', Validate::ANYTHING);
+    $v->declareParameter('TimeStart', Validate::TIME);
+    $v->declareParameter('TimeStop', Validate::TIME);
+    $v->declareParameter('WeekDays', $weekDaysValidator);
+
+    if( $action == 'create-time-condition' && $db->getKey($data['name']) ) {
+        $v->addValidationError('name', 'time_condition_exists', $data['name']);
+    } elseif ( $action == 'update-time-condition' && !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_time_condition', $data['name']);
+    }
+    break;
+case "delete-time-condition":
+    $db = new EsmithDatabase('fwtimes');
+    if ( !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_time_condition', $data['name']);
+    } else {
+        $deleteTimeConditionValidator = $v->createValidator()->platform('fwobject-time-delete', 'fwtimes');
+        if( !$deleteTimeConditionValidator->evaluate($data['name']) ) {
+            $v->addValidationError('name', 'time_condition_cannot_be_delete', $data['name']);
+        }
+    }
+    break;
+
 default:
     error();
     break;
