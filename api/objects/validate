@@ -109,6 +109,35 @@ case "delete-service":
     }
     break;
 
+case "create-zone":
+case "update-zone":
+    $ndb = new EsmithDatabase('networks');
+    $nameValidator = $v->createValidator()->maxLength(5)->username();
+    $interfaces = readInterfaces();
+    $interfaceValidator = $v->createValidator()->memberOf($interfaces);
+
+    $v->declareParameter('name', $nameValidator);
+    $v->declareParameter('Network', Validate::CIDR_BLOCK);
+    $v->declareParameter('Interface', $interfaceValidator);
+    $v->declareParameter('Description', Validate::ANYTHING);
+
+    if( $action == 'create-zone' && $ndb->getKey($data['name']) ) {
+        $v->addValidationError('name', 'zone_exists', $data['name']);
+    } elseif ( $action == 'update-zone' && !$ndb->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_zone', $data['name']);
+    }
+    break;
+case "delete-zone":
+    $ndb = new EsmithDatabase('networks');
+    if ( !$ndb->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_zone', $data['name']);
+    } else {
+        $deleteZoneValidator = $v->createValidator()->platform('fwobject-zone-delete', 'networks');
+        if( !$deleteZoneValidator->evaluate($data['name']) ) {
+            $v->addValidationError('name', 'zone_cannot_be_delete', $data['name']);
+        }
+    }
+    break;
 default:
     error();
     break;
@@ -121,3 +150,17 @@ if ($v->validate()) {
     error($v);
 }
 
+
+function readInterfaces() {
+    $ret = array();
+    $types = array('bridge', 'bond', 'vlan', 'ethernet', 'xdsl');
+    $db = new EsmithDatabase('networks');
+    $interfaces = $db->getAll();
+
+    foreach ($interfaces as $key => $props) {
+        if (in_array($props['type'], $types)) {
+            $ret[] = $key;
+        }
+    }
+    return $ret;
+}
