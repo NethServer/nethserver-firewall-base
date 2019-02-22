@@ -1126,7 +1126,13 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.ports')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newService.Ports" class="form-control">
+                  <input
+                    required
+                    type="text"
+                    v-model="newService.Ports"
+                    class="form-control"
+                    :placeholder="$t('objects.ports_comma')"
+                  >
                   <span
                     v-if="newService.errors.Ports.hasError"
                     class="help-block"
@@ -1171,7 +1177,7 @@
               <div v-show="currentHost.isError" class="alert alert-warning alert-dismissable">
                 <span class="pficon pficon-warning-triangle-o"></span>
                 <strong>{{$t('warning')}}.</strong>
-                {{$t(currentHost.isError)}}.
+                {{$t('validation.'+currentHost.isError)}}.
               </div>
               <div class="form-group">
                 <label
@@ -1200,7 +1206,7 @@
               <div v-show="currentHostGroup.isError" class="alert alert-warning alert-dismissable">
                 <span class="pficon pficon-warning-triangle-o"></span>
                 <strong>{{$t('warning')}}.</strong>
-                {{$t(currentHostGroup.isError)}}.
+                {{$t('validation.'+currentHostGroup.isError)}}.
               </div>
               <div class="form-group">
                 <label
@@ -1229,7 +1235,7 @@
               <div v-show="currentIPRange.isError" class="alert alert-warning alert-dismissable">
                 <span class="pficon pficon-warning-triangle-o"></span>
                 <strong>{{$t('warning')}}.</strong>
-                {{$t(currentIPRange.isError)}}.
+                {{$t('validation.'+currentIPRange.isError)}}.
               </div>
               <div class="form-group">
                 <label
@@ -1258,7 +1264,7 @@
               <div v-show="currentCIDRSub.isError" class="alert alert-warning alert-dismissable">
                 <span class="pficon pficon-warning-triangle-o"></span>
                 <strong>{{$t('warning')}}.</strong>
-                {{$t(currentCIDRSub.isError)}}.
+                {{$t('validation.'+currentCIDRSub.isError)}}.
               </div>
               <div class="form-group">
                 <label
@@ -1287,7 +1293,7 @@
               <div v-show="currentZone.isError" class="alert alert-warning alert-dismissable">
                 <span class="pficon pficon-warning-triangle-o"></span>
                 <strong>{{$t('warning')}}.</strong>
-                {{$t(currentZone.isError)}}.
+                {{$t('validation.'+currentZone.isError)}}.
               </div>
               <div class="form-group">
                 <label
@@ -1362,7 +1368,7 @@
               <div v-show="currentService.isError" class="alert alert-warning alert-dismissable">
                 <span class="pficon pficon-warning-triangle-o"></span>
                 <strong>{{$t('warning')}}.</strong>
-                {{$t(currentService.isError)}}.
+                {{$t('validation.'+currentService.isError)}}.
               </div>
               <div class="form-group">
                 <label
@@ -2194,8 +2200,8 @@ export default {
             errorData = JSON.parse(data);
             for (var e in errorData.attributes) {
               var attr = errorData.attributes[e];
-              context.newDns.errors[attr.parameter].hasError = true;
-              context.newDns.errors[attr.parameter].message = attr.error;
+              context.newHost.errors[attr.parameter].hasError = true;
+              context.newHost.errors[attr.parameter].message = attr.error;
             }
           } catch (e) {
             console.error(e);
@@ -2248,8 +2254,9 @@ export default {
         function(error, data) {
           console.error(error, data);
           try {
-            errorData = JSON.parse(data);
+            var errorData = JSON.parse(data);
             host.isError = errorData.message;
+            context.$forceUpdate();
           } catch (e) {
             console.error(e);
           }
@@ -2343,8 +2350,8 @@ export default {
             errorData = JSON.parse(data);
             for (var e in errorData.attributes) {
               var attr = errorData.attributes[e];
-              context.newDns.errors[attr.parameter].hasError = true;
-              context.newDns.errors[attr.parameter].message = attr.error;
+              context.newHostGroup.errors[attr.parameter].hasError = true;
+              context.newHostGroup.errors[attr.parameter].message = attr.error;
             }
           } catch (e) {
             console.error(e);
@@ -2397,8 +2404,9 @@ export default {
         function(error, data) {
           console.error(error, data);
           try {
-            errorData = JSON.parse(data);
+            var errorData = JSON.parse(data);
             hostGroup.isError = errorData.message;
+            context.$forceUpdate();
           } catch (e) {
             console.error(e);
           }
@@ -2492,8 +2500,8 @@ export default {
             errorData = JSON.parse(data);
             for (var e in errorData.attributes) {
               var attr = errorData.attributes[e];
-              context.newDns.errors[attr.parameter].hasError = true;
-              context.newDns.errors[attr.parameter].message = attr.error;
+              context.newIPRange.errors[attr.parameter].hasError = true;
+              context.newIPRange.errors[attr.parameter].message = attr.error;
             }
           } catch (e) {
             console.error(e);
@@ -2546,8 +2554,9 @@ export default {
         function(error, data) {
           console.error(error, data);
           try {
-            errorData = JSON.parse(data);
+            var errorData = JSON.parse(data);
             ipRange.isError = errorData.message;
+            context.$forceUpdate();
           } catch (e) {
             console.error(e);
           }
@@ -2641,8 +2650,8 @@ export default {
             errorData = JSON.parse(data);
             for (var e in errorData.attributes) {
               var attr = errorData.attributes[e];
-              context.newDns.errors[attr.parameter].hasError = true;
-              context.newDns.errors[attr.parameter].message = attr.error;
+              context.newCIDRSub.errors[attr.parameter].hasError = true;
+              context.newCIDRSub.errors[attr.parameter].message = attr.error;
             }
           } catch (e) {
             console.error(e);
@@ -2695,8 +2704,9 @@ export default {
         function(error, data) {
           console.error(error, data);
           try {
-            errorData = JSON.parse(data);
+            var errorData = JSON.parse(data);
             cidrSub.isError = errorData.message;
+            context.$forceUpdate();
           } catch (e) {
             console.error(e);
           }
@@ -2788,8 +2798,8 @@ export default {
             errorData = JSON.parse(data);
             for (var e in errorData.attributes) {
               var attr = errorData.attributes[e];
-              context.newDns.errors[attr.parameter].hasError = true;
-              context.newDns.errors[attr.parameter].message = attr.error;
+              context.newZone.errors[attr.parameter].hasError = true;
+              context.newZone.errors[attr.parameter].message = attr.error;
             }
           } catch (e) {
             console.error(e);
@@ -2842,8 +2852,9 @@ export default {
         function(error, data) {
           console.error(error, data);
           try {
-            errorData = JSON.parse(data);
+            var errorData = JSON.parse(data);
             zone.isError = errorData.message;
+            context.$forceUpdate();
           } catch (e) {
             console.error(e);
           }
@@ -2937,8 +2948,9 @@ export default {
             errorData = JSON.parse(data);
             for (var e in errorData.attributes) {
               var attr = errorData.attributes[e];
-              context.newDns.errors[attr.parameter].hasError = true;
-              context.newDns.errors[attr.parameter].message = attr.error;
+              context.newTimeCondition.errors[attr.parameter].hasError = true;
+              context.newTimeCondition.errors[attr.parameter].message =
+                attr.error;
             }
           } catch (e) {
             console.error(e);
@@ -2991,8 +3003,9 @@ export default {
         function(error, data) {
           console.error(error, data);
           try {
-            errorData = JSON.parse(data);
+            var errorData = JSON.parse(data);
             timeCondition.isError = errorData.message;
+            context.$forceUpdate();
           } catch (e) {
             console.error(e);
           }
@@ -3015,6 +3028,10 @@ export default {
       var context = this;
 
       var serviceObj = Object.assign({}, service);
+      serviceObj.Ports =
+        serviceObj.Ports.length > 0 && serviceObj.Ports.includes(",")
+          ? serviceObj.Ports.split(",")
+          : [];
       delete serviceObj.isLoading;
       delete serviceObj.isEdit;
       delete serviceObj.isError;
@@ -3084,8 +3101,8 @@ export default {
             errorData = JSON.parse(data);
             for (var e in errorData.attributes) {
               var attr = errorData.attributes[e];
-              context.newDns.errors[attr.parameter].hasError = true;
-              context.newDns.errors[attr.parameter].message = attr.error;
+              context.newService.errors[attr.parameter].hasError = true;
+              context.newService.errors[attr.parameter].message = attr.error;
             }
           } catch (e) {
             console.error(e);
@@ -3138,8 +3155,9 @@ export default {
         function(error, data) {
           console.error(error, data);
           try {
-            errorData = JSON.parse(data);
+            var errorData = JSON.parse(data);
             service.isError = errorData.message;
+            context.$forceUpdate();
           } catch (e) {
             console.error(e);
           }

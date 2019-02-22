@@ -806,12 +806,13 @@ export default {
         }
       );
     },
-    openCreateHost(host) {
+    openCreateHost(host, rules) {
       this.newHost = this.initHost();
       this.newHost.IpAddress = host;
+      this.newHost.rules = rules;
       $("#createHostModal").modal("show");
     },
-    saveHost(newHost, rules) {
+    saveHost(newHost) {
       var context = this;
 
       var hostObj = {
@@ -819,7 +820,7 @@ export default {
         name: context.newHost.name,
         IpAddress: context.newHost.IpAddress,
         Description: context.newHost.Description,
-        portforwards: rules.map(function(pf) {
+        portforwards: context.newHost.rules.map(function(pf) {
           return pf.name;
         })
       };

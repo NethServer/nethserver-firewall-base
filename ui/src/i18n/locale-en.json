@@ -291,7 +291,8 @@
             "service_updated_error": "Service not updated.",
             "service_deleted_ok": "Service deleted successfully!",
             "service_deleted_error": "Service not deleted.",
-            "fw": "Firewall"
+            "fw": "Firewall",
+            "ports_comma": "Insert ports comma separated"
         },
         "port_forward": {
             "title": "Port forward",
@@ -401,7 +402,8 @@
             "class_key_exists": "A class with the same name already exists",
             "non_existing_class": "This class does not exists",
             "invalid_interface": "Invalid network interface: make sure the interface exists",
-            "valid_greatThan_0": "The value must be greater than 0"
+            "valid_greatThan_0": "The value must be greater than 0",
+            "not_removable": "Object not removable"
         }
     }
 }
