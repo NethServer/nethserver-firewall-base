@@ -194,6 +194,42 @@ case "delete-cidr-sub":
         }
     }
     break;
+case "create-ip-range":
+case "update-ip-range":
+    $db = new EsmithDatabase('hosts');
+
+    $v->declareParameter('name', Validate::USERNAME);
+    $v->declareParameter('Start', Validate::IPv4);
+    $v->declareParameter('End', Validate::IPv4);
+    $v->declareParameter('Description', Validate::ANYTHING);
+
+    if( $action == 'create-ip-range' && $db->getKey($data['name']) ) {
+        $v->addValidationError('name', 'ip_range_exists', $data['name']);
+    } elseif ( $action == 'update-ip-range' && !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_ip_range', $data['name']);
+    }
+
+    $ipValidator = $v->createValidator()->ipV4Address();
+    if ( ($action == 'create-ip-range' || $action == 'update-ip-range' ) &&
+        $ipValidator->evaluate($data['Start']) && $ipValidator->evaluate($data['End'])) {
+            if (ip2long($data['Start']) >= ip2long($data['End'])) {
+                $v->addValidationError('Start', 'ip_range_outofbounds', $data['Start']);
+                $v->addValidationError('End', 'ip_range_outofbounds', $data['End']);
+            }
+        }
+    break;
+case "delete-ip-range":
+    $db = new EsmithDatabase('hosts');
+
+    if ( !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_ip_range', $data['name']);
+    } else {
+        $deleteIpRangeValidator = $v->createValidator()->platform('fwobject-iprange-delete', 'hosts');
+        if( !$deleteIpRangeValidator->evaluate($data['name']) ) {
+            $v->addValidationError('name', 'ip_range_cannot_be_delete', $data['name']);
+        }
+    }
+    break;
 default:
     error();
     break;
