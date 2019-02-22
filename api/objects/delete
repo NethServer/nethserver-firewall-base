@@ -24,13 +24,24 @@
 
 case $action in
 
-    "delete-host")
+    "delete-host" | \
+    "delete-cidr-sub" | \
+    "delete-ip-range" | \
+    "delete-host-group")
         save_db hosts
         /sbin/e-smith/db hosts delete "$(_get name)"
         ;;
     "delete-service")
         save_db fwservices
         /sbin/e-smith/db fwservices delete "$(_get name)"
+        ;;
+    "delete-zone")
+        save_db networks
+        /sbin/e-smith/db networks delete "$(_get name)"
+        ;;
+    "delete-time-condition")
+        save_db fwtimes
+        /sbin/e-smith/db fwtimes delete "$(_get name)"
         ;;
     *)
         error

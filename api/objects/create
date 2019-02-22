@@ -31,13 +31,37 @@ case $action in
             portforwards_list=$(echo $(_get_array portforwards) | sed -e 's/,/ /g')
             for pf in $portforwards_list
             do
+                 save_db portforward
                  /sbin/e-smith/db portforward setprop $pf DstHost "host;""$(_get name)"
             done
         fi
         ;;
     "create-service"|"update-service")
-        save_db fwservice
-        /sbin/e-smith/db fwservices set "$(_get name)" fwservice Ports "$(_get_array Ports)" Protocol  "$(_get Protocol)" Description "$(_get Description)"
+        save_db fwservices
+        /sbin/e-smith/db fwservices set "$(_get name)" fwservice Ports "$(_get_array Ports)" Protocol "$(_get Protocol)" \
+            Description "$(_get Description)"
+        ;;
+    "create-zone"|"update-zone")
+        save_db networks
+        /sbin/e-smith/db networks set "$(_get name)" zone Interface "$(_get Interface)" Network "$(_get Network)" \
+            Description "$(_get Description)"
+        ;;
+    "create-time-condition"|"update-time-condition")
+        save_db fwtimes
+        /sbin/e-smith/db fwtimes set "$(_get name)" time TimeStart "$(_get TimeStart)" TimeStop "$(_get TimeStop)" \
+            WeekDays "$(_get_array WeekDays)" Description "$(_get Description)"
+        ;;
+    "create-cidr-sub"|"update-cidr-sub")
+        save_db hosts
+        /sbin/e-smith/db hosts set "$(_get name)" cidr Address "$(_get Address)" Description "$(_get Description)"
+        ;;
+    "create-ip-range"|"update-ip-range")
+        save_db hosts
+        /sbin/e-smith/db hosts set "$(_get name)" iprange Start "$(_get Start)" End "$(_get End)" Description "$(_get Description)"
+        ;;
+    "create-host-group"|"update-host-group")
+        save_db hosts
+        /sbin/e-smith/db hosts set "$(_get name)" host-group Members "$(_get_array Members)" Description "$(_get Description)"
         ;;
     *)
         error
