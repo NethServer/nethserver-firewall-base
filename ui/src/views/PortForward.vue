@@ -62,7 +62,7 @@
                   ></span>
                 </div>
                 <div class="list-view-pf-body">
-                  <div class="list-view-pf-description">
+                  <div class="list-view-pf-description description-more-space">
                     <div class="list-group-item-heading flex-50">
                       <span class="normal">{{$t('port_forward.destination')}}:</span>
                       {{host | parseObj}}
@@ -82,7 +82,7 @@
                       >{{$t('create')}}</a>
                     </div>
                   </div>
-                  <div class="list-view-pf-additional-info">
+                  <div class="list-view-pf-additional-info additional-info-less-space">
                     <div class="list-view-pf-additional-info-item">
                       <span class="fa fa-exchange"></span>
                       <strong>{{data.rules.length}}</strong>
@@ -300,23 +300,16 @@
                   </span>
                 </div>
               </div>
-              <div class="form-group">
-                <label
-                  class="col-sm-4 control-label"
-                  for="textInput-modal-markup"
-                >{{$t('advanced_mode')}}</label>
-                <div class="col-sm-8">
-                  <toggle-button
-                    class="min-toggle"
-                    :width="40"
-                    :height="20"
-                    :color="{checked: '#0088ce', unchecked: '#bbbbbb'}"
-                    :value="newPf.advanced"
-                    :sync="true"
-                    @change="toggleAdvancedMode()"
-                  />
-                </div>
-              </div>
+              <legend class="fields-section-header-pf" aria-expanded="true">
+                <span
+                  :class="['fa fa-angle-right field-section-toggle-pf', newPf.advanced ? 'fa-angle-down' : '']"
+                ></span>
+                <a
+                  class="field-section-toggle-pf"
+                  @click="toggleAdvancedMode()"
+                >{{$t('advanced_mode')}}</a>
+              </legend>
+
               <div
                 v-show="newPf.advanced"
                 :class="['form-group', newPf.errors.OriDst.hasError ? 'has-error' : '']"
@@ -481,6 +474,15 @@ export default {
     this.getProtocols();
     this.getServices();
     this.getWans();
+
+    var context = this;
+    context.$parent.$on("changes-applied", function() {
+      context.getPF();
+      context.getHosts();
+      context.getProtocols();
+      context.getServices();
+      context.getWans();
+    });
   },
   beforeRouteLeave(to, from, next) {
     $(".modal").modal("hide");
@@ -1095,5 +1097,12 @@ export default {
 
 .textarea-mid-height {
   min-height: 100px;
+}
+
+.description-more-space {
+  width: 85% !important;
+}
+.additional-info-less-space {
+  width: 15% !important;
 }
 </style>

@@ -1168,6 +1168,11 @@
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteHost(currentHost)">
             <div class="modal-body">
+              <div v-show="currentHost.isError" class="alert alert-warning alert-dismissable">
+                <span class="pficon pficon-warning-triangle-o"></span>
+                <strong>{{$t('warning')}}.</strong>
+                {{$t(currentHost.isError)}}.
+              </div>
               <div class="form-group">
                 <label
                   class="col-sm-3 control-label"
@@ -1176,6 +1181,7 @@
               </div>
             </div>
             <div class="modal-footer">
+              <div v-if="currentHost.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
               <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
               <button class="btn btn-danger" type="submit">{{$t('delete')}}</button>
             </div>
@@ -1191,6 +1197,11 @@
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteHostGroup(currentHostGroup)">
             <div class="modal-body">
+              <div v-show="currentHostGroup.isError" class="alert alert-warning alert-dismissable">
+                <span class="pficon pficon-warning-triangle-o"></span>
+                <strong>{{$t('warning')}}.</strong>
+                {{$t(currentHostGroup.isError)}}.
+              </div>
               <div class="form-group">
                 <label
                   class="col-sm-3 control-label"
@@ -1199,6 +1210,7 @@
               </div>
             </div>
             <div class="modal-footer">
+              <div v-if="currentHostGroup.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
               <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
               <button class="btn btn-danger" type="submit">{{$t('delete')}}</button>
             </div>
@@ -1214,6 +1226,11 @@
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteIPRange(currentIPRange)">
             <div class="modal-body">
+              <div v-show="currentIPRange.isError" class="alert alert-warning alert-dismissable">
+                <span class="pficon pficon-warning-triangle-o"></span>
+                <strong>{{$t('warning')}}.</strong>
+                {{$t(currentIPRange.isError)}}.
+              </div>
               <div class="form-group">
                 <label
                   class="col-sm-3 control-label"
@@ -1222,6 +1239,7 @@
               </div>
             </div>
             <div class="modal-footer">
+              <div v-if="currentIPRange.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
               <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
               <button class="btn btn-danger" type="submit">{{$t('delete')}}</button>
             </div>
@@ -1237,6 +1255,11 @@
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteCIDRSub(currentCIDRSub)">
             <div class="modal-body">
+              <div v-show="currentCIDRSub.isError" class="alert alert-warning alert-dismissable">
+                <span class="pficon pficon-warning-triangle-o"></span>
+                <strong>{{$t('warning')}}.</strong>
+                {{$t(currentCIDRSub.isError)}}.
+              </div>
               <div class="form-group">
                 <label
                   class="col-sm-3 control-label"
@@ -1245,6 +1268,7 @@
               </div>
             </div>
             <div class="modal-footer">
+              <div v-if="currentCIDRSub.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
               <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
               <button class="btn btn-danger" type="submit">{{$t('delete')}}</button>
             </div>
@@ -1260,6 +1284,11 @@
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteZone(currentZone)">
             <div class="modal-body">
+              <div v-show="currentZone.isError" class="alert alert-warning alert-dismissable">
+                <span class="pficon pficon-warning-triangle-o"></span>
+                <strong>{{$t('warning')}}.</strong>
+                {{$t(currentZone.isError)}}.
+              </div>
               <div class="form-group">
                 <label
                   class="col-sm-3 control-label"
@@ -1268,6 +1297,7 @@
               </div>
             </div>
             <div class="modal-footer">
+              <div v-if="currentZone.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
               <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
               <button class="btn btn-danger" type="submit">{{$t('delete')}}</button>
             </div>
@@ -1294,6 +1324,14 @@
             v-on:submit.prevent="deleteTimeCondition(currentTimeCondition)"
           >
             <div class="modal-body">
+              <div
+                v-show="currentTimeCondition.isError"
+                class="alert alert-warning alert-dismissable"
+              >
+                <span class="pficon pficon-warning-triangle-o"></span>
+                <strong>{{$t('warning')}}.</strong>
+                {{$t(currentTimeCondition.isError)}}.
+              </div>
               <div class="form-group">
                 <label
                   class="col-sm-3 control-label"
@@ -1302,6 +1340,10 @@
               </div>
             </div>
             <div class="modal-footer">
+              <div
+                v-if="currentTimeCondition.isLoading"
+                class="spinner spinner-sm form-spinner-loader"
+              ></div>
               <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
               <button class="btn btn-danger" type="submit">{{$t('delete')}}</button>
             </div>
@@ -1317,6 +1359,11 @@
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteService(currentService)">
             <div class="modal-body">
+              <div v-show="currentService.isError" class="alert alert-warning alert-dismissable">
+                <span class="pficon pficon-warning-triangle-o"></span>
+                <strong>{{$t('warning')}}.</strong>
+                {{$t(currentService.isError)}}.
+              </div>
               <div class="form-group">
                 <label
                   class="col-sm-3 control-label"
@@ -1325,6 +1372,7 @@
               </div>
             </div>
             <div class="modal-footer">
+              <div v-if="currentService.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
               <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
               <button class="btn btn-danger" type="submit">{{$t('delete')}}</button>
             </div>
@@ -1354,6 +1402,19 @@ export default {
     this.getProtocols();
     this.getInterfaces();
     $("#hosts-tab-parent").click();
+
+    var context = this;
+    context.$parent.$on("changes-applied", function() {
+      context.getHosts();
+      context.getHostGroups();
+      context.getIPRanges();
+      context.getCIDRSubs();
+      context.getZones();
+      context.getTimeConditions();
+      context.getServices();
+      context.getProtocols();
+      context.getInterfaces();
+    });
   },
   data() {
     return {
@@ -1607,6 +1668,7 @@ export default {
       return {
         isLoading: false,
         isEdit: false,
+        isError: false,
         name: "",
         IpAddress: "",
         Description: "",
@@ -1617,6 +1679,7 @@ export default {
       return {
         isLoading: false,
         isEdit: false,
+        isError: false,
         name: "",
         Description: "",
         Members: [],
@@ -1628,6 +1691,7 @@ export default {
       return {
         isLoading: false,
         isEdit: false,
+        isError: false,
         name: "",
         Start: "",
         End: "",
@@ -1639,6 +1703,7 @@ export default {
       return {
         isLoading: false,
         isEdit: false,
+        isError: false,
         name: "",
         Address: "",
         Description: "",
@@ -1649,6 +1714,7 @@ export default {
       return {
         isLoading: false,
         isEdit: false,
+        isError: false,
         name: "",
         Interface: "",
         Network: "",
@@ -1660,6 +1726,7 @@ export default {
       return {
         isLoading: false,
         isEdit: false,
+        isError: false,
         name: "",
         TimeStart: "",
         TimeStop: "",
@@ -1673,6 +1740,7 @@ export default {
       return {
         isLoading: false,
         isEdit: false,
+        isError: false,
         name: "",
         Protocol: "",
         Ports: "",
@@ -2057,6 +2125,10 @@ export default {
       var context = this;
 
       var hostObj = Object.assign({}, host);
+      delete hostObj.isLoading;
+      delete hostObj.isEdit;
+      delete hostObj.isError;
+      delete hostObj.errors;
       hostObj.action = host.isEdit ? "update-host" : "create-host";
 
       context.newHost.isLoading = true;
@@ -2146,22 +2218,41 @@ export default {
         "objects.host_deleted_error"
       );
 
-      $("#deleteHostModal").modal("hide");
       nethserver.exec(
-        ["nethserver-firewall-base/objects/delete"],
+        ["nethserver-firewall-base/objects/validate"],
         {
           name: host.name,
           action: "delete-host"
         },
-        function(stream) {
-          console.info("hosts", stream);
-        },
+        null,
         function(success) {
-          // get hosts
-          context.getHosts();
+          $("#deleteHostModal").modal("hide");
+          nethserver.exec(
+            ["nethserver-firewall-base/objects/delete"],
+            {
+              name: host.name,
+              action: "delete-host"
+            },
+            function(stream) {
+              console.info("hosts", stream);
+            },
+            function(success) {
+              // get hosts
+              context.getHosts();
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
         },
         function(error, data) {
           console.error(error, data);
+          try {
+            errorData = JSON.parse(data);
+            host.isError = errorData.message;
+          } catch (e) {
+            console.error(e);
+          }
         }
       );
     },
@@ -2181,6 +2272,10 @@ export default {
       var context = this;
 
       var hostGroupObj = Object.assign({}, hostGroup);
+      delete hostGroupObj.isLoading;
+      delete hostGroupObj.isEdit;
+      delete hostGroupObj.isError;
+      delete hostGroupObj.errors;
       hostGroupObj.action = hostGroup.isEdit
         ? "update-host-group"
         : "create-host-group";
@@ -2272,22 +2367,41 @@ export default {
         "objects.host_group_deleted_error"
       );
 
-      $("#deleteHostGroupModal").modal("hide");
       nethserver.exec(
-        ["nethserver-firewall-base/objects/delete"],
+        ["nethserver-firewall-base/objects/validate"],
         {
           name: hostGroup.name,
           action: "delete-host-group"
         },
-        function(stream) {
-          console.info("hostGroups", stream);
-        },
+        null,
         function(success) {
-          // get hostGroups
-          context.getHostGroups();
+          $("#deleteHostGroupModal").modal("hide");
+          nethserver.exec(
+            ["nethserver-firewall-base/objects/delete"],
+            {
+              name: hostGroup.name,
+              action: "delete-host-group"
+            },
+            function(stream) {
+              console.info("hostGroups", stream);
+            },
+            function(success) {
+              // get hostGroups
+              context.getHostGroups();
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
         },
         function(error, data) {
           console.error(error, data);
+          try {
+            errorData = JSON.parse(data);
+            hostGroup.isError = errorData.message;
+          } catch (e) {
+            console.error(e);
+          }
         }
       );
     },
@@ -2307,6 +2421,10 @@ export default {
       var context = this;
 
       var ipRangeObj = Object.assign({}, ipRange);
+      delete ipRangeObj.isLoading;
+      delete ipRangeObj.isEdit;
+      delete ipRangeObj.isError;
+      delete ipRangeObj.errors;
       ipRangeObj.action = ipRange.isEdit
         ? "update-ip-range"
         : "create-ip-range";
@@ -2398,22 +2516,41 @@ export default {
         "objects.ip_range_deleted_error"
       );
 
-      $("#deleteIPRangeModal").modal("hide");
       nethserver.exec(
-        ["nethserver-firewall-base/objects/delete"],
+        ["nethserver-firewall-base/objects/validate"],
         {
           name: ipRange.name,
           action: "delete-ip-range"
         },
-        function(stream) {
-          console.info("ipRanges", stream);
-        },
+        null,
         function(success) {
-          // get ipRanges
-          context.getIPRanges();
+          $("#deleteIPRangeModal").modal("hide");
+          nethserver.exec(
+            ["nethserver-firewall-base/objects/delete"],
+            {
+              name: ipRange.name,
+              action: "delete-ip-range"
+            },
+            function(stream) {
+              console.info("ipRanges", stream);
+            },
+            function(success) {
+              // get ipRanges
+              context.getIPRanges();
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
         },
         function(error, data) {
           console.error(error, data);
+          try {
+            errorData = JSON.parse(data);
+            ipRange.isError = errorData.message;
+          } catch (e) {
+            console.error(e);
+          }
         }
       );
     },
@@ -2433,6 +2570,10 @@ export default {
       var context = this;
 
       var cidrSubObj = Object.assign({}, cidrSub);
+      delete cidrSubObj.isLoading;
+      delete cidrSubObj.isEdit;
+      delete cidrSubObj.isError;
+      delete cidrSubObj.errors;
       cidrSubObj.action = cidrSub.isEdit
         ? "update-cidr-sub"
         : "create-cidr-sub";
@@ -2524,22 +2665,41 @@ export default {
         "objects.cidr_sub_deleted_error"
       );
 
-      $("#deleteCIDRSubModal").modal("hide");
       nethserver.exec(
-        ["nethserver-firewall-base/objects/delete"],
+        ["nethserver-firewall-base/objects/validate"],
         {
           name: cidrSub.name,
           action: "delete-cidr-sub"
         },
-        function(stream) {
-          console.info("cidrSubs", stream);
-        },
+        null,
         function(success) {
-          // get cidrSubs
-          context.getCIDRSubs();
+          $("#deleteCIDRSubModal").modal("hide");
+          nethserver.exec(
+            ["nethserver-firewall-base/objects/delete"],
+            {
+              name: cidrSub.name,
+              action: "delete-cidr-sub"
+            },
+            function(stream) {
+              console.info("cidrSubs", stream);
+            },
+            function(success) {
+              // get cidrSubs
+              context.getCIDRSubs();
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
         },
         function(error, data) {
           console.error(error, data);
+          try {
+            errorData = JSON.parse(data);
+            cidrSub.isError = errorData.message;
+          } catch (e) {
+            console.error(e);
+          }
         }
       );
     },
@@ -2559,6 +2719,10 @@ export default {
       var context = this;
 
       var zoneObj = Object.assign({}, zone);
+      delete zoneObj.isLoading;
+      delete zoneObj.isEdit;
+      delete zoneObj.isError;
+      delete zoneObj.errors;
       zoneObj.action = zone.isEdit ? "update-zone" : "create-zone";
 
       context.newZone.isLoading = true;
@@ -2648,22 +2812,41 @@ export default {
         "objects.zone_deleted_error"
       );
 
-      $("#deleteZoneModal").modal("hide");
       nethserver.exec(
-        ["nethserver-firewall-base/objects/delete"],
+        ["nethserver-firewall-base/objects/validate"],
         {
           name: zone.name,
           action: "delete-zone"
         },
-        function(stream) {
-          console.info("zones", stream);
-        },
+        null,
         function(success) {
-          // get zones
-          context.getZones();
+          $("#deleteZoneModal").modal("hide");
+          nethserver.exec(
+            ["nethserver-firewall-base/objects/delete"],
+            {
+              name: zone.name,
+              action: "delete-zone"
+            },
+            function(stream) {
+              console.info("zones", stream);
+            },
+            function(success) {
+              // get zones
+              context.getZones();
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
         },
         function(error, data) {
           console.error(error, data);
+          try {
+            errorData = JSON.parse(data);
+            zone.isError = errorData.message;
+          } catch (e) {
+            console.error(e);
+          }
         }
       );
     },
@@ -2683,6 +2866,10 @@ export default {
       var context = this;
 
       var timeConditionObj = Object.assign({}, timeCondition);
+      delete timeConditionObj.isLoading;
+      delete timeConditionObj.isEdit;
+      delete timeConditionObj.isError;
+      delete timeConditionObj.errors;
       timeConditionObj.action = timeCondition.isEdit
         ? "update-time-condition"
         : "create-time-condition";
@@ -2774,22 +2961,41 @@ export default {
         "objects.time_condition_deleted_error"
       );
 
-      $("#deleteTimeConditionModal").modal("hide");
       nethserver.exec(
-        ["nethserver-firewall-base/objects/delete"],
+        ["nethserver-firewall-base/objects/validate"],
         {
           name: timeCondition.name,
           action: "delete-time-condition"
         },
-        function(stream) {
-          console.info("timeConditions", stream);
-        },
+        null,
         function(success) {
-          // get timeConditions
-          context.getTimeConditions();
+          $("#deleteTimeConditionModal").modal("hide");
+          nethserver.exec(
+            ["nethserver-firewall-base/objects/delete"],
+            {
+              name: timeCondition.name,
+              action: "delete-time-condition"
+            },
+            function(stream) {
+              console.info("timeConditions", stream);
+            },
+            function(success) {
+              // get timeConditions
+              context.getTimeConditions();
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
         },
         function(error, data) {
           console.error(error, data);
+          try {
+            errorData = JSON.parse(data);
+            timeCondition.isError = errorData.message;
+          } catch (e) {
+            console.error(e);
+          }
         }
       );
     },
@@ -2809,6 +3015,10 @@ export default {
       var context = this;
 
       var serviceObj = Object.assign({}, service);
+      delete serviceObj.isLoading;
+      delete serviceObj.isEdit;
+      delete serviceObj.isError;
+      delete serviceObj.errors;
       serviceObj.action = service.isEdit ? "update-service" : "create-service";
 
       context.newService.isLoading = true;
@@ -2898,22 +3108,41 @@ export default {
         "objects.service_deleted_error"
       );
 
-      $("#deleteServiceModal").modal("hide");
       nethserver.exec(
-        ["nethserver-firewall-base/objects/delete"],
+        ["nethserver-firewall-base/objects/validate"],
         {
           name: service.name,
           action: "delete-service"
         },
-        function(stream) {
-          console.info("services", stream);
-        },
+        null,
         function(success) {
-          // get services
-          context.getServices();
+          $("#deleteServiceModal").modal("hide");
+          nethserver.exec(
+            ["nethserver-firewall-base/objects/delete"],
+            {
+              name: service.name,
+              action: "delete-service"
+            },
+            function(stream) {
+              console.info("services", stream);
+            },
+            function(success) {
+              // get services
+              context.getServices();
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
         },
         function(error, data) {
           console.error(error, data);
+          try {
+            errorData = JSON.parse(data);
+            service.isError = errorData.message;
+          } catch (e) {
+            console.error(e);
+          }
         }
       );
     }

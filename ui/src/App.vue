@@ -71,6 +71,16 @@
 
         <li class="li-empty"></li>
 
+        <li
+          id="settings-item"
+          :class="[getCurrentPath('settings') ? 'active' : '', 'list-group-item']"
+        >
+          <a href="#/settings">
+            <span class="fa fa-gear"></span>
+            <span class="list-group-item-value">{{$t('settings.title')}}</span>
+          </a>
+        </li>
+
         <li id="logs-item" :class="[getCurrentPath('logs') ? 'active' : '', 'list-group-item']">
           <a href="#/logs">
             <span class="fa fa-list"></span>
@@ -89,27 +99,48 @@
       </ul>
     </nav>
     <div class="container-fluid container-cards-pf main-container">
-      <div v-if="needRestart" class="alert alert-warning alert-dismissable mg-top-10">
+      <div
+        v-if="status.CanApply || status.CanRestore"
+        class="alert alert-warning alert-dismissable mg-top-10"
+      >
         <button
+          v-show="status.CanApply"
           class="btn btn-primary pull-right"
           data-toggle="modal"
-          data-target="#restartFirewallModal"
+          data-target="#applyFirewallModal"
         >{{$t('dashboard.apply_changes')}}</button>
+        <button
+          v-show="status.CanRestore"
+          class="btn btn-primary pull-right"
+          data-toggle="modal"
+          data-target="#restoreFirewallModal"
+        >{{$t('dashboard.restore')}}</button>
+        <button
+          v-show="status.CanApply"
+          class="btn btn-default pull-right mg-right-5"
+          data-toggle="modal"
+          data-target="#resetFirewallModal"
+        >{{$t('dashboard.reset')}}</button>
         <span class="pficon pficon-warning-triangle-o"></span>
         <strong>{{$t('warning')}}.</strong>
-        {{$t('dashboard.firewall_settings_change')}}.
+        <span class="mg-left-5">{{$t('dashboard.firewall_settings_change')}}</span>.
       </div>
       <router-view/>
     </div>
 
-    <div class="modal" id="restartFirewallModal" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal" id="applyFirewallModal" tabindex="-1" role="dialog" data-backdrop="static">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title">{{$t('dashboard.firewall_restart')}}</h4>
+            <h4 class="modal-title">{{$t('dashboard.apply_changes')}}</h4>
           </div>
-          <form class="form-horizontal" v-on:submit.prevent="restartFirewall()">
+          <form class="form-horizontal" v-on:submit.prevent="applyChanges()">
             <div class="modal-body">
+              <div class="alert alert-warning alert-dismissable">
+                <span class="pficon pficon-warning-triangle-o"></span>
+                <strong>{{$t('warning')}}.</strong>
+                {{$t('dashboard.warning_apply_changes')}}.
+              </div>
               <div class="form-group">
                 <label
                   class="col-sm-3 control-label"
@@ -119,7 +150,63 @@
             </div>
             <div class="modal-footer">
               <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
-              <button class="btn btn-primary" type="submit">{{$t('restart')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('apply')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="restoreFirewallModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{$t('dashboard.restore')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="restoreChanges()">
+            <div class="modal-body">
+              <div class="alert alert-warning alert-dismissable">
+                <span class="pficon pficon-warning-triangle-o"></span>
+                <strong>{{$t('warning')}}.</strong>
+                {{$t('dashboard.warning_restore_changes')}}.
+              </div>
+              <div class="form-group">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('are_you_sure')}}?</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('restore')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="resetFirewallModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{$t('dashboard.reset')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="resetChanges()">
+            <div class="modal-body">
+              <div class="alert alert-warning alert-dismissable">
+                <span class="pficon pficon-warning-triangle-o"></span>
+                <strong>{{$t('warning')}}.</strong>
+                {{$t('dashboard.warning_reset_changes')}}.
+              </div>
+              <div class="form-group">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('are_you_sure')}}?</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('reset')}}</button>
             </div>
           </form>
         </div>
@@ -131,11 +218,22 @@
 <script>
 export default {
   name: "App",
-  mounted() {},
+  mounted() {
+    this.getFirewallStatus();
+    this.pollingStatus();
+  },
+  beforeRouteLeave(to, from, next) {
+    $(".modal").modal("hide");
+    next();
+  },
   data() {
     return {
       title: "",
-      needRestart: true
+      status: {
+        CanApply: 0,
+        CanRestore: 0
+      },
+      pollingIntervalId: null
     };
   },
   methods: {
@@ -146,7 +244,121 @@ export default {
         return this.$route.path.split("/")[1] === route;
       }
     },
-    restartFirewall() {}
+    pollingStatus() {
+      var context = this;
+      context.pollingIntervalId = setInterval(function() {
+        context.getFirewallStatus();
+      }, 2500);
+    },
+    getFirewallStatus() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/settings/read"],
+        {
+          action: "status"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+            context.status = success.status;
+          } catch (e) {
+            console.error(e);
+          }
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    applyChanges() {
+      var context = this;
+
+      // notification
+      nethserver.notifications.success = context.$i18n.t(
+        "dashboard.apply_changes_ok"
+      );
+      nethserver.notifications.error = context.$i18n.t(
+        "dashboard.apply_changes_error"
+      );
+
+      $("#applyFirewallModal").modal("hide");
+      nethserver.exec(
+        ["nethserver-firewall-base/settings/update"],
+        {
+          action: "apply"
+        },
+        function(stream) {
+          console.info("firewall-base-settings-update", stream);
+        },
+        function(success) {
+          context.$emit("changes-applied");
+          context.getFirewallStatus();
+        },
+        function(error, data) {
+          console.error(error);
+        }
+      );
+    },
+    restoreChanges() {
+      var context = this;
+
+      // notification
+      nethserver.notifications.success = context.$i18n.t(
+        "dashboard.restore_changes_ok"
+      );
+      nethserver.notifications.error = context.$i18n.t(
+        "dashboard.restore_changes_error"
+      );
+
+      $("#restoreFirewallModal").modal("hide");
+      nethserver.exec(
+        ["nethserver-firewall-base/settings/update"],
+        {
+          action: "restore"
+        },
+        function(stream) {
+          console.info("firewall-base-settings-update", stream);
+        },
+        function(success) {
+          context.$emit("changes-applied");
+          context.getFirewallStatus();
+        },
+        function(error, data) {
+          console.error(error);
+        }
+      );
+    },
+    resetChanges() {
+      var context = this;
+
+      // notification
+      nethserver.notifications.success = context.$i18n.t(
+        "dashboard.reset_changes_ok"
+      );
+      nethserver.notifications.error = context.$i18n.t(
+        "dashboard.reset_changes_error"
+      );
+
+      $("#resetFirewallModal").modal("hide");
+      nethserver.exec(
+        ["nethserver-firewall-base/settings/update"],
+        {
+          action: "reset"
+        },
+        function(stream) {
+          console.info("firewall-base-settings-update", stream);
+        },
+        function(success) {
+          context.$emit("changes-applied");
+          context.getFirewallStatus();
+        },
+        function(error, data) {
+          console.error(error);
+        }
+      );
+    }
   }
 };
 </script>

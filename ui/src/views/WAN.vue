@@ -313,14 +313,6 @@
               :title="mapTitleAction(r)"
               :class="[mapIcon(r.Action), 'list-view-pf-icon-sm']"
             ></span>
-            <span
-              data-toggle="tooltip"
-              data-placement="top"
-              data-html="true"
-              :title="$t('rules.log_enabled')"
-              v-show="r.Log"
-              class="fa fa-bookmark-o log-icon"
-            ></span>
           </div>
           <div class="list-view-pf-body">
             <div class="list-view-pf-description rules-src-dst">
@@ -433,23 +425,16 @@
                   </span>
                 </div>
               </div>
-              <div class="form-group">
-                <label
-                  class="col-sm-4 control-label"
-                  for="textInput-modal-markup"
-                >{{$t('advanced_mode')}}</label>
-                <div class="col-sm-8">
-                  <toggle-button
-                    class="min-toggle"
-                    :width="40"
-                    :height="20"
-                    :color="{checked: '#0088ce', unchecked: '#bbbbbb'}"
-                    :value="wan.advanced"
-                    :sync="true"
-                    @change="toggleAdvancedMode()"
-                  />
-                </div>
-              </div>
+              <legend class="fields-section-header-pf" aria-expanded="true">
+                <span
+                  :class="['fa fa-angle-right field-section-toggle-pf', wan.advanced ? 'fa-angle-down' : '']"
+                ></span>
+                <a
+                  class="field-section-toggle-pf"
+                  @click="toggleAdvancedMode()"
+                >{{$t('advanced_mode')}}</a>
+              </legend>
+
               <div
                 v-show="wan.advanced"
                 :class="['form-group', wan.errors.CheckIP.hasError ? 'has-error' : '']"
@@ -661,23 +646,15 @@
                 </div>
               </div>
 
-              <div class="form-group">
-                <label
-                  class="col-sm-4 control-label"
-                  for="textInput-modal-markup"
-                >{{$t('advanced_mode')}}</label>
-                <div class="col-sm-8">
-                  <toggle-button
-                    class="min-toggle"
-                    :width="40"
-                    :height="20"
-                    :color="{checked: '#0088ce', unchecked: '#bbbbbb'}"
-                    :value="newRule.advanced"
-                    :sync="true"
-                    @change="toggleAdvancedRuleMode()"
-                  />
-                </div>
-              </div>
+              <legend class="fields-section-header-pf" aria-expanded="true">
+                <span
+                  :class="['fa fa-angle-right field-section-toggle-pf', newRule.advanced ? 'fa-angle-down' : '']"
+                ></span>
+                <a
+                  class="field-section-toggle-pf"
+                  @click="toggleAdvancedRuleMode()"
+                >{{$t('advanced_mode')}}</a>
+              </legend>
 
               <div
                 v-show="newRule.advanced"
@@ -689,20 +666,6 @@
                   <span v-if="newRule.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newRule.errors.Description.message)}}
-                  </span>
-                </div>
-              </div>
-
-              <div
-                v-show="newRule.advanced"
-                :class="['form-group', newRule.errors.Log.hasError ? 'has-error' : '']"
-              >
-                <label class="col-sm-4 control-label">{{$t('rules.log')}}</label>
-                <div class="col-sm-8">
-                  <input class="form-control" type="checkbox" v-model="newRule.Log">
-                  <span v-if="newRule.errors.Log.hasError" class="help-block">
-                    {{$t('validation.validation_failed')}}:
-                    {{$t('validation.'+newRule.errors.Log.message)}}
                   </span>
                 </div>
               </div>
@@ -808,6 +771,21 @@ export default {
     this.getServices();
     this.getApplications();
     this.getRoles();
+
+    var context = this;
+    context.$parent.$on("changes-applied", function() {
+      context.getProviders();
+      context.getRules();
+      context.getHosts();
+      context.getHostGroups();
+      context.getIPRanges();
+      context.getCIDRSubs();
+      context.getZones();
+      context.getTimeConditions();
+      context.getServices();
+      context.getApplications();
+      context.getRoles();
+    });
   },
   beforeRouteLeave(to, from, next) {
     $(".modal").modal("hide");
@@ -832,14 +810,6 @@ export default {
     },
     mapTitleAction(rule) {
       var html = "<b>" + rule.Action.split(";")[1].toUpperCase() + "</b><br>";
-
-      if (rule.Log) {
-        html +=
-          '<div class="type-info"><span class="fa fa-bookmark-o mg-right-5 mg-top-5 detail-icon"></span>' +
-          "<span>" +
-          this.$i18n.t("rules.log_enabled") +
-          "</span></div>";
-      }
 
       return html;
     },
@@ -1148,7 +1118,6 @@ export default {
         Service: "",
         ServiceType: "",
         Action: "accept",
-        Log: false,
         Quick: false,
         Time: "",
         Description: "",
@@ -1175,10 +1144,6 @@ export default {
           message: ""
         },
         Action: {
-          hasError: false,
-          message: ""
-        },
-        Log: {
           hasError: false,
           message: ""
         },
@@ -1576,11 +1541,7 @@ export default {
         function(success) {
           try {
             success = JSON.parse(success);
-            var rules = success.rules.map(function(r) {
-              r.Log = r.Log == "none" ? false : true;
-              return r;
-            });
-            context.rules = rules;
+            context.rules = success.rules;
 
             context.view.isLoaded = true;
 

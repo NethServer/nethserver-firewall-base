@@ -11,6 +11,9 @@
         "delete": "Delete",
         "cancel": "Cancel",
         "restart": "Restart",
+        "restore": "Restore",
+        "reset": "Reset",
+        "apply": "Apply",
         "charts": "Charts",
         "list": "List",
         "details": "Details",
@@ -89,11 +92,21 @@
             "icmp": "ICMP",
             "firewall_settings_change": "Firewall settings are changed but the firewall has not been restarted. Click 'Apply changes' to apply changes",
             "apply_changes": "Apply changes",
-            "firewall_restart": "Firewall restart",
+            "restore": "Restore",
+            "reset": "Reset",
+            "warning_apply_changes": "Apply changes warning here",
+            "warning_restore_changes": "Restore changes warning here",
+            "warning_reset_changes": "Reset changes warning here",
             "snat": "sNAT",
             "iprange": "IP Ranges",
             "cidr": "CIDR Subnets",
-            "host-group": "Host groups"
+            "host-group": "Host groups",
+            "apply_changes_ok": "Changes applied successfully!",
+            "apply_changes_error": "Changes not applied.",
+            "restore_changes_ok": "Restore successfully!",
+            "restore_changes_error": "Error during restore.",
+            "reset_changes_ok": "Reset successfully!",
+            "reset_changes_error": "Error during reset."
         },
         "wan": {
             "title": "WAN",
@@ -351,7 +364,8 @@
             "to_firewall": "To Firewall",
             "from_firewall": "From Firewall",
             "provider": "Provider",
-            "class": "Class"
+            "class": "Class",
+            "policies": "Policies"
         },
         "protocols": {
             "ah": "AH",
@@ -360,6 +374,16 @@
             "tcpudp": "TCP and UDP",
             "gre": "GRE",
             "esp": "ESP"
+        },
+        "settings": {
+            "title": "Settings",
+            "traffic_internet": "Traffic to Internet (red interface)",
+            "external_ping": "Ping from Internet",
+            "mac": "MAC validation (IP/MAC binding)",
+            "allowed": "Allowed",
+            "allow_mac": "Allow hosts without IP/MAC binding (DHCP reservation)",
+            "settings_updated_ok": "Settings updated successfully!",
+            "settings_updated_error": "Settings not updated."
         },
         "logs": {
             "title": "Logs",

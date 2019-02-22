@@ -11,6 +11,7 @@ import PortForward from './views/PortForward.vue'
 import Rules from './views/Rules.vue'
 import LocalRules from './views/LocalRules.vue'
 
+import Settings from './views/Settings.vue'
 import Logs from './views/Logs.vue'
 import About from './views/About.vue'
 
@@ -56,6 +57,11 @@ export default new Router({
       path: '/snat',
       name: 'snat',
       component: sNAT
+    },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: Settings
     },
     {
       path: '/logs',

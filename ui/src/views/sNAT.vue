@@ -71,6 +71,12 @@ export default {
   mounted() {
     this.getSN();
     this.getHosts();
+
+    var context = this;
+    context.$parent.$on("changes-applied", function() {
+      context.getSN();
+      context.getHosts();
+    });
   },
   beforeRouteLeave(to, from, next) {
     $(".modal").modal("hide");

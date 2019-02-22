@@ -354,23 +354,15 @@
                 </div>
               </div>
 
-              <div class="form-group">
-                <label
-                  class="col-sm-4 control-label"
-                  for="textInput-modal-markup"
-                >{{$t('advanced_mode')}}</label>
-                <div class="col-sm-8">
-                  <toggle-button
-                    class="min-toggle"
-                    :width="40"
-                    :height="20"
-                    :color="{checked: '#0088ce', unchecked: '#bbbbbb'}"
-                    :value="newRule.advanced"
-                    :sync="true"
-                    @change="toggleAdvancedMode()"
-                  />
-                </div>
-              </div>
+              <legend class="fields-section-header-pf" aria-expanded="true">
+                <span
+                  :class="['fa fa-angle-right field-section-toggle-pf', newRule.advanced ? 'fa-angle-down' : '']"
+                ></span>
+                <a
+                  class="field-section-toggle-pf"
+                  @click="toggleAdvancedMode()"
+                >{{$t('advanced_mode')}}</a>
+              </legend>
 
               <div
                 v-show="newRule.advanced"
@@ -462,6 +454,20 @@ export default {
     this.getServices();
     this.getApplications();
     this.getRoles();
+
+    var context = this;
+    context.$parent.$on("changes-applied", function() {
+      context.getRules();
+      context.getHosts();
+      context.getHostGroups();
+      context.getIPRanges();
+      context.getCIDRSubs();
+      context.getZones();
+      context.getTimeConditions();
+      context.getServices();
+      context.getApplications();
+      context.getRoles();
+    });
   },
   beforeRouteLeave(to, from, next) {
     $(".modal").modal("hide");

@@ -15,7 +15,18 @@
     </div>
 
     <div v-if="rules.length > 0 && view.isLoaded">
-      <h3>{{$t('actions')}}</h3>
+      <h3>
+        {{$t('actions')}}
+        <a
+          id="routing-info"
+          data-toggle="modal"
+          data-target="#policiesModal"
+          :class="['right', policies.length == 0 ? 'disabled' : '']"
+        >
+          <span class="fa fa-shield starred-marging"></span>
+          {{$t('rules.policies')}}
+        </a>
+      </h3>
       <button @click="openCreateRule()" class="btn btn-primary btn-lg">{{$t('rules.create_rule')}}</button>
     </div>
 
@@ -186,6 +197,112 @@
       </ul>
     </div>
 
+    <div class="modal" id="policiesModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{$t('rules.policies')}}</h4>
+          </div>
+          <form class="form-horizontal">
+            <div class="modal-body">
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <ul
+                    v-if="policies.length > 0 && view.isLoaded"
+                    v-sortable="{onEnd: reorder, handle: '.drag-here'}"
+                    class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10"
+                  >
+                    <li
+                      :class="[mapList(r.Action), 'list-group-item']"
+                      v-for="r in policies"
+                      v-bind:key="r"
+                    >
+                      <div class="drag-size-large">
+                        <span class="gray mg-right-5">{{r.id}}</span>
+                      </div>
+
+                      <div class="list-view-pf-main-info small-list">
+                        <div class="list-view-pf-left">
+                          <span
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            data-html="true"
+                            :title="mapTitleAction(r)"
+                            :class="[mapIcon(r.Action), 'list-view-pf-icon-sm']"
+                          ></span>
+                        </div>
+                        <div class="list-view-pf-body">
+                          <div class="list-view-pf-description rules-src-dst">
+                            <div class="list-group-item-heading">
+                              <span
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                data-html="true"
+                                :title="mapTitleSrc(r)"
+                                class="handle-overflow"
+                              >
+                                <span :class="mapObjectIcon(r.Src)"></span>
+                                <span
+                                  :class="[r.Src.name.toLowerCase(),'mg-left-5']"
+                                >{{r.Src.type == 'role' || r.Src.type == 'any' ? (r.Src.name.toUpperCase()): r.Src.name}}</span>
+                              </span>
+                            </div>
+                            <div class="list-group-item-text">
+                              <span :class="[mapArrow(r.Action), 'mg-right-10 big-icon']"></span>
+                              <span
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                data-html="true"
+                                :title="mapTitleDst(r)"
+                                class="handle-overflow"
+                              >
+                                <span :class="mapObjectIcon(r.Dst)"></span>
+                                <span
+                                  :class="[r.Dst.name.toLowerCase(),'mg-left-5']"
+                                >{{r.Dst.type == 'role' || r.Dst.type == 'any' ? (r.Dst.name.toUpperCase()): r.Dst.name}}</span>
+                              </span>
+                            </div>
+                          </div>
+                          <div class="list-view-pf-additional-info rules-info">
+                            <div
+                              v-show="r.Service"
+                              data-toggle="tooltip"
+                              data-placement="top"
+                              data-html="true"
+                              :title="mapTitleService(r)"
+                              class="list-view-pf-additional-info-item"
+                            >
+                              <span class="fa fa-fighter-jet"></span>
+                              <strong>{{r.Service && r.Service.name}}</strong>
+                            </div>
+                            <div
+                              v-show="r.Time"
+                              data-toggle="tooltip"
+                              data-placement="top"
+                              data-html="true"
+                              :title="mapTitleTime(r)"
+                              class="list-view-pf-additional-info-item"
+                            >
+                              <span class="fa fa-clock-o"></span>
+                              <strong>{{r.Time && r.Time.name}}</strong>
+                            </div>
+                            <div class="list-view-pf-additional-info-item">{{r.Description}}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <div class="modal" id="createRuleModal" tabindex="-1" role="dialog" data-backdrop="static">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -321,23 +438,15 @@
                 </div>
               </div>
 
-              <div class="form-group">
-                <label
-                  class="col-sm-4 control-label"
-                  for="textInput-modal-markup"
-                >{{$t('advanced_mode')}}</label>
-                <div class="col-sm-8">
-                  <toggle-button
-                    class="min-toggle"
-                    :width="40"
-                    :height="20"
-                    :color="{checked: '#0088ce', unchecked: '#bbbbbb'}"
-                    :value="newRule.advanced"
-                    :sync="true"
-                    @change="toggleAdvancedMode()"
-                  />
-                </div>
-              </div>
+              <legend class="fields-section-header-pf" aria-expanded="true">
+                <span
+                  :class="['fa fa-angle-right field-section-toggle-pf', newRule.advanced ? 'fa-angle-down' : '']"
+                ></span>
+                <a
+                  class="field-section-toggle-pf"
+                  @click="toggleAdvancedMode()"
+                >{{$t('advanced_mode')}}</a>
+              </legend>
 
               <div
                 v-show="newRule.advanced"
@@ -420,6 +529,7 @@ export default {
   name: "Rules",
   mounted() {
     this.getRules();
+    this.getPolicies();
     this.getHosts();
     this.getHostGroups();
     this.getIPRanges();
@@ -429,10 +539,21 @@ export default {
     this.getServices();
     this.getApplications();
     this.getRoles();
-    setTimeout(function() {
-      console.log("tooltip");
-      $('[data-toggle="tooltip"]').tooltip();
-    }, 3000);
+
+    var context = this;
+    context.$parent.$on("changes-applied", function() {
+      context.getRules();
+      context.getPolicies();
+      context.getHosts();
+      context.getHostGroups();
+      context.getIPRanges();
+      context.getCIDRSubs();
+      context.getZones();
+      context.getTimeConditions();
+      context.getServices();
+      context.getApplications();
+      context.getRoles();
+    });
   },
   beforeRouteLeave(to, from, next) {
     $(".modal").modal("hide");
@@ -444,6 +565,7 @@ export default {
         isLoaded: false
       },
       rules: [],
+      policies: [],
       hosts: [],
       hostGroups: [],
       ipRanges: [],
@@ -1285,10 +1407,33 @@ export default {
 
             setTimeout(function() {
               $('[data-toggle="tooltip"]').tooltip();
-            }, 250);
+            }, 500);
           } catch (e) {
             console.error(e);
             context.view.isLoaded = true;
+          }
+        },
+        function(error) {
+          console.error(error);
+          context.view.isLoaded = true;
+        }
+      );
+    },
+    getPolicies() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/rules/read"],
+        {
+          action: "policies"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+            context.policies = success.policies;
+          } catch (e) {
+            console.error(e);
           }
         },
         function(error) {
@@ -1515,6 +1660,10 @@ export default {
 
 .drag-size {
   min-width: 35px !important;
+}
+
+.drag-size-large {
+  min-width: 65px !important;
 }
 
 .tooltip-inner {
