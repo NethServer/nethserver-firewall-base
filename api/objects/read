@@ -81,7 +81,7 @@ if($cmd eq 'hosts' || $cmd eq 'cidr-subs'  || $cmd eq 'host-groups' || $cmd eq '
                 my $start = $_->prop('Start') || next;
                 my $end = $_->prop('End') || next;
                 my $desc = $_->prop('Description') || '';
-                push(@objects, {"name" => $_->key, "Start" => $start, "End" => $start, "Description" => $desc});
+                push(@objects, {"name" => $_->key, "Start" => $start, "End" => $end, "Description" => $desc});
             }
 
        }
