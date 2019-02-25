@@ -20,16 +20,7 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-. /usr/libexec/nethserver/api/lib/helper_functions
-
-data=$(cat /dev/stdin)
-action=$(echo $data | jq -r '.action')
-
-function _get
-{
-    field=$1
-    echo $data | jq -r ".$field"
-}
+. /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
 
 case $action in
 
@@ -39,17 +30,18 @@ case $action in
         ;;
     "create"|"update")
         bindto=$(echo $data | jq -rc '.BindTo | map(tostring) | join(",")')
+        save_db tc
         /sbin/e-smith/db tc set "$(_get name)" class MinOutputRate "$(_get MinOutputRate)" MaxOutputRate "$(_get MaxOutputRate)" MaxInputRate "$(_get MaxInputRate)" MinInputRate "$(_get MinInputRate)" \
             Description "$(_get Description)" Unit "$(_get Unit)" BindTo "$bindto"
-        if [ $? -gt 0 ]; then
-            error "EventFailed" "See /var/log/messages"
-        fi
-        /sbin/e-smith/signal-event -j firewall-adjust
         ;;
+    *)
+        error
+        ;;
+
 esac
 
 if [ $? -gt 0 ]; then
-    error "EventFailed" "See /var/log/messages"
+    error "SaveFailed" "check_logs"
 else
     success
 fi
