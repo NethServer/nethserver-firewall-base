@@ -57,7 +57,7 @@ function _get
 function _get_array
 {
     field=$1
-    echo $data | jq -r ".$field | join(\",\")"
+    echo $data | jq -r ".$field | map(tostring) | join(\",\")"
 }
 
 #
