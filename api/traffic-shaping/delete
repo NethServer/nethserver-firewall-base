@@ -20,21 +20,19 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-. /usr/libexec/nethserver/api/lib/helper_functions
+. /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
 
-data=$(cat /dev/stdin)
+action=$(basename $0)
 
-function _get
-{
-    field=$1
-    echo $data | jq -r ".$field"
-}
-
-/sbin/e-smith/db tc delete "$(_get name)"
-/sbin/e-smith/signal-event -j firewall-adjust
+if [ "$action" = "delete" ]
+    db_save tc
+    /sbin/e-smith/db tc delete "$(_get name)"
+else
+    error
+fi
 
 if [ $? -gt 0 ]; then
-    error "EventFailed" "See /var/log/messages"
+    error "SaveFailed" "check_logs"
 else
     success
 fi
