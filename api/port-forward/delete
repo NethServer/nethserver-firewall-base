@@ -20,4 +20,19 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-. /usr/libexec/nethserver/api/nethserver-firewall-base/port-forward/create
+. /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
+
+action=$(basename $0)
+
+if [ "$action" = "delete" ]; then
+    save_db portforward
+    /sbin/e-smith/db portforward delete "$(_get name)"
+else
+    error
+fi
+
+if [ $? -gt 0 ]; then
+    error "SaveFailed" "check_logs"
+else
+    success
+fi

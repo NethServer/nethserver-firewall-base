@@ -56,10 +56,6 @@ case $action in
            Src "$src" status "$(_get status)"
        ;;
 
-   delete)
-       /sbin/e-smith/db portforward delete "$(_get name)"
-       ;;
-
     *)
         error
         ;;
