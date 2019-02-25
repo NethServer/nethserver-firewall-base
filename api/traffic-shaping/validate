@@ -20,7 +20,7 @@
  * along with NethServer.  If not, see COPYING.
 */
 
-require_once("/usr/libexec/nethserver/api/lib/Helpers.php");
+require_once("/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.php");
 
 $data = readInput();
 $action = $data['action'];
@@ -28,43 +28,67 @@ $action = $data['action'];
 $v = new LegacyValidator($data);
 $db = new EsmithDatabase('tc');
 
-if ($action == "create") {
-    if ($db->getKey($data['name'])) {
-        $v->addValidationError('name', 'class_key_exists', $data['name']);
-    }
-    $v->declareParameter('name', Validate::USERNAME);
-} else if ($action == "update") {
-    if (!$db->getKey($data['name'])) {
-        $v->addValidationError('name', 'non_existing_class', $data['name']);
-    }
-}
-
-$rateValidator = $v->createValidator()
-    ->orValidator(
-        $v->createValidator()->integer()->greatThan(0),
-        $v->createValidator()->isEmpty()
-    );
-
-
-$v->declareParameter('MaxInputRate', $rateValidator);
-$v->declareParameter('MaxOutputRate', $rateValidator);
-$v->declareParameter('MinInputRate', $rateValidator);
-$v->declareParameter('MinOutputRate', $rateValidator);
-$v->declareParameter('Unit', $v->createValidator()->memberOf(array('%','kbps')));
-if ($data['BindTo']) {
-    $ndb = new EsmithDatabase('networks');
-    foreach ($data['BindTo'] as $i) {
-        $r = $ndb->getKey($i);
-        if (!$r) {
-            $v->addValidationError('name', "invalid_interface");
+if ($action == "create-class" || $action == "update-class") {
+    if ($action == "create-class") {
+        if ($db->getKey($data['name'])) {
+            $v->addValidationError('name', 'class_key_exists', $data['name']);
+        }
+        $v->declareParameter('name', Validate::USERNAME);
+    } else if ($action == "update-class") {
+        if (!$db->getKey($data['name'])) {
+            $v->addValidationError('name', 'non_existing_class', $data['name']);
         }
     }
-}
 
-# Validate the input
-if ($v->validate()) {
-    success();
-} else {
-    error($v);
-}
+    $rateValidator = $v->createValidator()
+        ->orValidator(
+            $v->createValidator()->integer()->greatThan(0),
+            $v->createValidator()->isEmpty()
+        );
 
+
+    $v->declareParameter('MaxInputRate', $rateValidator);
+    $v->declareParameter('MaxOutputRate', $rateValidator);
+    $v->declareParameter('MinInputRate', $rateValidator);
+    $v->declareParameter('MinOutputRate', $rateValidator);
+    $v->declareParameter('Unit', $v->createValidator()->memberOf(array('%','kbps')));
+    if ($data['BindTo']) {
+        $ndb = new EsmithDatabase('networks');
+        foreach ($data['BindTo'] as $i) {
+            $r = $ndb->getKey($i);
+            if (!$r) {
+                $v->addValidationError('name', "invalid_interface");
+            }
+        }
+    }
+
+    # Validate the input
+    if ($v->validate()) {
+        success();
+    } else {
+        error($v);
+    }
+} else if ($action == 'delete-class') {
+
+    if (! $db->getKey($data['name'])) {
+        $v->addValidationError('name', 'non_existing_class', $data['name']);
+    }
+    $dbrules = new EsmithDatabase('fwrules');
+    foreach ($dbrules->getAll('rule') as $rule) {
+        if (strpos($rule['Action'],'class;') !== FALSE) {
+            $tmp = explode(";",$rule['Action']);
+            if ($tmp[1] == $data['name']) {
+                $v->addValidationError('name', 'class_cannot_be_deleted', $data['name']);
+            }
+        }
+    }
+  
+    # Validate the input
+    if ($v->validate()) {
+        success();
+    } else {
+        error($v);
+    }
+} else if ($action == 'create-rule' || $action == 'update-rule') {
+    validate_rule($data, 'traffic-shaping');
+}
