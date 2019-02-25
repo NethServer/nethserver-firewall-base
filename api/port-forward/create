@@ -22,46 +22,28 @@
 
 . /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
 
-data=$(cat /dev/stdin)
-action=$(echo $data | jq -r '.action')
+action=$(basename $0)
 
-case $action in
-    create)
-       new_name=$(expr $(/sbin/e-smith/db portforward showjson | jq -r '[.[].name] | max') + 1)
-       src=$(echo $data | jq -rc '.Src | map(tostring) | join(",")')
-       proto=$(_get Proto)
-       if [ "$proto" == "tcpudp" ]; then
-           proto="tcp,udp"
-       fi
+if [ "$action" = "create" ]; then
+    name=$(expr $(/sbin/e-smith/db portforward showjson | jq -r '[.[].name] | max') + 1)
+elif [ "$action" = "update" ]; then
+    name=$(_get name)
+else
+    error
+fi
 
-       save_db portforward
-       /sbin/e-smith/db portforward set "$new_name"  pf Allow "$(_get Allow)" \
-           Description "$(_get Description)" Dst "$(_get Dst)" \
-           DstHost "$(_get DstHost)" Log "$(_get Log)" \
-           OriDst "$(_get OriDst)" Proto "$proto" \
-           Src "$src" status "$(_get status)"
+src=$(echo $data | jq -rc '.Src | map(tostring) | join(",")')
+proto=$(_get Proto)
+if [ "$proto" == "tcpudp" ]; then
+    proto="tcp,udp"
+fi
 
-        ;;
-
-   update)
-       src=$(echo $data | jq -rc '.Src | map(tostring) | join(",")')
-       proto=$(_get Proto)
-       if [ "$proto" == "tcpudp" ]; then
-           proto="tcp,udp"
-       fi
-
-       save_db portforward
-       /sbin/e-smith/db portforward setprop "$(_get name)"  Allow "$(_get Allow)" \
-           Description "$(_get Description)" Dst "$(_get Dst)" \
-           DstHost "$(_get DstHost)" Log "$(_get Log)" \
-           OriDst "$(_get OriDst)" Proto "$proto" \
-           Src "$src" status "$(_get status)"
-       ;;
-
-    *)
-        error
-        ;;
-esac
+save_db portforward
+/sbin/e-smith/db portforward set "$name"  pf Allow "$(_get Allow)" \
+    Description "$(_get Description)" Dst "$(_get Dst)" \
+    DstHost "$(_get DstHost)" Log "$(_get Log)" \
+    OriDst "$(_get OriDst)" Proto "$proto" \
+    Src "$src" status "$(_get status)"
 
 if [ $? -gt 0 ]; then
     error "SaveFailed" "check_logs"
