@@ -34,6 +34,7 @@ case $action in
            proto="tcp,udp"
        fi
 
+       save_db portforward
        /sbin/e-smith/db portforward set "$new_name"  pf Allow "$(_get Allow)" \
            Description "$(_get Description)" Dst "$(_get Dst)" \
            DstHost "$(_get DstHost)" Log "$(_get Log)" \
@@ -49,6 +50,7 @@ case $action in
            proto="tcp,udp"
        fi
 
+       save_db portforward
        /sbin/e-smith/db portforward setprop "$(_get name)"  Allow "$(_get Allow)" \
            Description "$(_get Description)" Dst "$(_get Dst)" \
            DstHost "$(_get DstHost)" Log "$(_get Log)" \
@@ -62,13 +64,7 @@ case $action in
 esac
 
 if [ $? -gt 0 ]; then
-    error "EventFailed" "See /var/log/messages"
-fi
-
-/sbin/e-smith/signal-event -j firewall-adjust
-
-if [ $? -gt 0 ]; then
-    error "EventFailed" "See /var/log/messages"
+    error "SaveFailed" "check_logs"
 else
     success
 fi
