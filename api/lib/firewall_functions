@@ -45,7 +45,13 @@ action=$(echo $data | jq -r '.action')
 function _get
 {
     field=$1
-    echo $data | jq -r ".$field"
+    _output=$(echo $data | jq -r ".$field")
+
+    if [ "$_output" = "null" ]; then
+        echo -n ""
+    else
+        echo -n "$_output"
+    fi
 }
 
 #
