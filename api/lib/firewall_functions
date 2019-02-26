@@ -67,6 +67,39 @@ function _get_array
 }
 
 #
+# Return a firewall object from a JSON object.
+#
+# Usage example: echo $(_get_fw_object "$(get Dst)")
+#
+function _get_fw_object
+{
+    object_type=$(echo "$1" | jq -r ".type")
+    object_name=$(echo "$1" | jq -r ".name")
+
+    case "$object_type" in
+        fw)
+            echo -n fw
+            ;;
+        any)
+            echo -n any
+            ;;
+        raw)
+            echo -n "$object_name"
+            ;;
+        fwservice)
+            if [ "$object_name" == "any" ]; then
+                echo -n any
+            else
+                echo -n "$object_type;$object_name"
+            fi
+            ;;
+        *)
+            echo -n "$object_type;$object_name"
+            ;;
+    esac
+}
+
+#
 # Save the given database inside the spool directory
 # The datbase is saved only once with ".active" extension.
 # The copy is the database used for the running configuration.
