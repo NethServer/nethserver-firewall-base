@@ -23,32 +23,4 @@
 
 action=$(basename $0)
 
-if [ "$action" = "create" ]; then
-    id=$(expr $(/sbin/e-smith/db fwrules showjson | jq -r '[.[].name] | map(tonumber) | max' | sed -e 's/null/0/') + 1)
-elif [ "$action" = "update" ]; then
-    id=$(_get id)
-else
-    error
-fi
-
-if [ -z "$(_get Time)" ]; then
-    Time=""
-else
-    Time=$(_get_fw_object "$(_get Time)")
-fi
-
-Dst=$(_get_fw_object "$(_get Dst)")
-Src=$(_get_fw_object "$(_get Src)")
-Service=$(_get_fw_object "$(_get Service)")
-
-/sbin/e-smith/db fwrules set "$id" rule Action "$(_get Action)" Log $(_get Log) \
-    Position "$(_get Position)"  Time "$Time" \
-    Dst "$Dst" Service "$Service" \
-    Src "$Src" status "$(_get status)" \
-    Description "$(_get Description)"
-
-if [ $? -gt 0 ]; then
-    error "SaveFailed" "check_logs"
-else
-    success
-fi
+fw_rule $action
