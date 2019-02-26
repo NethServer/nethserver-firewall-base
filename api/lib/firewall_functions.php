@@ -111,23 +111,23 @@ function validate_rule($data, $type) {
         }
     }
 
-    # Check raw value. Eg: {"Value": "192.168.1.1", "type": "raw"}
+    # Check raw value. Eg: {"name": "192.168.1.1", "type": "raw"}
     $ip_v = $v->createValidator(Validate::IPv4);
     $cidr_v = $v->createValidator(Validate::CIDR_BLOCK);
     $ip_cidr_v = $v->createValidator()->orValidator($ip_v, $cidr_v);
     if ($data['Src']['type'] == 'raw') {
-        if (!$ip_cidr_v->evaluate($data['Src']['Value'])) {
+        if (!$ip_cidr_v->evaluate($data['Src']['name'])) {
             $v->addValidationError('Src', 'valid_ip_or_cidr', $data['Src']);
         }
-        $src = $data['Src']['Value'];
+        $src = $data['Src']['name'];
     } else {
         $src = $data['Src']['type'].";". $data['Src']['name'];
     }
     if ($data['Dst']['type'] == 'raw') {
-        if (!$ip_cidr_v->evaluate($data['Dst']['Value'])) {
+        if (!$ip_cidr_v->evaluate($data['Dst']['name'])) {
             $v->addValidationError('Dst', 'valid_ip_or_cidr', $data['Dst']);
         }
-        $dst = $data['Dst']['Value'];
+        $dst = $data['Dst']['name'];
     } else {
         $dst = $data['Dst']['type'].";". $data['Dst']['name'];
     }
