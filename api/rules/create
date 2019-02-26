@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+ 
+. /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
+
+action=$(basename $0)
+
+if [ "$action" = "create" ]; then
+    id=$(expr $(/sbin/e-smith/db fwrules showjson | jq -r '[.[].name] | map(tonumber) | max' | sed -e 's/null/0/') + 1)
+elif [ "$action" = "update" ]; then
+    id=$(_get id)
+else
+    error
+fi
+
+if [ -z "$(_get Time)" ]; then
+    Time=""
+else
+    Time=$(_get_fw_object "$(_get Time)")
+fi
+
+Dst=$(_get_fw_object "$(_get Dst)")
+Src=$(_get_fw_object "$(_get Src)")
+Service=$(_get_fw_object "$(_get Service)")
+
+/sbin/e-smith/db fwrules set "$id" rule Action "$(_get Action)" Log $(_get Log) \
+    Position "$(_get Position)"  Time "$Time" \
+    Dst "$Dst" Service "$Service" \
+    Src "$Src" status "$(_get status)" \
+    Description "$(_get Description)"
+
+if [ $? -gt 0 ]; then
+    error "SaveFailed" "check_logs"
+else
+    success
+fi
