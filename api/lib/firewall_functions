@@ -243,7 +243,8 @@ function fw_rule
     Dst=$(_get_fw_object "$(_get Dst)")
     Src=$(_get_fw_object "$(_get Src)")
     Service=$(_get_fw_object "$(_get Service)")
-    
+
+    save_db fwrules
     /sbin/e-smith/db fwrules set "$id" rule Action "$(_get Action)" Log $(_get Log) \
         Position "$(_get Position)"  Time "$Time" \
         Dst "$Dst" Service "$Service" \
