@@ -151,3 +151,28 @@ function reset_config
     done
 
 }
+
+#
+# Delete given firewall rule
+# Takes one argument: the rule id
+#
+# Usage example: delete_rule "$(_get name)"
+#
+function delete_rule
+{
+    id=$1
+
+    if [ -z $id ]; then
+        error
+    fi
+
+    save_db fwrules
+    /sbin/e-smith/db fwrules delete "$1"
+
+    if [ $? -gt 0 ]; then
+        error "DeleteFailed" "check_logs"
+    else
+        success
+    fi
+
+}
