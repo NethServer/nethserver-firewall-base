@@ -72,11 +72,13 @@ function validate_rule($data, $type) {
             $v->addValidationError('Src', 'role_no_red', $data['Src']);
         }
 
-        if ($data['Dst']['type'] == 'role' && $data['Dst']['name'] == 'red') {
-            $v->addValidationError('Dst', 'role_only_red', $data['Dst']);
+        if ($data['Dst']['type'] == 'role') {
+            if ($data['Dst']['name'] != 'red') {
+                $v->addValidationError('Dst', 'role_only_red', $data['Dst']);
+            }
         } else {
             if (! in_array($data['Dst']['type'], array('host', 'iprange', 'zone', 'cidr'))) {
-            $v->addValidationError('Dst', 'valid_types_zone_host_iprange_cidr', $data['Dst']);
+                $v->addValidationError('Dst', 'valid_types_zone_host_iprange_cidr', $data['Dst']);
             }
         }
     }
