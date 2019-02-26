@@ -31,7 +31,7 @@ my $fwRulesDb = esmith::ConfigDB->open_ro('fwrules');
 
 my $props = JSON->new->utf8->decode($rule);
 
-if($props->{'Action'} !~ /^priority;/) {
+if($props->{'Action'} !~ /^class;/) {
     # ignore non-priority actions
     exit(0);
 }
