@@ -85,6 +85,8 @@ case "create":
                 $v->addValidationError('Src', 'port_number_or_port_range');
             }
         }
+    } else {
+        $v->addValidationError('Src', 'must_be_an_array');
     }
     if (!preg_match("/tcp|udp/", $data['Proto'])) {
         if ($data['Src'] || $data['Dst']) {
