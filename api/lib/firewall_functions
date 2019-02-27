@@ -231,7 +231,7 @@ function delete_rule
 function fw_rule
 {
     if [ "$1" = "create" ]; then
-        id=$(expr $(/sbin/e-smith/db fwrules showjson | jq -r '[.[].name] | map(tonumber) | max' | sed -e 's/null/0/') + 1)
+        id=$(/usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-next-id)
     elif [ "$1" = "update" ]; then
         id=$(_get id)
     else
