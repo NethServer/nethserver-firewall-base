@@ -660,12 +660,8 @@ export default {
       });
 
       // notification
-      nethserver.notifications.success = this.$i18n.t(
-        "rules.rule_updated_ok"
-      );
-      nethserver.notifications.error = this.$i18n.t(
-        "rules.rule_updated_error"
-      );
+      nethserver.notifications.success = this.$i18n.t("rules.rule_updated_ok");
+      nethserver.notifications.error = this.$i18n.t("rules.rule_updated_error");
 
       nethserver.exec(
         ["nethserver-firewall-base/rules/update"],
@@ -1650,7 +1646,8 @@ export default {
         Src: context.newRule.SrcFull
           ? context.newRule.SrcFull
           : { name: context.newRule.Src, type: "raw" },
-        type: "rule"
+        type: "rule",
+        Description: context.newRule.Description
       };
 
       context.newRule.isLoading = true;

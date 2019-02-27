@@ -1535,7 +1535,8 @@ export default {
         Src: context.newRule.SrcFull
           ? context.newRule.SrcFull
           : { name: context.newRule.Src, type: "raw" },
-        type: "rule"
+        type: "rule",
+        Description: context.newRule.Description
       };
 
       if (context.newRule.fwTarget == "to-fw") {
