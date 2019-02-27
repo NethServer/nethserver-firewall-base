@@ -1,0 +1,47 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2018 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+. /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
+
+case $action in
+
+    "flush")
+        conntrack -F 2>/dev/null
+        ;;
+    "connection")
+        proto="$(_get protocol)"
+        if [ "$proto" == "icmp" ]; then
+            conntrack -D -s "$(_get src)"  -d "$(_get dst)" -p "$(_get protocol)" &>/dev/null
+        else
+            conntrack -D -s "$(_get src)"  -d "$(_get dst)" -p "$(_get protocol)" --sport "$(_get sport)" --dport "$(_get dport)" &>/dev/null
+        fi
+        ;;
+    *)
+        error
+        ;;
+esac
+
+if [ $? -gt 0 ]; then
+    error
+else
+    success
+fi
