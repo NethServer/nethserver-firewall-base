@@ -20,6 +20,10 @@
 # along with NethServer.  If not, see COPYING.
 #
 
+#
+# Reorder the given rules
+#
+
 use strict;
 use warnings;
 use JSON;
