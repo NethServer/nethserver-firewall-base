@@ -59,7 +59,7 @@ function validate_rule($data, $type) {
             $v->addValidationError('Src', 'src_or_dst_must_be_fw', $data['Src']);
         }
 
-        if ($data['Service']) {
+        if ($data['Service'] &&  $data['Dst']['name'] == 'fw') {
             $sdb = new EsmithDatabase('configuration');
             if ($data['Service']['type'] != 'service' || !$sdb->getKey($data['Service']['name'])) {
                 $v->addValidationError('Service', 'must_be_local_service', $data['Service']);
