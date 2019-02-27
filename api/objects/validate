@@ -155,6 +155,10 @@ case "update-time-condition":
     } elseif ( $action == 'update-time-condition' && !$db->getKey($data['name']) ){
         $v->addValidationError('name', 'not_exists_time_condition', $data['name']);
     }
+
+    if(strcmp($data['TimeStart'], $data['TimeStop']) > 0) {
+        $v->addValidationError('TimeStop','TimeStop_must_be_greater_then_TimeStart', $data['TimeStop']);
+    }
     break;
 case "delete-time-condition":
     $db = new EsmithDatabase('fwtimes');
