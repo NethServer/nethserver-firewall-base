@@ -8,7 +8,11 @@
 
       <div class="mg-bottom-10">
         <label class="control-label">{{$t('connections.protocol')}}</label>
-        <select v-model="searchProto" class="form-control quarter-width">
+        <select
+          @change="getConnections(true)"
+          v-model="searchProto"
+          class="form-control quarter-width"
+        >
           <option v-for="(p, pk) in protocols" v-bind:key="pk" :value="pk">{{pk | uppercase}}</option>
         </select>
       </div>
@@ -17,6 +21,7 @@
         <label class="control-label">{{$t('connections.state')}}</label>
         <select
           :disabled="searchProto == 'udp' || searchProto == 'icmp'"
+          @change="getConnections(true)"
           v-model="searchState"
           class="form-control quarter-width"
         >
@@ -64,8 +69,13 @@
         <p>{{$t('connections.no_connections_found_text')}}.</p>
       </div>
 
+      <div
+        v-if="!view.isLoadedAutoRefresh"
+        id="loader"
+        class="spinner spinner-lg view-spinner mg-top-10"
+      ></div>
       <ul
-        v-if="connections.length > 0 && view.isLoaded"
+        v-if="connections.length > 0 && view.isLoaded && view.isLoadedAutoRefresh"
         class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10"
       >
         <li :class="['list-group-item']" v-for="c in filteredConnections" v-bind:key="c">
@@ -194,7 +204,8 @@ export default {
   data() {
     return {
       view: {
-        isLoaded: false
+        isLoaded: false,
+        isLoadedAutoRefresh: false
       },
       connections: [],
       protocols: {},
@@ -215,7 +226,7 @@ export default {
         context.getConnections();
         context.pollingIntervalId = setInterval(function() {
           context.getConnections();
-        }, 2500);
+        }, 5000);
       } else {
         // stop polling
         clearInterval(this.pollingIntervalId);
@@ -278,10 +289,14 @@ export default {
         }
       );
     },
-    getConnections() {
+    getConnections(change) {
       var context = this;
 
-      context.view.isLoaded = false;
+      if (this.autoRefresh || change) {
+        context.view.isLoadedAutoRefresh = false;
+      } else {
+        context.view.isLoaded = false;
+      }
       nethserver.exec(
         ["nethserver-firewall-base/connections/read"],
         {
@@ -299,10 +314,12 @@ export default {
           }
 
           context.view.isLoaded = true;
+          context.view.isLoadedAutoRefresh = true;
         },
         function(error) {
           console.error(error);
           context.view.isLoaded = true;
+          context.view.isLoadedAutoRefresh = true;
         }
       );
     },
