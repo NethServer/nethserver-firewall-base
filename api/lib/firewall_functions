@@ -93,6 +93,9 @@ function _get_fw_object
                 echo -n "$object_type;$object_name"
             fi
             ;;
+        application)
+            echo -n "ndpi;$object_name"
+            ;;
         *)
             echo -n "$object_type;$object_name"
             ;;
