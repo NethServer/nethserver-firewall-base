@@ -673,7 +673,6 @@
                 <div class="col-sm-8">
                   <suggestions
                     v-model="newRule.Service"
-                    required
                     :options="autoOptions"
                     :onInputChange="filterServiceAuto"
                     :onItemSelected="selectServiceAuto"
@@ -1617,7 +1616,7 @@ export default {
           context.services = success["services"];
           context.services = context.services.map(function(i) {
             i.type = context.$i18n.t("objects.service");
-            i.typeId = "service";
+            i.typeId = "fwservice";
             return i;
           });
         },

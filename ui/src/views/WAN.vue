@@ -626,7 +626,6 @@
                 <div class="col-sm-8">
                   <suggestions
                     v-model="newRule.Service"
-                    required
                     :options="autoOptions"
                     :onInputChange="filterServiceAuto"
                     :onItemSelected="selectServiceAuto"
@@ -836,12 +835,8 @@ export default {
       });
 
       // notification
-      nethserver.notifications.success = this.$i18n.t(
-        "rules.rule_updated_ok"
-      );
-      nethserver.notifications.error = this.$i18n.t(
-        "rules.rule_updated_error"
-      );
+      nethserver.notifications.success = this.$i18n.t("rules.rule_updated_ok");
+      nethserver.notifications.error = this.$i18n.t("rules.rule_updated_error");
 
       nethserver.exec(
         ["nethserver-firewall-base/wan/update"],
@@ -1542,7 +1537,7 @@ export default {
           context.services = success["services"];
           context.services = context.services.map(function(i) {
             i.type = context.$i18n.t("objects.service");
-            i.typeId = "service";
+            i.typeId = "fwservice";
             return i;
           });
         },
