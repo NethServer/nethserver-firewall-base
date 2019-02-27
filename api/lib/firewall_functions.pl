@@ -72,9 +72,9 @@ sub get_target_info
     my $key = shift;
     my $fw = shift;
     my $expand = shift;
-    my %ret = ("name" => $key, "type" => $key);
-    if ($key eq 'fw') {
-        $ret{'type'} = 'fw';
+    my %ret = ("name" => $key, "type" => 'raw');
+    if ($key eq 'fw' || $key eq 'any') {
+        $ret{'type'} = $key;
     } elsif (index($key,';') >= 0) {
         my ($type, $name) = split(';', $key);
         $ret{'name'} = $name;
