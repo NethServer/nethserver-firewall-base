@@ -111,7 +111,7 @@
     <div class="container-fluid container-cards-pf main-container">
       <div
         v-if="status.CanApply || status.CanRestore"
-        class="alert alert-warning alert-dismissable mg-top-10"
+        :class="['alert', status.CanRestore ? 'alert-info': 'alert-warning', 'alert-dismissable mg-top-10']"
       >
         <button
           v-show="status.CanApply"
@@ -131,9 +131,13 @@
           data-toggle="modal"
           data-target="#resetFirewallModal"
         >{{$t('dashboard.reset')}}</button>
-        <span class="pficon pficon-warning-triangle-o"></span>
-        <strong>{{$t('warning')}}.</strong>
-        <span class="mg-left-5">{{$t('dashboard.firewall_settings_change')}}</span>.
+
+        <span :class="['pficon', status.CanRestore ? 'pficon-info' : 'pficon-warning-triangle-o']"></span>
+
+        <strong>{{status.CanRestore ? $t('info') : $t('warning')}}.</strong>
+        <span
+          class="mg-left-5"
+        >{{status.CanRestore ? $t('dashboard.firewall_settings_restore') : $t('dashboard.firewall_settings_change')}}</span>.
       </div>
       <router-view/>
     </div>

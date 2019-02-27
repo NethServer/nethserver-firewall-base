@@ -524,7 +524,7 @@ export default {
       expandInfo:
         (localStorage.getItem("expandInfo") &&
           localStorage.getItem("expandInfo") == "true") ||
-        false,
+        true,
       status: {}
     };
   },

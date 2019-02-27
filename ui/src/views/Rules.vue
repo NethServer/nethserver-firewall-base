@@ -472,7 +472,7 @@
               </div>
 
               <div
-                v-show="newRule.advanced"
+                v-show="newRule.advanced && newRule.Service && newRule.ServiceFull.type != 'application'"
                 :class="['form-group', newRule.errors.Log.hasError ? 'has-error' : '']"
               >
                 <label class="col-sm-4 control-label">{{$t('rules.log')}}</label>
@@ -617,7 +617,7 @@ export default {
       expandInfo:
         (localStorage.getItem("expandInfo") &&
           localStorage.getItem("expandInfo") == "true") ||
-        false,
+        true,
       status: {}
     };
   },
