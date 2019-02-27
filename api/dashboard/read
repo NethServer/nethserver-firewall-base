@@ -76,7 +76,7 @@ foreach ($ndb->get_all_by_prop('type', 'alias')) {
 # Objects
 foreach ($hdb->get_all()) {
     my $type = $_->prop('type');
-    if ($type eq' local' || $type eq 'remote' || $type eq 'host') {
+    if ($type eq 'local' || $type eq 'remote' || $type eq 'host') {
         $ret->{'statistics'}{'objects'}{'hosts'}++;
     } else {
         $ret->{'statistics'}{'objects'}{$type}++;
