@@ -28,13 +28,29 @@ $action = $data['action'];
 $v = new LegacyValidator($data);
 $db = new EsmithDatabase('portforward');
 
-if ($action == "update" || $action == "delete" ) {
+
+switch ($action) {
+
+case "delete":
 
     if (!$db->getKey($data['name'])) {
         $v->addValidationError('name', 'non_existing_port-forward', $data['name']);
     }
+    break;
 
-} elseif ($action == "update" || $action == "create" ) {
+case "update":
+case "create":
+
+    if ( $action == "update" ) {
+        if (!$db->getKey($data['name'])) {
+            $v->addValidationError('name', 'non_existing_port-forward', $data['name']);
+        }
+    } elseif ( $action == "create" ) {
+        if ($db->getKey($data['name'])) {
+            $v->addValidationError('name', 'port-forward_exists', $data['name']);
+        }
+    }
+
 
     $protocols = array('tcpudp', 'tcp', 'udp', 'gre', 'ah', 'esp');
     $protoValidator = $v->createValidator()->memberOf($protocols);
@@ -75,8 +91,11 @@ if ($action == "update" || $action == "delete" ) {
             $v->addValidationError('Src', 'protocol_doesnt_support_ports');
         }
     }
-} else {
+
+    break;
+default:
     error();
+    break;
 }
 
 # Validate the input
