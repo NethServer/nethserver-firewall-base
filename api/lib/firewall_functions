@@ -94,7 +94,8 @@ function _get_fw_object
             fi
             ;;
         application)
-            echo -n "ndpi;$object_name"
+            object_id=$(echo "$1" | jq -r ".id")
+            echo -n "ndpi;$object_id"
             ;;
         *)
             echo -n "$object_type;$object_name"
