@@ -96,6 +96,15 @@ sub get_target_info
         }
     }
 
+    # figure out possible object type for raw keys
+    if ($ret{'type'} eq 'raw') {
+        if (index($ret{'name'}, '/') > 0) {
+            $ret{'object'} = 'cidr';
+        } else {
+            $ret{'object'} = 'host';
+        }
+    }
+
     return \%ret;
 }
 
@@ -186,7 +195,7 @@ sub get_application_info
         }
     }
 
-   return {"name" => $key, "id" => '-', "icon" => 'fa-circle', 'type' => 'application'};
+    return {"name" => $key, "id" => '-', "icon" => 'fa-circle', 'type' => 'application'};
 }
 
 sub get_service_info
