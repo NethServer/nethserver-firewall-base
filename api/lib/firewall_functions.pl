@@ -269,7 +269,7 @@ sub list_tc_rules
         $props{'Src'} = get_target_info($props{'Src'}, $fw, $expand);
         $props{'Dst'} = get_target_info($props{'Dst'}, $fw, $expand);
         $props{'Time'} = get_time_info($props{'Time'}, $fw->{'ftdb'}, $expand);
-        $props{'Service'} = get_service_info($props{'Service'}, $fw->{'sdb'}, $expand);
+        $props{'Service'} = get_service_info($props{'Service'}, $fw, $expand);
         $max_pos = max($max_pos, $props{'Position'});
 
         push(@rules, \%props);

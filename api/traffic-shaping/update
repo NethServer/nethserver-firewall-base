@@ -24,7 +24,6 @@
 
 
 case $action in
-
     "update-rule")
         fw_rule "update"
         ;;
@@ -41,3 +40,10 @@ case $action in
         echo $data | /usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-reorder
         ;;
 esac
+
+if [ $? -gt 0 ]; then
+    error "SaveFailed" "check_logs"
+else
+    success
+fi
+
