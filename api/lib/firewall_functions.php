@@ -37,6 +37,7 @@ function validate_rule($data, $type) {
     $rulesdb = new EsmithDatabase('fwrules');
     $ndb = new EsmithDatabase('networks');
     $tdb = new EsmithDatabase('tc');
+    $timesdb = new EsmithDatabase('fwtimes');
 
     # set validActions for each type of rule
     if ($type == 'rules' || $type == 'local-rules') {
@@ -147,8 +148,9 @@ function validate_rule($data, $type) {
     }
 
     if ($data['Time']) {
-        $timedb = new EsmithDatabase('fwtimes');
-        $v->declareParameter('Time',  $v->createValidator()->memberOf(array_keys($timesdb->getAll('time'))));
+        if(!in_array($data['Time']['name'],array_keys($timesdb->getAll('time')))) {
+            $v->addValidationError('Time', 'time_not_found', $data['Time']['name']);
+        }
     }
 
     # Validate the input
