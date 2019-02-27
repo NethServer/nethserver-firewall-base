@@ -47,10 +47,14 @@ if ($cmd eq 'settings') {
     print encode_json({"settings" => \%ret});
 } elsif ($cmd eq 'status') {
 
-    my $can_apply = system('/usr/libexec/nethserver/api/nethserver-firewall-base/settings/can-apply');
-    my $can_restore = system('/usr/libexec/nethserver/api/nethserver-firewall-base/settings/can-restore');
+    my $can_restore = 0;
+    my $can_apply = int(system('/usr/libexec/nethserver/api/nethserver-firewall-base/settings/can-apply') == 0);
+    # allow restore only if there are no suspended modifications
+    if (!$can_apply) {
+        $can_restore = int(system('/usr/libexec/nethserver/api/nethserver-firewall-base/settings/can-restore') == 0);
+    }
 
-    print encode_json({"status" => {'CanApply' => int($can_apply == 0), "CanRestore" => int($can_restore == 0)}});
+    print encode_json({"status" => {'CanApply' => $can_apply, "CanRestore" => $can_restore}});
 } else {
     error();
 }
