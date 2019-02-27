@@ -1019,7 +1019,7 @@ export default {
           console.info("firewall-base-update", stream);
         },
         function(success) {
-          // get tc
+          // get port forwards
           context.getPF();
         },
         function(error, data) {
@@ -1053,7 +1053,7 @@ export default {
           console.info("nethserver-firewall-base", stream);
         },
         function(success) {
-          // get tc
+          // get port forwards
           context.getPF();
         },
         function(error, data) {

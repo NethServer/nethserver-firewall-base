@@ -5,7 +5,7 @@
             <pre id="log-file" class="monospace m-right-sm">{{!view.follow ? 'tail -'+view.lines+' /var/log/firewall.log' : 'tail -f /var/log/firewall.log'}}</pre>
             <button @click="handleLogs()" class="btn btn-primary">{{view.follow ? $t('logs.stop_follow') : $t('logs.follow')}}</button>
         </h3>
-        <div v-if="!view.logsLoaded" id="loader" class="spinner"></div>
+        <div v-if="!view.logsLoaded" id="loader" class="spinner spinner-lg view-spinner"></div>
         <pre id="logs-output" v-if="view.logsLoaded" class="logs">{{view.logsContent}}</pre>
     </div>
 </template>

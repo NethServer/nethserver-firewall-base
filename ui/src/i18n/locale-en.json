@@ -376,6 +376,20 @@
             "gre": "GRE",
             "esp": "ESP"
         },
+        "connections": {
+            "title": "Connections",
+            "conntrack_list": "Conntrack list",
+            "protocol": "Protocol",
+            "state": "State",
+            "connection_deleted_ok": "Connection deleted successfully!",
+            "connection_deleted_error": "Connection not deleted.",
+            "flush": "Flush connections",
+            "connections_flushed_ok": "Connection flushed successfully!",
+            "connections_flushed_error": "Connection not flushed.",
+            "delete_connection": "Delete connection",
+            "flush_connections": "Flush connections",
+            "auto_refresh": "Auto refresh"
+        },
         "settings": {
             "title": "Settings",
             "traffic_internet": "Traffic to Internet (red interface)",

@@ -72,6 +72,16 @@
         <li class="li-empty"></li>
 
         <li
+          id="connections-item"
+          :class="[getCurrentPath('connections') ? 'active' : '', 'list-group-item']"
+        >
+          <a href="#/connections">
+            <span class="fa fa-link"></span>
+            <span class="list-group-item-value">{{$t('connections.title')}}</span>
+          </a>
+        </li>
+
+        <li
           id="settings-item"
           :class="[getCurrentPath('settings') ? 'active' : '', 'list-group-item']"
         >
@@ -248,7 +258,7 @@ export default {
       var context = this;
       context.pollingIntervalId = setInterval(function() {
         context.getFirewallStatus();
-      }, 2500);
+      }, 5000);
     },
     getFirewallStatus() {
       var context = this;
@@ -400,12 +410,14 @@ export default {
 .mg-top-10 {
   margin-top: 10px !important;
 }
-
 .mg-bottom-10 {
   margin-bottom: 10px !important;
 }
 .mg-right-10 {
   margin-right: 10px !important;
+}
+.mg-left-10 {
+  margin-left: 10px !important;
 }
 
 .no-shadow {
@@ -529,5 +541,9 @@ export default {
 .highlight-mark {
   background: #ec7a08;
   color: #fff;
+}
+
+.icon-disabled {
+  color: #72767b !important;
 }
 </style>
