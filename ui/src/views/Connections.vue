@@ -29,7 +29,7 @@
         <input class="form-control adjust-check" type="checkbox" v-model="autoRefresh">
       </div>
 
-      <h2 class="right mg-top-5 normal">{{filteredConnections.length}}</h2>
+      <h2 v-if="connections.length > 0" class="right mg-top-5 normal">{{filteredConnections.length}}</h2>
 
       <form v-if="connections.length > 0" role="form" class="search-pf has-button search">
         <div class="form-group has-clear">
@@ -55,6 +55,14 @@
           >{{$t('connections.flush')}}</button>
         </div>
       </form>
+
+      <div v-show="connections.length == 0 && view.isLoaded" class="blank-slate-pf white">
+        <div class="blank-slate-pf-icon">
+          <span class="fa fa-link"></span>
+        </div>
+        <h1>{{$t('connections.no_connections_found')}}</h1>
+        <p>{{$t('connections.no_connections_found_text')}}.</p>
+      </div>
 
       <ul
         v-if="connections.length > 0 && view.isLoaded"

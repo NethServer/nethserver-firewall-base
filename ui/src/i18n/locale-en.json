@@ -388,7 +388,9 @@
             "connections_flushed_error": "Connection not flushed.",
             "delete_connection": "Delete connection",
             "flush_connections": "Flush connections",
-            "auto_refresh": "Auto refresh"
+            "auto_refresh": "Auto refresh",
+            "no_connections_found": "No connections found",
+            "no_connections_found_text": "Try to reload the page or enable the 'Auto refresh' option"
         },
         "settings": {
             "title": "Settings",
