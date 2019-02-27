@@ -33,7 +33,7 @@ my $cmd = $input->{'action'};
 
 if ($cmd eq 'list') {
 
-    print encode_json({"rules" => list_fwrules($input->{'expand'} || 0, 0)});
+    print encode_json(list_fw_rules($input->{'expand'} || 0, 0));
 
 } elsif ($cmd eq 'services') {
 

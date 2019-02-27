@@ -32,7 +32,7 @@ my $cmd = $input->{'action'};
 
 if ($cmd eq 'list') {
 
-    print encode_json({"rules" => list_fwrules($input->{'expand'}, 1)});
+    print encode_json(list_fw_rules($input->{'expand'}, 1));
 
 } elsif ($cmd eq 'roles') {
 

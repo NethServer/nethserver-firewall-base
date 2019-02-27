@@ -25,6 +25,7 @@ use warnings;
 use esmith::NetworksDB;
 use esmith::ConfigDB;
 use NethServer::Firewall;
+use List::Util qw[max];
 
 sub read_provider_status
 {
@@ -246,6 +247,7 @@ sub list_tc_rules
     my $filter = shift || 'provider';
     my $fw = new NethServer::Firewall();
     my @rules;
+    my $max_pos = 0;
     foreach ($fw->getTcRules()) {
         my %props = $_->props;
         my ($t, $v) = split(";",$props{'Action'});
@@ -259,20 +261,22 @@ sub list_tc_rules
         $props{'Dst'} = get_target_info($props{'Dst'}, $fw, $expand);
         $props{'Time'} = get_time_info($props{'Time'}, $fw->{'ftdb'}, $expand);
         $props{'Service'} = get_service_info($props{'Service'}, $fw->{'sdb'}, $expand);
+        $max_pos = max($max_pos, $props{'Position'});
 
         push(@rules, \%props);
     }
 
-    return \@rules;
+    return {"status" => {"count" => scalar(@rules), "next" => $max_pos+1 }, "rules" => \@rules};
 }
 
-sub list_fwrules
+sub list_fw_rules
 {
     my $expand = shift;
     my $skip_local = shift;
     my $fw = new NethServer::Firewall();
     my @rules;
     my $i = 1;
+    my $max_pos = 0;
     foreach ($fw->getRules()) {
         my %props = $_->props;
 
@@ -290,15 +294,14 @@ sub list_fwrules
         $props{'Dst'} = get_target_info($props{'Dst'}, $fw, $expand);
         $props{'Time'} = get_time_info($props{'Time'}, $fw->{'ftdb'}, $expand);
         $props{'Service'} = get_service_info($props{'Service'}, $fw, $expand);
-
-        # normalize position
-        $props{'Position'} = $i;
+        $props{'Position'} = int($props{'Position'});
+        $max_pos = max($max_pos, $props{'Position'});
 
         push(@rules, \%props);
         $i++;
     }
 
-    return \@rules;
+    return {"status" => {"count" => scalar(@rules), "next" => $max_pos+1 }, "rules" => \@rules};
 }
 
 sub list_policies
