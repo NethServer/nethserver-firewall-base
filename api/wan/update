@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/bin/bash
 
 #
 # Copyright (C) 2019 Nethesis S.r.l.
@@ -20,43 +20,35 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-use strict;
-use warnings;
-use esmith::NetworksDB;
-use esmith::ConfigDB;
+. /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
 
-require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
-require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
 
-my $input = readInput();
-my $cmd = $input->{'action'} || 'info';
+case $action in
+    "update-rule")
+        fw_rule "update"
+        ;;
 
-if($cmd eq 'provider') {
+    "provider")
+        save_db networks
+        # retrieve provider for the given interface
+        provider=$(/sbin/e-smith/db networks showjson | jq -r '.[] | select((.type == "provider") and (.props.interface == "'$(_get name)'")) | .name')
+        /sbin/e-smith/db networks setprop $provider weight "$(_get weight)"
+        /sbin/e-smith/db networks setprop "$(_get name)"  FwOutBandwidth "$(_get FwOutBandwidth)" FwInBandwidth  "$(_get FwInBandwidth)" nslabel  "$(_get nslabel)"
+        ;;
 
-    my $ndb = esmith::NetworksDB->open();
+    "wan")
+        notifywanfrom=$(/sbin/e-smith/db configuration getprop root SenderAddress)
+        notifyto=$(/sbin/e-smith/db configuration getprop root EmailAddress)
+        save_db configuration
+        /sbin/e-smith/db configuration setprop firewall WanMode "$(_get WanMode)" NotifyWan "$(_get NotifyWan)" \
+            MaxNumberPacketLoss "$(_get MaxNumberPacketLoss)" MaxPercentPacketLoss "$(_get MaxPercentPacketLoss)" PingInterval "$(_get PingInterval)" \
+            CheckIP "$(_get_array CheckIP)" NotifyWanTo "$notifyto" NotifyWanFrom "$notifywanfrom"
+        ;;
+esac
 
-    $ndb->set_prop($input->{'name'}, 'FwOutBandwidth', $input->{'FwOutBandwidth'});
-    $ndb->set_prop($input->{'name'}, 'FwInBandwidth', $input->{'FwInBandwidth'});
-    $ndb->set_prop($input->{'name'}, 'nslabel', $input->{'nslabel'});
+if [ $? -gt 0 ]; then
+    error "SaveFailed" "check_logs"
+else
+    success
+fi
 
-    my @provider = $ndb->get_all_by_prop('interface' => $input->{'name'});
-    $provider[0]->set_prop('weight', $input->{'weight'});
-
-} elsif ($cmd eq 'wan') {
-
-    my $db = esmith::ConfigDB->open();
-
-    foreach (qw(WanMode NotifyWan MaxNumberPacketLoss MaxPercentPacketLoss PingInterval)) {
-        $db->set_prop('firewall', $_, $input->{$_});
-    }
-    my $ips = $input->{'CheckIP'};
-    $db->set_prop('firewall', 'CheckIP', join(",",@$ips));
-
-    $db->set_prop('firewall','NotifyWanTo', $db->get_prop('root','EmailAddress'));
-    $db->set_prop('firewall','NotifyWanFrom', $db->get_prop('root','SenderAddress'));
-
-} else {
-    error()
-}
-    
-system("/sbin/e-smith/signal-event -j firewall-adjust");
