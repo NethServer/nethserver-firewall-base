@@ -2255,7 +2255,7 @@ export default {
           console.error(error, data);
           try {
             var errorData = JSON.parse(data);
-            host.isError = errorData.message;
+            host.isError = errorData.attributes[0].error;
             context.$forceUpdate();
           } catch (e) {
             console.error(e);
@@ -2353,6 +2353,8 @@ export default {
               context.newHostGroup.errors[attr.parameter].hasError = true;
               context.newHostGroup.errors[attr.parameter].message = attr.error;
             }
+
+            context.$forceUpdate();
           } catch (e) {
             console.error(e);
           }
@@ -2405,7 +2407,7 @@ export default {
           console.error(error, data);
           try {
             var errorData = JSON.parse(data);
-            hostGroup.isError = errorData.message;
+            hostGroup.isError = errorData.attributes[0].error;
             context.$forceUpdate();
           } catch (e) {
             console.error(e);
@@ -2555,7 +2557,7 @@ export default {
           console.error(error, data);
           try {
             var errorData = JSON.parse(data);
-            ipRange.isError = errorData.message;
+            ipRange.isError = errorData.attributes[0].error;
             context.$forceUpdate();
           } catch (e) {
             console.error(e);
@@ -2705,7 +2707,7 @@ export default {
           console.error(error, data);
           try {
             var errorData = JSON.parse(data);
-            cidrSub.isError = errorData.message;
+            cidrSub.isError = errorData.attributes[0].error;
             context.$forceUpdate();
           } catch (e) {
             console.error(e);
@@ -2853,7 +2855,7 @@ export default {
           console.error(error, data);
           try {
             var errorData = JSON.parse(data);
-            zone.isError = errorData.message;
+            zone.isError = errorData.attributes[0].error;
             context.$forceUpdate();
           } catch (e) {
             console.error(e);
@@ -3004,7 +3006,7 @@ export default {
           console.error(error, data);
           try {
             var errorData = JSON.parse(data);
-            timeCondition.isError = errorData.message;
+            timeCondition.isError = errorData.attributes[0].error;
             context.$forceUpdate();
           } catch (e) {
             console.error(e);
@@ -3019,6 +3021,7 @@ export default {
     },
     openEditService(service) {
       this.newService = Object.assign({}, service);
+      this.newService.Ports = this.newService.Ports.join(", ");
       this.newService.errors = this.initServiceErrors();
       this.newService.isLoading = false;
       this.newService.isEdit = true;
@@ -3030,7 +3033,9 @@ export default {
       var serviceObj = Object.assign({}, service);
       serviceObj.Ports =
         serviceObj.Ports.length > 0 && serviceObj.Ports.includes(",")
-          ? serviceObj.Ports.split(",")
+          ? serviceObj.Ports.split(",").map(function(item) {
+              return parseInt(item.trim());
+            })
           : [];
       delete serviceObj.isLoading;
       delete serviceObj.isEdit;
@@ -3156,7 +3161,7 @@ export default {
           console.error(error, data);
           try {
             var errorData = JSON.parse(data);
-            service.isError = errorData.message;
+            service.isError = errorData.attributes[0].error;
             context.$forceUpdate();
           } catch (e) {
             console.error(e);
