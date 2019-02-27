@@ -258,7 +258,11 @@
       v-sortable="{onEnd: reorder, handle: '.drag-here'}"
       class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10"
     >
-      <li :class="[mapList(r.Action), 'list-group-item']" v-for="r in rules" v-bind:key="r">
+      <li
+        :class="[mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
+        v-for="r in rules"
+        v-bind:key="r"
+      >
         <div class="drag-size">
           <span class="gray mg-right-5">{{r.Action.split(';')[1] | uppercase}}</span>
         </div>
@@ -266,9 +270,14 @@
           <span class="fa fa-bars"></span>
         </div>
         <div class="list-view-pf-actions">
-          <button class="btn btn-default">
-            <span class="fa fa-edit span-right-margin"></span>
-            {{$t('edit')}}
+          <button
+            @click="r.status == 'disabled' ? enableRule(r) : openEditRule(r, false)"
+            :class="['btn btn-default', r.status == 'disabled' ? 'btn-primary' : '']"
+          >
+            <span
+              :class="['fa', r.status == 'disabled' ? 'fa-check' : 'fa-edit', 'span-right-margin']"
+            ></span>
+            {{r.status == 'disabled' ? $t('enable') : $t('edit')}}
           </button>
           <div class="dropdown pull-right dropdown-kebab-pf">
             <button
@@ -283,20 +292,22 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownKebabRight9">
               <li>
-                <a href="#">
-                  <span class="fa fa-lock span-right-margin"></span>
-                  {{$t('disable')}}
+                <a @click="enableRule(r)">
+                  <span
+                    :class="['fa', r.status == 'enabled' ? 'fa-lock' : 'fa-check', 'span-right-margin']"
+                  ></span>
+                  {{r.status == 'enabled' ? $t('disable') : $t('enable')}}
                 </a>
               </li>
-              <li>
-                <a href="#">
+              <li @click="openEditRule(r, true)">
+                <a>
                   <span class="fa fa-clone span-right-margin"></span>
                   {{$t('rules.duplicate')}}
                 </a>
               </li>
               <li role="separator" class="divider"></li>
-              <li>
-                <a href="#">
+              <li @click="openDeleteRule(r)">
+                <a>
                   <span class="fa fa-times span-right-margin"></span>
                   {{$t('delete')}}
                 </a>
@@ -311,7 +322,7 @@
               data-placement="top"
               data-html="true"
               :title="mapTitleAction(r)"
-              :class="[mapIcon(r.Action), 'list-view-pf-icon-sm']"
+              :class="[mapIcon(r.Action), 'list-view-pf-icon-sm', r.status == 'disabled' ? 'icon-disabled border-gray' : '']"
             ></span>
           </div>
           <div class="list-view-pf-body">
@@ -622,10 +633,6 @@
                   >
                     <div slot="item" slot-scope="props" class="single-item">
                       <span>
-                        <span
-                          v-show="props.item.typeId == 'application'"
-                          :class="['square-'+ props.item.name]"
-                        ></span>
                         {{props.item.name}}
                         <span
                           v-show="props.item.Ports"
@@ -678,7 +685,6 @@
                 <div class="col-sm-8">
                   <suggestions
                     v-model="newRule.Time"
-                    required
                     :options="autoOptions"
                     :onInputChange="filterTimeAuto"
                     :onItemSelected="selectTimeAuto"
@@ -708,6 +714,30 @@
                 class="btn btn-primary"
                 type="submit"
               >{{newRule.isEdit ? $t('edit') : newRule.isDuplicate ? $t('rules.duplicate') : $t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="deleteRuleModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{$t('rules.delete_rule')}} {{currentRule.id}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="deleteRule(currentRule)">
+            <div class="modal-body">
+              <div class="form-group">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('are_you_sure')}}?</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-danger" type="submit">{{$t('delete')}}</button>
             </div>
           </form>
         </div>
@@ -751,12 +781,13 @@ export default {
       zones: [],
       timeConditions: [],
       services: [],
-      applications: [],
       roles: [],
       autoOptions: {
         inputClass: "form-control"
       },
-      newRule: this.initRule()
+      newRule: this.initRule(),
+      currentRule: {},
+      status: {}
     };
   },
   mounted() {
@@ -769,7 +800,6 @@ export default {
     this.getZones();
     this.getTimeConditions();
     this.getServices();
-    this.getApplications();
     this.getRoles();
 
     var context = this;
@@ -801,12 +831,32 @@ export default {
       const movedItem = this.rules.splice(oldIndex, 1)[0];
       this.rules.splice(newIndex, 0, movedItem);
 
-      this.rules = this.rules.map(function(r, i) {
-        r.Position = i + 1;
-        return r;
+      var ids = this.rules.map(function(i) {
+        return i.id;
       });
 
-      console.log(this.rules);
+      // notification
+      nethserver.notifications.success = this.$i18n.t(
+        "rules.rule_updated_ok"
+      );
+      nethserver.notifications.error = this.$i18n.t(
+        "rules.rule_updated_error"
+      );
+
+      nethserver.exec(
+        ["nethserver-firewall-base/wan/update"],
+        {
+          action: "reorder",
+          rules: ids
+        },
+        function(stream) {
+          console.info("firewall-base-update", stream);
+        },
+        function(success) {},
+        function(error, data) {
+          console.error(error, data);
+        }
+      );
     },
     mapTitleAction(rule) {
       var html = "<b>" + rule.Action.split(";")[1].toUpperCase() + "</b><br>";
@@ -1166,7 +1216,11 @@ export default {
         return null;
       }
 
-      var objects = this.roles.concat(
+      var roles = this.roles.filter(function(i) {
+        return i.name != "RED";
+      });
+
+      var objects = roles.concat(
         this.hosts.concat(
           this.hostGroups.concat(
             this.ipRanges.concat(this.cidrSubs.concat(this.zones))
@@ -1175,6 +1229,7 @@ export default {
       );
 
       this.newRule.Src = null;
+      this.newRule.SrcFull = null;
       this.newRule.SrcType = "";
 
       return objects.filter(function(service) {
@@ -1189,6 +1244,12 @@ export default {
     },
     selectSrcAuto(item) {
       this.newRule.Src = item.name;
+
+      this.newRule.SrcFull = Object.assign({}, item);
+      this.newRule.SrcFull.name = this.newRule.SrcFull.name.toLowerCase();
+      this.newRule.SrcFull.type = this.newRule.SrcFull.typeId;
+      delete this.newRule.SrcFull.typeId;
+
       this.newRule.SrcType =
         item.name +
         " " +
@@ -1202,15 +1263,18 @@ export default {
         return null;
       }
 
-      var objects = this.roles.concat(
+      var roles = this.roles.filter(function(i) {
+        return i.name == "RED";
+      });
+
+      var objects = roles.concat(
         this.hosts.concat(
-          this.hostGroups.concat(
-            this.ipRanges.concat(this.cidrSubs.concat(this.zones))
-          )
+          this.ipRanges.concat(this.cidrSubs.concat(this.zones))
         )
       );
 
       this.newRule.Dst = null;
+      this.newRule.DstFull = null;
       this.newRule.DstType = "";
 
       return objects.filter(function(service) {
@@ -1225,6 +1289,12 @@ export default {
     },
     selectDstAuto(item) {
       this.newRule.Dst = item.name;
+
+      this.newRule.DstFull = Object.assign({}, item);
+      this.newRule.DstFull.name = this.newRule.DstFull.name.toLowerCase();
+      this.newRule.DstFull.type = this.newRule.DstFull.typeId;
+      delete this.newRule.DstFull.typeId;
+
       this.newRule.DstType =
         item.name +
         " " +
@@ -1238,9 +1308,10 @@ export default {
         return null;
       }
 
-      var objects = this.services.concat(this.applications);
+      var objects = this.services;
 
       this.newRule.Service = null;
+      this.newRule.ServiceFull = null;
       this.newRule.ServiceType = "";
 
       return objects.filter(function(service) {
@@ -1257,6 +1328,11 @@ export default {
     },
     selectServiceAuto(item) {
       this.newRule.Service = item.name;
+
+      this.newRule.ServiceFull = Object.assign({}, item);
+      this.newRule.ServiceFull.type = this.newRule.ServiceFull.typeId;
+      delete this.newRule.ServiceFull.typeId;
+
       this.newRule.ServiceType = item.name + " (" + item.Ports.join(", ") + ")";
     },
     filterTimeAuto(query) {
@@ -1267,6 +1343,7 @@ export default {
       var objects = this.timeConditions;
 
       this.newRule.Time = null;
+      this.newRule.TimeFull = null;
       this.newRule.TimeType = "";
 
       return objects.filter(function(service) {
@@ -1278,6 +1355,11 @@ export default {
     },
     selectTimeAuto(item) {
       this.newRule.Time = item.name;
+
+      this.newRule.TimeFull = Object.assign({}, item);
+      this.newRule.TimeFull.type = this.newRule.TimeFull.typeId;
+      delete this.newRule.TimeFull.typeId;
+
       this.newRule.TimeType = item.name + " (" + item.Description + ")";
     },
     getHosts() {
@@ -1469,33 +1551,6 @@ export default {
         }
       );
     },
-    getApplications() {
-      var context = this;
-
-      nethserver.exec(
-        ["nethserver-firewall-base/objects/read"],
-        {
-          action: "applications"
-        },
-        null,
-        function(success) {
-          try {
-            success = JSON.parse(success);
-          } catch (e) {
-            console.error(e);
-          }
-          context.applications = success["applications"];
-          context.applications = context.applications.map(function(i) {
-            i.type = context.$i18n.t("objects.application");
-            i.typeId = "application";
-            return i;
-          });
-        },
-        function(error) {
-          console.error(error);
-        }
-      );
-    },
     getRoles() {
       var context = this;
 
@@ -1542,6 +1597,7 @@ export default {
           try {
             success = JSON.parse(success);
             context.rules = success.rules;
+            context.status = success.status;
 
             context.view.isLoaded = true;
 
@@ -1634,14 +1690,7 @@ export default {
         }
 
         this.view.isChartLoaded = true;
-      }
-
-      // start polling
-      var context = this;
-      if (context.pollingIntervalId == 0) {
-        context.pollingIntervalId = setInterval(function() {
-          context.updateCharts();
-        }, 2500);
+        this.updateCharts();
       }
     },
     updateCharts() {
@@ -1672,6 +1721,13 @@ export default {
               context.charts[i].out.load({
                 columns: [[outName, iface.out]]
               });
+
+              // start polling
+              if (context.pollingIntervalId == 0) {
+                context.pollingIntervalId = setInterval(function() {
+                  context.updateCharts();
+                }, 2500);
+              }
             } else {
               context.view.invalidChartsData = true;
               context.$forceUpdate();
@@ -2018,6 +2074,214 @@ export default {
           }
 
           context.$forceUpdate();
+        }
+      );
+    },
+    openCreateRule() {
+      this.newRule = this.initRule();
+      $("#createRuleModal").modal("show");
+    },
+    openEditRule(r, duplicate) {
+      this.newRule = Object.assign({}, r);
+      this.newRule.errors = this.initRuleErrors();
+      this.newRule.isLoading = false;
+      this.newRule.isEdit = !duplicate;
+      this.newRule.isDuplicate = duplicate;
+
+      // handle src
+      this.newRule.Src = r.Src.name;
+      this.newRule.SrcFull = Object.assign({}, r.Src);
+      this.newRule.SrcType =
+        r.Src.type +
+        " " +
+        (r.Src.IpAddress ? r.Src.IpAddress + " " : "") +
+        "(" +
+        r.Src.type +
+        ")";
+
+      // handle dst
+      this.newRule.Dst = r.Dst.name;
+      this.newRule.DstFull = Object.assign({}, r.Dst);
+      this.newRule.DstType =
+        r.Dst.name +
+        " " +
+        (r.Dst.IpAddress ? r.Dst.IpAddress + " " : "") +
+        "(" +
+        r.Dst.type +
+        ")";
+
+      // handle service
+      this.newRule.Service = r.Service.name;
+      this.newRule.ServiceFull = Object.assign({}, r.Service);
+      this.newRule.ServiceType =
+        r.Service.name +
+        (r.Service.Ports ? " (" + r.Service.Ports.join(", ") + ")" : "");
+
+      // handle time
+      if (r.Time) {
+        this.newRule.Time = r.Time.name;
+        this.newRule.TimeFull = Object.assign({}, r.Time);
+        this.newRule.TimeType =
+          r.Time.name +
+          (r.Time.Description ? " (" + r.Time.Description + ")" : "");
+      }
+
+      $("#createRuleModal").modal("show");
+    },
+    enableRule(r) {
+      var context = this;
+
+      var ruleObj = {
+        action: "update-rule",
+        Log: r.Log ? "info" : " none",
+        Time: r.Time ? r.Time : null,
+        Position: r.Position,
+        status: r.status == "enabled" ? "disabled" : "enabled",
+        Service: r.Service ? r.Service : null,
+        Action: r.Action ? r.Action : null,
+        Dst: r.Dst ? r.Dst : null,
+        id: r.id,
+        Src: r.Src ? r.Src : null,
+        type: "rule"
+      };
+
+      // notification
+      nethserver.notifications.success = context.$i18n.t(
+        "rules.rule_updated_ok"
+      );
+      nethserver.notifications.error = context.$i18n.t("rules.rule_updated_ok");
+
+      // update values
+      nethserver.exec(
+        ["nethserver-firewall-base/wan/update"],
+        ruleObj,
+        function(stream) {
+          console.info("firewall-base-update", stream);
+        },
+        function(success) {
+          // get rules
+          context.getRules();
+        },
+        function(error, data) {
+          console.error(error, data);
+        }
+      );
+    },
+    openDeleteRule(r) {
+      this.currentRule = Object.assign({}, r);
+      $("#deleteRuleModal").modal("show");
+    },
+    saveRule() {
+      var context = this;
+
+      var ruleObj = {
+        action: context.newRule.isEdit ? "update-rule" : "create-rule",
+        Log: context.newRule.Log ? "info" : "none",
+        Time: context.newRule.TimeFull ? context.newRule.TimeFull : null,
+        Position: context.newRule.isEdit
+          ? context.newRule.Position
+          : context.status.next,
+        status: context.newRule.isEdit ? context.newRule.status : "enabled",
+        Service: context.newRule.ServiceFull
+          ? context.newRule.ServiceFull
+          : null,
+        Action: context.newRule.Action ? context.newRule.Action : null,
+        Dst: context.newRule.DstFull
+          ? context.newRule.DstFull
+          : { name: context.newRule.Dst, type: "raw" },
+        id: context.newRule.isEdit ? context.newRule.id : null,
+        Src: context.newRule.SrcFull
+          ? context.newRule.SrcFull
+          : { name: context.newRule.Src, type: "raw" },
+        type: "rule"
+      };
+
+      context.newRule.isLoading = true;
+      context.$forceUpdate();
+      nethserver.exec(
+        ["nethserver-firewall-base/wan/validate"],
+        ruleObj,
+        null,
+        function(success) {
+          context.newRule.isLoading = false;
+          $("#createRuleModal").modal("hide");
+
+          // notification
+          nethserver.notifications.success = context.$i18n.t(
+            "rules.rule_" +
+              (context.newRule.isEdit ? "updated" : "created") +
+              "_ok"
+          );
+          nethserver.notifications.error = context.$i18n.t(
+            "rules.rule_" +
+              (context.newRule.isEdit ? "updated" : "created") +
+              "_error"
+          );
+
+          // update values
+          nethserver.exec(
+            [
+              "nethserver-firewall-base/wan/" +
+                (context.newRule.isEdit ? "update" : "create")
+            ],
+            ruleObj,
+            function(stream) {
+              console.info("firewall-base-update", stream);
+            },
+            function(success) {
+              // get rules
+              context.getRules();
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
+        },
+        function(error, data) {
+          var errorData = {};
+          context.newRule.isLoading = false;
+          context.newRule.errors = context.initRuleErrors();
+
+          try {
+            errorData = JSON.parse(data);
+            for (var e in errorData.attributes) {
+              var attr = errorData.attributes[e];
+              context.newRule.errors[attr.parameter].hasError = true;
+              context.newRule.errors[attr.parameter].message = attr.error;
+            }
+          } catch (e) {
+            console.error(e);
+          }
+          context.$forceUpdate();
+        }
+      );
+    },
+    deleteRule(r) {
+      var context = this;
+
+      // notification
+      nethserver.notifications.success = context.$i18n.t(
+        "rules.rule_deleted_ok"
+      );
+      nethserver.notifications.error = context.$i18n.t(
+        "rules.rule_deleted_error"
+      );
+
+      $("#deleteRuleModal").modal("hide");
+      nethserver.exec(
+        ["nethserver-firewall-base/wan/delete"],
+        {
+          name: r.id
+        },
+        function(stream) {
+          console.info("nethserver-firewall-base", stream);
+        },
+        function(success) {
+          // get rules
+          context.getRules();
+        },
+        function(error, data) {
+          console.error(error, data);
         }
       );
     }

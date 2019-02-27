@@ -149,7 +149,7 @@
             "create_class": "Create class",
             "create_default_class": "Create default classes",
             "edit_class": "Edit class",
-            "delete_class": "Edit class",
+            "delete_class": "Delete class",
             "class_name": "Class name",
             "class_description": "Description",
             "bandwidth_unit": "Bandwidth unit",
@@ -292,7 +292,8 @@
             "service_deleted_ok": "Service deleted successfully!",
             "service_deleted_error": "Service not deleted.",
             "fw": "Firewall",
-            "ports_comma": "Insert ports comma separated"
+            "ports_comma": "Insert ports comma separated",
+            "application": "Application"
         },
         "port_forward": {
             "title": "Port forward",
@@ -344,6 +345,7 @@
             "create_divert_rule": "Create divert rule",
             "create_routing_rule": "Create routing rule",
             "edit_rule": "Edit rule",
+            "delete_rule": "Delete rule",
             "duplicate_rule": "Duplicate rule",
             "source": "Source",
             "destination": "Destination",
@@ -366,7 +368,13 @@
             "from_firewall": "From Firewall",
             "provider": "Provider",
             "class": "Class",
-            "policies": "Policies"
+            "policies": "Policies",
+            "rule_created_ok": "Rule created successfully!",
+            "rule_created_error": "Rule not created.",
+            "rule_updated_ok": "Rule updated successfully!",
+            "rule_updated_error": "Rule not updated.",
+            "rule_deleted_ok": "Rule deleted successfully!",
+            "rule_deleted_error": "Rule not deleted."
         },
         "protocols": {
             "ah": "AH",
@@ -419,7 +427,20 @@
             "non_existing_class": "This class does not exists",
             "invalid_interface": "Invalid network interface: make sure the interface exists",
             "valid_greatThan_0": "The value must be greater than 0",
-            "not_removable": "Object not removable"
+            "not_removable": "Object not removable",
+            "src_or_dst_must_be_fw": "Source or destination must be the Firewall",
+            "must_be_local_service": "Must be a valid local service",
+            "role_no_red": "Role must be not red",
+            "role_only_red": "Role must be only red",
+            "valid_types_zone_host_iprange_cidr": "Valid object types are: zone, host, ip range or cidr",
+            "any_not_allowed": "Any is not allowed",
+            "fw_not_allowed": "Firewall is not allowed",
+            "reject_not_allowed": "Reject action is not allowed",
+            "divert_not_allowed": "Divert action is not allowed",
+            "rule_exists": "Rule already exists",
+            "rule_not_exists": "Rule not exists",
+            "valid_ip_or_cidr": "Must be a valid ip or cidr",
+            "src_dst_are_in_same_zone": "Source and Destination are in the same zone"
         }
     }
 }
