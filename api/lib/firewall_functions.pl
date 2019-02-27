@@ -173,6 +173,21 @@ sub get_fwservice_service_info
     return \%ret;
 }
 
+sub get_application_info
+{
+    my $key = shift;
+    my $apps = list_applications();
+
+    foreach (@$apps) {
+        if ($_->{'id'} eq $key) {
+            $_->{'type'} = 'application';
+            return $_;
+        }
+    }
+
+   return {"name" => $key, "id" => '-', "icon" => 'fa-circle', 'type' => 'application'};
+}
+
 sub get_service_info
 {
     my $id = shift || return undef;
@@ -187,6 +202,8 @@ sub get_service_info
 
     if ($db eq 'fwservice') {
         return get_fwservice_service_info($key, $fw->{'sdb'},$expand);
+    } elsif ($db eq 'ndpi') {
+        return get_application_info($key);
     } else {
         return get_local_service_info($key, $fw->{'cdb'},$expand);
     }
@@ -323,4 +340,30 @@ sub list_policies
     return \@policies;
 }
 
+
+sub list_applications
+{
+    my @applications;
+    my $json;
+    {
+        local $/; #Enable 'slurp' mode
+        open my $fh, "<", "/usr/libexec/nethserver/api/nethserver-firewall-base/lib/ndpi-icons.json",  or return undef;
+        $json = <$fh>;
+        close $fh;
+    }
+
+    my $icons = decode_json($json);
+    open my $fh, '<', "/proc/net/xt_ndpi/proto";
+    if ($fh) {
+        while (my $row = <$fh>) {
+            next if ($row =~ /^#/);
+            chomp $row;
+            my ($id, $mark, $name, $other) = split(/\s+/, $row, 4);
+            my $icon = defined($icons->{lc($name)}) ? $icons->{lc($name)} : "fa-circle";
+            push(@applications, {"name" => $name, "id" => $id, "icon" => $icon});
+        }
+    }
+
+    return \@applications;
+}
 1;

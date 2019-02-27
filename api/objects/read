@@ -165,27 +165,8 @@ if($cmd eq 'hosts' || $cmd eq 'cidr-subs'  || $cmd eq 'host-groups' || $cmd eq '
     print encode_json($ret);
 
 } elsif ($cmd eq 'applications') {
-    my @applications;
-    my $json;
-    {
-        local $/; #Enable 'slurp' mode
-        open my $fh, "<", "/usr/libexec/nethserver/api/nethserver-firewall-base/objects/ndpi-icons.json",  or return undef;
-        $json = <$fh>;
-        close $fh;
-    }
 
-    my $icons = decode_json($json);
-    open my $fh, '<', "/proc/net/xt_ndpi/proto";
-    if ($fh) {
-        while (my $row = <$fh>) {
-            next if ($row =~ /^#/);
-            chomp $row;
-            my ($id, $mark, $name, $other) = split(/\s+/, $row, 4);
-            my $icon = defined($icons->{lc($name)}) ? $icons->{lc($name)} : "fa-circle";
-            push(@applications, {"name" => $name, "id" => $id, "icon" => $icon});
-        }
-    }
-    print encode_json({"applications" => \@applications});
+    print encode_json({"applications" => list_applications()});
 
 } elsif ($cmd eq 'local-services') {
 
