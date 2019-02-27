@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/perl
 
 #
 # Copyright (C) 2019 Nethesis S.r.l.
@@ -20,24 +20,23 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-. /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
+use strict;
+use warnings;
+use JSON;
+use esmith::ConfigDB;
 
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
 
-case $action in
+my $input = readInput();
+my $order = $input->{'rules'};
 
-    "update-rule")
-        fw_rule "update"
-        ;;
+my $db = esmith::ConfigDB->open('fwrules');
 
-    "update-class")
-        bindto=$(echo $data | jq -rc '.BindTo | map(tostring) | join(",")')
-        save_db tc
-        /sbin/e-smith/db tc set "$(_get name)" class MinOutputRate "$(_get MinOutputRate)" MaxOutputRate "$(_get MaxOutputRate)" MaxInputRate "$(_get MaxInputRate)" MinInputRate "$(_get MinInputRate)" \
-            Description "$(_get Description)" Unit "$(_get Unit)" BindTo "$bindto"
-        ;;
+my $i = 1;
+foreach my $id (@$order) {
+    my $rule = $db->get($id) || next;
+    $rule->set_prop('Position',$i);
+    $i++;
+}
 
-    "reorder")
-        save_db fwrules
-        echo $data | /usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-reorder
-        ;;
-esac
+success();

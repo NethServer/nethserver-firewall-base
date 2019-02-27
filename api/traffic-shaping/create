@@ -28,11 +28,16 @@ case $action in
         /usr/libexec/nethserver/initialize-tc-database
         success
         ;;
-    "create"|"update")
+
+    "create-class")
         bindto=$(echo $data | jq -rc '.BindTo | map(tostring) | join(",")')
         save_db tc
         /sbin/e-smith/db tc set "$(_get name)" class MinOutputRate "$(_get MinOutputRate)" MaxOutputRate "$(_get MaxOutputRate)" MaxInputRate "$(_get MaxInputRate)" MinInputRate "$(_get MinInputRate)" \
             Description "$(_get Description)" Unit "$(_get Unit)" BindTo "$bindto"
+        ;;
+
+    "create-rule")
+        fw_rule "create"
         ;;
     *)
         error

@@ -21,6 +21,4 @@
 
 . /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
 
-action=$(basename $0)
-
-fw_rule $action
+fw_rule "create"

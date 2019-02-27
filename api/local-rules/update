@@ -20,4 +20,21 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-. /usr/libexec/nethserver/api/nethserver-firewall-base/local-rules/create
+. /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
+
+
+case $action in
+
+    "update-rule")
+        fw_rule "update"
+        ;;
+
+    "reorder")
+        save_db fwrules
+        echo $data | /usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-reorder
+        ;;
+
+    *)
+        error
+        ;;
+esac
