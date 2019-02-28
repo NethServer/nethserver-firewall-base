@@ -941,7 +941,7 @@ export default {
         DstHost: context.newPf.DstHostFull
           ? { name: context.newPf.DstHost, type: "host" }
           : { name: context.newPf.DstHost, type: "raw" },
-        Dst: context.newPf.Dst ? context.newPf.Dst : [],
+        Dst: context.newPf.Dst ? context.newPf.Dst : "",
         Proto: context.newPf.Proto,
         Description: context.newPf.Description,
         OriDst: context.newPf.OriDst == "any" ? "" : context.newPf.OriDst,

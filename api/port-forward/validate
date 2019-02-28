@@ -84,7 +84,7 @@ case "create":
     } else {
         # Check if object exists
         $objv = $v->createValidator()->platform('firewall-object-exists');
-        if (!$objv->evaluate($data['DstHost']['name'])) {
+        if (!$objv->evaluate($data['DstHost']['type'].";".$data['DstHost']['name'])) {
             $v->addValidationError('DstHost', 'host_doesnt_exists');
         }
     }
