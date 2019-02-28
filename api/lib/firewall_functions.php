@@ -67,7 +67,7 @@ function validate_rule($data, $type) {
         }
     }
 
-    # checks for divert rules
+    # checks for divert and tc rules
     if (strpos($data['Action'],'provider;') !== FALSE || strpos($data['Action'],'class;') !== FALSE) {
         if ($data['Src']['name'] == 'red' && $data['Src']['type'] == 'role') {
             $v->addValidationError('Src', 'role_no_red', $data['Src']);
@@ -78,7 +78,7 @@ function validate_rule($data, $type) {
                 $v->addValidationError('Dst', 'role_only_red', $data['Dst']);
             }
         } else {
-            if (! in_array($data['Dst']['type'], array('host', 'iprange', 'zone', 'cidr'))) {
+            if (($data['Dst']['type'] != 'raw') && (! in_array($data['Dst']['type'], array('host', 'iprange', 'zone', 'cidr')))) {
                 $v->addValidationError('Dst', 'valid_types_zone_host_iprange_cidr', $data['Dst']);
             }
         }
