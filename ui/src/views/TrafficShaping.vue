@@ -2268,6 +2268,7 @@ export default {
           nethserver.exec(
             ["nethserver-firewall-base/traffic-shaping/delete"],
             {
+              action: "delete-class",
               name: context.currentTc.name
             },
             function(stream) {
