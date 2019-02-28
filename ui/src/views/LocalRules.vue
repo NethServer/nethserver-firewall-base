@@ -56,7 +56,7 @@
         class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10"
       >
         <li
-          :class="[mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
+          :class="[r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
           v-for="r in filteredRules"
           v-bind:key="r"
         >
@@ -119,7 +119,7 @@
                 data-placement="top"
                 data-html="true"
                 :title="mapTitleAction(r)"
-                :class="[mapIcon(r.Action), 'list-view-pf-icon-sm', r.status == 'disabled' ? 'icon-disabled border-gray' : '']"
+                :class="[mapIcon(r.Action, r.status), 'list-view-pf-icon-sm']"
               ></span>
               <span
                 data-toggle="tooltip"
@@ -140,10 +140,20 @@
                     :title="mapTitleSrc(r)"
                     class="handle-overflow"
                   >
-                    <span :class="mapObjectIcon(r.Src)"></span>
+                    <span :class="mapObjectIcon(r.Src, r.status)"></span>
                     <span
-                      :class="[r.Src.name.toLowerCase(),'mg-left-5']"
-                    >{{r.Src.type == 'fw' || r.Src.type == 'role' || r.Src.type == 'any' ? (r.Src.name.toUpperCase()): r.Src.name}}</span>
+                      :class="[r.status == 'disabled' ? 'gray' : r.Src.name.toLowerCase(),'mg-left-5']"
+                    >
+                      <span
+                        v-show="r.Src.type == 'raw'"
+                        class="pficon pficon-warning-triangle-o mg-right-5"
+                      ></span>
+                      {{r.Src.type == 'fw' || r.Src.type == 'role' || r.Src.type == 'any' ? (r.Src.name.toUpperCase()): r.Src.name}}
+                      <a
+                        v-show="r.Src.type == 'raw'"
+                        @click="openCreateObject(r.Src)"
+                      >{{$t('create')}} {{$t('objects.'+r.Src.object)}}</a>
+                    </span>
                   </span>
                 </div>
                 <div class="list-group-item-text">
@@ -155,10 +165,20 @@
                     :title="mapTitleDst(r)"
                     class="handle-overflow"
                   >
-                    <span :class="mapObjectIcon(r.Dst)"></span>
+                    <span :class="mapObjectIcon(r.Dst, r.status)"></span>
                     <span
-                      :class="[r.Dst.name.toLowerCase(),'mg-left-5']"
-                    >{{r.Dst.type == 'fw' || r.Dst.type == 'role' || r.Dst.type == 'any' ? (r.Dst.name.toUpperCase()): r.Dst.name}}</span>
+                      :class="[r.status == 'disabled' ? 'gray' : r.Dst.name.toLowerCase(),'mg-left-5']"
+                    >
+                      <span
+                        v-show="r.Dst.type == 'raw'"
+                        class="pficon pficon-warning-triangle-o mg-right-5"
+                      ></span>
+                      {{r.Dst.type == 'fw' || r.Dst.type == 'role' || r.Dst.type == 'any' ? (r.Dst.name.toUpperCase()): r.Dst.name}}
+                      <a
+                        v-show="r.Dst.type == 'raw'"
+                        @click="openCreateObject(r.Dst)"
+                      >{{$t('create')}} {{$t('objects.'+r.Dst.object)}}</a>
+                    </span>
                   </span>
                 </div>
               </div>
@@ -251,9 +271,9 @@
                         ></span>
                         {{props.item.name}}
                         <span
-                          v-show="props.item.IpAddress"
+                          v-show="props.item.IpAddress || props.item.Address"
                           class="gray"
-                        >({{props.item.IpAddress}})</span>
+                        >({{ props.item.IpAddress || props.item.Address }})</span>
                         <i class="mg-left-5">{{props.item.Description}}</i>
                         <b class="mg-left-5">{{props.item.type | capitalize}}</b>
                       </span>
@@ -291,9 +311,9 @@
                         ></span>
                         {{props.item.name}}
                         <span
-                          v-show="props.item.IpAddress"
+                          v-show="props.item.IpAddress || props.item.Address"
                           class="gray"
-                        >({{props.item.IpAddress}})</span>
+                        >({{ props.item.IpAddress || props.item.Address }})</span>
                         <i class="mg-left-5">{{props.item.Description}}</i>
                         <b class="mg-left-5">{{props.item.type | capitalize}}</b>
                       </span>
@@ -460,6 +480,86 @@
         </div>
       </div>
     </div>
+
+    <div class="modal" id="createObjectModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{$t('objects.add_'+newObject.type)}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="saveObject(newObject)">
+            <div class="modal-body">
+              <div :class="['form-group', newObject.errors.name.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.name')}}</label>
+                <div class="col-sm-9">
+                  <input required type="text" v-model="newObject.name" class="form-control">
+                  <span
+                    v-if="newObject.errors.name.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newObject.errors.name.message)}}</span>
+                </div>
+              </div>
+              <div
+                v-if="newObject.IpAddress"
+                :class="['form-group', newObject.errors.IpAddress.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.ip_address')}}</label>
+                <div class="col-sm-9">
+                  <input required type="text" v-model="newObject.IpAddress" class="form-control">
+                  <span
+                    v-if="newObject.errors.IpAddress.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newObject.errors.IpAddress.message)}}</span>
+                </div>
+              </div>
+              <div
+                v-if="newObject.Address"
+                :class="['form-group', newObject.errors.Address.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.network')}}</label>
+                <div class="col-sm-9">
+                  <input required type="text" v-model="newObject.Address" class="form-control">
+                  <span
+                    v-if="newObject.errors.Address.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newObject.errors.Address.message)}}</span>
+                </div>
+              </div>
+              <div
+                :class="['form-group', newObject.errors.Description.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('objects.description')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="newObject.Description" class="form-control">
+                  <span
+                    v-if="newObject.errors.Description.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newObject.errors.Description.message)}}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <div v-if="newObject.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -524,7 +624,8 @@ export default {
         (localStorage.getItem("expandInfo") &&
           localStorage.getItem("expandInfo") == "true") ||
         true,
-      status: {}
+      status: {},
+      newObject: this.initObject()
     };
   },
   computed: {
@@ -567,12 +668,8 @@ export default {
       });
 
       // notification
-      nethserver.notifications.success = this.$i18n.t(
-        "rules.rule_updated_ok"
-      );
-      nethserver.notifications.error = this.$i18n.t(
-        "rules.rule_updated_error"
-      );
+      nethserver.notifications.success = this.$i18n.t("rules.rule_updated_ok");
+      nethserver.notifications.error = this.$i18n.t("rules.rule_updated_error");
 
       nethserver.exec(
         ["nethserver-firewall-base/local-rules/update"],
@@ -857,7 +954,7 @@ export default {
           break;
       }
     },
-    mapObjectIcon(obj) {
+    mapObjectIcon(obj, status) {
       switch (obj.type) {
         case "host":
           return "fa fa-desktop";
@@ -875,7 +972,9 @@ export default {
           return "pficon pficon-zone";
           break;
         case "role":
-          return "square-" + obj.name.toUpperCase();
+          return (
+            "square-" + (status == "disabled" ? "GRAY" : obj.name.toUpperCase())
+          );
           break;
         case "any":
           return "fa fa-globe";
@@ -911,22 +1010,61 @@ export default {
           break;
       }
     },
-    mapIcon(action) {
+    mapIcon(action, status) {
       switch (action) {
         case "accept":
-          return "fa fa-check green border-green";
+          return (
+            "fa fa-check " +
+            (status == "disabled" ? "gray border-gray" : "green border-green")
+          );
           break;
         case "reject":
-          return "fa fa-shield orange border-orange";
+          return (
+            "fa fa-shield " +
+            (status == "disabled" ? "gray border-gray" : "orange border-orange")
+          );
           break;
         case "drop":
-          return "fa fa-ban red border-red";
+          return (
+            "fa fa-ban " +
+            (status == "disabled" ? "gray border-gray" : "red border-red")
+          );
           break;
       }
     },
     toggleAdvancedMode() {
       this.newRule.advanced = !this.newRule.advanced;
       this.$forceUpdate();
+    },
+    initObject() {
+      return {
+        name: null,
+        Description: "",
+        IpAddress: "",
+        Address: "",
+        isLoading: false,
+        errors: this.initObjectErrors()
+      };
+    },
+    initObjectErrors() {
+      return {
+        name: {
+          hasError: false,
+          message: ""
+        },
+        Description: {
+          hasError: false,
+          message: ""
+        },
+        IpAddress: {
+          hasError: false,
+          message: ""
+        },
+        Address: {
+          hasError: false,
+          message: ""
+        }
+      };
     },
     initRule() {
       return {
@@ -986,6 +1124,10 @@ export default {
       };
     },
     filterSrcAuto(query) {
+      this.newRule.Src = null;
+      this.newRule.SrcFull = null;
+      this.newRule.SrcType = "";
+
       if (query.trim().length === 0) {
         return null;
       }
@@ -997,10 +1139,6 @@ export default {
           )
         )
       );
-
-      this.newRule.Src = null;
-      this.newRule.SrcFull = null;
-      this.newRule.SrcType = "";
 
       return objects.filter(function(service) {
         return (
@@ -1024,11 +1162,17 @@ export default {
         item.name +
         " " +
         (item.IpAddress ? item.IpAddress + " " : "") +
+        (item.Address ? item.Address + " " : "") +
+        (item.Start && item.End ? item.Start + " - " + item.End + " " : "") +
         "(" +
         item.type +
         ")";
     },
     filterDstAuto(query) {
+      this.newRule.Dst = null;
+      this.newRule.DstFull = null;
+      this.newRule.DstType = "";
+
       if (query.trim().length === 0) {
         return null;
       }
@@ -1040,10 +1184,6 @@ export default {
           )
         )
       );
-
-      this.newRule.Dst = null;
-      this.newRule.DstFull = null;
-      this.newRule.DstType = "";
 
       return objects.filter(function(service) {
         return (
@@ -1067,11 +1207,17 @@ export default {
         item.name +
         " " +
         (item.IpAddress ? item.IpAddress + " " : "") +
+        (item.Address ? item.Address + " " : "") +
+        (item.Start && item.End ? item.Start + " - " + item.End + " " : "") +
         "(" +
         item.type +
         ")";
     },
     filterServiceAuto(query) {
+      this.newRule.Service = null;
+      this.newRule.ServiceFull = null;
+      this.newRule.ServiceType = "";
+
       if (query.trim().length === 0) {
         return null;
       }
@@ -1080,10 +1226,6 @@ export default {
       if (this.newRule.fwTarget == "to-fw") {
         objects = this.localServices;
       }
-
-      this.newRule.Service = null;
-      this.newRule.ServiceFull = null;
-      this.newRule.ServiceType = "";
 
       return objects.filter(function(service) {
         return (
@@ -1107,15 +1249,15 @@ export default {
       this.newRule.ServiceType = item.name + " (" + item.Ports.join(", ") + ")";
     },
     filterTimeAuto(query) {
+      this.newRule.Time = null;
+      this.newRule.TimeFull = null;
+      this.newRule.TimeType = "";
+
       if (query.trim().length === 0) {
         return null;
       }
 
       var objects = this.timeConditions;
-
-      this.newRule.Time = null;
-      this.newRule.TimeFull = null;
-      this.newRule.TimeType = "";
 
       return objects.filter(function(service) {
         return (
@@ -1453,11 +1595,13 @@ export default {
         ")";
 
       // handle service
-      this.newRule.Service = r.Service.name;
-      this.newRule.ServiceFull = Object.assign({}, r.Service);
-      this.newRule.ServiceType =
-        r.Service.name +
-        (r.Service.Ports ? " (" + r.Service.Ports.join(", ") + ")" : "");
+      if (r.Service) {
+        this.newRule.Service = r.Service.name;
+        this.newRule.ServiceFull = Object.assign({}, r.Service);
+        this.newRule.ServiceType =
+          r.Service.name +
+          (r.Service.Ports ? " (" + r.Service.Ports.join(", ") + ")" : "");
+      }
 
       // handle time
       if (r.Time) {
@@ -1638,6 +1782,84 @@ export default {
         },
         function(error, data) {
           console.error(error, data);
+        }
+      );
+    },
+    openCreateObject(object) {
+      this.newObject = this.initObject();
+      this.newObject.IpAddress = object.object == "host" ? object.name : null;
+      this.newObject.Address = object.object == "cidr" ? object.name : null;
+      this.newObject.rules = 1;
+      this.newObject.type = object.object;
+      $("#createObjectModal").modal("show");
+    },
+    saveObject(object) {
+      var context = this;
+
+      var objectObj = {
+        action:
+          context.newObject.type == "host" ? "create-host" : "create-cidr-sub",
+        name: context.newObject.name,
+        IpAddress: context.newObject.IpAddress,
+        Address: context.newObject.Address,
+        Description: context.newObject.Description,
+        rules: context.newObject.rules
+      };
+
+      context.newObject.isLoading = true;
+      context.$forceUpdate();
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/validate"],
+        objectObj,
+        null,
+        function(success) {
+          context.newObject.isLoading = false;
+          $("#createObjectModal").modal("hide");
+
+          // notification
+          nethserver.notifications.success = context.$i18n.t(
+            context.newObject.type == "host"
+              ? "objects.host_created_ok"
+              : "objects.cidr_sub_created_ok"
+          );
+          nethserver.notifications.error = context.$i18n.t(
+            context.newObject.type == "host"
+              ? "objects.host_created_error"
+              : "objects.cidr_sub_created_error"
+          );
+
+          // update values
+          nethserver.exec(
+            ["nethserver-firewall-base/objects/create"],
+            objectObj,
+            function(stream) {
+              console.info("firewall-base-update", stream);
+            },
+            function(success) {
+              // get rules
+              context.getRules();
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
+        },
+        function(error, data) {
+          var errorData = {};
+          context.newObject.isLoading = false;
+          context.newObject.errors = context.initObjectErrors();
+
+          try {
+            errorData = JSON.parse(data);
+            for (var e in errorData.attributes) {
+              var attr = errorData.attributes[e];
+              context.newObject.errors[attr.parameter].hasError = true;
+              context.newObject.errors[attr.parameter].message = attr.error;
+            }
+          } catch (e) {
+            console.error(e);
+          }
+          context.$forceUpdate();
         }
       );
     }

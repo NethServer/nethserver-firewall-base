@@ -212,6 +212,7 @@
             "add_host": "Add host",
             "add_host_group": "Add host group",
             "add_ip_range": "Add IP range",
+            "add_cidr": "Add CIDR Subnet",
             "add_cidr_sub": "Add CIDR Subnet",
             "add_zone": "Add zone",
             "add_time_condition": "Add time condition",
@@ -295,7 +296,8 @@
             "service_deleted_error": "Service not deleted.",
             "fw": "Firewall",
             "ports_comma": "Insert ports comma separated",
-            "application": "Application"
+            "application": "Application",
+            "raw": "RAW value, no object found"
         },
         "port_forward": {
             "title": "Port forward",
@@ -345,7 +347,7 @@
             "no_rules_found_text": "To create a new rule use the button below",
             "create_rule": "Create rule",
             "create_divert_rule": "Create divert rule",
-            "create_routing_rule": "Create routing rule",
+            "create_priority_rule": "Create priority rule",
             "edit_rule": "Edit rule",
             "delete_rule": "Delete rule",
             "duplicate_rule": "Duplicate rule",
@@ -376,7 +378,8 @@
             "rule_updated_ok": "Rule updated successfully!",
             "rule_updated_error": "Rule not updated.",
             "rule_deleted_ok": "Rule deleted successfully!",
-            "rule_deleted_error": "Rule not deleted."
+            "rule_deleted_error": "Rule not deleted.",
+            "tc_add_rules_info": "This rule are ADD mode"
         },
         "protocols": {
             "ah": "AH",

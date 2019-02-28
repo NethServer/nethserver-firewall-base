@@ -53,12 +53,12 @@
         >
           <div class="list-group-item list-view-pf-expand-active no-shadow mg-bottom-10">
             <div
-              :class="[data.info.type == 'ip' ? 'ip-type-header': '', 'list-group-item-header cursor-initial']"
+              :class="[data.info.type == 'raw' ? 'ip-type-header': '', 'list-group-item-header cursor-initial']"
             >
               <div class="list-view-pf-main-info small-list">
                 <div class="list-view-pf-left">
                   <span
-                    :class="[data.info.type == 'ip' ? 'pficon pficon-warning-triangle-o ip-type' : 'pficon pficon-container-node', 'list-view-pf-icon-sm small-icon']"
+                    :class="[data.info.type == 'raw' ? 'pficon pficon-warning-triangle-o ip-type' : 'pficon pficon-container-node', 'list-view-pf-icon-sm small-icon']"
                   ></span>
                 </div>
                 <div class="list-view-pf-body">
@@ -72,10 +72,10 @@
                       >({{data.info.IpAddress}})</span>
                     </div>
                     <div
-                      v-if="data.info.type == 'object'"
+                      v-if="data.info.type == 'host'"
                       class="list-group-item-text"
                     >{{data.info.Description}}</div>
-                    <div v-if="data.info.type == 'ip'" class="list-group-item-text">
+                    <div v-if="data.info.type == 'raw'" class="list-group-item-text">
                       {{$t('port_forward.no_host_found')}}.
                       <a
                         @click="openCreateHost(host, data.rules)"
@@ -554,6 +554,11 @@ export default {
         this.newPf.Proto.toLowerCase().includes("tcp") ||
         this.newPf.Proto.toLowerCase().includes("udp")
       );
+
+      this.newPf.Dst = null;
+      this.newPf.DstDisabled = false;
+      this.newPf.Src = null;
+      this.newPf.SrcType = null;
     },
     highlight() {
       if (!this.highlightInstance) {
@@ -568,6 +573,10 @@ export default {
       this.highlightInstance.mark(this.searchString.toLowerCase(), options);
     },
     filterHostsAuto(query) {
+      this.newPf.DstHost = null;
+      this.newPf.DstHostIp = null;
+      this.newPf.DstHostFull = null;
+
       if (query.trim().length === 0) {
         return null;
       }
@@ -583,8 +592,17 @@ export default {
     selectHostsAuto(item) {
       this.newPf.DstHost = item.name;
       this.newPf.DstHostIp = item.IpAddress;
+
+      this.newPf.DstHostFull = Object.assign({}, item);
+      this.newPf.DstHostFull.name = this.newPf.DstHostFull.name.toLowerCase();
+      this.newPf.DstHostFull.type = "host";
     },
     filterSrcAuto(query) {
+      this.newPf.Src = null;
+      this.newPf.SrcType = null;
+      this.newPf.Proto = null;
+      this.newPf.DstDisabled = false;
+
       if (query.trim().length === 0) {
         return null;
       }
@@ -884,13 +902,15 @@ export default {
       $("#createPFModal").modal("show");
     },
     openEditPF(pf, host, duplicate) {
+      console.log(pf, host);
       this.newPf = Object.assign({}, pf);
       this.newPf.errors = this.initErrors();
       this.newPf.isLoading = false;
       this.newPf.isEdit = !duplicate;
       this.newPf.isDuplicate = duplicate;
-      this.newPf.SrcType = "";
+      this.newPf.SrcType = this.newPf.Service;
       this.newPf.DstHostIp = "";
+      this.newPf.DstDisabled = this.newPf.Src.includes(",");
       this.newPf.advanced = false;
       this.newPf.Log = this.newPf.Log == "info";
       this.newPf.Allow =
@@ -912,12 +932,14 @@ export default {
         Src: context.newPf.Src.split(",").map(function(item) {
           return parseInt(item.trim());
         }),
-        DstHost: "host;" + context.newPf.DstHost,
+        DstHost: context.newPf.DstHostFull
+          ? { name: context.newPf.DstHost, type: "host" }
+          : { name: context.newPf.DstHost, type: "raw" },
         Dst: context.newPf.Dst ? context.newPf.Dst : "",
         Proto: context.newPf.Proto,
         Description: context.newPf.Description,
         OriDst: context.newPf.OriDst == "any" ? "" : context.newPf.OriDst,
-        Allow: context.newPf.Allow,
+        Allow: context.newPf.Allow.split("\n"),
         Log: context.newPf.Log ? "info" : "none",
         status: context.newPf.isEdit
           ? context.newPf.status
@@ -1058,6 +1080,84 @@ export default {
         },
         function(error, data) {
           console.error(error, data);
+        }
+      );
+    },
+    openCreateObject(object) {
+      this.newObject = this.initObject();
+      this.newObject.IpAddress = object.object == "host" ? object.name : null;
+      this.newObject.Address = object.object == "cidr" ? object.name : null;
+      this.newObject.rules = 1;
+      this.newObject.type = object.object;
+      $("#createObjectModal").modal("show");
+    },
+    saveObject(object) {
+      var context = this;
+
+      var objectObj = {
+        action:
+          context.newObject.type == "host" ? "create-host" : "create-cidr-sub",
+        name: context.newObject.name,
+        IpAddress: context.newObject.IpAddress,
+        Address: context.newObject.Address,
+        Description: context.newObject.Description,
+        rules: context.newObject.rules
+      };
+
+      context.newObject.isLoading = true;
+      context.$forceUpdate();
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/validate"],
+        objectObj,
+        null,
+        function(success) {
+          context.newObject.isLoading = false;
+          $("#createObjectModal").modal("hide");
+
+          // notification
+          nethserver.notifications.success = context.$i18n.t(
+            context.newObject.type == "host"
+              ? "objects.host_created_ok"
+              : "objects.cidr_sub_created_ok"
+          );
+          nethserver.notifications.error = context.$i18n.t(
+            context.newObject.type == "host"
+              ? "objects.host_created_error"
+              : "objects.cidr_sub_created_error"
+          );
+
+          // update values
+          nethserver.exec(
+            ["nethserver-firewall-base/objects/create"],
+            objectObj,
+            function(stream) {
+              console.info("firewall-base-update", stream);
+            },
+            function(success) {
+              // get rules
+              context.getRules();
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
+        },
+        function(error, data) {
+          var errorData = {};
+          context.newObject.isLoading = false;
+          context.newObject.errors = context.initObjectErrors();
+
+          try {
+            errorData = JSON.parse(data);
+            for (var e in errorData.attributes) {
+              var attr = errorData.attributes[e];
+              context.newObject.errors[attr.parameter].hasError = true;
+              context.newObject.errors[attr.parameter].message = attr.error;
+            }
+          } catch (e) {
+            console.error(e);
+          }
+          context.$forceUpdate();
         }
       );
     }

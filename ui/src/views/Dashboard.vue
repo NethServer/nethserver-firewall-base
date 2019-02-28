@@ -323,6 +323,7 @@ export default {
           otherIntDOWN: {
             color: { background: "#363636", border: "#703fec" }
           },
+
           empty: {
             shape: "icon",
             icon: {
@@ -338,9 +339,17 @@ export default {
               top: 20
             }
           },
-          emptyInt: {
-            color: "#703fec"
+          emptyIntUP: {
+            color: {
+              background: "#703fec",
+              border: "#582fc0",
+              highlight: { background: "#a18fff", border: "#582fc0" }
+            }
           },
+          emptyIntDOWN: {
+            color: { background: "#363636", border: "#703fec" }
+          },
+
           missing: {
             shape: "icon",
             icon: {
@@ -356,9 +365,17 @@ export default {
               top: 20
             }
           },
-          missingInt: {
-            color: "#703fec"
+          missingIntUP: {
+            color: {
+              background: "#703fec",
+              border: "#582fc0",
+              highlight: { background: "#a18fff", border: "#582fc0" }
+            }
           },
+          missingIntDOWN: {
+            color: { background: "#363636", border: "#703fec" }
+          },
+
           free: {
             shape: "icon",
             icon: {
@@ -374,9 +391,17 @@ export default {
               top: 20
             }
           },
-          freeInt: {
-            color: "#703fec"
+          freeIntUP: {
+            color: {
+              background: "#703fec",
+              border: "#582fc0",
+              highlight: { background: "#a18fff", border: "#582fc0" }
+            }
           },
+          freeIntDOWN: {
+            color: { background: "#363636", border: "#703fec" }
+          },
+
           source: {
             shape: "icon",
             icon: {
