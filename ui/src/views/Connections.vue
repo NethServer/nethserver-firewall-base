@@ -2,38 +2,70 @@
   <div>
     <h2>{{$t('connections.title')}}</h2>
 
+    <h3 v-if="view.isChartLoaded && connections.length > 0">{{$t('charts')}}</h3>
+    <a
+      v-if="view.isChartLoaded && connections.length > 0"
+      @click="toggleCharts()"
+    >{{view.chartsShowed ? $t('hide_charts') : $t('show_charts')}}</a>
+    <div
+      v-if="!view.isChartLoaded && connections.length > 0"
+      class="spinner spinner-lg view-spinner"
+    ></div>
+    <div :class="view.chartsShowed ? '' : 'hidden'">
+      <div
+        v-if="view.invalidChartsData && connections.length > 0"
+        class="alert alert-warning alert-dismissable col-sm-12"
+      >
+        <span class="pficon pficon-warning-triangle-o"></span>
+        <strong>{{$t('warning')}}!</strong>
+        {{$t('charts_not_updated')}}.
+      </div>
+      <div
+        v-show="connections.length > 0 && view.isChartLoaded && !view.invalidChartsData"
+        class="row"
+      >
+        <div id="chart-connections" class="mg-top-10"></div>
+      </div>
+    </div>
+
     <div v-if="!view.isLoaded" id="loader" class="spinner spinner-lg view-spinner"></div>
+
+    <h3>{{$t('list')}}</h3>
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-2">{{$t('connections.protocol')}}</label>
+        <div class="col-sm-6">
+          <select
+            @change="getConnections(true)"
+            v-model="searchProto"
+            class="form-control quarter-width"
+          >
+            <option v-for="(p, pk) in protocols" v-bind:key="pk" :value="pk">{{pk | uppercase}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2">{{$t('connections.state')}}</label>
+        <div class="col-sm-6">
+          <select
+            :disabled="searchProto == 'udp' || searchProto == 'icmp'"
+            @change="getConnections(true)"
+            v-model="searchState"
+            class="form-control quarter-width"
+          >
+            <option v-for="s in protocols[searchProto]" v-bind:key="s" :value="s">{{s | uppercase}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2">{{$t('connections.auto_refresh')}}</label>
+        <div class="col-sm-6">
+          <input class="form-control adjust-check" type="checkbox" v-model="autoRefresh">
+        </div>
+      </div>
+    </form>
+
     <div class="pf-container" v-if="view.isLoaded">
-      <h3>{{$t('list')}}</h3>
-
-      <div class="mg-bottom-10">
-        <label class="control-label">{{$t('connections.protocol')}}</label>
-        <select
-          @change="getConnections(true)"
-          v-model="searchProto"
-          class="form-control quarter-width"
-        >
-          <option v-for="(p, pk) in protocols" v-bind:key="pk" :value="pk">{{pk | uppercase}}</option>
-        </select>
-      </div>
-
-      <div class="mg-bottom-10">
-        <label class="control-label">{{$t('connections.state')}}</label>
-        <select
-          :disabled="searchProto == 'udp' || searchProto == 'icmp'"
-          @change="getConnections(true)"
-          v-model="searchState"
-          class="form-control quarter-width"
-        >
-          <option v-for="s in protocols[searchProto]" v-bind:key="s" :value="s">{{s | uppercase}}</option>
-        </select>
-      </div>
-
-      <div class="mg-bottom-10">
-        <label class="control-label">{{$t('connections.auto_refresh')}}</label>
-        <input class="form-control adjust-check" type="checkbox" v-model="autoRefresh">
-      </div>
-
       <h2 v-if="connections.length > 0" class="right mg-top-5 normal">{{filteredConnections.length}}</h2>
 
       <form v-if="connections.length > 0" role="form" class="search-pf has-button search">
@@ -101,17 +133,25 @@
                 </div>
               </div>
               <div class="list-view-pf-additional-info">
-                <div v-show="c.status" class="list-view-pf-additional-info-item col-sm-4">
+                <div class="list-view-pf-additional-info-item no-mg-right col-sm-4">
+                  <span class="fa fa-exchange"></span>
+                  <strong>{{c.bytes_total | byteFormat}}</strong>
+                  BYTES
+                </div>
+                <div
+                  v-show="c.status"
+                  class="list-view-pf-additional-info-item no-mg-right col-sm-4"
+                >
                   <span class="fa fa-clock-o"></span>
                   <strong>{{c.timeout}}s</strong>
                   TIMEOUT
                 </div>
-                <div class="list-view-pf-additional-info-item col-sm-3">
+                <div class="list-view-pf-additional-info-item no-mg-right col-sm-3">
                   <span class="fa fa-crosshairs"></span>
                   <strong>{{c.mark}}</strong>
                   MARK
                 </div>
-                <div v-show="c.nat" class="list-view-pf-additional-info-item col-sm-3">
+                <div v-show="c.nat" class="list-view-pf-additional-info-item no-mg-right col-sm-3">
                   <span class="pficon pficon-route"></span>
                   <strong>{{handleNAT(c)}}</strong>
                   NAT
@@ -195,17 +235,22 @@ export default {
   mounted() {
     this.getConnections();
     this.getProtocols();
+    this.initCharts();
   },
   beforeRouteLeave(to, from, next) {
     $(".modal").modal("hide");
     clearInterval(this.pollingIntervalId);
+    clearInterval(this.pollingIntervalIdChart);
     next();
   },
   data() {
     return {
       view: {
         isLoaded: false,
-        isLoadedAutoRefresh: false
+        isLoadedAutoRefresh: false,
+        isChartLoaded: false,
+        invalidChartsData: false,
+        chartsShowed: false
       },
       connections: [],
       protocols: {},
@@ -215,7 +260,11 @@ export default {
       searchState: "ESTABLISHED",
       autoRefresh: false,
       currentConnection: {},
-      pollingIntervalId: 0
+      pollingIntervalId: 0,
+      pollingIntervalIdChart: 0,
+      charts: {
+        connections: null
+      }
     };
   },
   watch: {
@@ -247,6 +296,96 @@ export default {
     }
   },
   methods: {
+    toggleCharts() {
+      this.view.chartsShowed = !this.view.chartsShowed;
+      if (!this.autoRefresh) {
+        this.autoRefresh = this.view.chartsShowed;
+      }
+    },
+    initCharts() {
+      var context = this;
+      context.charts.connections = c3.generate({
+        bindto: "#" + context.$options.filters.sanitize("chart-connections"),
+        transition: {
+          duration: 0
+        },
+        data: {
+          x: "x",
+          xFormat: "%H:%M:%S",
+          columns: [],
+          types: "area-spline"
+        },
+        axis: {
+          x: {
+            type: "timeseries",
+            tick: {
+              format: "%H:%M:%S",
+              count: 7
+            }
+          },
+          y: {
+            tick: {
+              format: function(y) {
+                return Math.ceil(y);
+              },
+              count: 7
+            }
+          }
+        },
+        size: {
+          height: 200,
+          width: window.innerWidth - 100
+        }
+      });
+
+      context.view.isChartLoaded = true;
+
+      this.updateCharts();
+    },
+    updateCharts() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/connections/read"],
+        {
+          action: "stats"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          if (success.connections.length > 0) {
+            context.view.invalidChartsData = false;
+
+            context.charts.connections.load({
+              columns: [
+                ["x"].concat(
+                  success.time.map(function(i) {
+                    return moment.unix(i).format("HH:mm:ss");
+                  })
+                ),
+                ["connections"].concat(success.connections)
+              ]
+            });
+
+            // start polling
+            if (context.pollingIntervalIdChart == 0) {
+              context.pollingIntervalIdChart = setInterval(function() {
+                context.updateCharts();
+              }, 5000);
+            }
+          } else {
+            context.view.invalidChartsData = true;
+            context.$forceUpdate();
+          }
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
     highlight() {
       if (!this.highlightInstance) {
         this.highlightInstance = new Mark("div.pf-container");

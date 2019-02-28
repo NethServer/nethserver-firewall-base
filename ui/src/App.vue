@@ -389,13 +389,14 @@ export default {
 .no-mg-top {
   margin-top: 0px !important;
 }
-
 .no-mg-bottom {
   margin-bottom: 0px !important;
 }
-
 .no-mg-left {
   margin-left: 0px !important;
+}
+.no-mg-right {
+  margin-right: 0px !important;
 }
 
 .mg-top-5 {
