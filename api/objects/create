@@ -35,6 +35,10 @@ case $action in
                  /sbin/e-smith/db portforward setprop $pf DstHost "host;""$(_get name)"
             done
         fi
+        if [ "$(_get rules)" == "1" ]; then
+            save_db fwrules
+            /usr/libexec/nethserver/api/nethserver-firewall-base/objects/update-rules-reference "$(_get IpAddress)" "host;""$(_get name)"
+        fi
         ;;
     "create-service"|"update-service")
         save_db fwservices
@@ -54,6 +58,10 @@ case $action in
     "create-cidr-sub"|"update-cidr-sub")
         save_db hosts
         /sbin/e-smith/db hosts set "$(_get name)" cidr Address "$(_get Address)" Description "$(_get Description)"
+        if [ "$(_get rules)" == "1" ]; then
+            save_db fwrules
+            /usr/libexec/nethserver/api/nethserver-firewall-base/objects/update-rules-reference "$(_get Address)" "cidr;""$(_get name)"
+        fi
         ;;
     "create-ip-range"|"update-ip-range")
         save_db hosts
