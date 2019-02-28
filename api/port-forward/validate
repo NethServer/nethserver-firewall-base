@@ -72,7 +72,23 @@ case "create":
 
     $v->declareParameter('Proto', $protoValidator);
     $v->declareParameter('Dst', $dstValidator);
-    $v->declareParameter('DstHost', $v->createValidator()->platform('firewall-object-exists'));
+
+    $ip_v = $v->createValidator(Validate::IPv4);
+    $cidr_v = $v->createValidator(Validate::CIDR_BLOCK);
+    $ip_cidr_v = $v->createValidator()->orValidator($ip_v, $cidr_v);
+    if ($data['DstHost']['type'] == 'raw') {
+        # Check raw value. Eg: {"name": "192.168.1.1", "type": "raw"}
+        if (!$ip_cidr_v->evaluate($data['DstHost']['name'])) {
+            $v->addValidationError('DstHost', 'valid_ip_or_cidr', $data['DstHost']);
+        }
+    } else {
+        # Check if object exists
+        $objv = $v->createValidator()->platform('firewall-object-exists');
+        if (!$objv->evaluate($data['DstHost']['name'])) {
+            $v->addValidationError('DstHost', 'host_doesnt_exists');
+        }
+    }
+
     $v->declareParameter('OriDst', Validate::IPv4_OR_EMPTY);
     $v->declareParameter('status', Validate::SERVICESTATUS);
     $v->declareParameter('Allow', Validate::ANYTHING);
