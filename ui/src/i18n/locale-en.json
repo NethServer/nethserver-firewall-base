@@ -403,7 +403,8 @@
             "flush_connections": "Flush connections",
             "auto_refresh": "Auto refresh",
             "no_connections_found": "No connections found",
-            "no_connections_found_text": "Try to reload the page or enable the 'Auto refresh' option"
+            "no_connections_found_text": "Try to reload the page or enable the 'Auto refresh' option",
+            "flush_connections_warning": "all connections will drop and need to be re-established"
         },
         "settings": {
             "title": "Settings",

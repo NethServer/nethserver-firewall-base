@@ -209,6 +209,10 @@
           </div>
           <form class="form-horizontal" v-on:submit.prevent="flushConnections()">
             <div class="modal-body">
+              <div class="alert alert-warning alert-dismissable">
+                <span class="pficon pficon-warning-triangle-o"></span>
+                <strong>{{$t('warning')}}</strong>: {{$t('connections.flush_connections_warning')}}.
+              </div>
               <div class="form-group">
                 <label
                   class="col-sm-3 control-label"
