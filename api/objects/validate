@@ -59,7 +59,7 @@ case "update-host":
 case "delete-host":
     $deleteValidator = $v->createValidator()->platform('fwobject-host-delete', 'hosts');
     if( ! $deleteValidator->evaluate($data['name'])) {
-        $v->addValidationError('name', 'not_removable');
+        $v->addValidationError('name', 'host_not_removable');
     }
     break;
 
@@ -249,15 +249,6 @@ case "update-host-group":
     } elseif ( $action == 'update-host-group' && !$db->getKey($data['name']) ){
         $v->addValidationError('name', 'not_exists_host-group', $data['name']);
     }
-
-    $ipValidator = $v->createValidator()->ipV4Address();
-    if ( ($action == 'create-ip-range' || $action == 'update-ip-range' ) &&
-        $ipValidator->evaluate($data['Start']) && $ipValidator->evaluate($data['End'])) {
-            if (ip2long($data['Start']) >= ip2long($data['End'])) {
-                $v->addValidationError('Start', 'ip_range_outofbounds', $data['Start']);
-                $v->addValidationError('End', 'ip_range_outofbounds', $data['End']);
-            }
-        }
     break;
 case "delete-host-group":
     $db = new EsmithDatabase('hosts');
