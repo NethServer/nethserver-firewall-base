@@ -445,7 +445,9 @@
             "rule_exists": "Rule already exists",
             "rule_not_exists": "Rule not exists",
             "valid_ip_or_cidr": "Must be a valid ip or cidr",
-            "src_dst_are_in_same_zone": "Source and Destination are in the same zone"
+            "src_dst_are_in_same_zone": "Source and Destination are in the same zone",
+            "time_not_found": "Time object doesn't exists",
+            "host_doesnt_exists": "Host doesn't exists"
         }
     }
 }
