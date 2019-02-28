@@ -60,6 +60,7 @@ event_templates($event, '/etc/sudoers');
 
 event_actions($event,
               'initialize-default-databases' => '00',
+              'nethserver-firewall-base-conf' => 50,
               'static-routes-save' => '60',
 	      'nethserver-shorewall-restart' => '89'
 );
