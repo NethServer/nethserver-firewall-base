@@ -89,13 +89,13 @@ if ($cmd eq 'list') {
         push(@$tmp, \%props);
 
         if ($props{'DstHost'} =~ m/host;/) {
-            $pf{$props{'DstHost'}}{'info'}{'type'} = 'object';
+            $pf{$props{'DstHost'}}{'info'}{'type'} = 'host';
             my $host = (split(";",$props{'DstHost'}))[1];
             # read description and ip address
             $pf{$props{'DstHost'}}{'info'}{'IpAddress'} = $hdb->get_prop($host, 'IpAddress') || '';
             $pf{$props{'DstHost'}}{'info'}{'Description'} = $hdb->get_prop($host, 'Description') || '';
         } else {
-            $pf{$props{'DstHost'}}{'info'}{'type'} = 'ip';
+            $pf{$props{'DstHost'}}{'info'}{'type'} = 'raw';
         }
     }
     print encode_json($ret);
