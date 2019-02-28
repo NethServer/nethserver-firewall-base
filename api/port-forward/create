@@ -41,7 +41,7 @@ fi
 save_db portforward
 /sbin/e-smith/db portforward set "$name"  pf Allow "$(_get_array Allow)" \
     Description "$(_get Description)" Dst "$(_get Dst)" \
-    DstHost "$(_get DstHost)" Log "$(_get Log)" \
+    DstHost "$(_get_fw_object "$(_get DstHost)")" Log "$(_get Log)" \
     OriDst "$(_get OriDst)" Proto "$proto" \
     Src "$src" status "$(_get status)"
 
