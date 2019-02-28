@@ -555,10 +555,15 @@ export default {
         this.newPf.Proto.toLowerCase().includes("udp")
       );
 
-      this.newPf.Dst = null;
-      this.newPf.DstDisabled = false;
-      this.newPf.Src = null;
-      this.newPf.SrcType = null;
+      if (
+        this.newPf.Proto != "tcp" &&
+        this.newPf.Proto != "udp" &&
+        this.newPf.Proto != "tcpudp"
+      ) {
+        this.newPf.Dst = null;
+        this.newPf.Src = null;
+        this.newPf.SrcType = null;
+      }
     },
     highlight() {
       if (!this.highlightInstance) {
@@ -600,7 +605,6 @@ export default {
     filterSrcAuto(query) {
       this.newPf.Src = null;
       this.newPf.SrcType = null;
-      this.newPf.Proto = null;
       this.newPf.DstDisabled = false;
 
       if (query.trim().length === 0) {
@@ -929,17 +933,22 @@ export default {
       var pfObj = {
         action: context.newPf.isEdit ? "update" : "create",
         name: context.newPf.isEdit ? context.newPf.name : null,
-        Src: context.newPf.Src.split(",").map(function(item) {
-          return parseInt(item.trim());
-        }),
+        Src: context.newPf.Src
+          ? context.newPf.Src.split(",").map(function(item) {
+              return parseInt(item.trim());
+            })
+          : [],
         DstHost: context.newPf.DstHostFull
           ? { name: context.newPf.DstHost, type: "host" }
           : { name: context.newPf.DstHost, type: "raw" },
-        Dst: context.newPf.Dst ? context.newPf.Dst : "",
+        Dst: context.newPf.Dst ? context.newPf.Dst : [],
         Proto: context.newPf.Proto,
         Description: context.newPf.Description,
         OriDst: context.newPf.OriDst == "any" ? "" : context.newPf.OriDst,
-        Allow: context.newPf.Allow.split("\n"),
+        Allow:
+          context.newPf.Allow.length == 0
+            ? []
+            : context.newPf.Allow.split("\n"),
         Log: context.newPf.Log ? "info" : "none",
         status: context.newPf.isEdit
           ? context.newPf.status

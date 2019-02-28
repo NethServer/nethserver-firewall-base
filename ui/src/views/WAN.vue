@@ -1843,7 +1843,7 @@ export default {
           }
           for (var i in success) {
             var iface = success[i];
-            if (iface) {
+            if (iface && (iface.in && iface.out)) {
               var inName = context.$i18n.t("wan.inbound_bandwidth");
               var outName = context.$i18n.t("wan.outbound_bandwidth");
 
@@ -1860,7 +1860,7 @@ export default {
               if (context.pollingIntervalId == 0) {
                 context.pollingIntervalId = setInterval(function() {
                   context.updateCharts();
-                }, 2500);
+                }, 2000);
               }
             } else {
               context.view.invalidChartsData = true;

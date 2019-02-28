@@ -378,7 +378,7 @@ export default {
             if (context.pollingIntervalIdChart == 0) {
               context.pollingIntervalIdChart = setInterval(function() {
                 context.updateCharts();
-              }, 5000);
+              }, 2000);
             }
           } else {
             context.view.invalidChartsData = true;

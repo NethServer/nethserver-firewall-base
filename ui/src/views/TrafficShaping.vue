@@ -2009,10 +2009,10 @@ export default {
 
               context.view.isChartLoaded = true;
 
-              if (context.pollingIntervalId == 0) {
+              if (context.pollingIntervalId == 0 && !context.view.invalidChartsData) {
                 context.pollingIntervalId = setInterval(function() {
                   context.initCharts();
-                }, 2500);
+                }, 2000);
               }
             } else {
               context.view.invalidChartsData = true;
