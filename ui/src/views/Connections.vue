@@ -317,14 +317,14 @@ export default {
           x: "x",
           xFormat: "%H:%M:%S",
           columns: [],
-          types: "area-spline"
+          types: { connections: "area-spline" }
         },
         axis: {
           x: {
             type: "timeseries",
             tick: {
               format: "%H:%M:%S",
-              count: 7
+              count: 10
             }
           },
           y: {
@@ -332,7 +332,7 @@ export default {
               format: function(y) {
                 return Math.ceil(y);
               },
-              count: 7
+              count: 8
             }
           }
         },

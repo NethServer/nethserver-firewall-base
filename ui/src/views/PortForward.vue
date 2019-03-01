@@ -906,23 +906,31 @@ export default {
       $("#createPFModal").modal("show");
     },
     openEditPF(pf, host, duplicate) {
-      console.log(pf, host);
       this.newPf = Object.assign({}, pf);
       this.newPf.errors = this.initErrors();
       this.newPf.isLoading = false;
       this.newPf.isEdit = !duplicate;
       this.newPf.isDuplicate = duplicate;
+
       this.newPf.SrcType = this.newPf.Service;
       this.newPf.DstHostIp = "";
       this.newPf.DstDisabled = this.newPf.Src.includes(",");
+
       this.newPf.advanced = false;
       this.newPf.Log = this.newPf.Log == "info";
       this.newPf.Allow =
         this.newPf.Allow.length > 0
           ? this.newPf.Allow.split(",").join("\n")
           : "";
+
       this.newPf.OriDst = this.newPf.OriDst == "" ? "any" : this.newPf.OriDst;
-      this.newPf.DstHost = this.newPf.DstHost.split(";")[1];
+      this.newPf.DstHostFull = this.newPf.DstHost.includes(";")
+        ? this.newPf.DstHost
+        : null;
+      this.newPf.DstHost = this.newPf.DstHost.includes(";")
+        ? this.newPf.DstHost.split(";")[1]
+        : this.newPf.DstHost;
+
       this.newPf.name = duplicate ? "" : this.newPf.name;
       this.$forceUpdate();
       $("#createPFModal").modal("show");
@@ -935,7 +943,7 @@ export default {
         name: context.newPf.isEdit ? context.newPf.name : null,
         Src: context.newPf.Src
           ? context.newPf.Src.split(",").map(function(item) {
-              return parseInt(item.trim());
+              return item.trim();
             })
           : [],
         DstHost: context.newPf.DstHostFull
