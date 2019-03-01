@@ -7,6 +7,8 @@ import Sortable from 'sortablejs'
 import "v-suggestions/dist/v-suggestions.css";
 import VueSuggestions from 'v-suggestions'
 
+import DocInfo from "./directives/DocInfo.vue";
+
 import App from './App.vue'
 import router from './router'
 import languages from "./i18n/lang";
@@ -21,6 +23,7 @@ Vue.use(VueI18n);
 Vue.use(VueGoodTable);
 Vue.use(VueToggleButton);
 Vue.component('suggestions', VueSuggestions)
+Vue.component('doc-info', DocInfo)
 Vue.directive('sortable', {
   inserted: function (el, binding) {
     new Sortable(el, binding.value || {})

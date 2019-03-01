@@ -471,7 +471,6 @@
 </template>
 
 <script>
-import DocInfo from "../directives/DocInfo.vue";
 var Mark = require("mark.js");
 
 export default {
@@ -495,9 +494,6 @@ export default {
   beforeRouteLeave(to, from, next) {
     $(".modal").modal("hide");
     next();
-  },
-  components: {
-    DocInfo
   },
   data() {
     return {
