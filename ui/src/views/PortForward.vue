@@ -215,9 +215,16 @@
               </div>
               <div :class="['form-group', newPf.errors.Src.hasError ? 'has-error' : '']">
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('port_forward.origin_port')}}</label>
+                <doc-info
+                  class="col-sm-1"
+                  :placement="'bottom'"
+                  :title="'Port forward'"
+                  :chapter="'firewall'"
+                  :section="'ui-portforward-syntax'"
+                ></doc-info>
                 <div class="col-sm-8">
                   <suggestions
                     v-model="newPf.Src"
@@ -464,6 +471,7 @@
 </template>
 
 <script>
+import DocInfo from "../directives/DocInfo.vue";
 var Mark = require("mark.js");
 
 export default {
@@ -487,6 +495,9 @@ export default {
   beforeRouteLeave(to, from, next) {
     $(".modal").modal("hide");
     next();
+  },
+  components: {
+    DocInfo
   },
   data() {
     return {
