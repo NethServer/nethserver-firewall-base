@@ -224,7 +224,7 @@
           <form class="form-horizontal" v-on:submit.prevent="saveRule()">
             <div class="modal-body">
               <div class="form-group">
-                <label class="col-sm-4 control-label"></label>
+                <label class="col-sm-3 control-label"></label>
                 <input
                   id="to-fw-radio"
                   class="col-sm-2"
@@ -237,7 +237,7 @@
                   for="to-fw-radio"
                 >{{$t("rules.to_firewall")}}</label>
 
-                <label class="col-sm-4 control-label"></label>
+                <label class="col-sm-3 control-label"></label>
                 <input
                   id="from-fw-radio"
                   class="col-sm-2"
@@ -254,8 +254,16 @@
                 v-show="newRule.fwTarget == 'to-fw'"
                 :class="['form-group', newRule.errors.Src.hasError ? 'has-error' : '']"
               >
-                <label class="col-sm-4 control-label">{{$t('rules.source')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">
+                  {{$t('rules.source')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('rules.source')"
+                    :chapter="'rules_source'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Src"
                     :required="newRule.fwTarget == 'to-fw'"
@@ -294,8 +302,16 @@
                 v-show="newRule.fwTarget == 'from-fw'"
                 :class="['form-group', newRule.errors.Dst.hasError ? 'has-error' : '']"
               >
-                <label class="col-sm-4 control-label">{{$t('rules.destination')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">
+                  {{$t('rules.destination')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('rules.destination')"
+                    :chapter="'rules_destination'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Dst"
                     :required="newRule.fwTarget == 'from-fw'"
@@ -331,8 +347,8 @@
               </div>
 
               <div :class="['form-group', newRule.errors.Service.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('rules.service')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.service')}}</label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Service"
                     :options="autoOptions"
@@ -362,8 +378,8 @@
               </div>
 
               <div :class="['form-group', newRule.errors.Action.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('rules.action')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.action')}}</label>
+                <div class="col-sm-9">
                   <select v-model="newRule.Action" class="form-control">
                     <option value="accept">{{$t('rules.accept')}}</option>
                     <option value="reject">{{$t('rules.reject')}}</option>
@@ -390,8 +406,8 @@
                 v-show="newRule.advanced"
                 :class="['form-group', newRule.errors.Description.hasError ? 'has-error' : '']"
               >
-                <label class="col-sm-4 control-label">{{$t('rules.description')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.description')}}</label>
+                <div class="col-sm-9">
                   <input class="form-control" type="text" v-model="newRule.Description">
                   <span v-if="newRule.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -404,8 +420,8 @@
                 v-show="newRule.advanced"
                 :class="['form-group', newRule.errors.Log.hasError ? 'has-error' : '']"
               >
-                <label class="col-sm-4 control-label">{{$t('rules.log')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.log')}}</label>
+                <div class="col-sm-9">
                   <input class="form-control" type="checkbox" v-model="newRule.Log">
                   <span v-if="newRule.errors.Log.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -418,8 +434,8 @@
                 v-show="newRule.advanced"
                 :class="['form-group', newRule.errors.Time.hasError ? 'has-error' : '']"
               >
-                <label class="col-sm-4 control-label">{{$t('rules.time_condition')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.time_condition')}}</label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Time"
                     :options="autoOptions"

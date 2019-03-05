@@ -201,8 +201,8 @@
           <form class="form-horizontal" v-on:submit.prevent="savePF()">
             <div class="modal-body">
               <div :class="['form-group', newPf.errors.Proto.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('port_forward.protocol')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('port_forward.protocol')}}</label>
+                <div class="col-sm-9">
                   <select
                     @change="handleProto()"
                     v-model="newPf.Proto"
@@ -214,18 +214,16 @@
                 </div>
               </div>
               <div :class="['form-group', newPf.errors.Src.hasError ? 'has-error' : '']">
-                <label
-                  class="col-sm-3 control-label"
-                  for="textInput-modal-markup"
-                >{{$t('port_forward.origin_port')}}</label>
-                <doc-info
-                  class="col-sm-1"
-                  :placement="'bottom'"
-                  :title="'Port forward'"
-                  :chapter="'firewall'"
-                  :section="'ui-portforward-syntax'"
-                ></doc-info>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label" for="textInput-modal-markup">
+                  {{$t('port_forward.origin_port')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('port_forward.origin_port')"
+                    :chapter="'pf_origin_port'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newPf.Src"
                     :disabled="newPf.SrcDisabled"
@@ -250,10 +248,10 @@
               </div>
               <div :class="['form-group', newPf.errors.DstHost.hasError ? 'has-error' : '']">
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('port_forward.destination_host')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newPf.DstHost"
                     required
@@ -277,10 +275,10 @@
               </div>
               <div :class="['form-group', newPf.errors.Dst.hasError ? 'has-error' : '']">
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('port_forward.destination_port')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <input
                     v-model="newPf.Dst"
                     :disabled="newPf.DstDisabled"
@@ -296,10 +294,10 @@
               </div>
               <div :class="['form-group', newPf.errors.Description.hasError ? 'has-error' : '']">
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('port_forward.description')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <input type="text" v-model="newPf.Description" class="form-control">
                   <span v-if="newPf.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -321,8 +319,8 @@
                 v-show="newPf.advanced"
                 :class="['form-group', newPf.errors.OriDst.hasError ? 'has-error' : '']"
               >
-                <label class="col-sm-4 control-label">{{$t('port_forward.wan_ip')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('port_forward.wan_ip')}}</label>
+                <div class="col-sm-9">
                   <span v-for="(a,i) in wans" v-bind:key="i">
                     <input
                       :id="'wan_ip-'+i"
@@ -343,10 +341,10 @@
                 :class="['form-group', newPf.errors.Allow.hasError ? 'has-error' : '']"
               >
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('port_forward.allow_only')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <textarea v-model="newPf.Allow" class="form-control textarea-mid-height"></textarea>
                   <span v-if="newPf.errors.Allow.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -359,10 +357,10 @@
                 :class="['form-group', newPf.errors.Log.hasError ? 'has-error' : '']"
               >
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('port_forward.write_log')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <input type="checkbox" v-model="newPf.Log" class="form-control">
                   <span v-if="newPf.errors.Log.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:

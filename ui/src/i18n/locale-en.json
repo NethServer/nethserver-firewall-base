@@ -474,6 +474,11 @@
             "host_group_exists": "An host group with the same name already exist",
             "not_exists_host-group": "The host group doesn't exist",
             "host_group_cannot_be_delete": "This host group  can't be deleted because it is in use"
+        },
+        "docs": {
+            "pf_origin_port": "insert here the origin port",
+            "rules_source": "insert here the rules source",
+            "rules_destination": "insert here the rules destination"
         }
     }
 }

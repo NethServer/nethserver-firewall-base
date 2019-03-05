@@ -150,7 +150,7 @@
                             class="col-sm-3 control-label"
                             for="textInput-modal-markup"
                           >{{$t('wan.provider')}}</label>
-                          <div class="col-sm-8">
+                          <div class="col-sm-9">
                             <input required type="text" v-model="i.nslabel" class="form-control">
                             <span v-if="i.errors.nslabel.hasError" class="help-block">
                               {{$t('validation.validation_failed')}}:
@@ -165,7 +165,7 @@
                             class="col-sm-3 control-label"
                             for="textInput-modal-markup"
                           >{{$t('wan.weight')}}</label>
-                          <div class="col-sm-8">
+                          <div class="col-sm-9">
                             <input
                               required
                               type="number"
@@ -185,7 +185,7 @@
                             class="col-sm-3 control-label"
                             for="textInput-modal-markup"
                           >{{$t('wan.inbound_bandwidth')}}</label>
-                          <div class="col-sm-8">
+                          <div class="col-sm-9">
                             <input
                               :id="i.name + '-FwInBandwidth' | sanitize"
                               required
@@ -206,7 +206,7 @@
                             class="col-sm-3 control-label"
                             for="textInput-modal-markup"
                           >{{$t('wan.outbound_bandwidth')}}</label>
-                          <div class="col-sm-8">
+                          <div class="col-sm-9">
                             <input
                               :id="i.name + '-FwOutBandwidth' | sanitize"
                               required
@@ -417,8 +417,8 @@
           <form class="form-horizontal" v-on:submit.prevent="configureWAN()">
             <div class="modal-body">
               <div :class="['form-group', wan.errors.WanMode.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('wan.mode')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('wan.mode')}}</label>
+                <div class="col-sm-9">
                   <input
                     id="WanMode-1"
                     class="col-sm-2 col-xs-2"
@@ -445,10 +445,10 @@
               </div>
               <div :class="['form-group', wan.errors.NotifyWan.hasError ? 'has-error' : '']">
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('wan.notify_status_change')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <input type="checkbox" v-model="wan.NotifyWan" class="form-control">
                   <span v-if="wan.errors.NotifyWan.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -471,10 +471,10 @@
                 :class="['form-group', wan.errors.CheckIP.hasError ? 'has-error' : '']"
               >
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('wan.check_ip')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <textarea v-model="wan.CheckIP" class="form-control"></textarea>
                   <span v-if="wan.errors.CheckIP.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -487,10 +487,10 @@
                 :class="['form-group', wan.errors.MaxNumberPacketLoss.hasError ? 'has-error' : '']"
               >
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('wan.max_number_packet_loss')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <input type="number" v-model="wan.MaxNumberPacketLoss" class="form-control">
                   <span v-if="wan.errors.MaxNumberPacketLoss.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -503,10 +503,10 @@
                 :class="['form-group', wan.errors.MaxPercentPacketLoss.hasError ? 'has-error' : '']"
               >
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('wan.max_percent_packet_loss')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <input type="number" v-model="wan.MaxPercentPacketLoss" class="form-control">
                   <span v-if="wan.errors.MaxPercentPacketLoss.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -519,10 +519,10 @@
                 :class="['form-group', wan.errors.PingInterval.hasError ? 'has-error' : '']"
               >
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('wan.ping_interval')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <input type="number" v-model="wan.PingInterval" class="form-control">
                   <span v-if="wan.errors.PingInterval.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -552,8 +552,8 @@
           <form class="form-horizontal" v-on:submit.prevent="saveRule()">
             <div class="modal-body">
               <div :class="['form-group', newRule.errors.Action.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('rules.provider')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.provider')}}</label>
+                <div class="col-sm-9">
                   <select v-model="newRule.Action" class="form-control" required>
                     <option
                       v-for="i in interfaces"
@@ -568,8 +568,16 @@
                 </div>
               </div>
               <div :class="['form-group', newRule.errors.Src.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('rules.source')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">
+                  {{$t('rules.source')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('rules.source')"
+                    :chapter="'rules_source'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Src"
                     required
@@ -605,8 +613,16 @@
               </div>
 
               <div :class="['form-group', newRule.errors.Dst.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('rules.destination')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">
+                  {{$t('rules.destination')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('rules.destination')"
+                    :chapter="'rules_destination'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Dst"
                     required
@@ -642,8 +658,8 @@
               </div>
 
               <div :class="['form-group', newRule.errors.Service.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('rules.service')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.service')}}</label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Service"
                     :options="autoOptions"
@@ -686,8 +702,8 @@
                 v-show="newRule.advanced"
                 :class="['form-group', newRule.errors.Description.hasError ? 'has-error' : '']"
               >
-                <label class="col-sm-4 control-label">{{$t('rules.description')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.description')}}</label>
+                <div class="col-sm-9">
                   <input class="form-control" type="text" v-model="newRule.Description">
                   <span v-if="newRule.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -700,8 +716,8 @@
                 v-show="newRule.advanced"
                 :class="['form-group', newRule.errors.Time.hasError ? 'has-error' : '']"
               >
-                <label class="col-sm-4 control-label">{{$t('rules.time_condition')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.time_condition')}}</label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Time"
                     :options="autoOptions"

@@ -227,7 +227,8 @@
       class="alert alert-info alert-dismissable mg-top-10"
     >
       <span class="pficon pficon-info"></span>
-      <strong>{{$t('info')}}</strong>. {{$t('rules.tc_add_rules_info')}}.
+      <strong>{{$t('info')}}</strong>
+      . {{$t('rules.tc_add_rules_info')}}.
     </div>
     <ul
       v-if="rules.length > 0 && view.isLoaded"
@@ -404,10 +405,10 @@
             <div class="modal-body">
               <div :class="['form-group', newTc.errors.name.hasError ? 'has-error' : '']">
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('traffic_shaping.class_name')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <input
                     :disabled="newTc.isEdit"
                     type="text"
@@ -422,10 +423,10 @@
               </div>
               <div :class="['form-group', newTc.errors.Description.hasError ? 'has-error' : '']">
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('traffic_shaping.class_description')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <input type="text" v-model="newTc.Description" class="form-control">
                   <span v-if="newTc.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -435,10 +436,10 @@
               </div>
               <div class="form-group">
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="Bandwidth-Unit-1"
                 >{{$t('traffic_shaping.bandwidth_unit')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <input
                     id="Bandwidth-Unit-1"
                     class="col-sm-2 col-xs-2"
@@ -466,7 +467,7 @@
                 :class="['form-group', newTc.errors.MinInputRate.hasError || newTc.errors.MaxInputRate.hasError ? 'has-error' : '']"
               >
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('traffic_shaping.down_bandwidth_limit')}}</label>
                 <div class="col-sm-4">
@@ -490,7 +491,7 @@
                 :class="['form-group', newTc.errors.MinOutputRate.hasError || newTc.errors.MaxOutputRate.hasError ? 'has-error' : '']"
               >
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('traffic_shaping.up_bandwidth_limit')}}</label>
                 <div class="col-sm-4">
@@ -525,10 +526,10 @@
                 :class="['form-group', newTc.errors.BindTo.hasError ? 'has-error' : '']"
               >
                 <label
-                  class="col-sm-4 control-label"
+                  class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('traffic_shaping.bind_to')}}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <select
                     @change="addIfaceToBind(newTc.ifaceToBind)"
                     v-model="newTc.ifaceToBind"
@@ -544,8 +545,8 @@
                 </div>
               </div>
               <div v-if="newTc.advanced" class="form-group">
-                <label class="col-sm-4 control-label" for="textInput-modal-markup"></label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label" for="textInput-modal-markup"></label>
+                <div class="col-sm-9">
                   <ul class="list-inline compact">
                     <li v-for="(i, ki) in newTc.BindTo" v-bind:key="i">
                       <span class="label label-info">
@@ -611,8 +612,8 @@
           <form class="form-horizontal" v-on:submit.prevent="saveRule()">
             <div class="modal-body">
               <div :class="['form-group', newRule.errors.Action.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('rules.class')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.class')}}</label>
+                <div class="col-sm-9">
                   <select v-model="newRule.Action" class="form-control" required>
                     <option v-for="i in tc" v-bind:key="i" :value="'class;'+i.name">{{i.name}}</option>
                   </select>
@@ -623,8 +624,16 @@
                 </div>
               </div>
               <div :class="['form-group', newRule.errors.Src.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('rules.source')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">
+                  {{$t('rules.source')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('rules.source')"
+                    :chapter="'rules_source'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Src"
                     required
@@ -660,8 +669,16 @@
               </div>
 
               <div :class="['form-group', newRule.errors.Dst.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('rules.destination')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">
+                  {{$t('rules.destination')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('rules.destination')"
+                    :chapter="'rules_destination'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Dst"
                     required
@@ -697,8 +714,8 @@
               </div>
 
               <div :class="['form-group', newRule.errors.Service.hasError ? 'has-error' : '']">
-                <label class="col-sm-4 control-label">{{$t('rules.service')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.service')}}</label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Service"
                     :options="autoOptions"
@@ -741,8 +758,8 @@
                 v-show="newRule.advanced"
                 :class="['form-group', newRule.errors.Description.hasError ? 'has-error' : '']"
               >
-                <label class="col-sm-4 control-label">{{$t('rules.description')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.description')}}</label>
+                <div class="col-sm-9">
                   <input class="form-control" type="text" v-model="newRule.Description">
                   <span v-if="newRule.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -755,8 +772,8 @@
                 v-show="newRule.advanced"
                 :class="['form-group', newRule.errors.Log.hasError ? 'has-error' : '']"
               >
-                <label class="col-sm-4 control-label">{{$t('rules.log')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.log')}}</label>
+                <div class="col-sm-9">
                   <input class="form-control" type="checkbox" v-model="newRule.Log">
                   <span v-if="newRule.errors.Log.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -769,8 +786,8 @@
                 v-show="newRule.advanced"
                 :class="['form-group', newRule.errors.Time.hasError ? 'has-error' : '']"
               >
-                <label class="col-sm-4 control-label">{{$t('rules.time_condition')}}</label>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">{{$t('rules.time_condition')}}</label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Time"
                     :options="autoOptions"
@@ -2008,7 +2025,10 @@ export default {
 
               context.view.isChartLoaded = true;
 
-              if (context.pollingIntervalId == 0 && !context.view.invalidChartsData) {
+              if (
+                context.pollingIntervalId == 0 &&
+                !context.view.invalidChartsData
+              ) {
                 context.pollingIntervalId = setInterval(function() {
                   context.initCharts();
                 }, 2000);

@@ -179,7 +179,8 @@
                     <span :class="mapObjectIcon(r.Dst, r.status)"></span>
                     <span
                       :class="[r.status == 'disabled' ? 'gray' : r.Dst.name.toLowerCase(),'mg-left-5']"
-                    ><span
+                    >
+                      <span
                         v-show="r.Dst.type == 'raw'"
                         class="pficon pficon-warning-triangle-o mg-right-5"
                       ></span>
@@ -187,7 +188,8 @@
                       <a
                         v-show="r.Dst.type == 'raw'"
                         @click="openCreateObject(r.Dst)"
-                      >{{$t('create')}} {{$t('objects.'+r.Dst.object)}}</a></span>
+                      >{{$t('create')}} {{$t('objects.'+r.Dst.object)}}</a>
+                    </span>
                   </span>
                 </div>
               </div>
@@ -341,15 +343,16 @@
           <form class="form-horizontal" v-on:submit.prevent="saveRule()">
             <div class="modal-body">
               <div :class="['form-group', newRule.errors.Src.hasError ? 'has-error' : '']">
-                <label class="col-sm-3 control-label">{{$t('rules.source')}}</label>
-                <doc-info
-                  class="col-sm-1"
-                  :placement="'bottom'"
-                  :title="$t('rules.title')"
-                  :chapter="'firewall'"
-                  :section="'ui-rules-source'"
-                ></doc-info>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">
+                  {{$t('rules.source')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('rules.source')"
+                    :chapter="'rules_source'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Src"
                     required
@@ -385,15 +388,16 @@
               </div>
 
               <div :class="['form-group', newRule.errors.Dst.hasError ? 'has-error' : '']">
-                <label class="col-sm-3 control-label">{{$t('rules.destination')}}</label>
-                <doc-info
-                  class="col-sm-1"
-                  :placement="'bottom'"
-                  :title="$t('rules.title')"
-                  :chapter="'firewall'"
-                  :section="'ui-rules-destination'"
-                ></doc-info>
-                <div class="col-sm-8">
+                <label class="col-sm-3 control-label">
+                  {{$t('rules.destination')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('rules.destination')"
+                    :chapter="'rules_destination'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Dst"
                     required
@@ -430,14 +434,7 @@
 
               <div :class="['form-group', newRule.errors.Service.hasError ? 'has-error' : '']">
                 <label class="col-sm-3 control-label">{{$t('rules.service')}}</label>
-                <doc-info
-                  class="col-sm-1"
-                  :placement="'bottom'"
-                  :title="$t('rules.title')"
-                  :chapter="'firewall'"
-                  :section="'ui-rules-service'"
-                ></doc-info>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Service"
                     :options="autoOptions"
@@ -472,14 +469,7 @@
 
               <div :class="['form-group', newRule.errors.Action.hasError ? 'has-error' : '']">
                 <label class="col-sm-3 control-label">{{$t('rules.action')}}</label>
-                <doc-info
-                  class="col-sm-1"
-                  :placement="'bottom'"
-                  :title="$t('rules.title')"
-                  :chapter="'firewall'"
-                  :section="'ui-rules-action'"
-                ></doc-info>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <select v-model="newRule.Action" class="form-control">
                     <option value="accept">{{$t('rules.accept')}}</option>
                     <option value="reject">{{$t('rules.reject')}}</option>
@@ -507,14 +497,7 @@
                 :class="['form-group', newRule.errors.Description.hasError ? 'has-error' : '']"
               >
                 <label class="col-sm-3 control-label">{{$t('rules.description')}}</label>
-                <doc-info
-                  class="col-sm-1"
-                  :placement="'bottom'"
-                  :title="$t('rules.title')"
-                  :chapter="'firewall'"
-                  :section="'ui-rules-description'"
-                ></doc-info>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <input class="form-control" type="text" v-model="newRule.Description">
                   <span v-if="newRule.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -528,14 +511,7 @@
                 :class="['form-group', newRule.errors.Log.hasError ? 'has-error' : '']"
               >
                 <label class="col-sm-3 control-label">{{$t('rules.log')}}</label>
-                <doc-info
-                  class="col-sm-1"
-                  :placement="'bottom'"
-                  :title="$t('rules.title')"
-                  :chapter="'firewall'"
-                  :section="'ui-rules-log'"
-                ></doc-info>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <input class="form-control" type="checkbox" v-model="newRule.Log">
                   <span v-if="newRule.errors.Log.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -549,14 +525,7 @@
                 :class="['form-group', newRule.errors.Time.hasError ? 'has-error' : '']"
               >
                 <label class="col-sm-3 control-label">{{$t('rules.time_condition')}}</label>
-                <doc-info
-                  class="col-sm-1"
-                  :placement="'bottom'"
-                  :title="$t('rules.title')"
-                  :chapter="'firewall'"
-                  :section="'ui-rules-time'"
-                ></doc-info>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Time"
                     :options="autoOptions"
