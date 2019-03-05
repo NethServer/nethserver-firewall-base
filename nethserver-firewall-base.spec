@@ -4,6 +4,7 @@ Version: 3.5.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
+Source1: %{name}.tar.gz
 URL: %{url_prefix}/%{name}
 BuildArch: noarch
 
@@ -40,14 +41,22 @@ mv -v NethServer root%{perl_vendorlib}
 
 for _nsdb in fwservices portforward ; do
    mkdir -p root/%{_nsdbconfdir}/${_nsdb}/{migrate,force,defaults}
-done 
+done
 
 
 %install
 rm -rf %{buildroot}
 (cd root ; find . -depth -print | cpio -dump %{buildroot})
+
+mkdir -p %{buildroot}/usr/share/cockpit/%{name}/
+mkdir -p %{buildroot}/usr/share/cockpit/nethserver/applications/
+mkdir -p %{buildroot}/usr/libexec/nethserver/api/%{name}/
+tar xvf %{SOURCE1} -C %{buildroot}/usr/share/cockpit/%{name}/
+cp -a %{name}.json %{buildroot}/usr/share/cockpit/nethserver/applications/
+cp -a api/* %{buildroot}/usr/libexec/nethserver/api/%{name}/
+
 %{genfilelist} %{buildroot} > %{name}-%{version}-%{release}-filelist
-grep -e php$ -e rst$ -e html$ %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-ui
+grep -e php$ -e rst$ -e html$ -e cockpit %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-ui
 grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-core
 
 %files -f %{name}-%{version}-%{release}-filelist-core
@@ -337,7 +346,7 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 * Mon Jul 29 2013 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.0.4-1.ns6
 - Fix peerdns options usage #2057
-- Use new shorewall syntax for COMMENT and FORMAT 
+- Use new shorewall syntax for COMMENT and FORMAT
 
 * Mon Jul 15 2013 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.0.3-1.ns6
 - Wnhance DHCP configuration on red interfaces  #2057

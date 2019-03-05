@@ -1,0 +1,83 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2018 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+. /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
+
+case $action in
+
+    "create-host"|"update-host")
+        save_db hosts
+        /sbin/e-smith/db hosts set "$(_get name)" host IpAddress "$(_get IpAddress)" Description "$(_get Description)"
+        if [ -n "$(_get  portforwards)" ]; then
+            portforwards_list=$(echo $(_get_array portforwards) | sed -e 's/,/ /g')
+            for pf in $portforwards_list
+            do
+                 save_db portforward
+                 /sbin/e-smith/db portforward setprop $pf DstHost "host;""$(_get name)"
+            done
+        fi
+        if [ "$(_get rules)" == "1" ]; then
+            save_db fwrules
+            /usr/libexec/nethserver/api/nethserver-firewall-base/objects/update-rules-reference "$(_get IpAddress)" "host;""$(_get name)"
+        fi
+        ;;
+    "create-service"|"update-service")
+        save_db fwservices
+        /sbin/e-smith/db fwservices set "$(_get name)" fwservice Ports "$(_get_array Ports)" Protocol "$(_get Protocol)" \
+            Description "$(_get Description)"
+        ;;
+    "create-zone"|"update-zone")
+        save_db networks
+        /sbin/e-smith/db networks set "$(_get name)" zone Interface "$(_get Interface)" Network "$(_get Network)" \
+            Description "$(_get Description)"
+        ;;
+    "create-time-condition"|"update-time-condition")
+        save_db fwtimes
+        /sbin/e-smith/db fwtimes set "$(_get name)" time TimeStart "$(_get TimeStart)" TimeStop "$(_get TimeStop)" \
+            WeekDays "$(_get_array WeekDays)" Description "$(_get Description)"
+        ;;
+    "create-cidr-sub"|"update-cidr-sub")
+        save_db hosts
+        /sbin/e-smith/db hosts set "$(_get name)" cidr Address "$(_get Address)" Description "$(_get Description)"
+        if [ "$(_get rules)" == "1" ]; then
+            save_db fwrules
+            /usr/libexec/nethserver/api/nethserver-firewall-base/objects/update-rules-reference "$(_get Address)" "cidr;""$(_get name)"
+        fi
+        ;;
+    "create-ip-range"|"update-ip-range")
+        save_db hosts
+        /sbin/e-smith/db hosts set "$(_get name)" iprange Start "$(_get Start)" End "$(_get End)" Description "$(_get Description)"
+        ;;
+    "create-host-group"|"update-host-group")
+        save_db hosts
+        /sbin/e-smith/db hosts set "$(_get name)" host-group Members "$(_get_array Members)" Description "$(_get Description)"
+        ;;
+    *)
+        error
+        ;;
+esac
+
+if [ $? -gt 0 ]; then
+    error "SaveFailed" "check_logs"
+else
+    success
+fi

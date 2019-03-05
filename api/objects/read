@@ -1,0 +1,186 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+use strict;
+use warnings;
+use esmith::ConfigDB;
+use esmith::NetworksDB;
+use esmith::HostsDB;
+use JSON;
+
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
+
+sub list_services
+{
+    my $fdb = esmith::ConfigDB->open_ro('fwservices');
+    my @services;
+    foreach ($fdb->get_all()) {
+        my %props = $_->props;
+        $props{'name'} = $_->key;
+        my @ports = split(",",$props{'Ports'});
+        $props{'Ports'} = \@ports;
+        push(@services, \%props);
+    }
+
+    return \@services;
+}
+
+my $input = readInput();
+my $cmd = $input->{'action'};
+
+my $ndb = esmith::NetworksDB->open_ro();
+if($cmd eq 'hosts' || $cmd eq 'cidr-subs'  || $cmd eq 'host-groups' || $cmd eq 'ip-ranges') {
+
+    my @objects;
+    my $ret = {"$cmd" => \@objects};
+    my $hdb = esmith::HostsDB->open_ro();
+    # Objects
+    foreach ($hdb->get_all()) {
+        my $type = $_->prop('type');
+        if ($cmd eq 'hosts') {
+            if ($type eq' local' || $type eq 'remote' || $type eq 'host') {
+                my $ip = $_->prop('IpAddress') || next;
+                my $desc = $_->prop('Description') || '';
+                push(@objects, {"name" => $_->key, "IpAddress" => $ip, "Description" => $desc});
+            }
+        } elsif ($cmd eq 'cidr-subs') {
+            if ($type eq 'cidr') {
+                my $cidr = $_->prop('Address') || next;
+                my $desc = $_->prop('Description') || '';
+                push(@objects, {"name" => $_->key, "Address" => $cidr, "Description" => $desc});
+            }
+        } elsif ($cmd eq 'host-groups') {
+            if ($type eq 'host-group') {
+                my $members = $_->prop('Members') || next;
+                my @members = split(",",$members);
+                my $desc = $_->prop('Description') || '';
+                push(@objects, {"name" => $_->key, "Members" => \@members, "Description" => $desc});
+            }
+        } elsif ($cmd eq 'ip-ranges') {
+            if ($type eq 'iprange') {
+                my $start = $_->prop('Start') || next;
+                my $end = $_->prop('End') || next;
+                my $desc = $_->prop('Description') || '';
+                push(@objects, {"name" => $_->key, "Start" => $start, "End" => $end, "Description" => $desc});
+            }
+
+       }
+
+    }
+
+    print encode_json($ret);
+
+} elsif ($cmd eq 'zones') {
+    my @objects;
+    my $ret = {"$cmd" => \@objects};
+    foreach ($ndb->get_all_by_prop('type' => 'zone')) {
+        my %props = $_->props;
+        $props{'name'} = $_->key;
+        delete($props{'type'});
+        push(@objects, \%props);
+    }
+    print encode_json($ret);
+} elsif ($cmd eq 'time-conditions') {
+    my $db = esmith::ConfigDB->open_ro('fwtimes');
+    my @objects;
+    my $ret = {"$cmd" => \@objects};
+    foreach ($db->get_all_by_prop('type' => 'time')) {
+        my %props = $_->props;
+        $props{'name'} = $_->key;
+        my @tmp = split(",",$props{'WeekDays'});
+        $props{'WeekDays'} = \@tmp;
+        delete($props{'type'});
+        push(@objects, \%props);
+    }
+    print encode_json($ret);
+} elsif ($cmd eq 'interfaces') {
+    my @objects;
+    my $ret = {"$cmd" => \@objects};
+    my %types = ('bridge' => 1, 'bond' => 1, 'vlan' => 1, 'ethernet' => 1, 'xdsl' => 1);
+    foreach ($ndb->get_all()) {
+        next if (!exists($types{$_->prop('type')}));
+        push(@objects, $_->key);
+    }
+    print encode_json($ret);
+} elsif ($cmd eq 'services') {
+
+    my $ret = {'services' => list_services()};
+    print encode_json($ret);
+
+} elsif ($cmd eq 'wans') {
+
+    my $ndb = esmith::NetworksDB->open_ro();
+    my @wans;
+    my $ret = {"wans" => \@wans};
+    foreach ($ndb->get_all()) {
+        my $type = $_->prop('type');
+        my $role = $_->prop('role') || next;
+
+        if ($type eq 'alias') {
+            my @tmp = split(":",$_->key);
+            my $parent_role = $ndb->get_prop($tmp[0], 'role') || '';
+            next if ($parent_role ne 'red');
+            push(@wans, $_->prop('ipaddr'));
+        } else {
+            next if ($role ne 'red');
+            my $bootproto = $_->prop('bootproto') || next;
+
+            if ($bootproto eq 'dhcp') {
+                my $iname = $_->key;
+                my $cidr = `/sbin/ip -o -4 address show $iname primary 2>/dev/null| head -1 | awk '{print \$4}'`;
+                $cidr =~ /^(.*)\/(.*)$/;
+                push(@wans, $1);
+            } else {
+                push(@wans, $_->prop('ipaddr'));
+            }
+        }
+    }
+
+    print encode_json($ret);
+
+} elsif ($cmd eq 'protocols') {
+
+    my $ret = {'protocols' => ['tcpudp', 'tcp', 'udp', 'gre', 'ah', 'esp']};
+
+    print encode_json($ret);
+
+} elsif ($cmd eq 'applications') {
+
+    print encode_json({"applications" => list_applications()});
+
+} elsif ($cmd eq 'local-services') {
+
+    my $db = esmith::ConfigDB->open_ro();
+    my @services;
+    foreach ($db->get_all_by_prop('type' => 'service')) {
+        my $s =  get_local_service_info($_->key, $db, 1);
+        if ($s) {
+            push(@services, $s);
+        }
+    }
+
+    print encode_json({"local-services" => \@services});
+
+} else {
+    error()
+}

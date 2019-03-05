@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+#
+# Replaces a raw address with an object inside the fwrules database
+# Takes 2 arguments:
+# - the address to replace
+# - the object in the format <type>;<name>
+#
+# Example: update-rules-reference "192.168.1.1" "host;myhost"
+#
+
+use strict;
+use warnings;
+use esmith::ConfigDB;
+
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+
+my $address = shift;
+my $obj = shift;
+
+my $db = esmith::ConfigDB->open('fwrules');
+foreach ($db->get_all()) {
+    my $type = $_->prop('type');
+    if ($type eq 'rule') {
+        # firewal rules
+        if ($_->prop('Src') eq $address) {
+            $_->set_prop('Src', $obj)
+        }
+        if ($_->prop('Dst') eq $address) {
+            $_->set_prop('Dst', $obj)
+        }
+    } else {
+        # bypass-src and bypass-dst squid rules
+        if ($_->prop('Host') eq $address) {
+            $_->set_prop('Host', $obj)
+        }
+    }
+}

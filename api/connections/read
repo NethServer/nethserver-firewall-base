@@ -1,0 +1,157 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+use strict;
+use warnings;
+use JSON;
+
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
+
+
+sub get_zone {
+    my $addr = shift;
+    my $fw = shift;
+
+    #return split(":", $fw->getZone($addr))[0];
+}
+
+sub list_connections
+{
+    # suppress warning if reply_<var> is not initialized
+    no warnings 'uninitialized';
+
+    my $proto = shift || 'tcp';
+    my $state = shift || '';
+    my $expand = shift || 0;
+
+    my %zones;
+    my $fw = new NethServer::Firewall();
+    my $sort_key = 'timeout';
+
+    my @connections;
+    open(FH, "/proc/net/nf_conntrack");
+    while (<FH>) {
+        chomp;
+        my $skip = 0;
+        my %fields;
+        my @parts = split(/\s+/, $_);
+
+        # set common fields
+        $fields{'layer'} = $parts[0];
+        $fields{'protocol'} = $parts[2];
+        $fields{'timeout'} = $parts[4];
+        next if ($fields{'protocol'} ne $proto);
+
+        if ($proto eq 'tcp') {
+            $fields{'state'} = $parts[5];
+            $skip = 6;
+        } else {
+            $fields{'state'} = '';
+            $skip = 5;
+        }
+
+        # set extra fields
+        foreach my $part (@parts[ $skip .. $#parts ]) {
+            if (index($part,'=') > 0) {
+                my ($k, $v) = split("=",$part);
+                if (!defined($fields{$k})) {
+                    $fields{$k} = $v;
+                } else {
+                    $fields{$k."_reply"} = $v;
+                }
+            } else {
+                # map status field
+                $part =~ /\[(.*)\]/;
+                $fields{'status'} = $1;
+            }
+        }
+
+        if ($expand) {
+            if (!defined($zones{$fields{'src'}})) {
+                $zones{$fields{'src'}} = (split(":", $fw->getZone($fields{'src'})))[0];
+            }
+            if (!defined($zones{$fields{'dst'}})) {
+                $zones{$fields{'dst'}} = (split(":", $fw->getZone($fields{'dst'})))[0];
+            }
+            $fields{'src_zone'} = $zones{'src'};
+            $fields{'dst_zone'} = $zones{'dst'};
+        }
+
+        # enable orderding by bytes if accounting is enabled
+        if (defined($fields{'bytes'})) {
+            $sort_key = 'bytes_total';
+        }
+
+        $fields{'bytes_total'} = int($fields{'bytes'}) + int($fields{'bytes_reply'});
+        $fields{'packets_total'} = int($fields{'packets'}) + int($fields{'packets_reply'});
+
+        # calculate nat flag
+        if ($fields{'src'} ne $fields{'dst_reply'} || $fields{'dst'} ne $fields{'src_reply'}) {
+            $fields{'nat'} = 1;
+        } else {
+            $fields{'nat'} = 0;
+        }
+        push(@connections, \%fields);
+    }
+    close(FH);
+
+    my @sorted = sort{$b->{$sort_key} <=> $a->{$sort_key}} @connections;
+    return \@sorted;
+}
+
+
+my $input = readInput();
+my $cmd = $input->{'action'};
+
+if ($cmd eq 'conntrack') {
+
+    print encode_json({"connections" => list_connections($input->{'protocol'}, $input->{'state'})});
+
+} elsif ($cmd eq 'protocols') {
+
+    print encode_json({ "protocols" => {
+                'tcp' => ['CLOSE', 'CLOSE_WAIT', 'ESTABLISHED', 'FIN_WAIT', 'LAST_ACK', 'LISTEN', 'NONE', 'SYN_SENT', 'SYN_RECV', 'TIME_WAIT'],
+                'udp' => [],
+                'icmp' => []
+            }});
+
+} elsif ($cmd eq 'stats') {
+
+    my @time;
+    my @connections;
+
+    my $txt = read_netdata("/api/v1/data?chart=netfilter.conntrack_sockets&format=csv&before=0&after=-30&options=abs,seconds");
+    if ($txt) {
+        my @lines = split("\r\n",$txt);
+        shift @lines; # skip header
+        foreach (@lines) {
+            my ($t, $c) = split(",",$_);
+            push(@time, $t);
+            push(@connections, $c);
+        }
+    }
+    print encode_json({'time' => \@time, 'connections' => \@connections});
+
+} else {
+    error();
+}

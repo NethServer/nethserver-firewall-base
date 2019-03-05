@@ -1,0 +1,52 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+. /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
+
+action=$(basename $0)
+
+if [ "$action" = "create" ]; then
+    name=$(expr $(/sbin/e-smith/db portforward showjson | jq -r '[.[].name] | map(tonumber) | max' | sed -e 's/null/0/') + 1)
+elif [ "$action" = "update" ]; then
+    name=$(_get name)
+else
+    error
+fi
+
+src=$(echo $data | jq -rc '.Src | map(tostring) | join(",")')
+proto=$(_get Proto)
+if [ "$proto" == "tcpudp" ]; then
+    proto="tcp,udp"
+fi
+
+save_db portforward
+/sbin/e-smith/db portforward set "$name"  pf Allow "$(_get_array Allow)" \
+    Description "$(_get Description)" Dst "$(_get Dst)" \
+    DstHost "$(_get_fw_object "$(_get DstHost)")" Log "$(_get Log)" \
+    OriDst "$(_get OriDst)" Proto "$proto" \
+    Src "$src" status "$(_get status)"
+
+if [ $? -gt 0 ]; then
+    error "SaveFailed" "check_logs"
+else
+    success
+fi

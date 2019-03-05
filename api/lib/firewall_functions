@@ -1,0 +1,263 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+#
+# The library automatically parse the JSON from stdin
+# Each script has the following variables ready to be used:
+# - action: action field extraced from JSON input
+# - data: JSON input in string format
+#
+
+. /usr/libexec/nethserver/api/lib/helper_functions
+
+# Spool for database copies
+SPOOL=/var/spool/nethserver-cockpit/nethserver-firewall-base
+# System databases
+DB_DIR=/var/lib/nethserver/db
+
+data=$(cat /dev/stdin)
+action=$(echo $data | jq -r '.action')
+
+#
+# Return the selected string field from JSON input.
+#
+# Usage example: echo "$(_get name)"
+#
+function _get
+{
+    field=$1
+    _output=$(echo $data | jq -r ".$field")
+
+    if [ "$_output" = "null" ]; then
+        echo -n ""
+    else
+        echo -n "$_output"
+    fi
+}
+
+#
+# Return the selected array field from JSON input.
+# The array is returned as comma-separated string
+#
+# Usage example: echo "$(_get Ports)"
+#
+function _get_array
+{
+    field=$1
+    echo $data | jq -r ".$field | map(tostring) | join(\",\")"
+}
+
+#
+# Return a firewall object from a JSON object.
+#
+# Usage example: echo $(_get_fw_object "$(get Dst)")
+#
+function _get_fw_object
+{
+    object_type=$(echo "$1" | jq -r ".type")
+    object_name=$(echo "$1" | jq -r ".name")
+
+    case "$object_type" in
+        fw)
+            echo -n fw
+            ;;
+        any)
+            echo -n any
+            ;;
+        raw)
+            echo -n "$object_name"
+            ;;
+        fwservice)
+            if [ "$object_name" == "any" ]; then
+                echo -n any
+            else
+                echo -n "$object_type;$object_name"
+            fi
+            ;;
+        application)
+            object_id=$(echo "$1" | jq -r ".id")
+            echo -n "ndpi;$object_id"
+            ;;
+        *)
+            echo -n "$object_type;$object_name"
+            ;;
+    esac
+}
+
+#
+# Save the given database inside the spool directory
+# The datbase is saved only once with ".active" extension.
+# The copy is the database used for the running configuration.
+#
+# Usage example: save_db "hosts"
+#
+function save_db
+{
+    db=$1
+
+    if [ ! -d $SPOOL ]; then
+        mkdir -p $SPOOL
+    fi
+    if [ ! -f $SPOOL/$1.active ]; then
+        /bin/cp -p $DB_DIR/$db $SPOOL/$db.active
+    fi
+}
+
+#
+# Copy all ".active" database to ".backup" then apply the firewall configuration
+# The ".backup" files can be used to restore last running configuration
+# 
+# Usage example: apply_config
+# 
+function apply_config
+{
+    for f in $(find $SPOOL -name \*.active); do
+        filename="${f%.*}"
+        mv $f $filename.backup
+    done
+    /sbin/e-smith/signal-event -j firewall-adjust
+}
+
+#
+# Return 0 if firewall configuration is changed.
+# The configuration is marked as changes if there is at least one ".active" file inside the spool
+#
+# Usage example:
+#
+#   if is_changed; then
+#       apply
+#   fi
+#
+function is_changed
+{
+    find $SPOOL -name \*.active | grep -q '.*'
+    return $?
+}
+
+#
+# Return 0 if there is at least one backup db ready to be restored
+#
+# Usage example: can_restore
+function can_restore
+{
+    find $SPOOL -name \*.backup | grep -q '.*'
+    return $?
+}
+
+#
+# Restore all ".backup" files inside DB_DIR then apply the configuration
+# This function can be used to restore the configuration before last apply.
+#
+# Usage example: restore_config
+#
+function restore_config
+{
+    for f in $(find $SPOOL -name \*.backup); do
+        filename="${f%.*}"
+        dest=$(basename $filename)
+        mv $f $DB_DIR/$dest
+    done
+    /sbin/e-smith/signal-event -j firewall-adjust
+}
+
+#
+# Restore all ".active" files inside DB_DIR but do not apply the configuration
+# This function can be used to reset all modifications without changing the running configuration.
+#
+# Usage example: reset_config
+#
+function reset_config
+{
+    for f in $(find $SPOOL -name \*.active); do
+        filename="${f%.*}"
+        dest=$(basename $filename)
+        mv $f $DB_DIR/$dest
+    done
+
+}
+
+#
+# Delete given firewall rule
+# Takes one argument: the rule id
+#
+# Usage example: delete_rule "$(_get name)"
+#
+function delete_rule
+{
+    id=$1
+
+    if [ -z $id ]; then
+        error
+    fi
+
+    save_db fwrules
+    /sbin/e-smith/db fwrules delete "$1"
+
+    if [ $? -gt 0 ]; then
+        error "DeleteFailed" "check_logs"
+    else
+        success
+    fi
+
+}
+
+#
+# Create or update a firewall rule
+# The rule is passed by $data global variable
+# Takes one argument: action to perform (create/update)
+#
+# Usage example: fw_rule create
+#
+
+function fw_rule
+{
+    if [ "$1" = "create" ]; then
+        id=$(/usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-next-id)
+    elif [ "$1" = "update" ]; then
+        id=$(_get id)
+    else
+        error
+    fi
+    
+    if [ -z "$(_get Time)" ]; then
+        Time=""
+    else
+        Time=$(_get_fw_object "$(_get Time)")
+    fi
+    
+    Dst=$(_get_fw_object "$(_get Dst)")
+    Src=$(_get_fw_object "$(_get Src)")
+    Service=$(_get_fw_object "$(_get Service)")
+
+    save_db fwrules
+    /sbin/e-smith/db fwrules set "$id" rule Action "$(_get Action)" Log $(_get Log) \
+        Position "$(_get Position)"  Time "$Time" \
+        Dst "$Dst" Service "$Service" \
+        Src "$Src" status "$(_get status)" \
+        Description "$(_get Description)"
+    
+    if [ $? -gt 0 ]; then
+        error "SaveFailed" "check_logs"
+    else
+        success
+    fi
+}

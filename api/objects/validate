@@ -1,0 +1,290 @@
+#!/usr/bin/php
+<?php
+/*
+ * Copyright (C) 2019 Nethesis S.r.l.
+ * http://www.nethesis.it - nethserver@nethesis.it
+ *
+ * This script is part of NethServer.
+ *
+ * NethServer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or any later version.
+ *
+ * NethServer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with NethServer.  If not, see COPYING.
+*/
+
+require_once("/usr/libexec/nethserver/api/lib/Helpers.php");
+
+$data = readInput();
+$action = $data['action'];
+
+$v = new LegacyValidator($data);
+
+switch ($action) {
+
+case "create-host":
+    $db = new EsmithDatabase('hosts');
+    $v->declareParameter('name', Validate::USERNAME);
+    if ($db->getKey($data['name'])) {
+        $v->addValidationError('name', 'host_key_exists', $data['name']);
+    }
+    $v->declareParameter('IpAddress', Validate::IPv4);
+
+    if ($data['portforwards']) {
+        $db = new EsmithDatabase('portforward');
+            foreach( $data['portforwards'] as $pf)
+            {
+                if(!$db->getKey($pf)) {
+                    $v->addValidationError('portforwards', 'non_existing_port-forward', $pf);
+                }
+            }
+    }
+    break;
+
+case "update-host":
+    $db = new EsmithDatabase('hosts');
+    if (!$db->getKey($data['name'])) {
+        $v->addValidationError('name', 'non_existing_host', $data['name']);
+    }
+    $v->declareParameter('IpAddress', Validate::IPv4);
+    break;
+
+case "delete-host":
+    $deleteValidator = $v->createValidator()->platform('fwobject-host-delete', 'hosts');
+    if( ! $deleteValidator->evaluate($data['name'])) {
+        $v->addValidationError('name', 'host_not_removable');
+    }
+    break;
+
+case "create-service":
+case "update-service":
+    $db = new EsmithDatabase('fwservices');
+
+    if( $action == "create-service") {
+        if ($db->getKey($data['name'])) {
+            $v->addValidationError('name', 'service_exists', $data['name']);
+        }
+    } elseif ( $action == "update-service") {
+        if (!$db->getKey($data['name'])) {
+            $v->addValidationError('name', 'not_exists_service', $data['name']);
+        }
+    }
+
+    if($data['Ports']) { 
+        if (strpos($data['Ports'][0], "-") !== false ) { # port range
+            $tmp = explode("-",$data['Ports'][0]);
+            # two non-zero integers, right number must be greater then left one
+            if ( !isset($tmp[0], $tmp[1]) || !(int)$tmp[0] || !(int)$tmp[1] || (int)$tmp[0] >= (int)$tmp[1] ) {
+                $v->addValidationError('Ports', 'not_valid_port_range');
+            }
+        } else {
+            $portValidator = $v->createValidator(Validate::PORTNUMBER);
+            foreach( $data['Ports'] as $port)
+            {
+                if(!$portValidator->evaluate($port)) {
+                    $v->addValidationError('Ports', 'not_valid_port_number');
+                }
+            }
+        }
+    }
+
+    $protocols = array('tcp','udp','tcpudp');
+    $protoValidator = $v->createValidator()->memberOf($protocols);
+
+    $v->declareParameter('Protocol', $protoValidator);
+    $v->declareParameter('Description', $v->createValidator()->maxLength(35));
+    break;
+
+case "delete-service":
+    $db = new EsmithDatabase('fwservices');
+    if (!$db->getKey($data['name'])) {
+        $v->addValidationError('name', 'not_exists_service', $data['name']);
+    }
+    break;
+
+case "create-zone":
+case "update-zone":
+    $ndb = new EsmithDatabase('networks');
+    $nameValidator = $v->createValidator()->maxLength(5)->username();
+    $interfaces = readInterfaces();
+    $interfaceValidator = $v->createValidator()->memberOf($interfaces);
+
+    $v->declareParameter('name', $nameValidator);
+    $v->declareParameter('Network', Validate::CIDR_BLOCK);
+    $v->declareParameter('Interface', $interfaceValidator);
+    $v->declareParameter('Description', Validate::ANYTHING);
+
+    if( $action == 'create-zone' && $ndb->getKey($data['name']) ) {
+        $v->addValidationError('name', 'zone_exists', $data['name']);
+    } elseif ( $action == 'update-zone' && !$ndb->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_zone', $data['name']);
+    }
+    break;
+case "delete-zone":
+    $ndb = new EsmithDatabase('networks');
+    if ( !$ndb->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_zone', $data['name']);
+    } else {
+        $deleteZoneValidator = $v->createValidator()->platform('fwobject-zone-delete', 'networks');
+        if( !$deleteZoneValidator->evaluate($data['name']) ) {
+            $v->addValidationError('name', 'zone_cannot_be_delete', $data['name']);
+        }
+    }
+    break;
+case "create-time-condition":
+case "update-time-condition":
+    $db = new EsmithDatabase('fwtimes');
+    $weekDays = array('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun');
+    $weekDaysValidator = $weekDaysValidator = $v->createValidator()->notEmpty()->collectionValidator($v->createValidator()->memberOf($weekDays));
+
+    $v->declareParameter('name', Validate::USERNAME);
+    $v->declareParameter('Description', Validate::ANYTHING);
+    $v->declareParameter('TimeStart', Validate::TIME);
+    $v->declareParameter('TimeStop', Validate::TIME);
+    $v->declareParameter('WeekDays', $weekDaysValidator);
+
+    if( $action == 'create-time-condition' && $db->getKey($data['name']) ) {
+        $v->addValidationError('name', 'time_condition_exists', $data['name']);
+    } elseif ( $action == 'update-time-condition' && !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_time_condition', $data['name']);
+    }
+
+    if(strcmp($data['TimeStart'], $data['TimeStop']) > 0) {
+        $v->addValidationError('TimeStop','TimeStop_must_be_greater_then_TimeStart', $data['TimeStop']);
+    }
+    break;
+case "delete-time-condition":
+    $db = new EsmithDatabase('fwtimes');
+    if ( !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_time_condition', $data['name']);
+    } else {
+        $deleteTimeConditionValidator = $v->createValidator()->platform('fwobject-time-delete', 'fwtimes');
+        if( !$deleteTimeConditionValidator->evaluate($data['name']) ) {
+            $v->addValidationError('name', 'time_condition_cannot_be_delete', $data['name']);
+        }
+    }
+    break;
+
+case "create-cidr-sub":
+case "update-cidr-sub":
+    $db = new EsmithDatabase('hosts');
+
+    $v->declareParameter('name', Validate::USERNAME);
+    $v->declareParameter('Address', Validate::CIDR_BLOCK);
+    $v->declareParameter('Description', Validate::ANYTHING);
+
+    if( $action == 'create-cidr-sub' && $db->getKey($data['name']) ) {
+        $v->addValidationError('name', 'cidr_sub_exists', $data['name']);
+    } elseif ( $action == 'update-cidr-sub' && !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_cidr_sub', $data['name']);
+    }
+    break;
+case "delete-cidr-sub":
+    $db = new EsmithDatabase('hosts');
+
+    if ( !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_cidr_sub', $data['name']);
+    } else {
+        $deleteCidrValidator = $v->createValidator()->platform('fwobject-cidr-delete', 'hosts');
+        if( !$deleteCidrValidator->evaluate($data['name']) ) {
+            $v->addValidationError('name', 'cidr_sub_cannot_be_delete', $data['name']);
+        }
+    }
+    break;
+case "create-ip-range":
+case "update-ip-range":
+    $db = new EsmithDatabase('hosts');
+
+    $v->declareParameter('name', Validate::USERNAME);
+    $v->declareParameter('Start', Validate::IPv4);
+    $v->declareParameter('End', Validate::IPv4);
+    $v->declareParameter('Description', Validate::ANYTHING);
+
+    if( $action == 'create-ip-range' && $db->getKey($data['name']) ) {
+        $v->addValidationError('name', 'ip_range_exists', $data['name']);
+    } elseif ( $action == 'update-ip-range' && !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_ip_range', $data['name']);
+    }
+
+    $ipValidator = $v->createValidator()->ipV4Address();
+    if ( ($action == 'create-ip-range' || $action == 'update-ip-range' ) &&
+        $ipValidator->evaluate($data['Start']) && $ipValidator->evaluate($data['End'])) {
+            if (ip2long($data['Start']) >= ip2long($data['End'])) {
+                $v->addValidationError('Start', 'ip_range_outofbounds', $data['Start']);
+                $v->addValidationError('End', 'ip_range_outofbounds', $data['End']);
+            }
+        }
+    break;
+case "delete-ip-range":
+    $db = new EsmithDatabase('hosts');
+
+    if ( !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_ip_range', $data['name']);
+    } else {
+        $deleteIpRangeValidator = $v->createValidator()->platform('fwobject-iprange-delete', 'hosts');
+        if( !$deleteIpRangeValidator->evaluate($data['name']) ) {
+            $v->addValidationError('name', 'ip_range_cannot_be_delete', $data['name']);
+        }
+    }
+    break;
+case "create-host-group":
+case "update-host-group":
+    $db = new EsmithDatabase('hosts');
+
+    $membersValidator = $v->createValidator()->notEmpty()->collectionValidator($v->createValidator(Validate::ANYTHING));
+
+    $v->declareParameter('name', Validate::USERNAME);
+    $v->declareParameter('Description', Validate::ANYTHING);
+    $v->declareParameter('Members', $membersValidator);
+
+    if( $action == 'create-host-group' && $db->getKey($data['name']) ) {
+        $v->addValidationError('name', 'host_group_exists', $data['name']);
+    } elseif ( $action == 'update-host-group' && !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_host-group', $data['name']);
+    }
+    break;
+case "delete-host-group":
+    $db = new EsmithDatabase('hosts');
+
+    if ( !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'not_exists_host-group', $data['name']);
+    } else {
+        $deleteHostGroupValidator = $v->createValidator()->platform('fwobject-host-group-delete', 'hosts');
+        if( !$deleteHostGroupValidator->evaluate($data['name']) ) {
+            $v->addValidationError('name', 'host_group_cannot_be_delete', $data['name']);
+        }
+    }
+    break;
+default:
+    error();
+    break;
+}
+
+# Validate the input
+if ($v->validate()) {
+    success();
+} else {
+    error($v);
+}
+
+
+function readInterfaces() {
+    $ret = array();
+    $types = array('bridge', 'bond', 'vlan', 'ethernet', 'xdsl');
+    $db = new EsmithDatabase('networks');
+    $interfaces = $db->getAll();
+
+    foreach ($interfaces as $key => $props) {
+        if (in_array($props['type'], $types)) {
+            $ret[] = $key;
+        }
+    }
+    return $ret;
+}

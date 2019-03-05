@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2018 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+#
+# Return current ssh connections and sshd configuration
+#
+
+use warnings;
+use strict;
+
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+
+use JSON;
+use esmith::ConfigDB;
+
+my %ret;
+my $input = readInput();
+my $cmd = $input->{'action'};
+
+if ($cmd eq 'settings') {
+
+    my $db = esmith::ConfigDB->open();
+    my $firewall = $db->get('firewall');
+    foreach (qw(ExternalPing MACValidation MACValidationPolicy Policy)) {
+        $ret{$_} = $firewall->prop($_)
+    }
+
+    print encode_json({"settings" => \%ret});
+} elsif ($cmd eq 'status') {
+
+    my $can_restore = 0;
+    my $can_apply = int(system('/usr/libexec/nethserver/api/nethserver-firewall-base/settings/can-apply') == 0);
+    # allow restore only if there are no suspended modifications
+    if (!$can_apply) {
+        $can_restore = int(system('/usr/libexec/nethserver/api/nethserver-firewall-base/settings/can-restore') == 0);
+    }
+
+    print encode_json({"status" => {'CanApply' => $can_apply, "CanRestore" => $can_restore}});
+} else {
+    error();
+}

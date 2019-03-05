@@ -1,0 +1,53 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2018 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+. /usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions
+
+case $action in
+
+    "create-default")
+        /usr/libexec/nethserver/initialize-tc-database
+        success
+        ;;
+
+    "create-class")
+        bindto=$(echo $data | jq -rc '.BindTo | map(tostring) | join(",")')
+        mark=$(/usr/libexec/nethserver/api/nethserver-firewall-base/lib/mark-next)
+        save_db tc
+        /sbin/e-smith/db tc set "$(_get name)" class MinOutputRate "$(_get MinOutputRate)" MaxOutputRate "$(_get MaxOutputRate)" MaxInputRate "$(_get MaxInputRate)" MinInputRate "$(_get MinInputRate)" \
+            Description "$(_get Description)" Unit "$(_get Unit)" BindTo "$bindto" Mark "$mark"
+        ;;
+
+    "create-rule")
+        fw_rule "create"
+        ;;
+    *)
+        error
+        ;;
+
+esac
+
+if [ $? -gt 0 ]; then
+    error "SaveFailed" "check_logs"
+else
+    success
+fi

@@ -1,0 +1,105 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+use strict;
+use warnings;
+use esmith::ConfigDB;
+use esmith::NetworksDB;
+use esmith::HostsDB;
+use JSON;
+
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
+
+sub list_services
+{
+    my $fdb = esmith::ConfigDB->open_ro('fwservices');
+    my @services;
+    foreach ($fdb->get_all()) {
+        my %props = $_->props;
+        $props{'name'} = $_->key;
+        my @ports = split(",",$props{'Ports'});
+        $props{'Ports'} = \@ports;
+        push(@services, \%props);
+    }
+
+    return \@services;
+}
+
+sub find_service
+{
+    my $src = shift;
+    my $proto = shift;
+    my $services = shift;
+
+    foreach (@$services) {
+        my $p = $_->{'Ports'};
+        my $ports = join(",",@$p);
+        if ($proto eq $_->{'Protocol'} && $src eq $ports) {
+            return $_->{'name'};
+        }
+    }
+
+    return '';
+}
+
+my $input = readInput();
+my $cmd = $input->{'action'};
+
+if ($cmd eq 'list') {
+
+    my $db = esmith::ConfigDB->open_ro('portforward');
+    my $hdb = esmith::HostsDB->open_ro();
+    my %pf;
+    my $services = list_services();
+    my $ret = {"portforward" => \%pf};
+    foreach ($db->get_all()) {
+        my %props = $_->props;
+        $props{'name'} = $_->key;
+        if (!exists($props{'Log'})) {
+            $props{'Log'} = "none";
+        }
+
+        $props{'Proto'} =~ s/,//; # UI uses tcpudp as protocol instead of tcp,udp
+        $props{'Service'} = find_service($props{'Src'}, $props{'Proto'}, $services);
+        if (!exists($pf{$props{'DstHost'}})) {
+            $pf{$props{'DstHost'}}{'rules'} = [];
+            $pf{$props{'DstHost'}}{'info'} = {};
+        }
+        my $tmp = $pf{$props{'DstHost'}}{'rules'};
+        push(@$tmp, \%props);
+
+        if ($props{'DstHost'} =~ m/host;/) {
+            $pf{$props{'DstHost'}}{'info'}{'type'} = 'host';
+            my $host = (split(";",$props{'DstHost'}))[1];
+            # read description and ip address
+            $pf{$props{'DstHost'}}{'info'}{'IpAddress'} = $hdb->get_prop($host, 'IpAddress') || '';
+            $pf{$props{'DstHost'}}{'info'}{'Description'} = $hdb->get_prop($host, 'Description') || '';
+        } else {
+            $pf{$props{'DstHost'}}{'info'}{'type'} = 'raw';
+        }
+    }
+    print encode_json($ret);
+
+} else {
+    error()
+}
