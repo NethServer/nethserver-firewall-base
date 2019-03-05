@@ -31,9 +31,10 @@ case $action in
 
     "create-class")
         bindto=$(echo $data | jq -rc '.BindTo | map(tostring) | join(",")')
+        mark=$(/usr/libexec/nethserver/api/nethserver-firewall-base/lib/mark-next)
         save_db tc
         /sbin/e-smith/db tc set "$(_get name)" class MinOutputRate "$(_get MinOutputRate)" MaxOutputRate "$(_get MaxOutputRate)" MaxInputRate "$(_get MaxInputRate)" MinInputRate "$(_get MinInputRate)" \
-            Description "$(_get Description)" Unit "$(_get Unit)" BindTo "$bindto"
+            Description "$(_get Description)" Unit "$(_get Unit)" BindTo "$bindto" Mark "$mark"
         ;;
 
     "create-rule")
