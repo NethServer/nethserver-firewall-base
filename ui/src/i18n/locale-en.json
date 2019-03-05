@@ -380,7 +380,8 @@
             "rule_updated_error": "Rule not updated.",
             "rule_deleted_ok": "Rule deleted successfully!",
             "rule_deleted_error": "Rule not deleted.",
-            "tc_add_rules_info": "This rule are ADD mode"
+            "tc_add_rules_info": "This rule are ADD mode",
+            "type_to_search": "Type to search objects, roles..."
         },
         "protocols": {
             "ah": "AH",
@@ -476,9 +477,9 @@
             "host_group_cannot_be_delete": "This host group  can't be deleted because it is in use"
         },
         "docs": {
-            "pf_origin_port": "insert here the origin port",
-            "rules_source": "insert here the rules source",
-            "rules_destination": "insert here the rules destination"
+            "pf_origin_port": "Insert a single port, a list comma-separated list of ports, or a port range using \":\" as separator like \"100:200\".",
+            "rules_source": "Insert an IP address or a CIDR if you do not want to create an host or CIDR object.",
+            "rules_destination": "Insert an IP address or a CIDR if you do not want to create an host or CIDR object"
         }
     }
 }
