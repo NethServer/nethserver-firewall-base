@@ -74,9 +74,6 @@ Properties of ``firewall`` key inside ``configuration`` db:
 * ``NotifyWan``: can be ``enabled`` or ``disabled``, if ``enabled`` a mail is sent every time a provider changes its own state
 * ``NotifyWanFrom``: sender address for mails sent if NotifyWAN is set to enabled
 * ``NotifyWanTo``: recipient address for mails sent if NotifyWAN is set to enabled
-* ``TCLinklayer``: default empty (map to ``ethernet``), can contains all information about connections overheads
-  See https://firehol.org/fireqos-manual/fireqos-params-class/#linklayer-linklayer-name-ethernet-atm
-
 
 Example
 
@@ -382,6 +379,7 @@ markers are used to match traffic inside FireQOS tc classes.
 The firewall needs to know how much inbound and outbound bandwidth has a red interface.
 The bandwidth value (expressed in kbit) is stored inside ``FwInBandwidth`` and ``FwOutBandwidth`` properties, wich are
 parts of the network interface record inside the ``networks`` db.
+Each red interface can have also the ``TCLinklayer`` property, see FireQoS documentation `supported values <https://firehol.org/fireqos-manual/fireqos-params-class/#linklayer-linklayer-name-ethernet-atm>`.
 
 FireQOS tutorial suggests to use 90% of the declared bandwidth to shape the inbound traffic faster.
 
@@ -392,6 +390,7 @@ Example: ::
  enp0s20f2=ethernet
     FwInBandwidth=30000
     FwOutBandwidth=24000
+    TCLinklayer=ethernet
     bootproto=none
     gateway=1.2.3.4
     ipaddr=1.2.3.5
@@ -402,9 +401,7 @@ Example: ::
 All traffic shaping rules are saved inside the ``fwrules`` database with the same format.
 Valid actions for traffic shaping rules are:
 
-- ``class;<name>``: set associated tc class. There are 2 built-in classes:
-  - ``high``: set the priority to high
-  - ``low``: set the priority to low
+- ``class;<name>``: set associated tc class.
 - ``provider;<name>``: force the traffic to the provider specified by ``name``
 
 tc classess
@@ -414,24 +411,38 @@ tc classes are saved inside the ``tc`` database with type ``class``.
 
 Each tc class has the following properties:
 
+- ``BindTo``: empty (default) or comma-separated list of red interfaces. If one ore more interface is listed,
+  the class is applied only to given interface
 - ``Description``: optional class description (used only in the UI)
 - ``Mark``: integer value which identify the marker used for this class. Maximum is ``63``
 - ``MaxInputRate``: maximum download rate, expressed in percentage of the total download bandwidth
 - ``MaxOutputRate``: maximum upload rate, expressed in percentage of the total upload bandwidth
 - ``MinInputRate``: reserved download rate, expressed in percentage of the total download bandwidth
 - ``MinOutputRate``: reserved upload rate, expressed in percentage of the total upload bandwidth
+- ``Unit``: bandwidth unit of measure for TC classes, default to ``%``, supported values are from FireQoS doc
 
 
 Example: ::
 
  high=class
+    BindTo=
     Description=
     Mark=2
     MaxInputRate=
     MaxOutputRate=
     MinInputRate=10
     MinOutputRate=10
+    Unit=%
 
+ low=class
+    BindTo=ens1
+    Description=
+    Mark=2
+    MaxInputRate=
+    MaxOutputRate=
+    MinInputRate=10
+    MinOutputRate=10
+    Unit=kbps
 
 Assumptions and limitations
 ---------------------------
