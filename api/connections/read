@@ -28,13 +28,6 @@ require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
 require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
 
 
-sub get_zone {
-    my $addr = shift;
-    my $fw = shift;
-
-    #return split(":", $fw->getZone($addr))[0];
-}
-
 sub list_connections
 {
     # suppress warning if reply_<var> is not initialized
@@ -42,12 +35,40 @@ sub list_connections
 
     my $proto = shift || 'tcp';
     my $state = shift || '';
-    my $expand = shift || 0;
 
-    my %zones;
-    my $fw = new NethServer::Firewall();
     my $sort_key = 'timeout';
 
+    # init providers lookup table
+    my $fw = new NethServer::Firewall();
+    my %providers;
+    foreach my $p ($fw->getProviders()) {
+        my $label = $fw->{'ndb'}->get_prop($p->{'interface'}, 'nslabel') || $p->{'name'};
+        $providers{$p->{'number'}} = $label;
+    }
+
+    # init priority classes lookup table
+    my %classes;
+    my $tcdb = esmith::ConfigDB->open_ro('tc');
+    foreach ($tcdb->get_all_by_prop('type' => 'class')) {
+        $classes{$_->prop('Mark')} = $_->key;
+    }
+    $classes{'0'} = 'default';
+
+    # init ndpi lookup table
+    my %ndpi;
+    if (-f '/proc/net/xt_ndpi/proto') {
+        open my $fh, '<', "/proc/net/xt_ndpi/proto";
+        if ($fh) {
+            while (my $row = <$fh>) {
+                next if ($row =~ /^#/);
+                chomp $row;
+                my ($id, $mark, $name, $other) = split(/\s+/, $row, 4);
+                $ndpi{$id} = $name;
+            }
+        }
+    }
+
+    # parse all connections
     my @connections;
     open(FH, "/proc/net/nf_conntrack");
     while (<FH>) {
@@ -86,17 +107,6 @@ sub list_connections
             }
         }
 
-        if ($expand) {
-            if (!defined($zones{$fields{'src'}})) {
-                $zones{$fields{'src'}} = (split(":", $fw->getZone($fields{'src'})))[0];
-            }
-            if (!defined($zones{$fields{'dst'}})) {
-                $zones{$fields{'dst'}} = (split(":", $fw->getZone($fields{'dst'})))[0];
-            }
-            $fields{'src_zone'} = $zones{'src'};
-            $fields{'dst_zone'} = $zones{'dst'};
-        }
-
         # enable orderding by bytes if accounting is enabled
         if (defined($fields{'bytes'})) {
             $sort_key = 'bytes_total';
@@ -111,6 +121,14 @@ sub list_connections
         } else {
             $fields{'nat'} = 0;
         }
+        my $mark = $fields{'mark'};
+        # convert mark to hex
+        $fields{'mark'} = sprintf("0x%x", $mark);
+        # split mark
+        $fields{'provider'} = ($mark >> 16) ? $providers{$mark >> 16} : '';
+        my $ndpi_id = sprintf("%0.2x", ($mark & 0xff00) >> 8);
+        $fields{'ndpi'} = $ndpi{$ndpi_id} || '';
+        $fields{'prio'} = $classes{$mark & 0xff};
         push(@connections, \%fields);
     }
     close(FH);
