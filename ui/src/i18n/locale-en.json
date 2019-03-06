@@ -109,7 +109,12 @@
             "restore_changes_ok": "Restore successfully!",
             "restore_changes_error": "Error during restore.",
             "reset_changes_ok": "Reset successfully!",
-            "reset_changes_error": "Error during reset."
+            "reset_changes_error": "Error during reset.",
+            "ufdb": "Web filter",
+            "chilli": "Hotspot",
+            "clamd@squidclamav":  "Web antivirus",
+            "squid": "Web proxy",
+            "suricata": "IPS"
         },
         "wan": {
             "title": "WAN",
