@@ -361,6 +361,8 @@ sub list_policies
 sub list_applications
 {
     my @applications;
+    # return if ndpi is not loaded
+    return \@applications if (! -e "/proc/net/xt_ndpi/proto");
     my $json;
     {
         local $/; #Enable 'slurp' mode
