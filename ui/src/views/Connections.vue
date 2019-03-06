@@ -30,7 +30,7 @@
 
     <div v-if="!view.isLoaded" id="loader" class="spinner spinner-lg view-spinner"></div>
 
-    <h3>{{$t('list')}}</h3>
+    <h3>{{$t('filter')}}</h3>
     <form class="form-horizontal">
       <div class="form-group">
         <label class="col-sm-2">{{$t('connections.protocol')}}</label>
@@ -53,7 +53,7 @@
             v-model="searchState"
             class="form-control quarter-width"
           >
-            <option v-for="s in protocols[searchProto]" v-bind:key="s" :value="s">{{s | uppercase}}</option>
+            <option v-for="s in protocols[searchProto]" v-bind:key="s" :value="s">{{s ? s : "-" | uppercase}}</option>
           </select>
         </div>
       </div>
@@ -66,23 +66,9 @@
     </form>
 
     <div class="pf-container" v-if="view.isLoaded">
-      <h2 v-if="connections.length > 0" class="right mg-top-5 normal">{{filteredConnections.length}}</h2>
 
+      <h3>{{$t('actions')}}</h3>
       <form v-if="connections.length > 0" role="form" class="search-pf has-button search">
-        <div class="form-group has-clear">
-          <div class="search-pf-input-group">
-            <label class="sr-only">Search</label>
-            <input
-              v-focus
-              type="search"
-              v-model="searchString"
-              class="form-control input-lg"
-              :placeholder="$t('search')+'...'"
-              @keyup="highlight"
-              id="pf-search-list"
-            >
-          </div>
-        </div>
         <div class="form-group">
           <button
             class="btn btn-danger btn-lg mg-left-10"
@@ -106,61 +92,59 @@
         id="loader"
         class="spinner spinner-lg view-spinner mg-top-10"
       ></div>
-      <ul
-        v-if="connections.length > 0 && view.isLoaded && view.isLoadedAutoRefresh"
-        class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10"
+
+      <h3 class="pull-left">{{$t('list')}}</h3>
+      <h3 v-if="connections.length > 0" class="pull-right">{{filteredConnections.length}}</h3>
+      <vue-good-table
+        v-show="connections.length > 0 && view.isLoaded && view.isLoadedAutoRefresh"
+        :customRowsPerPageDropdown="[25,50,100]"
+        :perPage="25"
+        :columns="columns"
+        :rows="connections"
+        :lineNumbers="false"
+        :sort-options="{ enabled: false }"
+        :globalSearch="true"
+        :paginate="true"
+        styleClass="table condensed"
+        :nextText="tableLangsTexts.nextText"
+        :prevText="tableLangsTexts.prevText"
+        :rowsPerPageText="tableLangsTexts.rowsPerPageText"
+        :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
+        :ofText="tableLangsTexts.ofText"
       >
-        <li :class="['list-group-item']" v-for="c in filteredConnections" v-bind:key="c">
-          <div class="list-view-pf-actions">
-            <button @click="openDeleteConnection(c)" :class="['btn btn-danger']">
-              <span :class="['fa', 'fa-times', 'span-right-margin']"></span>
-              {{$t('delete')}}
-            </button>
-          </div>
-          <div class="list-view-pf-main-info small-list">
-            <div class="list-view-pf-body">
-              <div class="list-view-pf-description">
-                <div class="list-group-item-heading adjust-heading">
-                  <span class="col-sm-6 mg-right-10">
-                    <span>{{c.src}}</span>
-                    <span class="gray">:{{c.sport}}</span>
-                  </span>
-                  <span class="fa fa-arrow-right mg-right-10"></span>
-                  <span>
-                    <span>{{c.dst}}</span>
-                    <span class="gray">:{{c.dport}}</span>
-                  </span>
-                </div>
-              </div>
-              <div class="list-view-pf-additional-info">
-                <div class="list-view-pf-additional-info-item no-mg-right col-sm-4">
-                  <span class="fa fa-exchange"></span>
-                  <strong>{{c.bytes_total | byteFormat}}</strong>
-                  BYTES
-                </div>
-                <div
-                  v-show="c.status"
-                  class="list-view-pf-additional-info-item no-mg-right col-sm-4"
-                >
-                  <span class="fa fa-clock-o"></span>
-                  <strong>{{c.timeout}}s</strong>
-                  TIMEOUT
-                </div>
-                <div class="list-view-pf-additional-info-item no-mg-right col-sm-3">
-                  <span class="fa fa-crosshairs"></span>
-                  <strong>{{c.mark}}</strong>
-                  MARK
-                </div>
-                <div v-show="c.nat" class="list-view-pf-additional-info-item no-mg-right col-sm-3">
-                  <span class="pficon pficon-route"></span>
-                  <strong>{{handleNAT(c)}}</strong>
-                  NAT
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-      </ul>
+      <template slot="table-row" slot-scope="props">
+      <td class="fancy">
+        <span class="semi-bold">{{props.row.src}}</span> <span v-if="props.row.sport"> : {{props.row.sport}} </span>
+      </td>
+      <td class="fancy">
+        <span class="semi-bold">{{props.row.dst}}</span> <span v-if="props.row.dport"> : {{props.row.dport}} </span>
+      </td>
+      <td class="fancy">
+        {{props.row.bytes_total | byteFormat}}
+      </td>
+      <td class="fancy">
+        {{props.row.timeout + " s"}}
+      </td>
+      <td class="fancy">
+        {{formatNatField(props.row)}}
+      </td>
+      <td class="fancy">
+        {{props.row.provider ?  props.row.provider : "-" }}
+      </td>
+      <td class="fancy">
+        {{props.row.ndpi ?  props.row.ndpi : "-" }}
+      </td>
+      <td class="fancy">
+        {{props.row.prio ?  props.row.prio : "-" }}
+      </td>
+      <td class="fancy">
+        <button @click="openDeleteConnection(props.row)" :class="['btn btn-danger']">
+            <span :class="['fa', 'fa-times', 'span-right-margin']"></span>
+            {{$t('delete')}}
+        </button>
+      </td>
+    </vue-good-table>
+
     </div>
 
     <div
@@ -259,16 +243,64 @@ export default {
       connections: [],
       protocols: {},
       searchString: "",
-      highlightInstance: null,
       searchProto: "tcp",
       searchState: "ESTABLISHED",
       autoRefresh: false,
       currentConnection: {},
       pollingIntervalId: 0,
       pollingIntervalIdChart: 0,
+      tableLangsTexts: this.tableLangs(),
       charts: {
         connections: null
-      }
+      },
+      columns: [
+        {
+          label: this.$i18n.t("connections.source"),
+          field: "src",
+          sortable: false
+        },
+        {
+          label: this.$i18n.t("connections.destination"),
+          field: "dst",
+          sortable: false
+        },
+        {
+          label: this.$i18n.t("connections.bytes"),
+          field: "bytes_total",
+          sortable: false
+        },
+        {
+          label: this.$i18n.t("connections.timeout"),
+          field: "timeout",
+          sortable: false
+        },
+        {
+          label: this.$i18n.t("connections.nat"),
+          field: "nat",
+          sortable: false
+        },
+        {
+          label: this.$i18n.t("connections.provider"),
+          field: "provider",
+          sortable: false
+        },
+        {
+          label: this.$i18n.t("connections.application"),
+          field: "ndpi",
+          sortable: false
+        },
+        {
+          label: this.$i18n.t("connections.priority"),
+          field: "prio",
+          sortable: false
+        },
+        {
+          label: "",
+          field: "",
+          filterable: true,
+          sortable: false
+        }
+      ]
     };
   },
   watch: {
@@ -389,26 +421,6 @@ export default {
           console.error(error);
         }
       );
-    },
-    highlight() {
-      if (!this.highlightInstance) {
-        this.highlightInstance = new Mark("div.pf-container");
-      }
-      var options = {
-        element: "span",
-        className: "highlight-mark",
-        accuracy: "partially"
-      };
-      this.highlightInstance.unmark(options);
-      this.highlightInstance.mark(this.searchString.toLowerCase(), options);
-    },
-    handleNAT(c) {
-      if (c.dst != c.src_reply) {
-        return c.src_reply;
-      }
-      if (c.src != c.dst_reply) {
-        return c.dst_reply;
-      }
     },
     getProtocols() {
       var context = this;
@@ -538,6 +550,17 @@ export default {
           console.error(error, data);
         }
       );
+    },
+    formatNatField(row) {
+      if (!row.nat) {
+        return "-"
+      }
+      if (row.dst != row.src_reply) {
+        return row.src_reply;
+      }
+      if (row.src != row.dst_reply) {
+        return row.dst_reply;
+      }
     }
   }
 };
