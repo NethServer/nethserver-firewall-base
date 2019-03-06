@@ -35,9 +35,14 @@ sub read_provider_status
         open my $fh, '<', $file;
         my $content = do { local $/; <$fh> };
         chomp $content;
-        return 1 if ($content == "0");
+        if ($content == "0") {
+            return 1;
+        } else {
+            return 0;
+        }
     }
-    return 0;
+    # assume provider is up if shorewall doesn't have a status file
+    return 1;
 }
 
 sub read_addresses
