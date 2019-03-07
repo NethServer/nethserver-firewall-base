@@ -120,6 +120,9 @@
         <span class="semi-bold">{{props.row.dst}}</span> <span v-if="props.row.dport"> : {{props.row.dport}} </span>
       </td>
       <td class="fancy">
+        {{props.row.state}}
+      </td>
+      <td class="fancy">
         {{props.row.bytes_total | byteFormat}}
       </td>
       <td class="fancy">
@@ -244,7 +247,7 @@ export default {
       protocols: {},
       searchString: "",
       searchProto: "tcp",
-      searchState: "ESTABLISHED",
+      searchState: "",
       autoRefresh: false,
       currentConnection: {},
       pollingIntervalId: 0,
@@ -262,6 +265,11 @@ export default {
         {
           label: this.$i18n.t("connections.destination"),
           field: "dst",
+          sortable: false
+        },
+        {
+          label: this.$i18n.t("connections.state"),
+          field: "state",
           sortable: false
         },
         {

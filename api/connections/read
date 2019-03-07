@@ -91,6 +91,10 @@ sub list_connections
             $skip = 5;
         }
 
+        if ($state ne '' && $state ne $fields{'state'}) {
+            next;
+        }
+
         # set extra fields
         foreach my $part (@parts[ $skip .. $#parts ]) {
             if (index($part,'=') > 0) {
@@ -148,7 +152,7 @@ if ($cmd eq 'conntrack') {
 } elsif ($cmd eq 'protocols') {
 
     print encode_json({ "protocols" => {
-                'tcp' => ['CLOSE', 'CLOSE_WAIT', 'ESTABLISHED', 'FIN_WAIT', 'LAST_ACK', 'LISTEN', 'NONE', 'SYN_SENT', 'SYN_RECV', 'TIME_WAIT'],
+                'tcp' => ['', 'CLOSE', 'CLOSE_WAIT', 'ESTABLISHED', 'FIN_WAIT', 'LAST_ACK', 'LISTEN', 'NONE', 'SYN_SENT', 'SYN_RECV', 'TIME_WAIT'],
                 'udp' => [],
                 'icmp' => []
             }});
