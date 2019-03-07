@@ -149,6 +149,10 @@ function apply_config
 #
 function is_changed
 {
+    if [ ! -d $SPOOL ]; then
+        exit 1
+    fi
+
     find $SPOOL -name \*.active | grep -q '.*'
     return $?
 }
@@ -159,6 +163,10 @@ function is_changed
 # Usage example: can_restore
 function can_restore
 {
+    if [ ! -d $SPOOL ]; then
+        exit 1
+    fi
+
     find $SPOOL -name \*.backup | grep -q '.*'
     return $?
 }
