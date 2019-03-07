@@ -402,6 +402,7 @@
             "conntrack_list": "Conntrack list",
             "protocol": "Protocol",
             "state": "State",
+            "duration": "Duration",
             "connection_deleted_ok": "Connection deleted successfully!",
             "connection_deleted_error": "Connection not deleted.",
             "flush": "Flush connections",

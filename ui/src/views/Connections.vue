@@ -129,6 +129,9 @@
         {{props.row.timeout + " s"}}
       </td>
       <td class="fancy">
+        {{props.row['delta-time'] ? props.row['delta-time']  : null | secondsInHour }}
+      </td>
+      <td class="fancy">
         {{formatNatField(props.row)}}
       </td>
       <td class="fancy">
@@ -280,6 +283,11 @@ export default {
         {
           label: this.$i18n.t("connections.timeout"),
           field: "timeout",
+          sortable: false
+        },
+        {
+          label: this.$i18n.t("connections.duration"),
+          field: "delta-time",
           sortable: false
         },
         {
