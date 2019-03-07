@@ -149,6 +149,7 @@
             {{$t('delete')}}
         </button>
       </td>
+      </template>
     </vue-good-table>
 
     </div>
