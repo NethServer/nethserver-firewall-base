@@ -93,7 +93,7 @@
         class="spinner spinner-lg view-spinner mg-top-10"
       ></div>
 
-      <h3 class="pull-left">{{$t('list')}}</h3>
+      <h3 v-if="connections.length > 0" class="pull-left">{{$t('list')}}</h3>
       <h3 v-if="connections.length > 0" class="pull-right">{{filteredConnections.length}}</h3>
       <vue-good-table
         v-show="connections.length > 0 && view.isLoaded && view.isLoadedAutoRefresh"
