@@ -16,6 +16,7 @@
         "apply": "Apply",
         "charts": "Charts",
         "list": "List",
+        "filter": "Filter",
         "details": "Details",
         "advanced_mode": "Advanced options",
         "are_you_sure": "Are you sure",
@@ -401,6 +402,7 @@
             "conntrack_list": "Conntrack list",
             "protocol": "Protocol",
             "state": "State",
+            "duration": "Duration",
             "connection_deleted_ok": "Connection deleted successfully!",
             "connection_deleted_error": "Connection not deleted.",
             "flush": "Flush connections",
@@ -411,7 +413,16 @@
             "auto_refresh": "Auto refresh",
             "no_connections_found": "No connections found",
             "no_connections_found_text": "Try to reload the page or enable the 'Auto refresh' option",
-            "flush_connections_warning": "all connections will drop and need to be re-established"
+            "flush_connections_warning": "all connections will drop and need to be re-established",
+            "source": "Source",
+            "destination": "Destination",
+            "bytes": "Bytes",
+            "timeout": "Timeout",
+            "nat": "NAT",
+            "provider": "Provider",
+            "application": "Application",
+            "priority": "Priority",
+            "actions": "Actions"
         },
         "settings": {
             "title": "Settings",

@@ -32,6 +32,11 @@ var Filters = {
         return result;
     },
     secondsInHour: function (value) {
+        if (!value || value.length == 0) {
+            return '-'
+        }
+
+        var ret = "";
         let hours = parseInt(Math.floor(value / 3600));
         let minutes = parseInt(Math.floor((value - hours * 3600) / 60));
         let seconds = parseInt((value - (hours * 3600 + minutes * 60)) % 60);
@@ -40,7 +45,15 @@ var Filters = {
         let dMins = minutes > 9 ? minutes : "0" + minutes;
         let dSecs = seconds > 9 ? seconds : "0" + seconds;
 
-        return dHours + "h " + dMins + "m " + dSecs + "s";
+        ret = dSecs + "s";
+        if (minutes) {
+          ret = dMins + "m " + ret;
+        }
+        if (hours) {
+          ret = dHours + "h " + ret;
+        }
+
+        return ret;
     },
     dateFormat: function (value) {
         var moment = require("moment");
