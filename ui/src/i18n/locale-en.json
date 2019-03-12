@@ -390,7 +390,8 @@
             "rule_updated_error": "Rule not updated.",
             "rule_deleted_ok": "Rule deleted successfully!",
             "rule_deleted_error": "Rule not deleted.",
-            "tc_add_rules_info": "Order is important: a rule match doesn't stop rules evaluation [link]",
+            "tc_add_rules_info": "Order is important: a rule match doesn't stop rules evaluation.",
+            "wan_add_rules_info": "Order is important: a rule match doesn't stop rules evaluation.",
             "type_to_search": "Type to search objects, roles...",
             "two_providers_needed": "Divert rules can be created only if there are two or more configured red interfaces."
         },

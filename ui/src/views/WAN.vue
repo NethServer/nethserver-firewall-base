@@ -242,6 +242,14 @@
       @click="openCreateRule()"
       class="btn btn-primary btn-lg"
     >{{$t('rules.create_divert_rule')}}</button>
+    <div
+      v-if="rules.length > 0 && view.isLoaded"
+      class="alert alert-info alert-dismissable mg-top-10"
+    >
+      <span class="pficon pficon-info"></span>
+      <strong>{{$t('info')}}.</strong>
+      {{$t('rules.wan_add_rules_info')}}
+    </div>
     <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
     <div v-if="rules.length == 0 && view.isLoaded" class="blank-slate-pf white">
       <div class="blank-slate-pf-icon">

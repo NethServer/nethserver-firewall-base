@@ -227,8 +227,8 @@
       class="alert alert-info alert-dismissable mg-top-10"
     >
       <span class="pficon pficon-info"></span>
-      <strong>{{$t('info')}}</strong>
-      . {{$t('rules.tc_add_rules_info')}}.
+      <strong>{{$t('info')}}.</strong>
+      {{$t('rules.tc_add_rules_info')}}
     </div>
     <ul
       v-if="rules.length > 0 && view.isLoaded"
