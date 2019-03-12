@@ -405,9 +405,9 @@
             "duration": "Duration",
             "connection_deleted_ok": "Connection deleted successfully!",
             "connection_deleted_error": "Connection not deleted.",
-            "flush": "Clear all connections",
-            "connections_flushed_ok": "Connections cleared successfully!",
-            "connections_flushed_error": "Connections not cleared.",
+            "flush": "Delete all connections",
+            "connections_flushed_ok": "Connection deleted successfully!",
+            "connections_flushed_error": "Connection not deleted.",
             "delete_connection": "Delete connection",
             "flush_connections": "Clear all connections",
             "auto_refresh": "Auto refresh",
@@ -422,7 +422,11 @@
             "provider": "Provider",
             "application": "Application",
             "priority": "Priority",
-            "actions": "Actions"
+            "actions": "Actions",
+            "total": "Total",
+            "refresh": "Refresh",
+            "limit": "Number of connections",
+            "all": "All"
         },
         "settings": {
             "title": "Settings",

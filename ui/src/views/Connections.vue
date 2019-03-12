@@ -58,9 +58,17 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="col-sm-2">{{$t('connections.auto_refresh')}}</label>
+        <label class="col-sm-2">{{$t('connections.limit')}}</label>
         <div class="col-sm-6">
-          <input class="form-control adjust-check" type="checkbox" v-model="autoRefresh">
+          <select
+            @change="getConnections(true)"
+            v-model="searchLimit"
+            class="form-control quarter-width"
+          >
+            <option value="25">25</option>
+            <option value="100">100</option>
+            <option value="">{{ $t("connections.all") }}</option>
+          </select>
         </div>
       </div>
     </form>
@@ -70,6 +78,11 @@
       <h3>{{$t('actions')}}</h3>
       <form v-if="connections.length > 0" role="form" class="search-pf has-button search">
         <div class="form-group">
+          <button
+            class="btn btn-primary btn-lg mg-left-10"
+            type="button"
+            v-on:click="getConnections(true)"
+          >{{$t('connections.refresh')}}</button>
           <button
             class="btn btn-danger btn-lg mg-left-10"
             type="button"
@@ -93,64 +106,65 @@
         class="spinner spinner-lg view-spinner mg-top-10"
       ></div>
 
-      <h3 v-if="connections.length > 0" class="pull-left">{{$t('list')}}</h3>
-      <h3 v-if="connections.length > 0" class="pull-right">{{filteredConnections.length}}</h3>
-      <vue-good-table
-        v-show="connections.length > 0 && view.isLoaded && view.isLoadedAutoRefresh"
-        :customRowsPerPageDropdown="[25,50,100]"
-        :perPage="25"
-        :columns="columns"
-        :rows="connections"
-        :lineNumbers="false"
-        :sort-options="{ enabled: false }"
-        :globalSearch="true"
-        :paginate="true"
-        styleClass="table condensed"
-        :nextText="tableLangsTexts.nextText"
-        :prevText="tableLangsTexts.prevText"
-        :rowsPerPageText="tableLangsTexts.rowsPerPageText"
-        :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
-        :ofText="tableLangsTexts.ofText"
-      >
-      <template slot="table-row" slot-scope="props">
-      <td class="fancy">
-        <span class="semi-bold">{{props.row.src}}</span> <span v-if="props.row.sport"> : {{props.row.sport}} </span>
-      </td>
-      <td class="fancy">
-        <span class="semi-bold">{{props.row.dst}}</span> <span v-if="props.row.dport"> : {{props.row.dport}} </span>
-      </td>
-      <td class="fancy">
-        {{props.row.state}}
-      </td>
-      <td class="fancy">
-        {{props.row.bytes_total | byteFormat}}
-      </td>
-      <td class="fancy">
-        {{props.row.timeout + " s"}}
-      </td>
-      <td class="fancy">
-        {{props.row['delta-time'] ? props.row['delta-time']  : null | secondsInHour }}
-      </td>
-      <td class="fancy">
-        {{formatNatField(props.row)}}
-      </td>
-      <td class="fancy">
-        {{props.row.provider ?  props.row.provider : "-" }}
-      </td>
-      <td class="fancy">
-        {{props.row.ndpi ?  props.row.ndpi : "-" }}
-      </td>
-      <td class="fancy">
-        {{props.row.prio ?  props.row.prio : "-" }}
-      </td>
-      <td class="fancy">
-        <button @click="openDeleteConnection(props.row)" :class="['btn btn-danger']">
-            <span :class="['fa', 'fa-times', 'span-right-margin']"></span>
-            {{$t('delete')}}
-        </button>
-      </td>
-      </template>
-    </vue-good-table>
+      <div v-if="connections.length > 0 && view.isLoaded && view.isLoadedAutoRefresh">
+        <h3 class="pull-left">{{$t('list')}}</h3>
+        <h3 class="pull-right table-counter">{{$t('connections.total')}}: {{filteredConnections.length}}</h3>
+        <vue-good-table
+          :customRowsPerPageDropdown="[25,50,100]"
+          :perPage="25"
+          :columns="columns"
+          :rows="connections"
+          :lineNumbers="false"
+          :sort-options="{ enabled: false }"
+          :globalSearch="true"
+          :paginate="true"
+          styleClass="table condensed"
+          :nextText="tableLangsTexts.nextText"
+          :prevText="tableLangsTexts.prevText"
+          :rowsPerPageText="tableLangsTexts.rowsPerPageText"
+          :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
+          :ofText="tableLangsTexts.ofText"
+        >
+        <template slot="table-row" slot-scope="props">
+        <td class="fancy">
+          <span class="semi-bold">{{props.row.src}}</span> <span v-if="props.row.sport"> : {{props.row.sport}} </span>
+        </td>
+        <td class="fancy">
+          <span class="semi-bold">{{props.row.dst}}</span> <span v-if="props.row.dport"> : {{props.row.dport}} </span>
+        </td>
+        <td class="fancy">
+          {{props.row.state ? props.row.state : '-'}}
+        </td>
+        <td class="fancy">
+          {{props.row.bytes_total | byteFormat}}
+        </td>
+        <td class="fancy">
+          {{props.row.timeout + " s"}}
+        </td>
+        <td class="fancy">
+          {{props.row['delta-time'] ? props.row['delta-time']  : null | secondsInHour }}
+        </td>
+        <td class="fancy">
+          {{formatNatField(props.row)}}
+        </td>
+        <td class="fancy">
+          {{props.row.provider ?  props.row.provider : "-" }}
+        </td>
+        <td class="fancy">
+          {{props.row.ndpi ?  props.row.ndpi : "-" }}
+        </td>
+        <td class="fancy">
+          {{props.row.prio ?  props.row.prio : "-" }}
+        </td>
+        <td class="fancy">
+          <button @click="openDeleteConnection(props.row)" :class="['btn btn-danger']">
+              <span :class="['fa', 'fa-times', 'span-right-margin']"></span>
+              {{$t('delete')}}
+          </button>
+        </td>
+        </template>
+      </vue-good-table>
+    </div>
 
     </div>
 
@@ -252,7 +266,7 @@ export default {
       searchString: "",
       searchProto: "tcp",
       searchState: "",
-      autoRefresh: false,
+      searchLimit: 25,
       currentConnection: {},
       pollingIntervalId: 0,
       pollingIntervalIdChart: 0,
@@ -320,21 +334,6 @@ export default {
       ]
     };
   },
-  watch: {
-    autoRefresh: function(val) {
-      if (val) {
-        // start polling
-        var context = this;
-        context.getConnections();
-        context.pollingIntervalId = setInterval(function() {
-          context.getConnections();
-        }, 5000);
-      } else {
-        // stop polling
-        clearInterval(this.pollingIntervalId);
-      }
-    }
-  },
   computed: {
     filteredConnections() {
       var returnObj = [];
@@ -351,9 +350,6 @@ export default {
   methods: {
     toggleCharts() {
       this.view.chartsShowed = !this.view.chartsShowed;
-      if (!this.autoRefresh) {
-        this.autoRefresh = this.view.chartsShowed;
-      }
     },
     initCharts() {
       var context = this;
@@ -374,7 +370,7 @@ export default {
             tick: {
               format: "%H:%M:%S",
               count: 10
-            }
+            },
           },
           y: {
             tick: {
@@ -388,6 +384,9 @@ export default {
         size: {
           height: 200,
           width: window.innerWidth - 100
+        },
+        point: {
+          show: false
         }
       });
 
@@ -464,7 +463,7 @@ export default {
     getConnections(change) {
       var context = this;
 
-      if (this.autoRefresh || change) {
+      if (change) {
         context.view.isLoadedAutoRefresh = false;
       } else {
         context.view.isLoaded = false;
@@ -474,7 +473,8 @@ export default {
         {
           action: "conntrack",
           protocol: context.searchProto,
-          state: context.searchState
+          state: context.searchState,
+          limit: context.searchLimit
         },
         null,
         function(success) {
@@ -600,5 +600,13 @@ export default {
 
 .adjust-check {
   margin-top: -5px !important;
+}
+
+.table-counter {
+  position: absolute;
+  right: 10px;
+  margin-top: 56px;
+  z-index: 999;
+  font-size: 20px;
 }
 </style>

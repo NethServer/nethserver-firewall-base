@@ -126,6 +126,11 @@
           data-target="#restoreFirewallModal"
         >{{$t('dashboard.restore')}}</button>
         <button
+          v-show="status.CanRestore"
+          class="btn btn-default pull-right mg-right-5"
+          v-click="discardBackup()"
+        >{{$t('dashboard.dismiss_restore')}}</button>
+        <button
           v-show="status.CanApply"
           class="btn btn-default pull-right mg-right-5"
           data-toggle="modal"
@@ -338,6 +343,28 @@ export default {
         function(success) {
           context.$emit("changes-applied");
           context.getFirewallStatus();
+        },
+        function(error, data) {
+          console.error(error);
+        }
+      );
+    },
+    discardBackup() {
+      var context = this;
+
+      // notification
+
+      nethserver.notifications.error = context.$i18n.t(
+        "dashboard.discard_error"
+      );
+
+      nethserver.exec(
+        ["nethserver-firewall-base/settings/update"],
+        {
+          action: "discard"
+        },
+        function(stream) {
+          console.info("firewall-base-settings-update", stream);
         },
         function(error, data) {
           console.error(error);

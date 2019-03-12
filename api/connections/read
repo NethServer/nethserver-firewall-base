@@ -27,15 +27,16 @@ use JSON;
 require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
 require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
 
-
 sub list_connections
 {
     # suppress warning if reply_<var> is not initialized
     no warnings 'uninitialized';
 
-    my $proto = shift || 'tcp';
+    my $proto = shift || '';
     my $state = shift || '';
+    my $limit = shift || -1;
 
+    my $counter = 0;
     my $sort_key = 'timeout';
 
     # init providers lookup table
@@ -81,7 +82,8 @@ sub list_connections
         $fields{'layer'} = $parts[0];
         $fields{'protocol'} = $parts[2];
         $fields{'timeout'} = $parts[4];
-        next if ($fields{'protocol'} ne $proto);
+        next if ($proto ne '' && $fields{'protocol'} ne $proto);
+
 
         if ($proto eq 'tcp') {
             $fields{'state'} = $parts[5];
@@ -91,9 +93,7 @@ sub list_connections
             $skip = 5;
         }
 
-        if ($state ne '' && $state ne $fields{'state'}) {
-            next;
-        }
+        next if ($state ne '' && $state ne $fields{'state'});
 
         # set extra fields
         foreach my $part (@parts[ $skip .. $#parts ]) {
@@ -134,6 +134,11 @@ sub list_connections
         $fields{'ndpi'} = $ndpi{$ndpi_id} || '';
         $fields{'prio'} = $classes{$mark & 0xff};
         push(@connections, \%fields);
+
+        $counter++;
+        if ($limit > 0 && $counter >= $limit) {
+            last;
+        }
     }
     close(FH);
 
@@ -147,7 +152,7 @@ my $cmd = $input->{'action'};
 
 if ($cmd eq 'conntrack') {
 
-    print encode_json({"connections" => list_connections($input->{'protocol'}, $input->{'state'})});
+    print encode_json({"connections" => list_connections($input->{'protocol'}, $input->{'state'}, $input->{'limit'})});
 
 } elsif ($cmd eq 'protocols') {
 
@@ -162,7 +167,7 @@ if ($cmd eq 'conntrack') {
     my @time;
     my @connections;
 
-    my $txt = read_netdata("/api/v1/data?chart=netfilter.conntrack_sockets&format=csv&before=0&after=-30&options=abs,seconds");
+    my $txt = read_netdata("/api/v1/data?chart=netfilter.conntrack_sockets&format=csv&before=0&after=-900&options=abs,seconds");
     if ($txt) {
         my @lines = split("\r\n",$txt);
         shift @lines; # skip header
