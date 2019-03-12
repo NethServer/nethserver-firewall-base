@@ -450,6 +450,7 @@
                 >{{$t('wan.notify_status_change')}}</label>
                 <div class="col-sm-9">
                   <input type="checkbox" v-model="wan.NotifyWan" class="form-control">
+                  <small v-if="wan.EmailAddress">{{wan.EmailAddress}}</small>
                   <span v-if="wan.errors.NotifyWan.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+wan.errors.NotifyWan.message)}}

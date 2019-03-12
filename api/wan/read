@@ -77,6 +77,7 @@ if($cmd eq 'providers') {
     foreach (qw(MaxNumberPacketLoss MaxPercentPacketLoss NotifyWan PingInterval WanMode)) {
         $ret->{'configuration'}{'multiwan'}{$_} = $cdb->get_prop('firewall',$_);
     }
+    $ret->{'configuration'}{'multiwan'}{'EmailAddress'} = $cdb->get_prop('root', 'EmailAddress');
 
     print encode_json($ret);
 } elsif ($cmd eq 'speedtest') {

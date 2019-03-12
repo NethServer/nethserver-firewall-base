@@ -144,7 +144,6 @@
             "ping": "Ping",
             "speed_info": "Speedtest results",
             "notify_status_change": "Notify status changes",
-            "notify_to": "Notify to",
             "use_this_set": "Use this settings",
             "provider_configured_ok": "Multi WAN provider configured successfully!",
             "provider_configured_error": "Multi WAN provider not configured.",
