@@ -29,6 +29,7 @@ $v = new LegacyValidator($data);
 
 $v->declareParameter('ExternalPing', Validate::SERVICESTATUS);
 $v->declareParameter('MACValidation', Validate::SERVICESTATUS);
+$v->declareParameter('HairpinNat', Validate::SERVICESTATUS);
 $v->declareParameter('Policy', $v->createValidator()->memberOf(array('permissive','strict')));
 $v->declareParameter('MACValidationPolicy', $v->createValidator()->memberOf(array('drop','accept')));
 

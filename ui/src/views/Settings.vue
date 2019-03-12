@@ -37,6 +37,23 @@
         </div>
       </form>
 
+      <h3>{{$t('settings.portforward')}}</h3>
+      <form class="form-horizontal" v-on:submit.prevent="saveSettings('pf')">
+        <div :class="['form-group', errors.HairpinNat.hasError ? 'has-error' : '']">
+          <label
+            class="col-sm-2 control-label"
+            for="textInput-modal-markup"
+          >{{$t('settings.enable_hairpinnat')}}</label>
+          <div class="col-sm-5">
+            <input type="checkbox" v-model="settings.pf.HairpinNat" class="form-control">
+            <span v-if="errors.HairpinNat.hasError" class="help-block">
+              {{$t('validation.validation_failed')}}:
+              {{$t('validation.'+errors.HairpinNat.message)}}
+            </span>
+          </div>
+        </div>
+      </form>
+
       <h3>{{$t('settings.mac')}}</h3>
       <form class="form-horizontal" v-on:submit.prevent="saveSettings('mac')">
         <div :class="['form-group', errors.MACValidation.hasError ? 'has-error' : '']">
@@ -113,6 +130,9 @@ export default {
         ping: {
           ExternalPing: true
         },
+        pf: {
+          HairpinNat: false
+        },
         mac: {
           MACValidationPolicy: false,
           MACValidation: false
@@ -130,6 +150,10 @@ export default {
           message: ""
         },
         ExternalPing: {
+          hasError: false,
+          message: ""
+        },
+        HairpinNat: {
           hasError: false,
           message: ""
         },
@@ -167,6 +191,10 @@ export default {
           context.settings.ping.ExternalPing =
             success.settings.ExternalPing == "enabled";
 
+          // port forward
+          context.settings.pf.HairpinNat =
+              success.settings.HairpinNat == "enabled";
+
           // mac
           context.settings.mac.MACValidationPolicy =
             success.settings.MACValidationPolicy == "accept";
@@ -191,6 +219,9 @@ export default {
         ExternalPing: context.settings.ping.ExternalPing
           ? "enabled"
           : "disabled",
+        HairpinNat: context.settings.pf.HairpinNat
+            ? "enabled"
+            : "disabled",
         Policy: context.settings.internet.Policy ? "permissive" : "strict",
         MACValidationPolicy: context.settings.mac.MACValidationPolicy
           ? "accept"

@@ -442,7 +442,9 @@
             "allowed": "Allowed",
             "allow_mac": "Allow hosts without IP/MAC binding (DHCP reservation)",
             "settings_updated_ok": "Settings updated successfully!",
-            "settings_updated_error": "Settings not updated."
+            "settings_updated_error": "Settings not updated.",
+            "portforward": "Port forward",
+            "enable_hairpinnat": "Enable hairpin NAT"
         },
         "logs": {
             "title": "Logs",
