@@ -38,6 +38,9 @@ case $action in
     "restore")
         restore_config
         ;;
+    "discard")
+        discard_backup
+        ;;
     *)
         error
         ;;

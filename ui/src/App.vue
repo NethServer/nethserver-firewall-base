@@ -25,7 +25,7 @@
           :class="[getCurrentPath('traffic-shaping') ? 'active' : '', 'list-group-item']"
         >
           <a href="#/traffic-shaping">
-            <span class="fa fa-balance-scale"></span>
+            <span class="fa fa-tachometer"></span>
             <span class="list-group-item-value">{{$t('traffic_shaping.title')}}</span>
           </a>
         </li>
@@ -128,8 +128,8 @@
         <button
           v-show="status.CanRestore"
           class="btn btn-default pull-right mg-right-5"
-          v-click="discardBackup()"
-        >{{$t('dashboard.dismiss_restore')}}</button>
+          v-on:click="discardBackup()"
+        >{{$t('dashboard.discard_backup')}}</button>
         <button
           v-show="status.CanApply"
           class="btn btn-default pull-right mg-right-5"
@@ -353,7 +353,9 @@ export default {
       var context = this;
 
       // notification
-
+      nethserver.notifications.success = context.$i18n.t(
+        "dashboard.discard_ok"
+      );
       nethserver.notifications.error = context.$i18n.t(
         "dashboard.discard_error"
       );
@@ -365,6 +367,9 @@ export default {
         },
         function(stream) {
           console.info("firewall-base-settings-update", stream);
+        },
+        function(success) {
+          context.$emit("changes-applied");
         },
         function(error, data) {
           console.error(error);

@@ -172,6 +172,16 @@ function can_restore
 }
 
 #
+# Delete the backup
+#
+# Usage example: discard_backup
+function discard_backup
+{
+    find $SPOOL -name \*.backup -delete
+    return 0
+}
+
+#
 # Restore all ".backup" files inside DB_DIR then apply the configuration
 # This function can be used to restore the configuration before last apply.
 #
