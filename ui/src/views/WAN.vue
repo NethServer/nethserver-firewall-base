@@ -247,10 +247,15 @@
       <div class="blank-slate-pf-icon">
         <span class="fa fa-share"></span>
       </div>
-      <h1>{{$t('rules.no_rules_found')}}</h1>
-      <p>{{$t('rules.no_rules_found_text')}}.</p>
-      <div class="blank-slate-pf-main-action">
-        <button @click="openCreateRule()" class="btn btn-primary">{{$t('rules.create_divert_rule')}}</button>
+      <div v-if="interfaces.length > 1">
+        <h1>{{$t('rules.no_rules_found')}}</h1>
+        <p>{{$t('rules.no_rules_found_text')}}.</p>
+        <div  class="blank-slate-pf-main-action">
+          <button @click="openCreateRule()" class="btn btn-primary">{{$t('rules.create_divert_rule')}}</button>
+        </div>
+      </div>
+      <div v-if="interfaces.length <= 1">
+        <h3>{{$t('rules.two_providers_needed')}}</h3>
       </div>
     </div>
     <ul
