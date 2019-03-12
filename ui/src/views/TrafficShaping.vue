@@ -587,6 +587,7 @@
               </div>
               <div class="form-group">
                 <label
+                  v-if="!currentTc.isError"
                   class="col-sm-3 control-label"
                   for="textInput-modal-markup"
                 >{{$t('are_you_sure')}}?</label>
@@ -594,7 +595,7 @@
             </div>
             <div class="modal-footer">
               <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
-              <button class="btn btn-danger" type="submit">{{$t('delete')}}</button>
+              <button class="btn btn-danger" type="submit" v-if="!currentTc.isError">{{$t('delete')}}</button>
             </div>
           </form>
         </div>
