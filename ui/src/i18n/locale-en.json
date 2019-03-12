@@ -25,7 +25,7 @@
         "download_low": "download",
         "upload_low": "upload",
         "warning": "Warning",
-        "charts_not_updated": "Charts may not be updated. Netdata is not running",
+        "charts_not_updated": "Charts cannot be updated. Maybe Netdata is not running",
         "any": "Any",
         "search": "Search",
         "configure": "Configure",
@@ -93,12 +93,12 @@
             "tcp": "TCP",
             "udp": "UDP",
             "icmp": "ICMP",
-            "firewall_settings_change": "Firewall settings have been changed but not applied. Click 'Apply' to activate the new settings",
+            "firewall_settings_change": "Firewall settings have been changed but not applied. Click 'Apply' to activate the new settings or 'Revert' to discard changes",
             "apply_changes": "Apply",
-            "firewall_settings_restore": "The previous running configuration is still available in case of problems. Click 'Restore' to apply it now",
+            "firewall_settings_restore": "The previous running configuration is still available in case of problems. Click 'Restore' to roll back",
             "restore": "Restore",
             "reset": "Revert",
-            "warning_apply_changes": "New firewall rules will be applied. Active connections will continue to run",
+            "warning_apply_changes": "New firewall rules will be applied immediately. Active connections will continue to run",
             "warning_restore_changes": "The running configuration will be lost",
             "warning_reset_changes": "New settings will be discarded",
             "snat": "SNAT",
@@ -357,7 +357,7 @@
             "no_rules_found": "No rules found",
             "no_rules_found_text": "To create a new rule use the button below",
             "create_rule": "Create rule",
-            "create_divert_rule": "Create divert rule",
+            "create_divert_rule": "Create policy route",
             "create_priority_rule": "Create priority rule",
             "edit_rule": "Edit rule",
             "delete_rule": "Delete rule",
@@ -390,10 +390,10 @@
             "rule_updated_error": "Rule not updated.",
             "rule_deleted_ok": "Rule deleted successfully!",
             "rule_deleted_error": "Rule not deleted.",
-            "tc_add_rules_info": "Order is important: a rule match doesn't stop rules evaluation.",
-            "wan_add_rules_info": "Order is important: a rule match doesn't stop rules evaluation.",
+            "tc_add_rules_info": "Order is important: evaluation of rules will continue after a match. Priority is assigned by last match.",
+            "wan_add_rules_info": "Order is important: evaluation of rules will continue after a match. Route is assigned by last match.",
             "type_to_search": "Type to search objects, roles...",
-            "two_providers_needed": "Divert rules can be created only if there are two or more configured red interfaces."
+            "two_providers_needed": "Policy routes can be created only if there are two or more configured red interfaces."
         },
         "protocols": {
             "ah": "AH",
@@ -473,7 +473,7 @@
             "any_not_allowed": "Any is not allowed",
             "fw_not_allowed": "Firewall is not allowed",
             "reject_not_allowed": "Reject action is not allowed",
-            "divert_not_allowed": "Divert action is not allowed",
+            "divert_not_allowed": "Policy routing is not allowed",
             "rule_exists": "Rule already exists",
             "rule_not_exists": "Rule does not exist",
             "valid_ip_or_cidr": "Must be a valid ip or cidr",
@@ -508,8 +508,8 @@
         },
         "docs": {
             "pf_origin_port": "Insert a single port, a list of comma-separated ports, or a port range using \":\" as separator like \"100:200\".",
-            "rules_source": "Insert an IP address or a CIDR if you do not want to create a host or CIDR object.",
-            "rules_destination": "Insert an IP address or a CIDR if you do not want to create a host or CIDR object"
+            "rules_source": "You may insert an IP address or a CIDR if you do not want to create a host or CIDR object.",
+            "rules_destination": "You may insert an IP address or a CIDR if you do not want to create a host or CIDR object."
         }
     }
 }
