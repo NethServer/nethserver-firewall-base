@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "watch": "vue-cli-service build --watch"
   },
   "dependencies": {
     "c3": "^0.6.12",
