@@ -191,7 +191,7 @@
                   :title="mapTitleService(r)"
                   class="list-view-pf-additional-info-item"
                 >
-                  <span class="fa fa-fighter-jet"></span>
+                  <span class="fa fa-cogs"></span>
                   <strong>{{r.Service && r.Service.name}}</strong>
                 </div>
                 <div
