@@ -159,7 +159,7 @@
                           </div>
                         </div>
                         <div
-                          :class="['form-group', i.errors.provider.weight.hasError ? 'has-error' : '']"
+                          :class="['form-group', i.errors.weight.hasError ? 'has-error' : '']"
                         >
                           <label
                             class="col-sm-3 control-label"
@@ -172,9 +172,9 @@
                               v-model="i.provider.weight"
                               class="form-control"
                             >
-                            <span v-if="i.errors.provider.weight.hasError" class="help-block">
+                            <span v-if="i.errors.weight.hasError" class="help-block">
                               {{$t('validation.validation_failed')}}:
-                              {{$t('validation.'+i.errors.provider.weight.message)}}
+                              {{$t('validation.'+i.errors.weight.message)}}
                             </span>
                           </div>
                         </div>
@@ -1909,11 +1909,9 @@ export default {
           hasError: false,
           message: ""
         },
-        provider: {
-          weight: {
-            hasError: false,
-            message: ""
-          }
+        weight: {
+          hasError: false,
+          message: ""
         }
       };
     },
@@ -2020,7 +2018,7 @@ export default {
       ).data("bs.popover");
 
       if (!iface.speedtest.isLoaded && popover) {
-        popover.options.content = '<div class="spinner spinner-sm"></div>';
+        popover.options.content = '<div class="spinner spinner-sm"></div><small>'+this.$i18n.t('wan.fireqos_temporary_disabled')+'</small>';
         popover.show();
 
         var context = this;
@@ -2084,6 +2082,10 @@ export default {
             popover.show();
           },
           function(error) {
+            popover.options.content = '<div class="alert alert-warning alert-dismissable"><span class="pficon pficon-warning-triangle-o"></span><strong>' +
+              context.$i18n.t('warning') + '.</strong>'+context.$i18n.t('wan.speedtest_error') +
+              '</div>';
+            popover.show();
             iface.speedtest.isLoaded = true;
             console.error(error);
           }

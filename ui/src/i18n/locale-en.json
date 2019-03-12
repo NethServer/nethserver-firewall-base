@@ -151,7 +151,9 @@
             "multiwan_configured_error": "Multi WAN options not saved",
             "inbound_zero": "Download bandwidth is not set",
             "outbound_zero": "Upload bandwidth is not set",
-            "in_out_bound_zero": "Upload or Download bandwidth is not set"
+            "in_out_bound_zero": "Upload or Download bandwidth is not set",
+            "fireqos_temporary_disabled": "Traffic shaping is temporary disabled during speed test.",
+            "speedtest_error": "Speedtest failed: please check Internet connection."
         },
         "traffic_shaping": {
             "title": "Traffic Shaping",
@@ -498,7 +500,8 @@
             "ip_range_cannot_be_delete": "This IP range can't be deleted because it is in use",
             "host_group_exists": "A host group with the same name already exists",
             "not_exists_host-group": "The host group does not exist",
-            "host_group_cannot_be_delete": "This host group  can't be deleted because it is in use"
+            "host_group_cannot_be_delete": "This host group  can't be deleted because it is in use",
+            "valid_lessThan_256": "Must be less than 256"
         },
         "docs": {
             "pf_origin_port": "Insert a single port, a list of comma-separated ports, or a port range using \":\" as separator like \"100:200\".",
