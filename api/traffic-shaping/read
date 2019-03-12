@@ -67,7 +67,7 @@ if($cmd eq 'classes') {
         $ret->{$name} = undef;
         foreach my $direction (qw(in out)) {
             my $txt = read_netdata("/api/v1/data?chart=tc.".$name."_$direction&format=csv&before=0&after=-30&options=abs,seconds");
-            if ($txt) {
+            if ($txt && index($txt, "Chart is not found") < 0) {
                 my $i = 0;
                 my @headers;
                 foreach my $line (split("\r\n",$txt)) {
@@ -91,6 +91,7 @@ if($cmd eq 'classes') {
                 }
             }
         }
+        delete $ret->{$name} if (! $ret->{$name});
     }
     print encode_json($ret);
 } elsif ($cmd eq 'rules') {
