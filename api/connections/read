@@ -36,7 +36,6 @@ sub list_connections
     my $state = shift || '';
     my $limit = shift || -1;
 
-    my $counter = 0;
     my $sort_key = 'timeout';
 
     # init providers lookup table
@@ -134,15 +133,14 @@ sub list_connections
         $fields{'ndpi'} = $ndpi{$ndpi_id} || '';
         $fields{'prio'} = $classes{$mark & 0xff};
         push(@connections, \%fields);
-
-        $counter++;
-        if ($limit > 0 && $counter >= $limit) {
-            last;
-        }
     }
     close(FH);
 
     my @sorted = sort{$b->{$sort_key} <=> $a->{$sort_key}} @connections;
+
+    if ($limit > 0) {
+        @sorted = splice(@sorted, 0, $limit);
+    }
     return \@sorted;
 }
 
