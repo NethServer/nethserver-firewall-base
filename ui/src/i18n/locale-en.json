@@ -152,7 +152,7 @@
             "inbound_zero": "Download bandwidth is not set",
             "outbound_zero": "Upload bandwidth is not set",
             "in_out_bound_zero": "Upload or Download bandwidth is not set",
-            "fireqos_temporary_disabled": "Traffic shaping is temporary disabled during speed test.",
+            "fireqos_temporary_disabled": "Traffic shaping is temporarily disabled during the speed test.",
             "speedtest_error": "Speedtest failed: please check Internet connection."
         },
         "traffic_shaping": {

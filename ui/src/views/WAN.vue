@@ -2091,7 +2091,7 @@ export default {
           },
           function(error) {
             popover.options.content = '<div class="alert alert-warning alert-dismissable"><span class="pficon pficon-warning-triangle-o"></span><strong>' +
-              context.$i18n.t('warning') + '.</strong>'+context.$i18n.t('wan.speedtest_error') +
+              context.$i18n.t('warning') + '.</strong> '+context.$i18n.t('wan.speedtest_error') +
               '</div>';
             popover.show();
             iface.speedtest.isLoaded = true;
