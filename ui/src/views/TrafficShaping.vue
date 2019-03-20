@@ -51,11 +51,15 @@
             <span>{{$t('traffic_shaping.classes')}}: {{tc.length}}</span>
           </span>
           <a
-            class="mg-left-5 provider-details"
+            class="mg-left-10"
             data-toggle="collapse"
             data-parent="#provider-markup"
             href="#providerDetails"
-          >{{$t('details')}}</a>
+            @click="toggleDetails()"
+          >
+            <span :class="['fa', view.opened ? 'fa-angle-down' : 'fa-angle-right']"></span>
+            {{$t('details')}}
+          </a>
         </div>
         <div id="providerDetails" class="panel-collapse collapse in">
           <div v-if="!view.isLoadedTc" class="spinner spinner-lg view-spinner"></div>
@@ -950,7 +954,8 @@ export default {
         isLoadedTc: false,
         isChartLoaded: false,
         invalidChartsData: false,
-        chartsShowed: false
+        chartsShowed: false,
+        opened: true
       },
       tc: [],
       newTc: this.initTc(),
@@ -1014,6 +1019,9 @@ export default {
     next();
   },
   methods: {
+    toggleDetails() {
+      this.view.opened = !this.view.opened;
+    },
     toggleAdvancedMode() {
       this.newTc.advanced = !this.newTc.advanced;
       this.$forceUpdate();
