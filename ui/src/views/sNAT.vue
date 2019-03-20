@@ -23,7 +23,7 @@
       v-if="snList.length > 0 && view.isLoaded"
       class="list-group list-view-pf list-view-pf-view no-mg-top"
     >
-      <div class="list-group-item" v-for="s in snList" v-bind:key="s">
+      <div class="list-group-item" v-for="(s,k) in snList" v-bind:key="k">
         <div class="list-view-pf-actions">
           <div v-if="s.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
           <button :disabled="s.isLoading" @click="saveSN(s)" class="btn btn-default">
@@ -50,8 +50,8 @@
                 <select class="combobox form-control" v-model="s.FwObjectNat">
                   <option>-</option>
                   <option
-                    v-for="h in hosts"
-                    v-bind:key="h"
+                    v-for="(h,k) in hosts"
+                    v-bind:key="k"
                     :value="h.name"
                   >{{h.name}} | {{h.IpAddress}}</option>
                 </select>

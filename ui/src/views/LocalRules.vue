@@ -57,8 +57,8 @@
       >
         <li
           :class="[r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
-          v-for="r in filteredRules"
-          v-bind:key="r"
+          v-for="(r,k) in filteredRules"
+          v-bind:key="k"
         >
           <div class="drag-size">
             <span class="gray mg-right-5">{{r.id}}</span>

@@ -120,8 +120,8 @@
                   </span>
                 </li>
                 <li
-                  v-for="p in data.rules"
-                  v-bind:key="p"
+                  v-for="(p,i) in data.rules"
+                  v-bind:key="i"
                   :class="['list-group-item small-li', p.status == 'disabled' ? 'gray' : '']"
                 >
                   <div class="col-sm-10">
@@ -209,7 +209,7 @@
                     required
                     class="form-control"
                   >
-                    <option v-for="p in protocols" v-bind:key="p" :value="p">{{$t('protocols.'+p)}}</option>
+                    <option v-for="(p,i) in protocols" v-bind:key="i" :value="p">{{$t('protocols.'+p)}}</option>
                   </select>
                 </div>
               </div>

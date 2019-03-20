@@ -24,7 +24,7 @@
         v-show="interfaces.length > 0 && view.isChartLoaded && !view.invalidChartsData"
         class="row"
       >
-        <div v-for="i in interfaces" v-bind:key="i" class="col-sm-4">
+        <div v-for="(i,k) in interfaces" v-bind:key="k" class="col-sm-4">
           <h4>
             {{i.nslabel}}
             <span class="gray">({{i.provider.name}})</span>
@@ -81,8 +81,8 @@
             class="list-group list-view-pf list-view-pf-view wizard-pf-contents-title white no-mg-top"
           >
             <div
-              v-for="i in interfaces"
-              v-bind:key="i"
+              v-for="(i,k) in interfaces"
+              v-bind:key="k"
               class="list-group-item wan-list list-view-pf-expand-active no-shadow mg-bottom-10"
             >
               <div class="list-group-item-header">
@@ -273,8 +273,8 @@
     >
       <li
         :class="[r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
-        v-for="r in rules"
-        v-bind:key="r"
+        v-for="(r,k) in rules"
+        v-bind:key="k"
       >
         <div class="drag-size">
           <span class="gray mg-right-5">{{r.Action.split(';')[1] | uppercase}}</span>
@@ -570,8 +570,8 @@
                 <div class="col-sm-9">
                   <select v-model="newRule.Action" class="form-control" required>
                     <option
-                      v-for="i in interfaces"
-                      v-bind:key="i"
+                      v-for="(i,k) in interfaces"
+                      v-bind:key="k"
                       :value="'provider;'+i.provider.name"
                     >{{i.provider.name}}</option>
                   </select>
