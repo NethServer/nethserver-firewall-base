@@ -32,18 +32,6 @@
 
     <div class="pf-container" v-if="rules.length > 0 && view.isLoaded">
       <h3>{{$t('rules.list')}}</h3>
-      <div class="right">
-        <span class="expand-text">{{$t('rules.expand')}}</span>
-        <toggle-button
-          class="min-toggle"
-          :width="40"
-          :height="20"
-          :color="{checked: '#0088ce', unchecked: '#bbbbbb'}"
-          :value="expandInfo"
-          :sync="true"
-          @change="toggleExpand()"
-        />
-      </div>
       <form v-if="rules.length > 0" role="form" class="search-pf has-button search">
         <div class="form-group has-clear">
           <div class="search-pf-input-group">
@@ -729,10 +717,7 @@ export default {
       currentRule: {},
       searchString: "",
       highlightInstance: null,
-      expandInfo:
-        (localStorage.getItem("expandInfo") &&
-          localStorage.getItem("expandInfo") == "true") ||
-        true,
+      expandInfo: true,
       status: {},
       newObject: this.initObject()
     };
@@ -751,11 +736,6 @@ export default {
     }
   },
   methods: {
-    toggleExpand() {
-      this.expandInfo = !this.expandInfo;
-      localStorage.setItem("expandInfo", this.expandInfo) || false;
-      this.getRules();
-    },
     highlight() {
       if (!this.highlightInstance) {
         this.highlightInstance = new Mark("div.pf-container");
