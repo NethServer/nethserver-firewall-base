@@ -53,7 +53,7 @@
             v-model="searchState"
             class="form-control quarter-width"
           >
-            <option v-for="s in protocols[searchProto]" v-bind:key="s" :value="s">{{s ? s : "-" | uppercase}}</option>
+            <option v-for="(s,k) in protocols[searchProto]" v-bind:key="k" :value="s">{{s ? s : "-" | uppercase}}</option>
           </select>
         </div>
       </div>

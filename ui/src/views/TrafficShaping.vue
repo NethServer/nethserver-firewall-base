@@ -22,7 +22,7 @@
         v-show="interfaces.length > 0 && view.isChartLoaded && tc.length > 0 && !view.invalidChartsData"
         class="row"
       >
-        <div v-for="i in interfaces" v-bind:key="i" class="col-sm-6">
+        <div v-for="(i,k) in interfaces" v-bind:key="k" class="col-sm-6">
           <h4>
             {{i.nslabel}}
             <span class="gray">({{$t('download_low')}})</span>
@@ -83,7 +83,7 @@
             id="pf-list-simple-expansion"
             class="list-group list-view-pf list-view-pf-view no-mg-top"
           >
-            <div v-for="t in tc" v-bind:key="t" class="list-group-item">
+            <div v-for="(t,i) in tc" v-bind:key="i" class="list-group-item">
               <div class="list-group-item-header cursor-initial">
                 <div class="list-view-pf-actions">
                   <button @click="openEditTc(t)" class="btn btn-default">
@@ -237,8 +237,8 @@
     >
       <li
         :class="[r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
-        v-for="r in rules"
-        v-bind:key="r"
+        v-for="(r,i) in rules"
+        v-bind:key="i"
       >
         <div class="drag-size">
           <span class="gray mg-right-5">{{r.Action.split(';')[1] | uppercase}}</span>
@@ -548,7 +548,7 @@
                 <label class="col-sm-3 control-label" for="textInput-modal-markup"></label>
                 <div class="col-sm-9">
                   <ul class="list-inline compact">
-                    <li v-for="(i, ki) in newTc.BindTo" v-bind:key="i">
+                    <li v-for="(i, ki) in newTc.BindTo" v-bind:key="ki">
                       <span class="label label-info">
                         {{i}}
                         <a @click="removeIfaceToBind(ki)" class="remove-item-inline">
@@ -595,7 +595,11 @@
             </div>
             <div class="modal-footer">
               <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
-              <button class="btn btn-danger" type="submit" v-if="!currentTc.isError">{{$t('delete')}}</button>
+              <button
+                class="btn btn-danger"
+                type="submit"
+                v-if="!currentTc.isError"
+              >{{$t('delete')}}</button>
             </div>
           </form>
         </div>
@@ -616,7 +620,7 @@
                 <label class="col-sm-3 control-label">{{$t('rules.class')}}</label>
                 <div class="col-sm-9">
                   <select v-model="newRule.Action" class="form-control" required>
-                    <option v-for="i in tc" v-bind:key="i" :value="'class;'+i.name">{{i.name}}</option>
+                    <option v-for="(i,k) in tc" v-bind:key="k" :value="'class;'+i.name">{{i.name}}</option>
                   </select>
                   <span v-if="newRule.errors.Action.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -1879,6 +1883,9 @@ export default {
             console.error(e);
           }
 
+          context.view.isChartLoaded = true;
+          context.view.invalidChartsData = true;
+
           for (var i in success) {
             var provider = success[i];
 
@@ -2025,7 +2032,6 @@ export default {
               }
 
               context.view.isChartLoaded = true;
-
               if (
                 context.pollingIntervalId == 0 &&
                 !context.view.invalidChartsData
@@ -2042,6 +2048,8 @@ export default {
         },
         function(error) {
           console.error(error);
+          context.view.isChartLoaded = true;
+          context.view.invalidChartsData = true;
         }
       );
     },
