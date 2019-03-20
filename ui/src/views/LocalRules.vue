@@ -667,6 +667,7 @@ export default {
       nethserver.notifications.success = this.$i18n.t("rules.rule_updated_ok");
       nethserver.notifications.error = this.$i18n.t("rules.rule_updated_error");
 
+      var context = this;
       nethserver.exec(
         ["nethserver-firewall-base/local-rules/update"],
         {
@@ -676,7 +677,9 @@ export default {
         function(stream) {
           console.info("firewall-base-update", stream);
         },
-        function(success) {},
+        function(success) {
+          context.getRules();
+        },
         function(error, data) {
           console.error(error, data);
         }

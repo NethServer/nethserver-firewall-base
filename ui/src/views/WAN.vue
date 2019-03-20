@@ -158,9 +158,7 @@
                             </span>
                           </div>
                         </div>
-                        <div
-                          :class="['form-group', i.errors.weight.hasError ? 'has-error' : '']"
-                        >
+                        <div :class="['form-group', i.errors.weight.hasError ? 'has-error' : '']">
                           <label
                             class="col-sm-3 control-label"
                             for="textInput-modal-markup"
@@ -258,8 +256,11 @@
       <div v-if="interfaces.length > 1">
         <h1>{{$t('rules.no_rules_found')}}</h1>
         <p>{{$t('rules.no_rules_found_text')}}.</p>
-        <div  class="blank-slate-pf-main-action">
-          <button @click="openCreateRule()" class="btn btn-primary">{{$t('rules.create_divert_rule')}}</button>
+        <div class="blank-slate-pf-main-action">
+          <button
+            @click="openCreateRule()"
+            class="btn btn-primary"
+          >{{$t('rules.create_divert_rule')}}</button>
         </div>
       </div>
       <div v-if="interfaces.length <= 1">
@@ -968,6 +969,7 @@ export default {
       nethserver.notifications.success = this.$i18n.t("rules.rule_updated_ok");
       nethserver.notifications.error = this.$i18n.t("rules.rule_updated_error");
 
+      var context = this;
       nethserver.exec(
         ["nethserver-firewall-base/wan/update"],
         {
@@ -977,7 +979,9 @@ export default {
         function(stream) {
           console.info("firewall-base-update", stream);
         },
-        function(success) {},
+        function(success) {
+          context.getRules();
+        },
         function(error, data) {
           console.error(error, data);
         }
@@ -2026,7 +2030,10 @@ export default {
       ).data("bs.popover");
 
       if (!iface.speedtest.isLoaded && popover) {
-        popover.options.content = '<div class="spinner spinner-sm"></div><small>'+this.$i18n.t('wan.fireqos_temporary_disabled')+'</small>';
+        popover.options.content =
+          '<div class="spinner spinner-sm"></div><small>' +
+          this.$i18n.t("wan.fireqos_temporary_disabled") +
+          "</small>";
         popover.show();
 
         var context = this;
@@ -2090,9 +2097,12 @@ export default {
             popover.show();
           },
           function(error) {
-            popover.options.content = '<div class="alert alert-warning alert-dismissable"><span class="pficon pficon-warning-triangle-o"></span><strong>' +
-              context.$i18n.t('warning') + '.</strong> '+context.$i18n.t('wan.speedtest_error') +
-              '</div>';
+            popover.options.content =
+              '<div class="alert alert-warning alert-dismissable"><span class="pficon pficon-warning-triangle-o"></span><strong>' +
+              context.$i18n.t("warning") +
+              ".</strong> " +
+              context.$i18n.t("wan.speedtest_error") +
+              "</div>";
             popover.show();
             iface.speedtest.isLoaded = true;
             console.error(error);
