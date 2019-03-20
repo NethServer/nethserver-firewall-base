@@ -39,20 +39,20 @@ Vue.mixin(UtilService)
 
 // configure i18n
 const i18n = new VueI18n();
-// FIXME: invoke lang API
-moment.locale('en');
 
 var ns = new Vue({
   router,
   i18n,
-  currentLocale: 'en',
   render: function (h) {
     return h(App)
   }
 })
 
-nethserver.fetchTranslatedStrings(function (data) {
-    i18n.setLocaleMessage('cockpit', data);
-    i18n.locale = 'cockpit';
+nethserver.fetchTranslatedStrings(function (data, lang) {
+    var langCode = lang.substr(0, 2);
+    i18n.setLocaleMessage(langCode, data);
+    i18n.locale = langCode;
+    moment.locale(langCode);
+    ns.currentLocale = langCode;
     ns.$mount('#app'); // Start VueJS application after language strings are loaded
 })
