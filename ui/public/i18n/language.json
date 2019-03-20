@@ -115,7 +115,7 @@
             "discard_ok": "Discard successful!.",
             "ufdb": "Web filter",
             "chilli": "Hotspot",
-            "clamd@squidclamav":  "Web antivirus",
+            "clamd@squidclamav": "Web antivirus",
             "squid": "Web proxy",
             "suricata": "IPS"
         },
@@ -185,7 +185,8 @@
             "tc_deleted_ok": "Traffic shaping class deleted successfully!",
             "tc_deleted_error": "Traffic shaping class not deleted.",
             "configuration": "Configuration",
-            "classes": "Classes"
+            "classes": "Classes",
+            "all_wans": "All WANs"
         },
         "snat": {
             "title": "SNAT",

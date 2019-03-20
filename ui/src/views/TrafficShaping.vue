@@ -535,8 +535,12 @@
                     v-model="newTc.ifaceToBind"
                     class="combobox form-control"
                   >
-                    <option>-</option>
-                    <option :value="i.name" v-for="(i, ki) in interfaces" v-bind:key="ki">{{i.name}}</option>
+                    <option value="all">{{$t('traffic_shaping.all_wans')}}</option>
+                    <option
+                      :value="i.name"
+                      v-for="(i, ki) in interfaces"
+                      v-bind:key="ki"
+                    >{{i.name}} - {{i.nslabel}} | Down: {{i.FwInBandwidth}} Up: {{i.FwOutBandwidth}}</option>
                   </select>
                   <span
                     v-if="newTc.errors.BindTo.hasError"
@@ -2081,6 +2085,7 @@ export default {
         MaxOutputRate: "",
         Unit: "%",
         BindTo: [],
+        ifaceToBind: "all",
         advanced: false,
         isLoading: false,
         isEdit: false,
