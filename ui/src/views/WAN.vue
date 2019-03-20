@@ -49,11 +49,15 @@
             <span>{{$t('wan.mode')}}: {{wan.WanMode == 'balance' ? $t('wan.balance') : $t('wan.backup')}}</span>
           </span>
           <a
-            class="mg-left-5"
+            class="mg-left-10"
             data-toggle="collapse"
             data-parent="#provider-markup"
             href="#providerDetails"
-          >{{$t('details')}}</a>
+            @click="toggleDetails()"
+          >
+            <span :class="['fa', view.opened ? 'fa-angle-down' : 'fa-angle-right']"></span>
+            {{$t('details')}}
+          </a>
         </div>
         <div id="providerDetails" class="panel-collapse collapse in">
           <div v-show="!view.isLoadedInterface" class="spinner spinner-lg view-spinner"></div>
@@ -886,7 +890,8 @@ export default {
         isLoadedInterface: false,
         isChartLoaded: false,
         invalidChartsData: false,
-        chartsShowed: false
+        chartsShowed: false,
+        opened: true
       },
       interfaces: [],
       wan: {
@@ -953,6 +958,9 @@ export default {
     next();
   },
   methods: {
+    toggleDetails() {
+      this.view.opened = !this.view.opened;
+    },
     toggleAdvancedMode() {
       this.wan.advanced = !this.wan.advanced;
       this.$forceUpdate();
