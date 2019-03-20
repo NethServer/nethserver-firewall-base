@@ -193,7 +193,7 @@ export default {
 
           // port forward
           context.settings.pf.HairpinNat =
-              success.settings.HairpinNat == "enabled";
+            success.settings.HairpinNat == "enabled";
 
           // mac
           context.settings.mac.MACValidationPolicy =
@@ -202,6 +202,8 @@ export default {
             success.settings.MACValidation == "enabled";
 
           context.view.isLoaded = true;
+
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -219,9 +221,7 @@ export default {
         ExternalPing: context.settings.ping.ExternalPing
           ? "enabled"
           : "disabled",
-        HairpinNat: context.settings.pf.HairpinNat
-            ? "enabled"
-            : "disabled",
+        HairpinNat: context.settings.pf.HairpinNat ? "enabled" : "disabled",
         Policy: context.settings.internet.Policy ? "permissive" : "strict",
         MACValidationPolicy: context.settings.mac.MACValidationPolicy
           ? "accept"

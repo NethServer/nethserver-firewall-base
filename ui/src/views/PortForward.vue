@@ -209,7 +209,11 @@
                     required
                     class="form-control"
                   >
-                    <option v-for="(p,i) in protocols" v-bind:key="i" :value="p">{{$t('protocols.'+p)}}</option>
+                    <option
+                      v-for="(p,i) in protocols"
+                      v-bind:key="i"
+                      :value="p"
+                    >{{$t('protocols.'+p)}}</option>
                   </select>
                 </div>
               </div>
@@ -826,6 +830,8 @@ export default {
             console.error(e);
             context.view.isLoaded = true;
           }
+
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
