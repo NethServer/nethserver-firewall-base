@@ -11,7 +11,6 @@ import DocInfo from "./directives/DocInfo.vue";
 
 import App from './App.vue'
 import router from './router'
-import languages from "./i18n/lang";
 import "./filters/filters";
 
 window.c3 = require('c3');
@@ -39,18 +38,21 @@ import UtilService from "./services/util"
 Vue.mixin(UtilService)
 
 // configure i18n
-var langConf = languages.initLang();
-const i18n = new VueI18n({
-  locale: langConf.locale,
-  messages: langConf.messages
-});
-moment.locale(langConf.locale);
+const i18n = new VueI18n();
+// FIXME: invoke lang API
+moment.locale('en');
 
 var ns = new Vue({
   router,
   i18n,
-  currentLocale: langConf.locale,
+  currentLocale: 'en',
   render: function (h) {
     return h(App)
   }
-}).$mount('#app')
+})
+
+nethserver.fetchTranslatedStrings(function (data) {
+    i18n.setLocaleMessage('cockpit', data);
+    i18n.locale = 'cockpit';
+    ns.$mount('#app'); // Start VueJS application after language strings are loaded
+})
