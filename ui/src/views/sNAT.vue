@@ -136,6 +136,8 @@ export default {
             }
 
             context.view.isLoaded = true;
+
+            context.$parent.getFirewallStatus();
           } catch (e) {
             console.error(e);
             context.view.isLoaded = true;

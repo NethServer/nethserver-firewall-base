@@ -1639,6 +1639,8 @@ export default {
             setTimeout(function() {
               $('[data-toggle="tooltip"]').tooltip();
             }, 500);
+
+            context.$parent.getFirewallStatus();
           } catch (e) {
             console.error(e);
             context.view.isLoaded = true;

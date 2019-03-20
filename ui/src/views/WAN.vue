@@ -2017,6 +2017,8 @@ export default {
           setTimeout(function() {
             $('[data-toggle="tooltip"]').tooltip();
           }, 500);
+
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);

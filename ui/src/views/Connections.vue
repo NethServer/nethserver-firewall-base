@@ -53,7 +53,11 @@
             v-model="searchState"
             class="form-control quarter-width"
           >
-            <option v-for="(s,k) in protocols[searchProto]" v-bind:key="k" :value="s">{{s ? s : "-" | uppercase}}</option>
+            <option
+              v-for="(s,k) in protocols[searchProto]"
+              v-bind:key="k"
+              :value="s"
+            >{{s ? s : "-" | uppercase}}</option>
           </select>
         </div>
       </div>
@@ -67,14 +71,13 @@
           >
             <option value="25">25</option>
             <option value="100">100</option>
-            <option value="">{{ $t("connections.all") }}</option>
+            <option value>{{ $t("connections.all") }}</option>
           </select>
         </div>
       </div>
     </form>
 
     <div class="pf-container" v-if="view.isLoaded">
-
       <h3>{{$t('actions')}}</h3>
       <form v-if="connections.length > 0" role="form" class="search-pf has-button search">
         <div class="form-group">
@@ -108,7 +111,9 @@
 
       <div v-if="connections.length > 0 && view.isLoaded && view.isLoadedAutoRefresh">
         <h3 class="pull-left">{{$t('list')}}</h3>
-        <h3 class="pull-right table-counter">{{$t('connections.total')}}: {{filteredConnections.length}}</h3>
+        <h3
+          class="pull-right table-counter"
+        >{{$t('connections.total')}}: {{filteredConnections.length}}</h3>
         <vue-good-table
           :customRowsPerPageDropdown="[25,50,100]"
           :perPage="25"
@@ -125,47 +130,34 @@
           :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
           :ofText="tableLangsTexts.ofText"
         >
-        <template slot="table-row" slot-scope="props">
-        <td class="fancy">
-          <span class="semi-bold">{{props.row.src}}</span> <span v-if="props.row.sport"> : {{props.row.sport}} </span>
-        </td>
-        <td class="fancy">
-          <span class="semi-bold">{{props.row.dst}}</span> <span v-if="props.row.dport"> : {{props.row.dport}} </span>
-        </td>
-        <td class="fancy">
-          {{props.row.state ? props.row.state : '-'}}
-        </td>
-        <td class="fancy">
-          {{props.row.bytes_total | byteFormat}}
-        </td>
-        <td class="fancy">
-          {{props.row.timeout + " s"}}
-        </td>
-        <td class="fancy">
-          {{props.row['delta-time'] ? props.row['delta-time']  : null | secondsInHour }}
-        </td>
-        <td class="fancy">
-          {{formatNatField(props.row)}}
-        </td>
-        <td class="fancy">
-          {{props.row.provider ?  props.row.provider : "-" }}
-        </td>
-        <td class="fancy">
-          {{props.row.ndpi ?  props.row.ndpi : "-" }}
-        </td>
-        <td class="fancy">
-          {{props.row.prio ?  props.row.prio : "-" }}
-        </td>
-        <td class="fancy">
-          <button @click="openDeleteConnection(props.row)" :class="['btn btn-danger']">
-              <span :class="['fa', 'fa-times', 'span-right-margin']"></span>
-              {{$t('delete')}}
-          </button>
-        </td>
-        </template>
-      </vue-good-table>
-    </div>
-
+          <template slot="table-row" slot-scope="props">
+            <td class="fancy">
+              <span class="semi-bold">{{props.row.src}}</span>
+              <span v-if="props.row.sport">: {{props.row.sport}}</span>
+            </td>
+            <td class="fancy">
+              <span class="semi-bold">{{props.row.dst}}</span>
+              <span v-if="props.row.dport">: {{props.row.dport}}</span>
+            </td>
+            <td class="fancy">{{props.row.state ? props.row.state : '-'}}</td>
+            <td class="fancy">{{props.row.bytes_total | byteFormat}}</td>
+            <td class="fancy">{{props.row.timeout + " s"}}</td>
+            <td
+              class="fancy"
+            >{{props.row['delta-time'] ? props.row['delta-time'] : null | secondsInHour }}</td>
+            <td class="fancy">{{formatNatField(props.row)}}</td>
+            <td class="fancy">{{props.row.provider ? props.row.provider : "-" }}</td>
+            <td class="fancy">{{props.row.ndpi ? props.row.ndpi : "-" }}</td>
+            <td class="fancy">{{props.row.prio ? props.row.prio : "-" }}</td>
+            <td class="fancy">
+              <button @click="openDeleteConnection(props.row)" :class="['btn btn-danger']">
+                <span :class="['fa', 'fa-times', 'span-right-margin']"></span>
+                {{$t('delete')}}
+              </button>
+            </td>
+          </template>
+        </vue-good-table>
+      </div>
     </div>
 
     <div
@@ -216,7 +208,8 @@
             <div class="modal-body">
               <div class="alert alert-warning alert-dismissable">
                 <span class="pficon pficon-warning-triangle-o"></span>
-                <strong>{{$t('warning')}}</strong>: {{$t('connections.flush_connections_warning')}}.
+                <strong>{{$t('warning')}}</strong>
+                : {{$t('connections.flush_connections_warning')}}.
               </div>
               <div class="form-group">
                 <label
@@ -370,7 +363,7 @@ export default {
             tick: {
               format: "%H:%M:%S",
               count: 10
-            },
+            }
           },
           y: {
             tick: {
@@ -487,6 +480,8 @@ export default {
 
           context.view.isLoaded = true;
           context.view.isLoadedAutoRefresh = true;
+
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -570,7 +565,7 @@ export default {
     },
     formatNatField(row) {
       if (!row.nat) {
-        return "-"
+        return "-";
       }
       if (row.dst != row.src_reply) {
         return row.src_reply;

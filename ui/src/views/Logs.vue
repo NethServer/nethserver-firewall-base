@@ -1,13 +1,16 @@
 <template>
-    <div>
-        <h2>{{$t('logs.title')}}</h2>
-        <h3>
-            <pre id="log-file" class="monospace m-right-sm">{{!view.follow ? 'tail -'+view.lines+' /var/log/firewall.log' : 'tail -f /var/log/firewall.log'}}</pre>
-            <button @click="handleLogs()" class="btn btn-primary">{{view.follow ? $t('logs.stop_follow') : $t('logs.follow')}}</button>
-        </h3>
-        <div v-if="!view.logsLoaded" id="loader" class="spinner spinner-lg view-spinner"></div>
-        <pre id="logs-output" v-if="view.logsLoaded" class="logs">{{view.logsContent}}</pre>
-    </div>
+  <div>
+    <h2>{{$t('logs.title')}}</h2>
+    <h3>
+      <pre id="log-file" class="monospace m-right-sm">{{!view.follow ? 'tail -'+view.lines+' /var/log/firewall.log' : 'tail -f /var/log/firewall.log'}}</pre>
+      <button
+        @click="handleLogs()"
+        class="btn btn-primary"
+      >{{view.follow ? $t('logs.stop_follow') : $t('logs.follow')}}</button>
+    </h3>
+    <div v-if="!view.logsLoaded" id="loader" class="spinner spinner-lg view-spinner"></div>
+    <pre id="logs-output" v-if="view.logsLoaded" class="logs">{{view.logsContent}}</pre>
+  </div>
 </template>
 
 <script>
@@ -57,17 +60,20 @@ export default {
           context.view.logsLoaded = true;
 
           if (success.length == 0) {
-            context.view.logsContent = context.i18n.t("logs.process_terminated");
+            context.view.logsContent = context.i18n.t(
+              "logs.process_terminated"
+            );
           } else {
             context.view.logsContent = success;
           }
 
-            setTimeout(function() {
-                document.getElementById(
-            "logs-output"
-          ).scrollTop = document.getElementById("logs-output").scrollHeight;
-            },100)
+          setTimeout(function() {
+            document.getElementById(
+              "logs-output"
+            ).scrollTop = document.getElementById("logs-output").scrollHeight;
+          }, 100);
 
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           context.view.logsLoaded = true;

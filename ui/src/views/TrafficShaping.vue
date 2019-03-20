@@ -2183,6 +2183,8 @@ export default {
           setTimeout(function() {
             $('[data-toggle="tooltip"]').tooltip();
           }, 250);
+
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);

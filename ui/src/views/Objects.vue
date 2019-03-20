@@ -1954,6 +1954,7 @@ export default {
           context.hostsRows = success["hosts"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -1980,6 +1981,7 @@ export default {
           context.hostGroupsRows = success["host-groups"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -2006,6 +2008,7 @@ export default {
           context.ipRangesRows = success["ip-ranges"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -2032,6 +2035,7 @@ export default {
           context.cidrSubsRows = success["cidr-subs"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -2058,6 +2062,7 @@ export default {
           context.zonesRows = success["zones"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -2084,6 +2089,7 @@ export default {
           context.timeConditionsRows = success["time-conditions"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -2110,6 +2116,7 @@ export default {
           context.servicesRows = success["services"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);

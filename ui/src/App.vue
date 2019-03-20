@@ -226,7 +226,6 @@ export default {
   name: "App",
   mounted() {
     this.getFirewallStatus();
-    this.pollingStatus();
   },
   beforeRouteLeave(to, from, next) {
     $(".modal").modal("hide");
@@ -237,8 +236,7 @@ export default {
       title: "",
       status: {
         CanApply: 0
-      },
-      pollingIntervalId: null
+      }
     };
   },
   methods: {
@@ -248,12 +246,6 @@ export default {
       } else {
         return this.$route.path.split("/")[1] === route;
       }
-    },
-    pollingStatus() {
-      var context = this;
-      context.pollingIntervalId = setInterval(function() {
-        context.getFirewallStatus();
-      }, 5000);
     },
     getFirewallStatus() {
       var context = this;
