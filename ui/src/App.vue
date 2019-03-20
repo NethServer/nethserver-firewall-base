@@ -110,8 +110,8 @@
     </nav>
     <div class="container-fluid container-cards-pf main-container">
       <div
-        v-if="status.CanApply || status.CanRestore"
-        :class="['alert', status.CanRestore ? 'alert-info': 'alert-warning', 'alert-dismissable mg-top-10']"
+        v-if="status.CanApply"
+        :class="['alert', 'alert-warning', 'alert-dismissable mg-top-10']"
       >
         <button
           v-show="status.CanApply"
@@ -120,29 +120,16 @@
           data-target="#applyFirewallModal"
         >{{$t('dashboard.apply_changes')}}</button>
         <button
-          v-show="status.CanRestore"
-          class="btn btn-primary pull-right"
-          data-toggle="modal"
-          data-target="#restoreFirewallModal"
-        >{{$t('dashboard.restore')}}</button>
-        <button
-          v-show="status.CanRestore"
-          class="btn btn-default pull-right mg-right-5"
-          v-on:click="discardBackup()"
-        >{{$t('dashboard.discard_backup')}}</button>
-        <button
           v-show="status.CanApply"
           class="btn btn-default pull-right mg-right-5"
           data-toggle="modal"
           data-target="#resetFirewallModal"
         >{{$t('dashboard.reset')}}</button>
 
-        <span :class="['pficon', status.CanRestore ? 'pficon-info' : 'pficon-warning-triangle-o']"></span>
+        <span :class="['pficon', 'pficon-warning-triangle-o']"></span>
 
-        <strong>{{status.CanRestore ? $t('info') : $t('warning')}}.</strong>
-        <span
-          class="mg-left-5"
-        >{{status.CanRestore ? $t('dashboard.firewall_settings_restore') : $t('dashboard.firewall_settings_change')}}</span>.
+        <strong>{{$t('warning')}}.</strong>
+        <span class="mg-left-5">{{$t('dashboard.firewall_settings_change')}}</span>.
       </div>
       <router-view/>
     </div>
@@ -249,8 +236,7 @@ export default {
     return {
       title: "",
       status: {
-        CanApply: 0,
-        CanRestore: 0
+        CanApply: 0
       },
       pollingIntervalId: null
     };
