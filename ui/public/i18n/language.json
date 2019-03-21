@@ -1,5 +1,4 @@
 {
-    "en": {
         "enabled": "Enabled",
         "disabled": "Disabled",
         "up": "Up",
@@ -511,5 +510,4 @@
             "rules_source": "You may insert an IP address or a CIDR if you do not want to create a host or CIDR object.",
             "rules_destination": "You may insert an IP address or a CIDR if you do not want to create a host or CIDR object."
         }
-    }
 }
