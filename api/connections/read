@@ -162,20 +162,20 @@ if ($cmd eq 'conntrack') {
 
 } elsif ($cmd eq 'stats') {
 
-    my @time;
     my @connections;
+    my @labels;
 
-    my $txt = read_netdata("/api/v1/data?chart=netfilter.conntrack_sockets&format=csv&before=0&after=-900&options=abs,seconds");
+    my $time = $input->{'time'} || 900;
+    my $txt = read_netdata("/api/v1/data?chart=netfilter.conntrack_sockets&format=csv&before=0&after=-$time&options=abs,seconds");
     if ($txt) {
         my @lines = split("\r\n",$txt);
-        shift @lines; # skip header
+        @labels = split(",",shift @lines);
         foreach (@lines) {
-            my ($t, $c) = split(",",$_);
-            push(@time, $t);
-            push(@connections, $c);
+            my @values = map(int, split(",",$_));
+            push(@connections, \@values);
         }
     }
-    print encode_json({'time' => \@time, 'connections' => \@connections});
+    print encode_json({labels => \@labels, data => \@connections});
 
 } else {
     error();

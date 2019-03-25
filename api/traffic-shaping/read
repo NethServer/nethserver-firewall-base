@@ -61,33 +61,22 @@ if($cmd eq 'classes') {
 } elsif ($cmd eq 'stats') {
     my $ret = {};
 
+    my $time = $input->{'time'} || '30';
     foreach my $provider ($ndb->get_all_by_prop('type' => 'provider'))
     {
         my $name = $provider->key;
         $ret->{$name} = undef;
         foreach my $direction (qw(in out)) {
-            my $txt = read_netdata("/api/v1/data?chart=tc.".$name."_$direction&format=csv&before=0&after=-30&options=abs,seconds");
+            my $txt = read_netdata("/api/v1/data?chart=tc.".$name."_$direction&format=csv&before=0&after=-$time&options=abs,seconds");
             if ($txt && index($txt, "Chart is not found") < 0) {
-                my $i = 0;
-                my @headers;
-                foreach my $line (split("\r\n",$txt)) {
+                my @lines = split("\r\n",$txt);
+                my @labels = split(",",shift @lines);
+                $ret->{$name}{$direction}{'labels'} = \@labels;
+                $ret->{$name}{$direction}{'data'} = [];
+                foreach my $line (@lines) {
                     my @values = split(",",$line);
-                    if ($i == 0) {
-                        @headers = @values;
-                        foreach (@headers) {
-                            my @arr;
-                            $ret->{$name}{$direction}{$_} = \@arr;
-                        }
-                    } else {
-                        my $k = 0;
-                        foreach (@values) {
-                            my $arr = $ret->{$name}{$direction}{$headers[$k]};
-                            $_ = int($_) + 0.01; # hack for better graph
-                            push(@$arr, $_);
-                            $k++;
-                        }
-                    }
-                    $i++;
+                    my @tmp = map(int, @values);
+                    push($ret->{$name}{$direction}{'data'}, \@tmp);
                 }
             }
         }
