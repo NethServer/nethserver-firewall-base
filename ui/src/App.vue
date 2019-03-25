@@ -435,6 +435,13 @@ export default {
   margin-left: 10px !important;
 }
 
+.mg-top-20 {
+  margin-top: 20px !important;
+}
+.mg-top-35 {
+  margin-top: 35px !important;
+}
+
 .no-shadow {
   box-shadow: none !important;
 }

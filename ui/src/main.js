@@ -14,8 +14,6 @@ import router from './router'
 import languages from "./i18n/lang";
 import "./filters/filters";
 
-window.c3 = require('c3');
-window.d3 = require('d3');
 window.moment = require("moment");
 
 Vue.config.productionTip = false

@@ -23,14 +23,16 @@
         class="row"
       >
         <div v-for="(i,k) in interfaces" v-bind:key="k" class="col-sm-6">
-          <h4>
+          <h4 class="col-sm-12">
             {{i.nslabel}}
             <span class="gray">({{$t('download_low')}})</span>
+            <div :id="'status-in-'+i.provider.name | sanitize" class="legend"></div>
           </h4>
           <div :id="'chart-in-'+i.provider.name | sanitize" class="col-sm-12"></div>
-          <h4>
+          <h4 class="col-sm-12 mg-top-35">
             {{i.nslabel}}
             <span class="gray">({{$t('upload_low')}})</span>
+            <div :id="'status-out-'+i.provider.name | sanitize" class="legend"></div>
           </h4>
           <div :id="'chart-out-'+i.provider.name | sanitize" class="col-sm-12"></div>
         </div>
@@ -945,6 +947,8 @@
 </template>
 
 <script>
+import Dygraph from "dygraphs";
+
 export default {
   name: "TrafficShaping",
   data() {
@@ -1888,7 +1892,132 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/traffic-shaping/read"],
         {
-          action: "stats"
+          action: "stats",
+          time: 120
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+
+          context.view.invalidChartsData = true;
+
+          for (var i in success) {
+            var provider = success[i];
+
+            if (provider) {
+              context.view.invalidChartsData = false;
+
+              if (provider.in && provider.in.data) {
+                for (var t in provider.in.data) {
+                  provider.in.data[t][0] = new Date(
+                    provider.in.data[t][0] * 1000
+                  );
+                }
+                context.charts["chart-in-" + i] = new Dygraph(
+                  document.getElementById(
+                    context.$options.filters.sanitize("chart-in-" + i)
+                  ),
+                  provider.in.data,
+                  {
+                    fillGraph: true,
+                    stackedGraph: true,
+                    labels: provider.in.labels,
+                    height: 150,
+                    strokeWidth: 1,
+                    strokeBorderWidth: 1,
+                    ylabel: context.$i18n.t("traffic_shaping.bandwidth"),
+                    axisLineColor: "white",
+                    labelsDiv: document.getElementById(
+                      context.$options.filters.sanitize("status-in-" + i)
+                    ),
+                    labelsSeparateLines: true,
+                    legend: "always",
+                    axes: {
+                      y: {
+                        axisLabelFormatter: function(y) {
+                          return context.$options.filters.byteFormat(y);
+                        }
+                      }
+                    }
+                  }
+                );
+                context.charts["chart-in-" + i].initialData = provider.in.data;
+              }
+
+              if (provider.out && provider.out.data) {
+                for (var t in provider.out.data) {
+                  provider.out.data[t][0] = new Date(
+                    provider.out.data[t][0] * 1000
+                  );
+                }
+
+                console.log(provider.out);
+
+                context.charts["chart-out-" + i] = new Dygraph(
+                  document.getElementById(
+                    context.$options.filters.sanitize("chart-out-" + i)
+                  ),
+                  provider.out.data,
+                  {
+                    fillGraph: true,
+                    stackedGraph: true,
+                    labels: provider.in.labels,
+                    height: 150,
+                    strokeWidth: 1,
+                    strokeBorderWidth: 1,
+                    ylabel: context.$i18n.t("traffic_shaping.bandwidth"),
+                    axisLineColor: "white",
+                    labelsDiv: document.getElementById(
+                      context.$options.filters.sanitize("status-out-" + i)
+                    ),
+                    labelsSeparateLines: true,
+                    legend: "always",
+                    axes: {
+                      y: {
+                        axisLabelFormatter: function(y) {
+                          return context.$options.filters.byteFormat(y);
+                        }
+                      }
+                    }
+                  }
+                );
+                context.charts["chart-out-" + i].initialData =
+                  provider.out.data;
+              }
+
+              context.view.isChartLoaded = true;
+              if (
+                context.pollingIntervalId == 0 &&
+                !context.view.invalidChartsData
+              ) {
+                context.pollingIntervalId = setInterval(function() {
+                  context.updateCharts(120);
+                }, 1000);
+              }
+            } else {
+              context.view.invalidChartsData = true;
+              context.view.isChartLoaded = true;
+            }
+          }
+        },
+        function(error) {
+          console.error(error);
+          context.view.isChartLoaded = true;
+          context.view.invalidChartsData = true;
+        }
+      );
+    },
+    updateCharts(time) {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/traffic-shaping/read"],
+        {
+          action: "stats",
+          time: time
         },
         null,
         function(success) {
@@ -1905,155 +2034,28 @@ export default {
             var provider = success[i];
 
             if (provider) {
-              // out classes
-              var outColumns = [];
-              var typesOutClass = {};
-              if (provider.out && provider.out.time) {
-                context.view.invalidChartsData = false;
-                for (var c in provider.out) {
-                  var classVal = provider.out[c];
+              context.view.invalidChartsData = false;
 
-                  if (c != "time") {
-                    typesOutClass[c] = "area-spline";
-                    outColumns.push([c].concat(classVal.reverse()));
-                  } else {
-                    outColumns.push(
-                      ["x"].concat(
-                        classVal
-                          .map(function(i) {
-                            return moment.unix(i).format("HH:mm:ss");
-                          })
-                          .reverse()
-                      )
-                    );
-                  }
+              if (provider.in && provider.in.data) {
+                for (var t in provider.in.data) {
+                  provider.in.data[t][0] = new Date(
+                    provider.in.data[t][0] * 1000
+                  );
                 }
-              } else {
-                context.view.invalidChartsData = true;
+                context.charts["chart-in-" + i].updateOptions({
+                  file: provider.in.data.reverse()
+                });
               }
 
-              // in classes
-              var inColumns = [];
-              var typesInClass = {};
-              if (provider.in && provider.in.time) {
-                context.view.invalidChartsData = false;
-
-                for (var c in provider.in) {
-                  var classVal = provider.in[c];
-
-                  if (c != "time") {
-                    typesInClass[c] = "area-spline";
-                    inColumns.push([c].concat(classVal.reverse()));
-                  } else {
-                    inColumns.push(
-                      ["x"].concat(
-                        classVal
-                          .map(function(i) {
-                            return moment.unix(i).format("HH:mm:ss");
-                          })
-                          .reverse()
-                      )
-                    );
-                  }
+              if (provider.out && provider.out.data) {
+                for (var t in provider.out.data) {
+                  provider.out.data[t][0] = new Date(
+                    provider.out.data[t][0] * 1000
+                  );
                 }
-              } else {
-                context.view.invalidChartsData = true;
-              }
-
-              if (context.charts["chart-out-" + i]) {
-                context.charts["chart-out-" + i].load({
-                  columns: outColumns
+                context.charts["chart-out-" + i].updateOptions({
+                  file: provider.out.data.reverse()
                 });
-              } else {
-                context.charts["chart-out-" + i] = c3.generate({
-                  bindto:
-                    "#" + context.$options.filters.sanitize("chart-out-" + i),
-                  transition: {
-                    duration: 0
-                  },
-                  data: {
-                    x: "x",
-                    xFormat: "%H:%M:%S",
-                    columns: outColumns,
-                    types: typesOutClass
-                  },
-                  axis: {
-                    x: {
-                      type: "timeseries",
-                      tick: {
-                        format: "%H:%M:%S",
-                        count: 7
-                      }
-                    },
-                    y: {
-                      tick: {
-                        format: function(y) {
-                          return context.$options.filters.byteFormat(
-                            (Math.round(y * 100) / 100) * 1000
-                          );
-                        },
-                        count: 5
-                      }
-                    }
-                  },
-                  size: {
-                    height: 150,
-                    width: window.innerWidth / 2 - 100
-                  }
-                });
-              }
-
-              if (context.charts["chart-in-" + i]) {
-                context.charts["chart-in-" + i].load({
-                  columns: inColumns
-                });
-              } else {
-                context.charts["chart-in-" + i] = c3.generate({
-                  bindto:
-                    "#" + context.$options.filters.sanitize("chart-in-" + i),
-                  transition: {
-                    duration: 0
-                  },
-                  data: {
-                    x: "x",
-                    xFormat: "%H:%M:%S",
-                    columns: inColumns,
-                    types: typesInClass
-                  },
-                  axis: {
-                    x: {
-                      type: "timeseries",
-                      tick: {
-                        format: "%H:%M:%S",
-                        count: 7
-                      }
-                    },
-                    y: {
-                      tick: {
-                        format: function(y) {
-                          return context.$options.filters.byteFormat(
-                            (Math.round(y * 100) / 100) * 1000
-                          );
-                        },
-                        count: 5
-                      }
-                    }
-                  },
-                  size: {
-                    height: 150,
-                    width: window.innerWidth / 2 - 100
-                  }
-                });
-              }
-
-              context.view.isChartLoaded = true;
-              if (
-                context.pollingIntervalId == 0 &&
-                !context.view.invalidChartsData
-              ) {
-                context.pollingIntervalId = setInterval(function() {
-                  context.initCharts();
-                }, 2000);
               }
             } else {
               context.view.invalidChartsData = true;
@@ -2663,4 +2665,16 @@ export default {
 </script>
 
 <style>
+.legend {
+  position: absolute;
+  right: 0;
+  font-size: 0.8em;
+  top: -10px;
+  text-align: left;
+}
+.dygraph-label.dygraph-ylabel {
+  transform: rotate(-90deg) !important;
+  text-align: center;
+  padding-left: 15px;
+}
 </style>
