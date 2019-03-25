@@ -29,8 +29,17 @@
             {{i.nslabel}}
             <span class="gray">({{i.provider.name}})</span>
           </h4>
-          <div :id="'chart-in-'+i.name | sanitize" class="col-sm-12"></div>
-          <div :id="'chart-out-'+i.name | sanitize" class="col-sm-12"></div>
+          <div>
+            <h5>{{$t("wan.inbound_bandwidth")}}</h5>
+            <canvas :id="'chart-in-'+i.name | sanitize" class="col-sm-12"></canvas>
+            <div :id="'preview-in-'+i.name | sanitize">0</div>
+          </div>
+
+          <div>
+            <h5>{{$t("wan.outbound_bandwidth")}}</h5>
+            <canvas :id="'chart-out-'+i.name | sanitize" class="col-sm-12"></canvas>
+            <div :id="'preview-out-'+i.name | sanitize">0</div>
+          </div>
         </div>
       </div>
     </div>
@@ -881,6 +890,7 @@
 </template>
 
 <script>
+import { Gauge } from "gaugeJS";
 export default {
   name: "WAN",
   data() {
@@ -1797,77 +1807,113 @@ export default {
     },
     toggleCharts() {
       this.view.chartsShowed = !this.view.chartsShowed;
+      if (this.view.chartsShowed) {
+        var context = this;
+        setTimeout(function() {
+          context.initCharts();
+        }, 150);
+      }
     },
     initCharts() {
-      for (var i in this.interfaces) {
-        var iface = this.interfaces[i];
-        this.charts[iface.name] = {};
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/wan/read"],
+        {
+          action: "stats"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          for (var i in success) {
+            var iface = success[i];
+            if (iface && (iface.in && iface.out)) {
+              var opts = {
+                angle: -0.15,
+                lineWidth: 0.2,
+                radiusScale: 0.9,
+                pointer: {
+                  length: 0.6,
+                  strokeWidth: 0.05,
+                  color: "#000000"
+                },
+                limitMax: false,
+                limitMin: false,
+                highDpiSupport: true,
+                percentColors: [
+                  [0.0, "#3f9c35"],
+                  [0.6, "#ec7a08"],
+                  [1.0, "#cc0000"]
+                ],
+                generateGradient: true
+              };
 
-        if (!this.charts[iface.name].in) {
-          var inName = this.$i18n.t("wan.inbound_bandwidth");
+              for (var i in context.interfaces) {
+                var iface = context.interfaces[i];
+                context.charts[iface.name] = {};
 
-          this.charts[iface.name].in = c3.generate({
-            bindto:
-              "#" + this.$options.filters.sanitize("chart-in-" + iface.name),
-            data: {
-              columns: [[inName, 0]],
-              type: "gauge"
-            },
-            gauge: {
-              max: iface.FwInBandwidth <= 0 ? 1 : iface.FwInBandwidth,
-              units: ""
-            },
-            color: {
-              pattern: ["#60B044", "#F97600", "#FF0000"],
-              threshold: {
-                values: [
-                  iface.FwInBandwidth / 3,
-                  iface.FwInBandwidth / 1.5,
-                  iface.FwInBandwidth / 1.25
-                ]
+                if (!context.charts[iface.name].in) {
+                  var inName = context.$i18n.t("wan.inbound_bandwidth");
+
+                  var target = document.getElementById(
+                    context.$options.filters.sanitize("chart-in-" + iface.name)
+                  );
+                  context.charts[iface.name].in = new Gauge(target).setOptions(
+                    opts
+                  );
+                  context.charts[iface.name].in.maxValue = iface.FwInBandwidth;
+                  context.charts[iface.name].in.setMinValue(0);
+                  context.charts[iface.name].in.set(0);
+                  context.charts[iface.name].in.setTextField(
+                    document.getElementById(
+                      context.$options.filters.sanitize(
+                        "preview-in-" + iface.name
+                      )
+                    )
+                  );
+                }
+
+                if (!context.charts[iface.name].out) {
+                  var outName = context.$i18n.t("wan.outbound_bandwidth");
+
+                  var target = document.getElementById(
+                    context.$options.filters.sanitize("chart-out-" + iface.name)
+                  );
+                  context.charts[iface.name].out = new Gauge(target).setOptions(
+                    opts
+                  );
+                  context.charts[iface.name].out.maxValue =
+                    iface.FwOutBandwidth;
+                  context.charts[iface.name].out.setMinValue(0);
+                  context.charts[iface.name].out.set(0);
+                  context.charts[iface.name].out.setTextField(
+                    document.getElementById(
+                      context.$options.filters.sanitize(
+                        "preview-out-" + iface.name
+                      )
+                    )
+                  );
+                }
+
+                if (context.pollingIntervalId == 0) {
+                  context.pollingIntervalId = setInterval(function() {
+                    context.updateCharts();
+                  }, 1000);
+                }
               }
-            },
-            size: {
-              height: 100,
-              width: window.innerWidth / 3 - 100
+            } else {
+              context.view.invalidChartsData = true;
+              context.$forceUpdate();
             }
-          });
+          }
+        },
+        function(error) {
+          console.error(error);
         }
-
-        if (!this.charts[iface.name].out) {
-          var outName = this.$i18n.t("wan.outbound_bandwidth");
-
-          this.charts[iface.name].out = c3.generate({
-            bindto:
-              "#" + this.$options.filters.sanitize("chart-out-" + iface.name),
-            data: {
-              columns: [[outName, 0]],
-              type: "gauge"
-            },
-            gauge: {
-              max: iface.FwOutBandwidth <= 0 ? 1 : iface.FwOutBandwidth,
-              units: ""
-            },
-            color: {
-              pattern: ["#60B044", "#F97600", "#FF0000"],
-              threshold: {
-                values: [
-                  iface.FwOutBandwidth / 3,
-                  iface.FwOutBandwidth / 1.5,
-                  iface.FwOutBandwidth / 1.25
-                ]
-              }
-            },
-            size: {
-              height: 100,
-              width: window.innerWidth / 3 - 100
-            }
-          });
-        }
-
-        this.view.isChartLoaded = true;
-        this.updateCharts();
-      }
+      );
     },
     updateCharts() {
       var context = this;
@@ -1886,24 +1932,8 @@ export default {
           for (var i in success) {
             var iface = success[i];
             if (iface && (iface.in && iface.out)) {
-              var inName = context.$i18n.t("wan.inbound_bandwidth");
-              var outName = context.$i18n.t("wan.outbound_bandwidth");
-
-              context.view.invalidChartsData = false;
-
-              context.charts[i].in.load({
-                columns: [[inName, iface.in]]
-              });
-              context.charts[i].out.load({
-                columns: [[outName, iface.out]]
-              });
-
-              // start polling
-              if (context.pollingIntervalId == 0) {
-                context.pollingIntervalId = setInterval(function() {
-                  context.updateCharts();
-                }, 2000);
-              }
+              context.charts[i].in.set(parseInt(iface.in));
+              context.charts[i].out.set(parseInt(iface.out));
             } else {
               context.view.invalidChartsData = true;
               context.$forceUpdate();
@@ -2019,13 +2049,13 @@ export default {
               .on("hidden.bs.popover", function(e) {
                 $(e.target).data("bs.popover").inState.click = false;
               });
-            context.initCharts();
           }, 250);
 
           setTimeout(function() {
             $('[data-toggle="tooltip"]').tooltip();
           }, 500);
 
+          context.view.isChartLoaded = true;
           context.$parent.getFirewallStatus();
         },
         function(error) {

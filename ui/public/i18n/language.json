@@ -166,6 +166,7 @@
             "class_description": "Description",
             "bandwidth_unit": "Bandwidth unit",
             "kbps": "kbps",
+            "bandwidth": "Bandwidth",
             "%": "%",
             "down_bandwidth_limit": "Download bandwidth limits",
             "up_bandwidth_limit": "Upload bandwidth limits",

@@ -13,8 +13,6 @@ import App from './App.vue'
 import router from './router'
 import "./filters/filters";
 
-window.c3 = require('c3');
-window.d3 = require('d3');
 window.moment = require("moment");
 
 Vue.config.productionTip = false

@@ -24,7 +24,13 @@
         v-show="connections.length > 0 && view.isChartLoaded && !view.invalidChartsData"
         class="row"
       >
-        <div id="chart-connections" class="mg-top-10"></div>
+        <div class="col-sm-11">
+          <h4 class="col-sm-12">
+            {{$t('connections.title')}}
+            <div id="chart-status" class="legend"></div>
+          </h4>
+          <div id="chart-connections" class="col-sm-12"></div>
+        </div>
       </div>
     </div>
 
@@ -231,6 +237,7 @@
 
 <script>
 var Mark = require("mark.js");
+import Dygraph from "dygraphs";
 
 export default {
   name: "Connections",
@@ -343,56 +350,17 @@ export default {
   methods: {
     toggleCharts() {
       this.view.chartsShowed = !this.view.chartsShowed;
+      if (this.view.chartsShowed) {
+        this.initCharts();
+      }
     },
     initCharts() {
-      var context = this;
-      context.charts.connections = c3.generate({
-        bindto: "#" + context.$options.filters.sanitize("chart-connections"),
-        transition: {
-          duration: 0
-        },
-        data: {
-          x: "x",
-          xFormat: "%H:%M:%S",
-          columns: [],
-          types: { connections: "area-spline" }
-        },
-        axis: {
-          x: {
-            type: "timeseries",
-            tick: {
-              format: "%H:%M:%S",
-              count: 10
-            }
-          },
-          y: {
-            tick: {
-              format: function(y) {
-                return Math.ceil(y);
-              },
-              count: 8
-            }
-          }
-        },
-        size: {
-          height: 200,
-          width: window.innerWidth - 100
-        },
-        point: {
-          show: false
-        }
-      });
-
-      context.view.isChartLoaded = true;
-
-      this.updateCharts();
-    },
-    updateCharts() {
       var context = this;
       nethserver.exec(
         ["nethserver-firewall-base/connections/read"],
         {
-          action: "stats"
+          action: "stats",
+          time: 120
         },
         null,
         function(success) {
@@ -401,26 +369,84 @@ export default {
           } catch (e) {
             console.error(e);
           }
-          if (success.connections.length > 0) {
+
+          if (success.data.length > 0) {
             context.view.invalidChartsData = false;
 
-            context.charts.connections.load({
-              columns: [
-                ["x"].concat(
-                  success.time.map(function(i) {
-                    return moment.unix(i).format("HH:mm:ss");
-                  })
-                ),
-                ["connections"].concat(success.connections)
-              ]
-            });
+            for (var t in success.data) {
+              success.data[t][0] = new Date(success.data[t][0] * 1000);
+            }
+
+            context.charts["chart-connections"] = new Dygraph(
+              document.getElementById("chart-connections"),
+              success.data,
+              {
+                fillGraph: true,
+                stackedGraph: true,
+                labels: success.labels,
+                height: 150,
+                strokeWidth: 1,
+                strokeBorderWidth: 1,
+                ylabel: context.$i18n.t("connections.total"),
+                axisLineColor: "white",
+                labelsDiv: document.getElementById("chart-status"),
+                labelsSeparateLines: true,
+                legend: "always",
+                axes: {
+                  y: {
+                    axisLabelFormatter: function(y) {
+                      return Math.ceil(y);
+                    }
+                  }
+                }
+              }
+            );
+            context.charts["chart-connections"].initialData = success.data;
+
+            context.view.isChartLoaded = true;
 
             // start polling
             if (context.pollingIntervalIdChart == 0) {
               context.pollingIntervalIdChart = setInterval(function() {
-                context.updateCharts();
-              }, 2000);
+                context.updateCharts(120);
+              }, 1000);
             }
+          } else {
+            context.view.invalidChartsData = true;
+            context.$forceUpdate();
+          }
+        },
+        function(error) {
+          console.error(error);
+          context.view.isChartLoaded = true;
+        }
+      );
+    },
+    updateCharts(time) {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/connections/read"],
+        {
+          action: "stats",
+          time: time
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          if (success.data.length > 0) {
+            context.view.invalidChartsData = false;
+
+            for (var t in success.data) {
+              success.data[t][0] = new Date(success.data[t][0] * 1000);
+            }
+
+            context.charts["chart-connections"].updateOptions({
+              file: success.data.reverse()
+            });
           } else {
             context.view.invalidChartsData = true;
             context.$forceUpdate();
