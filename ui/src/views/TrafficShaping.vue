@@ -22,15 +22,17 @@
         v-show="interfaces.length > 0 && view.isChartLoaded && tc.length > 0 && !view.invalidChartsData"
         class="row"
       >
-        <div v-for="i in interfaces" v-bind:key="i" class="col-sm-6">
-          <h4>
+        <div v-for="(i,k) in interfaces" v-bind:key="k" class="col-sm-6">
+          <h4 class="col-sm-12">
             {{i.nslabel}}
             <span class="gray">({{$t('download_low')}})</span>
+            <div :id="'status-in-'+i.provider.name | sanitize" class="legend"></div>
           </h4>
           <div :id="'chart-in-'+i.provider.name | sanitize" class="col-sm-12"></div>
-          <h4>
+          <h4 class="col-sm-12 mg-top-35">
             {{i.nslabel}}
             <span class="gray">({{$t('upload_low')}})</span>
+            <div :id="'status-out-'+i.provider.name | sanitize" class="legend"></div>
           </h4>
           <div :id="'chart-out-'+i.provider.name | sanitize" class="col-sm-12"></div>
         </div>
@@ -51,11 +53,15 @@
             <span>{{$t('traffic_shaping.classes')}}: {{tc.length}}</span>
           </span>
           <a
-            class="mg-left-5 provider-details"
+            class="mg-left-10"
             data-toggle="collapse"
             data-parent="#provider-markup"
             href="#providerDetails"
-          >{{$t('details')}}</a>
+            @click="toggleDetails()"
+          >
+            <span :class="['fa', view.opened ? 'fa-angle-down' : 'fa-angle-right']"></span>
+            {{$t('details')}}
+          </a>
         </div>
         <div id="providerDetails" class="panel-collapse collapse in">
           <div v-if="!view.isLoadedTc" class="spinner spinner-lg view-spinner"></div>
@@ -83,7 +89,7 @@
             id="pf-list-simple-expansion"
             class="list-group list-view-pf list-view-pf-view no-mg-top"
           >
-            <div v-for="t in tc" v-bind:key="t" class="list-group-item">
+            <div v-for="(t,i) in tc" v-bind:key="i" class="list-group-item">
               <div class="list-group-item-header cursor-initial">
                 <div class="list-view-pf-actions">
                   <button @click="openEditTc(t)" class="btn btn-default">
@@ -237,8 +243,8 @@
     >
       <li
         :class="[r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
-        v-for="r in rules"
-        v-bind:key="r"
+        v-for="(r,i) in rules"
+        v-bind:key="i"
       >
         <div class="drag-size">
           <span class="gray mg-right-5">{{r.Action.split(';')[1] | uppercase}}</span>
@@ -535,8 +541,12 @@
                     v-model="newTc.ifaceToBind"
                     class="combobox form-control"
                   >
-                    <option>-</option>
-                    <option :value="i.name" v-for="(i, ki) in interfaces" v-bind:key="ki">{{i.name}}</option>
+                    <option value="all">{{$t('traffic_shaping.all_wans')}}</option>
+                    <option
+                      :value="i.name"
+                      v-for="(i, ki) in interfaces"
+                      v-bind:key="ki"
+                    >{{i.name}} - {{i.nslabel}} | Down: {{i.FwInBandwidth}} Up: {{i.FwOutBandwidth}}</option>
                   </select>
                   <span
                     v-if="newTc.errors.BindTo.hasError"
@@ -548,7 +558,7 @@
                 <label class="col-sm-3 control-label" for="textInput-modal-markup"></label>
                 <div class="col-sm-9">
                   <ul class="list-inline compact">
-                    <li v-for="(i, ki) in newTc.BindTo" v-bind:key="i">
+                    <li v-for="(i, ki) in newTc.BindTo" v-bind:key="ki">
                       <span class="label label-info">
                         {{i}}
                         <a @click="removeIfaceToBind(ki)" class="remove-item-inline">
@@ -595,7 +605,11 @@
             </div>
             <div class="modal-footer">
               <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
-              <button class="btn btn-danger" type="submit" v-if="!currentTc.isError">{{$t('delete')}}</button>
+              <button
+                class="btn btn-danger"
+                type="submit"
+                v-if="!currentTc.isError"
+              >{{$t('delete')}}</button>
             </div>
           </form>
         </div>
@@ -616,7 +630,7 @@
                 <label class="col-sm-3 control-label">{{$t('rules.class')}}</label>
                 <div class="col-sm-9">
                   <select v-model="newRule.Action" class="form-control" required>
-                    <option v-for="i in tc" v-bind:key="i" :value="'class;'+i.name">{{i.name}}</option>
+                    <option v-for="(i,k) in tc" v-bind:key="k" :value="'class;'+i.name">{{i.name}}</option>
                   </select>
                   <span v-if="newRule.errors.Action.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -933,6 +947,8 @@
 </template>
 
 <script>
+import Dygraph from "dygraphs";
+
 export default {
   name: "TrafficShaping",
   data() {
@@ -942,7 +958,8 @@ export default {
         isLoadedTc: false,
         isChartLoaded: false,
         invalidChartsData: false,
-        chartsShowed: false
+        chartsShowed: false,
+        opened: true
       },
       tc: [],
       newTc: this.initTc(),
@@ -1006,6 +1023,9 @@ export default {
     next();
   },
   methods: {
+    toggleDetails() {
+      this.view.opened = !this.view.opened;
+    },
     toggleAdvancedMode() {
       this.newTc.advanced = !this.newTc.advanced;
       this.$forceUpdate();
@@ -1026,6 +1046,7 @@ export default {
       nethserver.notifications.success = this.$i18n.t("rules.rule_updated_ok");
       nethserver.notifications.error = this.$i18n.t("rules.rule_updated_error");
 
+      var context = this;
       nethserver.exec(
         ["nethserver-firewall-base/traffic-shaping/update"],
         {
@@ -1035,7 +1056,9 @@ export default {
         function(stream) {
           console.info("firewall-base-update", stream);
         },
-        function(success) {},
+        function(success) {
+          context.getRules();
+        },
         function(error, data) {
           console.error(error, data);
         }
@@ -1869,7 +1892,8 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/traffic-shaping/read"],
         {
-          action: "stats"
+          action: "stats",
+          time: 120
         },
         null,
         function(success) {
@@ -1879,160 +1903,100 @@ export default {
             console.error(e);
           }
 
+          context.view.invalidChartsData = true;
+
           for (var i in success) {
             var provider = success[i];
 
             if (provider) {
-              // out classes
-              var outColumns = [];
-              var typesOutClass = {};
-              if (provider.out && provider.out.time) {
-                context.view.invalidChartsData = false;
-                for (var c in provider.out) {
-                  var classVal = provider.out[c];
+              context.view.invalidChartsData = false;
 
-                  if (c != "time") {
-                    typesOutClass[c] = "area-spline";
-                    outColumns.push([c].concat(classVal.reverse()));
-                  } else {
-                    outColumns.push(
-                      ["x"].concat(
-                        classVal
-                          .map(function(i) {
-                            return moment.unix(i).format("HH:mm:ss");
-                          })
-                          .reverse()
-                      )
-                    );
-                  }
+              if (provider.in && provider.in.data) {
+                for (var t in provider.in.data) {
+                  provider.in.data[t][0] = new Date(
+                    provider.in.data[t][0] * 1000
+                  );
                 }
-              } else {
-                context.view.invalidChartsData = true;
-              }
-
-              // in classes
-              var inColumns = [];
-              var typesInClass = {};
-              if (provider.in && provider.in.time) {
-                context.view.invalidChartsData = false;
-
-                for (var c in provider.in) {
-                  var classVal = provider.in[c];
-
-                  if (c != "time") {
-                    typesInClass[c] = "area-spline";
-                    inColumns.push([c].concat(classVal.reverse()));
-                  } else {
-                    inColumns.push(
-                      ["x"].concat(
-                        classVal
-                          .map(function(i) {
-                            return moment.unix(i).format("HH:mm:ss");
-                          })
-                          .reverse()
-                      )
-                    );
-                  }
-                }
-              } else {
-                context.view.invalidChartsData = true;
-              }
-
-              if (context.charts["chart-out-" + i]) {
-                context.charts["chart-out-" + i].load({
-                  columns: outColumns
-                });
-              } else {
-                context.charts["chart-out-" + i] = c3.generate({
-                  bindto:
-                    "#" + context.$options.filters.sanitize("chart-out-" + i),
-                  transition: {
-                    duration: 0
-                  },
-                  data: {
-                    x: "x",
-                    xFormat: "%H:%M:%S",
-                    columns: outColumns,
-                    types: typesOutClass
-                  },
-                  axis: {
-                    x: {
-                      type: "timeseries",
-                      tick: {
-                        format: "%H:%M:%S",
-                        count: 7
-                      }
-                    },
-                    y: {
-                      tick: {
-                        format: function(y) {
-                          return context.$options.filters.byteFormat(
-                            (Math.round(y * 100) / 100) * 1000
-                          );
-                        },
-                        count: 5
+                context.charts["chart-in-" + i] = new Dygraph(
+                  document.getElementById(
+                    context.$options.filters.sanitize("chart-in-" + i)
+                  ),
+                  provider.in.data,
+                  {
+                    fillGraph: true,
+                    stackedGraph: true,
+                    labels: provider.in.labels,
+                    height: 150,
+                    strokeWidth: 1,
+                    strokeBorderWidth: 1,
+                    ylabel: context.$i18n.t("traffic_shaping.bandwidth"),
+                    axisLineColor: "white",
+                    labelsDiv: document.getElementById(
+                      context.$options.filters.sanitize("status-in-" + i)
+                    ),
+                    labelsSeparateLines: true,
+                    legend: "always",
+                    axes: {
+                      y: {
+                        axisLabelFormatter: function(y) {
+                          return context.$options.filters.byteFormat(y);
+                        }
                       }
                     }
-                  },
-                  size: {
-                    height: 150,
-                    width: window.innerWidth / 2 - 100
                   }
-                });
+                );
+                context.charts["chart-in-" + i].initialData = provider.in.data;
               }
 
-              if (context.charts["chart-in-" + i]) {
-                context.charts["chart-in-" + i].load({
-                  columns: inColumns
-                });
-              } else {
-                context.charts["chart-in-" + i] = c3.generate({
-                  bindto:
-                    "#" + context.$options.filters.sanitize("chart-in-" + i),
-                  transition: {
-                    duration: 0
-                  },
-                  data: {
-                    x: "x",
-                    xFormat: "%H:%M:%S",
-                    columns: inColumns,
-                    types: typesInClass
-                  },
-                  axis: {
-                    x: {
-                      type: "timeseries",
-                      tick: {
-                        format: "%H:%M:%S",
-                        count: 7
-                      }
-                    },
-                    y: {
-                      tick: {
-                        format: function(y) {
-                          return context.$options.filters.byteFormat(
-                            (Math.round(y * 100) / 100) * 1000
-                          );
-                        },
-                        count: 5
+              if (provider.out && provider.out.data) {
+                for (var t in provider.out.data) {
+                  provider.out.data[t][0] = new Date(
+                    provider.out.data[t][0] * 1000
+                  );
+                }
+
+                console.log(provider.out);
+
+                context.charts["chart-out-" + i] = new Dygraph(
+                  document.getElementById(
+                    context.$options.filters.sanitize("chart-out-" + i)
+                  ),
+                  provider.out.data,
+                  {
+                    fillGraph: true,
+                    stackedGraph: true,
+                    labels: provider.in.labels,
+                    height: 150,
+                    strokeWidth: 1,
+                    strokeBorderWidth: 1,
+                    ylabel: context.$i18n.t("traffic_shaping.bandwidth"),
+                    axisLineColor: "white",
+                    labelsDiv: document.getElementById(
+                      context.$options.filters.sanitize("status-out-" + i)
+                    ),
+                    labelsSeparateLines: true,
+                    legend: "always",
+                    axes: {
+                      y: {
+                        axisLabelFormatter: function(y) {
+                          return context.$options.filters.byteFormat(y);
+                        }
                       }
                     }
-                  },
-                  size: {
-                    height: 150,
-                    width: window.innerWidth / 2 - 100
                   }
-                });
+                );
+                context.charts["chart-out-" + i].initialData =
+                  provider.out.data;
               }
 
               context.view.isChartLoaded = true;
-
               if (
                 context.pollingIntervalId == 0 &&
                 !context.view.invalidChartsData
               ) {
                 context.pollingIntervalId = setInterval(function() {
-                  context.initCharts();
-                }, 2000);
+                  context.updateCharts(120);
+                }, 1000);
               }
             } else {
               context.view.invalidChartsData = true;
@@ -2042,6 +2006,67 @@ export default {
         },
         function(error) {
           console.error(error);
+          context.view.isChartLoaded = true;
+          context.view.invalidChartsData = true;
+        }
+      );
+    },
+    updateCharts(time) {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/traffic-shaping/read"],
+        {
+          action: "stats",
+          time: time
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+
+          context.view.isChartLoaded = true;
+          context.view.invalidChartsData = true;
+
+          for (var i in success) {
+            var provider = success[i];
+
+            if (provider) {
+              context.view.invalidChartsData = false;
+
+              if (provider.in && provider.in.data) {
+                for (var t in provider.in.data) {
+                  provider.in.data[t][0] = new Date(
+                    provider.in.data[t][0] * 1000
+                  );
+                }
+                context.charts["chart-in-" + i].updateOptions({
+                  file: provider.in.data.reverse()
+                });
+              }
+
+              if (provider.out && provider.out.data) {
+                for (var t in provider.out.data) {
+                  provider.out.data[t][0] = new Date(
+                    provider.out.data[t][0] * 1000
+                  );
+                }
+                context.charts["chart-out-" + i].updateOptions({
+                  file: provider.out.data.reverse()
+                });
+              }
+            } else {
+              context.view.invalidChartsData = true;
+              context.view.isChartLoaded = true;
+            }
+          }
+        },
+        function(error) {
+          console.error(error);
+          context.view.isChartLoaded = true;
+          context.view.invalidChartsData = true;
         }
       );
     },
@@ -2070,6 +2095,7 @@ export default {
         MaxOutputRate: "",
         Unit: "%",
         BindTo: [],
+        ifaceToBind: "all",
         advanced: false,
         isLoading: false,
         isEdit: false,
@@ -2167,6 +2193,8 @@ export default {
           setTimeout(function() {
             $('[data-toggle="tooltip"]').tooltip();
           }, 250);
+
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -2637,4 +2665,16 @@ export default {
 </script>
 
 <style>
+.legend {
+  position: absolute;
+  right: 0;
+  font-size: 0.8em;
+  top: -10px;
+  text-align: left;
+}
+.dygraph-label.dygraph-ylabel {
+  transform: rotate(-90deg) !important;
+  text-align: center;
+  padding-left: 15px;
+}
 </style>

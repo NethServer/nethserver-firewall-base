@@ -905,7 +905,7 @@
                 >{{$t('objects.interface')}}</label>
                 <div class="col-sm-9">
                   <select required type="text" v-model="newZone.Interface" class="form-control">
-                    <option v-for="i in interfaces" v-bind:key="i" :value="i">{{i}}</option>
+                    <option v-for="(i,k) in interfaces" v-bind:key="k" :value="i">{{i}}</option>
                   </select>
                   <span
                     v-if="newZone.errors.Interface.hasError"
@@ -1024,7 +1024,7 @@
                     :required="newTimeCondition.WeekDays.length == 0"
                   >
                     <option>-</option>
-                    <option :value="d" v-for="d in weekdays" v-bind:key="d">{{$t(d)}}</option>
+                    <option :value="d" v-for="(d,k) in weekdays" v-bind:key="k">{{$t(d)}}</option>
                   </select>
                   <span
                     v-if="newTimeCondition.errors.WeekDays.hasError"
@@ -1112,7 +1112,7 @@
                 >{{$t('objects.protocol')}}</label>
                 <div class="col-sm-9">
                   <select required type="text" v-model="newService.Protocol" class="form-control">
-                    <option v-for="p in protocols" v-bind:key="p" :value="p">{{p | uppercase}}</option>
+                    <option v-for="(p,k) in protocols" v-bind:key="k" :value="p">{{p | uppercase}}</option>
                   </select>
                   <span
                     v-if="newService.errors.Protocol.hasError"
@@ -1954,6 +1954,7 @@ export default {
           context.hostsRows = success["hosts"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -1980,6 +1981,7 @@ export default {
           context.hostGroupsRows = success["host-groups"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -2006,6 +2008,7 @@ export default {
           context.ipRangesRows = success["ip-ranges"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -2032,6 +2035,7 @@ export default {
           context.cidrSubsRows = success["cidr-subs"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -2058,6 +2062,7 @@ export default {
           context.zonesRows = success["zones"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -2084,6 +2089,7 @@ export default {
           context.timeConditionsRows = success["time-conditions"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -2110,6 +2116,7 @@ export default {
           context.servicesRows = success["services"];
 
           context.$forceUpdate();
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);

@@ -21,18 +21,6 @@
 
     <div class="pf-container" v-if="rules.length > 0 && view.isLoaded">
       <h3>{{$t('rules.list')}}</h3>
-      <div class="right">
-        <span class="expand-text">{{$t('rules.expand')}}</span>
-        <toggle-button
-          class="min-toggle"
-          :width="40"
-          :height="20"
-          :color="{checked: '#0088ce', unchecked: '#bbbbbb'}"
-          :value="expandInfo"
-          :sync="true"
-          @change="toggleExpand()"
-        />
-      </div>
       <form v-if="rules.length > 0" role="form" class="search-pf has-button search">
         <div class="form-group has-clear">
           <div class="search-pf-input-group">
@@ -57,8 +45,8 @@
       >
         <li
           :class="[r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
-          v-for="r in filteredRules"
-          v-bind:key="r"
+          v-for="(r,k) in filteredRules"
+          v-bind:key="k"
         >
           <div class="drag-size">
             <span class="gray mg-right-5">{{r.id}}</span>
@@ -636,10 +624,7 @@ export default {
       currentRule: {},
       searchString: "",
       highlightInstance: null,
-      expandInfo:
-        (localStorage.getItem("expandInfo") &&
-          localStorage.getItem("expandInfo") == "true") ||
-        true,
+      expandInfo: true,
       status: {},
       newObject: this.initObject()
     };
@@ -658,11 +643,6 @@ export default {
     }
   },
   methods: {
-    toggleExpand() {
-      this.expandInfo = !this.expandInfo;
-      localStorage.setItem("expandInfo", this.expandInfo) || false;
-      this.getRules();
-    },
     highlight() {
       if (!this.highlightInstance) {
         this.highlightInstance = new Mark("div.pf-container");
@@ -687,6 +667,7 @@ export default {
       nethserver.notifications.success = this.$i18n.t("rules.rule_updated_ok");
       nethserver.notifications.error = this.$i18n.t("rules.rule_updated_error");
 
+      var context = this;
       nethserver.exec(
         ["nethserver-firewall-base/local-rules/update"],
         {
@@ -696,7 +677,9 @@ export default {
         function(stream) {
           console.info("firewall-base-update", stream);
         },
-        function(success) {},
+        function(success) {
+          context.getRules();
+        },
         function(error, data) {
           console.error(error, data);
         }
@@ -1564,6 +1547,8 @@ export default {
             setTimeout(function() {
               $('[data-toggle="tooltip"]').tooltip();
             }, 750);
+
+            context.$parent.getFirewallStatus();
           } catch (e) {
             console.error(e);
             context.view.isLoaded = true;

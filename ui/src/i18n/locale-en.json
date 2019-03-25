@@ -116,7 +116,7 @@
             "discard_ok": "Discard successful!.",
             "ufdb": "Web filter",
             "chilli": "Hotspot",
-            "clamd@squidclamav":  "Web antivirus",
+            "clamd@squidclamav": "Web antivirus",
             "squid": "Web proxy",
             "suricata": "IPS"
         },
@@ -167,6 +167,7 @@
             "class_description": "Description",
             "bandwidth_unit": "Bandwidth unit",
             "kbps": "kbps",
+            "bandwidth": "Bandwidth",
             "%": "%",
             "down_bandwidth_limit": "Download bandwidth limits",
             "up_bandwidth_limit": "Upload bandwidth limits",
@@ -186,7 +187,8 @@
             "tc_deleted_ok": "Traffic shaping class deleted successfully!",
             "tc_deleted_error": "Traffic shaping class not deleted.",
             "configuration": "Configuration",
-            "classes": "Classes"
+            "classes": "Classes",
+            "all_wans": "All WANs"
         },
         "snat": {
             "title": "SNAT",

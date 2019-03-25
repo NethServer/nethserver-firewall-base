@@ -24,13 +24,22 @@
         v-show="interfaces.length > 0 && view.isChartLoaded && !view.invalidChartsData"
         class="row"
       >
-        <div v-for="i in interfaces" v-bind:key="i" class="col-sm-4">
+        <div v-for="(i,k) in interfaces" v-bind:key="k" class="col-sm-4">
           <h4>
             {{i.nslabel}}
             <span class="gray">({{i.provider.name}})</span>
           </h4>
-          <div :id="'chart-in-'+i.name | sanitize" class="col-sm-12"></div>
-          <div :id="'chart-out-'+i.name | sanitize" class="col-sm-12"></div>
+          <div>
+            <h5>{{$t("wan.inbound_bandwidth")}}</h5>
+            <canvas :id="'chart-in-'+i.name | sanitize" class="col-sm-12"></canvas>
+            <div :id="'preview-in-'+i.name | sanitize">0</div>
+          </div>
+
+          <div>
+            <h5>{{$t("wan.outbound_bandwidth")}}</h5>
+            <canvas :id="'chart-out-'+i.name | sanitize" class="col-sm-12"></canvas>
+            <div :id="'preview-out-'+i.name | sanitize">0</div>
+          </div>
         </div>
       </div>
     </div>
@@ -49,11 +58,15 @@
             <span>{{$t('wan.mode')}}: {{wan.WanMode == 'balance' ? $t('wan.balance') : $t('wan.backup')}}</span>
           </span>
           <a
-            class="mg-left-5"
+            class="mg-left-10"
             data-toggle="collapse"
             data-parent="#provider-markup"
             href="#providerDetails"
-          >{{$t('details')}}</a>
+            @click="toggleDetails()"
+          >
+            <span :class="['fa', view.opened ? 'fa-angle-down' : 'fa-angle-right']"></span>
+            {{$t('details')}}
+          </a>
         </div>
         <div id="providerDetails" class="panel-collapse collapse in">
           <div v-show="!view.isLoadedInterface" class="spinner spinner-lg view-spinner"></div>
@@ -81,8 +94,8 @@
             class="list-group list-view-pf list-view-pf-view wizard-pf-contents-title white no-mg-top"
           >
             <div
-              v-for="i in interfaces"
-              v-bind:key="i"
+              v-for="(i,k) in interfaces"
+              v-bind:key="k"
               class="list-group-item wan-list list-view-pf-expand-active no-shadow mg-bottom-10"
             >
               <div class="list-group-item-header">
@@ -158,9 +171,7 @@
                             </span>
                           </div>
                         </div>
-                        <div
-                          :class="['form-group', i.errors.weight.hasError ? 'has-error' : '']"
-                        >
+                        <div :class="['form-group', i.errors.weight.hasError ? 'has-error' : '']">
                           <label
                             class="col-sm-3 control-label"
                             for="textInput-modal-markup"
@@ -258,8 +269,11 @@
       <div v-if="interfaces.length > 1">
         <h1>{{$t('rules.no_rules_found')}}</h1>
         <p>{{$t('rules.no_rules_found_text')}}.</p>
-        <div  class="blank-slate-pf-main-action">
-          <button @click="openCreateRule()" class="btn btn-primary">{{$t('rules.create_divert_rule')}}</button>
+        <div class="blank-slate-pf-main-action">
+          <button
+            @click="openCreateRule()"
+            class="btn btn-primary"
+          >{{$t('rules.create_divert_rule')}}</button>
         </div>
       </div>
       <div v-if="interfaces.length <= 1">
@@ -273,8 +287,8 @@
     >
       <li
         :class="[r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
-        v-for="r in rules"
-        v-bind:key="r"
+        v-for="(r,k) in rules"
+        v-bind:key="k"
       >
         <div class="drag-size">
           <span class="gray mg-right-5">{{r.Action.split(';')[1] | uppercase}}</span>
@@ -570,8 +584,8 @@
                 <div class="col-sm-9">
                   <select v-model="newRule.Action" class="form-control" required>
                     <option
-                      v-for="i in interfaces"
-                      v-bind:key="i"
+                      v-for="(i,k) in interfaces"
+                      v-bind:key="k"
                       :value="'provider;'+i.provider.name"
                     >{{i.provider.name}}</option>
                   </select>
@@ -876,6 +890,7 @@
 </template>
 
 <script>
+import { Gauge } from "gaugeJS";
 export default {
   name: "WAN",
   data() {
@@ -885,7 +900,8 @@ export default {
         isLoadedInterface: false,
         isChartLoaded: false,
         invalidChartsData: false,
-        chartsShowed: false
+        chartsShowed: false,
+        opened: true
       },
       interfaces: [],
       wan: {
@@ -952,6 +968,9 @@ export default {
     next();
   },
   methods: {
+    toggleDetails() {
+      this.view.opened = !this.view.opened;
+    },
     toggleAdvancedMode() {
       this.wan.advanced = !this.wan.advanced;
       this.$forceUpdate();
@@ -968,6 +987,7 @@ export default {
       nethserver.notifications.success = this.$i18n.t("rules.rule_updated_ok");
       nethserver.notifications.error = this.$i18n.t("rules.rule_updated_error");
 
+      var context = this;
       nethserver.exec(
         ["nethserver-firewall-base/wan/update"],
         {
@@ -977,7 +997,9 @@ export default {
         function(stream) {
           console.info("firewall-base-update", stream);
         },
-        function(success) {},
+        function(success) {
+          context.getRules();
+        },
         function(error, data) {
           console.error(error, data);
         }
@@ -1785,77 +1807,113 @@ export default {
     },
     toggleCharts() {
       this.view.chartsShowed = !this.view.chartsShowed;
+      if (this.view.chartsShowed) {
+        var context = this;
+        setTimeout(function() {
+          context.initCharts();
+        }, 150);
+      }
     },
     initCharts() {
-      for (var i in this.interfaces) {
-        var iface = this.interfaces[i];
-        this.charts[iface.name] = {};
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/wan/read"],
+        {
+          action: "stats"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          for (var i in success) {
+            var iface = success[i];
+            if (iface && (iface.in && iface.out)) {
+              var opts = {
+                angle: -0.15,
+                lineWidth: 0.2,
+                radiusScale: 0.9,
+                pointer: {
+                  length: 0.6,
+                  strokeWidth: 0.05,
+                  color: "#000000"
+                },
+                limitMax: false,
+                limitMin: false,
+                highDpiSupport: true,
+                percentColors: [
+                  [0.0, "#3f9c35"],
+                  [0.6, "#ec7a08"],
+                  [1.0, "#cc0000"]
+                ],
+                generateGradient: true
+              };
 
-        if (!this.charts[iface.name].in) {
-          var inName = this.$i18n.t("wan.inbound_bandwidth");
+              for (var i in context.interfaces) {
+                var iface = context.interfaces[i];
+                context.charts[iface.name] = {};
 
-          this.charts[iface.name].in = c3.generate({
-            bindto:
-              "#" + this.$options.filters.sanitize("chart-in-" + iface.name),
-            data: {
-              columns: [[inName, 0]],
-              type: "gauge"
-            },
-            gauge: {
-              max: iface.FwInBandwidth <= 0 ? 1 : iface.FwInBandwidth,
-              units: ""
-            },
-            color: {
-              pattern: ["#60B044", "#F97600", "#FF0000"],
-              threshold: {
-                values: [
-                  iface.FwInBandwidth / 3,
-                  iface.FwInBandwidth / 1.5,
-                  iface.FwInBandwidth / 1.25
-                ]
+                if (!context.charts[iface.name].in) {
+                  var inName = context.$i18n.t("wan.inbound_bandwidth");
+
+                  var target = document.getElementById(
+                    context.$options.filters.sanitize("chart-in-" + iface.name)
+                  );
+                  context.charts[iface.name].in = new Gauge(target).setOptions(
+                    opts
+                  );
+                  context.charts[iface.name].in.maxValue = iface.FwInBandwidth;
+                  context.charts[iface.name].in.setMinValue(0);
+                  context.charts[iface.name].in.set(0);
+                  context.charts[iface.name].in.setTextField(
+                    document.getElementById(
+                      context.$options.filters.sanitize(
+                        "preview-in-" + iface.name
+                      )
+                    )
+                  );
+                }
+
+                if (!context.charts[iface.name].out) {
+                  var outName = context.$i18n.t("wan.outbound_bandwidth");
+
+                  var target = document.getElementById(
+                    context.$options.filters.sanitize("chart-out-" + iface.name)
+                  );
+                  context.charts[iface.name].out = new Gauge(target).setOptions(
+                    opts
+                  );
+                  context.charts[iface.name].out.maxValue =
+                    iface.FwOutBandwidth;
+                  context.charts[iface.name].out.setMinValue(0);
+                  context.charts[iface.name].out.set(0);
+                  context.charts[iface.name].out.setTextField(
+                    document.getElementById(
+                      context.$options.filters.sanitize(
+                        "preview-out-" + iface.name
+                      )
+                    )
+                  );
+                }
+
+                if (context.pollingIntervalId == 0) {
+                  context.pollingIntervalId = setInterval(function() {
+                    context.updateCharts();
+                  }, 1000);
+                }
               }
-            },
-            size: {
-              height: 100,
-              width: window.innerWidth / 3 - 100
+            } else {
+              context.view.invalidChartsData = true;
+              context.$forceUpdate();
             }
-          });
+          }
+        },
+        function(error) {
+          console.error(error);
         }
-
-        if (!this.charts[iface.name].out) {
-          var outName = this.$i18n.t("wan.outbound_bandwidth");
-
-          this.charts[iface.name].out = c3.generate({
-            bindto:
-              "#" + this.$options.filters.sanitize("chart-out-" + iface.name),
-            data: {
-              columns: [[outName, 0]],
-              type: "gauge"
-            },
-            gauge: {
-              max: iface.FwOutBandwidth <= 0 ? 1 : iface.FwOutBandwidth,
-              units: ""
-            },
-            color: {
-              pattern: ["#60B044", "#F97600", "#FF0000"],
-              threshold: {
-                values: [
-                  iface.FwOutBandwidth / 3,
-                  iface.FwOutBandwidth / 1.5,
-                  iface.FwOutBandwidth / 1.25
-                ]
-              }
-            },
-            size: {
-              height: 100,
-              width: window.innerWidth / 3 - 100
-            }
-          });
-        }
-
-        this.view.isChartLoaded = true;
-        this.updateCharts();
-      }
+      );
     },
     updateCharts() {
       var context = this;
@@ -1874,24 +1932,8 @@ export default {
           for (var i in success) {
             var iface = success[i];
             if (iface && (iface.in && iface.out)) {
-              var inName = context.$i18n.t("wan.inbound_bandwidth");
-              var outName = context.$i18n.t("wan.outbound_bandwidth");
-
-              context.view.invalidChartsData = false;
-
-              context.charts[i].in.load({
-                columns: [[inName, iface.in]]
-              });
-              context.charts[i].out.load({
-                columns: [[outName, iface.out]]
-              });
-
-              // start polling
-              if (context.pollingIntervalId == 0) {
-                context.pollingIntervalId = setInterval(function() {
-                  context.updateCharts();
-                }, 2000);
-              }
+              context.charts[i].in.set(parseInt(iface.in));
+              context.charts[i].out.set(parseInt(iface.out));
             } else {
               context.view.invalidChartsData = true;
               context.$forceUpdate();
@@ -2007,12 +2049,14 @@ export default {
               .on("hidden.bs.popover", function(e) {
                 $(e.target).data("bs.popover").inState.click = false;
               });
-            context.initCharts();
           }, 250);
 
           setTimeout(function() {
             $('[data-toggle="tooltip"]').tooltip();
           }, 500);
+
+          context.view.isChartLoaded = true;
+          context.$parent.getFirewallStatus();
         },
         function(error) {
           console.error(error);
@@ -2026,7 +2070,10 @@ export default {
       ).data("bs.popover");
 
       if (!iface.speedtest.isLoaded && popover) {
-        popover.options.content = '<div class="spinner spinner-sm"></div><small>'+this.$i18n.t('wan.fireqos_temporary_disabled')+'</small>';
+        popover.options.content =
+          '<div class="spinner spinner-sm"></div><small>' +
+          this.$i18n.t("wan.fireqos_temporary_disabled") +
+          "</small>";
         popover.show();
 
         var context = this;
@@ -2090,9 +2137,12 @@ export default {
             popover.show();
           },
           function(error) {
-            popover.options.content = '<div class="alert alert-warning alert-dismissable"><span class="pficon pficon-warning-triangle-o"></span><strong>' +
-              context.$i18n.t('warning') + '.</strong> '+context.$i18n.t('wan.speedtest_error') +
-              '</div>';
+            popover.options.content =
+              '<div class="alert alert-warning alert-dismissable"><span class="pficon pficon-warning-triangle-o"></span><strong>' +
+              context.$i18n.t("warning") +
+              ".</strong> " +
+              context.$i18n.t("wan.speedtest_error") +
+              "</div>";
             popover.show();
             iface.speedtest.isLoaded = true;
             console.error(error);
