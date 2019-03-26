@@ -93,12 +93,6 @@ source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.FirewallRules]
-source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_FirewallRules.php
-source_lang = en
-type = PHP_ALT_ARRAY
-
-
 [nethserver.NethServer_Module_TcClasses]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_TcClasses.php
 source_lang = en
