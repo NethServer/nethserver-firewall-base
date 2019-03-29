@@ -379,7 +379,7 @@ export default {
 
             context.charts["chart-connections"] = new Dygraph(
               document.getElementById("chart-connections"),
-              success.data,
+              success.data.reverse(),
               {
                 fillGraph: true,
                 stackedGraph: true,

@@ -1921,7 +1921,7 @@ export default {
                   document.getElementById(
                     context.$options.filters.sanitize("chart-in-" + i)
                   ),
-                  provider.in.data,
+                  provider.in.data.reverse(),
                   {
                     fillGraph: true,
                     stackedGraph: true,
@@ -1955,13 +1955,11 @@ export default {
                   );
                 }
 
-                console.log(provider.out);
-
                 context.charts["chart-out-" + i] = new Dygraph(
                   document.getElementById(
                     context.$options.filters.sanitize("chart-out-" + i)
                   ),
-                  provider.out.data,
+                  provider.out.data.reverse(),
                   {
                     fillGraph: true,
                     stackedGraph: true,
