@@ -288,4 +288,7 @@ export default {
 </script>
 
 <style>
+.adjust-top-loader {
+  margin-top: -4px;
+}
 </style>
