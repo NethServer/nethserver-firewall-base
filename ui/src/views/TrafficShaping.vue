@@ -441,10 +441,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <label
-                  class="col-sm-3 control-label"
-                  for="Bandwidth-Unit-1"
-                >{{$t('traffic_shaping.bandwidth_unit')}}</label>
+                <label class="col-sm-3 control-label">{{$t('traffic_shaping.bandwidth_unit')}}</label>
                 <div class="col-sm-9">
                   <input
                     id="Bandwidth-Unit-1"
@@ -455,7 +452,7 @@
                   >
                   <label
                     class="col-sm-10 col-xs-10 control-label text-align-left"
-                    for="Bandwidth-Unit-2"
+                    for="Bandwidth-Unit-1"
                   >{{$t('traffic_shaping.kbps')}}</label>
                   <input
                     id="Bandwidth-Unit-2"
@@ -466,6 +463,7 @@
                   >
                   <label
                     class="col-sm-10 col-xs-10 control-label text-align-left"
+                    for="Bandwidth-Unit-2"
                   >{{$t('traffic_shaping.%')}}</label>
                 </div>
               </div>
