@@ -51,7 +51,7 @@
           id="pf-list-simple-expansion"
           class="list-group list-view-pf list-view-pf-view wizard-pf-contents-title white mg-top-10"
         >
-          <div class="list-group-item list-view-pf-expand-active no-shadow mg-bottom-10">
+          <div class="list-group-item list-view-pf-expand-active mg-bottom-10">
             <div
               :class="[data.info.type == 'raw' ? 'ip-type-header': '', 'list-group-item-header cursor-initial']"
             >
