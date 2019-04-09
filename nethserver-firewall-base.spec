@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.5.0
+Version: 3.6.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -69,6 +69,9 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Tue Apr 09 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.6.0-1
+- Cockpit: basic firewall configuration - NethServer/dev#5695
+
 * Wed Dec 05 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.5.0-1
 - Firewall: update to nDPI-netfilter-2.2 and nDPI-2.4  - NethServer/dev#5645
 - Server unreachable after creating a logical interface - Bug NethServer/dev#5637
