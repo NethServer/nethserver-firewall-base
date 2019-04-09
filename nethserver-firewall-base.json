@@ -1,6 +1,6 @@
 {
     "id": "nethserver-firewall-base",
-    "name": "NethServer Firewall",
+    "name": "Firewall",
     "summary": "NethServer firewall implementation based on Shorewall",
     "description": "NethServer firewall implementation based on Shorewall",
     "url": "",
