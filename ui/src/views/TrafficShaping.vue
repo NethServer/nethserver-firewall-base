@@ -96,7 +96,7 @@
                     <span class="fa fa-edit span-right-margin"></span>
                     {{$t('edit')}}
                   </button>
-                  <div class="dropdown pull-right dropdown-kebab-pf">
+                  <div class="dropup pull-right dropdown-kebab-pf">
                     <button
                       class="btn btn-link dropdown-toggle"
                       type="button"
@@ -262,7 +262,7 @@
             ></span>
             {{r.status == 'disabled' ? $t('enable') : $t('edit')}}
           </button>
-          <div class="dropdown pull-right dropdown-kebab-pf">
+          <div class="dropup pull-right dropdown-kebab-pf">
             <button
               class="btn btn-link dropdown-toggle"
               type="button"
