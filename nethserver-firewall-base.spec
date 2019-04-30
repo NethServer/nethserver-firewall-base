@@ -57,7 +57,7 @@ cp -a api/* %{buildroot}/usr/libexec/nethserver/api/%{name}/
 
 %{genfilelist} %{buildroot} > %{name}-%{version}-%{release}-filelist
 grep -e php$ -e rst$ -e html$ -e cockpit %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-ui
-grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-core
+grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-core
 
 %files -f %{name}-%{version}-%{release}-filelist-core
 %defattr(-,root,root)
