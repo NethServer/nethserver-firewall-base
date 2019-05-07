@@ -74,9 +74,11 @@ export default {
           }
 
           setTimeout(function() {
-            document.getElementById(
-              "logs-output"
-            ).scrollTop = document.getElementById("logs-output").scrollHeight;
+            if(document.getElementById("logs-output")) {
+              document.getElementById(
+                "logs-output"
+              ).scrollTop = document.getElementById("logs-output").scrollHeight;
+            }
           }, 100);
 
           context.$parent.getFirewallStatus();
