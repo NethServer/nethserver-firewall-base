@@ -25,9 +25,15 @@ export default {
         logsLoaded: false,
         logsContent: "",
         follow: false,
-        lines: 50
+        lines: 50,
+        process: null
       }
     };
+  },
+  beforeRouteLeave(to, from, next) {
+    $(".modal").modal("hide");
+    this.process.close()
+    next();
   },
   methods: {
     handleLogs() {
@@ -38,7 +44,7 @@ export default {
     },
     getLogs() {
       var context = this;
-      nethserver.readLogs(
+      this.process = nethserver.readLogs(
         {
           action: this.view.follow ? "follow" : "dump",
           lines: this.view.follow ? null : this.view.lines,
