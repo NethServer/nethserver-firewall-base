@@ -224,7 +224,14 @@
 <script>
 export default {
   name: "App",
+  watch: {
+    $route: function(val) {
+      localStorage.setItem("path", val.path);
+    }
+  },
   mounted() {
+    var path = localStorage.getItem("path") || "/";
+    this.$router.push(path);
     this.getFirewallStatus();
   },
   beforeRouteLeave(to, from, next) {
