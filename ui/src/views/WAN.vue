@@ -27,7 +27,10 @@
         <div v-for="(i,k) in interfaces" v-bind:key="k" class="col-sm-4">
           <h4>
             {{i.nslabel}}
-            <span class="gray">({{i.provider.name}})</span>
+            <span
+              v-if="i.provider && i.provider.name && i.provider.name.length > 0"
+              class="gray"
+            >({{i.provider.name}})</span>
           </h4>
           <div>
             <h5>{{$t("wan.inbound_bandwidth")}}</h5>
@@ -71,7 +74,7 @@
         <div id="providerDetails" class="panel-collapse collapse in">
           <div v-show="!view.isLoadedInterface" class="spinner spinner-lg view-spinner"></div>
           <div
-            v-show="interfaces.length == 0 && view.isLoadedInterface"
+            v-show="interfaces.length == 0 && view.isLoadedInterface && view.isLoaded"
             class="blank-slate-pf white"
           >
             <div class="blank-slate-pf-icon">
@@ -97,6 +100,9 @@
               v-for="(i,k) in interfaces"
               v-bind:key="k"
               class="list-group-item wan-list list-view-pf-expand-active no-shadow mg-bottom-10"
+              data-toggle="tooltip"
+              data-placement="top"
+              :title="$t('wan.click_to_open')"
             >
               <div class="list-group-item-header">
                 <div class="list-view-pf-actions">
@@ -122,7 +128,10 @@
                     <div class="list-view-pf-description">
                       <div class="list-group-item-heading red">
                         {{i.name}}
-                        <span class="gray">({{i.provider.name}})</span>
+                        <span
+                          v-if="i.provider && i.provider.name && i.provider.name.length > 0"
+                          class="gray"
+                        >({{i.provider.name}})</span>
                       </div>
                       <div class="list-group-item-text more-space-description">{{i.nslabel || '-'}}</div>
                     </div>
@@ -587,7 +596,10 @@
                       v-for="(i,k) in interfaces"
                       v-bind:key="k"
                       :value="'provider;'+i.provider.name"
-                    >{{i.provider.name}}</option>
+                    >
+                      {{i.provider.name}}
+                      <span v-if="i.nslabel.length > 0"> - {{i.nslabel}}</span>
+                    </option>
                   </select>
                   <span v-if="newRule.errors.Action.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -2067,6 +2079,7 @@ export default {
       );
     },
     speedTest(iface) {
+      iface.opened = true;
       var popover = $(
         "#" + this.$options.filters.sanitize("popover-" + iface.name)
       ).data("bs.popover");

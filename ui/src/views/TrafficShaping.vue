@@ -2001,6 +2001,7 @@ export default {
               context.view.isChartLoaded = true;
             }
           }
+          context.view.isChartLoaded = true;
         },
         function(error) {
           console.error(error);
