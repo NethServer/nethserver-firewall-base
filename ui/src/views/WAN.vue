@@ -136,6 +136,10 @@
                       <div class="list-group-item-text more-space-description">{{i.nslabel || '-'}}</div>
                     </div>
                     <div class="list-view-pf-additional-info">
+                      <div data-toggle="tooltip" data-placement="bottom" :title="$t('wan.weight')" class="list-view-pf-additional-info-item">
+                        <span class="pficon pficon-rebalance"></span>
+                        <strong>{{i.provider.weight}}</strong>
+                      </div>
                       <div class="list-view-pf-additional-info-item">
                         <span class="pficon pficon-screen"></span>
                         <strong>{{i.cidr}}</strong> CIDR
