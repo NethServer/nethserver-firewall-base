@@ -128,6 +128,7 @@
           :lineNumbers="false"
           :sort-options="{ enabled: false }"
           :globalSearch="true"
+          :globalSearchFn="searchFn"
           :paginate="true"
           styleClass="table condensed"
           :nextText="tableLangsTexts.nextText"
@@ -348,6 +349,11 @@ export default {
     }
   },
   methods: {
+    searchFn(row, col, cellValue, searchTerm) {
+      return JSON.stringify(row)
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+    },
     toggleCharts() {
       this.view.chartsShowed = !this.view.chartsShowed;
       if (this.view.chartsShowed) {
