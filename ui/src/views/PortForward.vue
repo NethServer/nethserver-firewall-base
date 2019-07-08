@@ -504,7 +504,7 @@ export default {
       },
       pfList: null,
       snList: [],
-      wans: ["any", "192.168.5.59", "93.57.48.70"],
+      wans: ["any"],
       hosts: [],
       protocols: [],
       services: [],
@@ -732,7 +732,7 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/objects/read"],
         {
-          action: "wan"
+          action: "wans"
         },
         null,
         function(success) {
