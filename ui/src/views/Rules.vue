@@ -1246,7 +1246,7 @@ export default {
       this.newRule.Src = item.name;
 
       this.newRule.SrcFull = Object.assign({}, item);
-      this.newRule.SrcFull.name = this.newRule.SrcFull.name.toLowerCase();
+      this.newRule.SrcFull.name = this.newRule.SrcFull.typeId == 'role' ? this.newRule.SrcFull.name.toLowerCase() : this.newRule.SrcFull.name;
       this.newRule.SrcFull.type = this.newRule.SrcFull.typeId;
       delete this.newRule.SrcFull.typeId;
 
@@ -1291,7 +1291,7 @@ export default {
       this.newRule.Dst = item.name;
 
       this.newRule.DstFull = Object.assign({}, item);
-      this.newRule.DstFull.name = this.newRule.DstFull.name.toLowerCase();
+      this.newRule.DstFull.name = this.newRule.DstFull.typeId == 'role' ? this.newRule.DstFull.name.toLowerCase() : this.newRule.DstFull.name;
       this.newRule.DstFull.type = this.newRule.DstFull.typeId;
       delete this.newRule.DstFull.typeId;
 
@@ -1737,7 +1737,10 @@ export default {
         Time: r.Time ? r.Time : null,
         Position: r.Position,
         status: r.status == "enabled" ? "disabled" : "enabled",
-        Service: r.Service ? r.Service : null,
+        Service: r.Service ? r.Service : {
+          "name": "any",
+          "type": "fwservice"
+        },
         Action: r.Action ? r.Action : null,
         Dst: r.Dst ? r.Dst : null,
         id: r.id,
@@ -1786,7 +1789,10 @@ export default {
         status: context.newRule.isEdit ? context.newRule.status : "enabled",
         Service: context.newRule.ServiceFull
           ? context.newRule.ServiceFull
-          : null,
+          : {
+              "name": "any",
+              "type": "fwservice"
+            },
         Action: context.newRule.Action ? context.newRule.Action : null,
         Dst: context.newRule.DstFull
           ? context.newRule.DstFull

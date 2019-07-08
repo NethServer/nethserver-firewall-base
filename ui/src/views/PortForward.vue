@@ -608,7 +608,7 @@ export default {
       this.newPf.DstHostIp = item.IpAddress;
 
       this.newPf.DstHostFull = Object.assign({}, item);
-      this.newPf.DstHostFull.name = this.newPf.DstHostFull.name.toLowerCase();
+      this.newPf.DstHostFull.name = this.newPf.DstHostFull.typeId == 'role' ? this.newPf.DstHostFull.name.toLowerCase() : this.newPf.DstHostFull.name;
       this.newPf.DstHostFull.type = "host";
     },
     filterSrcAuto(query) {
@@ -665,12 +665,12 @@ export default {
       return {
         name: null,
         Description: "",
-        Src: null,
+        Src: "",
         SrcDisabled: false,
         SrcType: "",
         DstHost: "",
         DstHostIp: "",
-        Dst: null,
+        Dst: "",
         DstDisabled: false,
         Proto: "tcpudp",
         OriDst: "any",
