@@ -1121,18 +1121,17 @@
                 </div>
               </div>
               <div :class="['form-group', newService.errors.Ports.hasError ? 'has-error' : '']">
-                <label
-                  class="col-sm-3 control-label"
-                  for="textInput-modal-markup"
-                >{{$t('objects.ports')}}</label>
+                <label class="col-sm-3 control-label" for="textInput-modal-markup">
+                  {{$t('objects.ports')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('objects.ports')"
+                    :chapter="'objects_ports'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
                 <div class="col-sm-9">
-                  <input
-                    required
-                    type="text"
-                    v-model="newService.Ports"
-                    class="form-control"
-                    :placeholder="$t('objects.ports_comma')"
-                  >
+                  <input required type="text" v-model="newService.Ports" class="form-control">
                   <span
                     v-if="newService.errors.Ports.hasError"
                     class="help-block"
@@ -3039,9 +3038,9 @@ export default {
 
       var serviceObj = Object.assign({}, service);
       serviceObj.Ports =
-        serviceObj.Ports.length > 0 && serviceObj.Ports.includes(",")
+        serviceObj.Ports.length > 0
           ? serviceObj.Ports.split(",").map(function(item) {
-              return parseInt(item.trim());
+              return item.trim();
             })
           : [];
       delete serviceObj.isLoading;
@@ -3116,6 +3115,7 @@ export default {
               context.newService.errors[attr.parameter].hasError = true;
               context.newService.errors[attr.parameter].message = attr.error;
             }
+            context.$forceUpdate();
           } catch (e) {
             console.error(e);
           }
