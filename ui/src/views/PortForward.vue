@@ -943,6 +943,16 @@ export default {
         : this.newPf.DstHost;
 
       this.newPf.name = duplicate ? "" : this.newPf.name;
+
+      this.newPf.SrcDisabled = !(
+        this.newPf.Proto.toLowerCase().includes("tcp") ||
+        this.newPf.Proto.toLowerCase().includes("udp")
+      );
+      this.newPf.DstDisabled = !(
+        this.newPf.Proto.toLowerCase().includes("tcp") ||
+        this.newPf.Proto.toLowerCase().includes("udp")
+      );
+
       this.$forceUpdate();
       $("#createPFModal").modal("show");
     },
