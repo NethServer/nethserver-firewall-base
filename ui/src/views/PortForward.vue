@@ -570,7 +570,7 @@ export default {
         this.newPf.Proto != "tcpudp"
       ) {
         this.newPf.Dst = null;
-        this.newPf.Src = null;
+        this.newPf.Src = "";
         this.newPf.SrcType = null;
       }
     },
@@ -825,7 +825,7 @@ export default {
           try {
             success = JSON.parse(success);
             context.view.isLoaded = true;
-            context.pfList = success.portforward;
+            context.pfList = Object.keys(success.portforward).length == 0 ? null : success.portforward;
           } catch (e) {
             console.error(e);
             context.view.isLoaded = true;
