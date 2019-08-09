@@ -56,7 +56,7 @@
           </div>
           <div class="list-view-pf-actions">
             <button
-              @click="r.status == 'disabled' ? enableRule(r) : openEditRule(r, false)"
+              @click="r.status == 'disabled' ? toggleEnableRule(r) : openEditRule(r, false)"
               :class="['btn btn-default', r.status == 'disabled' ? 'btn-primary' : '']"
             >
               <span
@@ -77,11 +77,11 @@
               </button>
               <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownKebabRight9">
                 <li>
-                  <a @click="enableRule(r)">
+                  <a @click="r.status == 'enabled' ? toggleEnableRule(r) : openEditRule(r, false)">
                     <span
-                      :class="['fa', r.status == 'enabled' ? 'fa-lock' : 'fa-check', 'span-right-margin']"
+                      :class="['fa', r.status == 'enabled' ? 'fa-lock' : 'fa-edit', 'span-right-margin']"
                     ></span>
-                    {{r.status == 'enabled' ? $t('disable') : $t('enable')}}
+                    {{r.status == 'enabled' ? $t('disable') : $t('edit')}}
                   </a>
                 </li>
                 <li @click="openEditRule(r, true)">
@@ -1615,7 +1615,7 @@ export default {
 
       $("#createRuleModal").modal("show");
     },
-    enableRule(r) {
+    toggleEnableRule(r) {
       var context = this;
 
       var ruleObj = {
