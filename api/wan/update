@@ -36,6 +36,16 @@ case $action in
         /sbin/e-smith/db networks setprop "$(_get name)"  FwOutBandwidth "$(_get FwOutBandwidth)" FwInBandwidth  "$(_get FwInBandwidth)" nslabel  "$(_get nslabel)"
         ;;
 
+    "provider-enable")
+        save_db networks
+        /usr/sbin/shorewall enable "$(_get name)"
+        ;;
+
+    "provider-disable")
+        save_db networks
+        /usr/sbin/shorewall disable "$(_get name)"
+        ;;
+
     "wan")
         notifywanfrom=$(/sbin/e-smith/db configuration getprop root SenderAddress)
         notifyto=$(/sbin/e-smith/db configuration getprop root EmailAddress)

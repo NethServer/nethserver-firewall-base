@@ -99,13 +99,14 @@
             <div
               v-for="(i,k) in interfaces"
               v-bind:key="k"
-              class="list-group-item wan-list list-view-pf-expand-active no-shadow mg-bottom-10"
+              :class="['list-group-item', interfacesStatus[i.provider.name] ? '' : 'gray', interfacesStatus[i.provider.name] ? 'wan-list' : 'gray-list', 'list-view-pf-expand-active', 'no-shadow', 'mg-bottom-10']"
               data-toggle="tooltip"
               data-placement="top"
               :title="$t('wan.click_to_open')"
             >
               <div class="list-group-item-header">
                 <div class="list-view-pf-actions">
+                  <div v-if="i.isUpdating" class="spinner spinner-sm form-spinner-loader"></div>
                   <a
                     tabindex="0"
                     @click="speedTest(i)"
@@ -115,18 +116,54 @@
                     data-html="true"
                     :title="$t('wan.speed_info')"
                     class="btn btn-default"
+                    v-if="interfacesStatus[i.provider.name]"
                   >
                     <span class="fa fa-bolt span-right-margin"></span>
                     {{$t('wan.speedtest')}}
                   </a>
+                  <div
+                    v-if="interfacesStatus[i.provider.name] && interfaces.length > 1"
+                    class="dropup pull-right dropdown-kebab-pf"
+                  >
+                    <button
+                      class="btn btn-link dropdown-toggle"
+                      type="button"
+                      id="dropdownKebabRight9"
+                      data-toggle="dropdown"
+                      aria-haspopup="true"
+                      aria-expanded="true"
+                    >
+                      <span class="fa fa-ellipsis-v"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                      <li>
+                        <a @click="toggleProvider(i)">
+                          <span class="fa fa-lock span-right-margin"></span>
+                          {{$t('disable')}}
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                  <button
+                    @click="toggleProvider(i)"
+                    v-if="!interfacesStatus[i.provider.name]"
+                    class="btn btn-primary"
+                  >
+                    <span class="fa fa-check span-right-margin"></span>
+                    {{$t('enable')}}
+                  </button>
                 </div>
                 <div @click="openInterfaceDetails(i)" class="list-view-pf-main-info">
                   <div class="list-view-pf-left">
-                    <span class="fa fa-globe list-view-pf-icon-sm border-red"></span>
+                    <span
+                      :class="['fa fa-globe list-view-pf-icon-sm', interfacesStatus[i.provider.name] ? 'border-red' : 'border-gray']"
+                    ></span>
                   </div>
                   <div class="list-view-pf-body">
                     <div class="list-view-pf-description">
-                      <div class="list-group-item-heading red">
+                      <div
+                        :class="['list-group-item-heading', interfacesStatus[i.provider.name] ? 'red' : 'gray']"
+                      >
                         {{i.name}}
                         <span
                           v-if="i.provider && i.provider.name && i.provider.name.length > 0"
@@ -136,7 +173,12 @@
                       <div class="list-group-item-text more-space-description">{{i.nslabel || '-'}}</div>
                     </div>
                     <div class="list-view-pf-additional-info">
-                      <div data-toggle="tooltip" data-placement="bottom" :title="$t('wan.weight')" class="list-view-pf-additional-info-item">
+                      <div
+                        data-toggle="tooltip"
+                        data-placement="bottom"
+                        :title="$t('wan.weight')"
+                        class="list-view-pf-additional-info-item"
+                      >
                         <span class="pficon pficon-rebalance"></span>
                         <strong>{{i.provider.weight}}</strong>
                       </div>
@@ -177,7 +219,7 @@
                             for="textInput-modal-markup"
                           >{{$t('wan.provider')}}</label>
                           <div class="col-sm-9">
-                            <input required type="text" v-model="i.nslabel" class="form-control">
+                            <input required type="text" v-model="i.nslabel" class="form-control" />
                             <span v-if="i.errors.nslabel.hasError" class="help-block">
                               {{$t('validation.validation_failed')}}:
                               {{$t('validation.'+i.errors.nslabel.message)}}
@@ -195,7 +237,7 @@
                               type="number"
                               v-model="i.provider.weight"
                               class="form-control"
-                            >
+                            />
                             <span v-if="i.errors.weight.hasError" class="help-block">
                               {{$t('validation.validation_failed')}}:
                               {{$t('validation.'+i.errors.weight.message)}}
@@ -216,7 +258,7 @@
                               type="number"
                               class="form-control"
                               v-model="i.FwInBandwidth"
-                            >
+                            />
                             <span v-if="i.errors.FwInBandwidth.hasError" class="help-block">
                               {{$t('validation.validation_failed')}}:
                               {{$t('validation.'+i.errors.FwInBandwidth.message)}}
@@ -237,7 +279,7 @@
                               type="number"
                               class="form-control"
                               v-model="i.FwOutBandwidth"
-                            >
+                            />
                             <span v-if="i.errors.FwOutBandwidth.hasError" class="help-block">
                               {{$t('validation.validation_failed')}}:
                               {{$t('validation.'+i.errors.FwOutBandwidth.message)}}
@@ -465,7 +507,7 @@
                     type="radio"
                     v-model="wan.WanMode"
                     value="balance"
-                  >
+                  />
                   <label
                     class="col-sm-10 col-xs-10 control-label text-align-left"
                     for="WanMode-1"
@@ -476,7 +518,7 @@
                     type="radio"
                     v-model="wan.WanMode"
                     value="backup"
-                  >
+                  />
                   <label
                     class="col-sm-10 col-xs-10 control-label text-align-left"
                     for="WanMode-2"
@@ -489,7 +531,7 @@
                   for="textInput-modal-markup"
                 >{{$t('wan.notify_status_change')}}</label>
                 <div class="col-sm-9">
-                  <input type="checkbox" v-model="wan.NotifyWan" class="form-control">
+                  <input type="checkbox" v-model="wan.NotifyWan" class="form-control" />
                   <small v-if="wan.EmailAddress">{{wan.EmailAddress}}</small>
                   <span v-if="wan.errors.NotifyWan.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
@@ -532,7 +574,7 @@
                   for="textInput-modal-markup"
                 >{{$t('wan.max_number_packet_loss')}}</label>
                 <div class="col-sm-9">
-                  <input type="number" v-model="wan.MaxNumberPacketLoss" class="form-control">
+                  <input type="number" v-model="wan.MaxNumberPacketLoss" class="form-control" />
                   <span v-if="wan.errors.MaxNumberPacketLoss.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+wan.errors.MaxNumberPacketLoss.message)}}
@@ -548,7 +590,7 @@
                   for="textInput-modal-markup"
                 >{{$t('wan.max_percent_packet_loss')}}</label>
                 <div class="col-sm-9">
-                  <input type="number" v-model="wan.MaxPercentPacketLoss" class="form-control">
+                  <input type="number" v-model="wan.MaxPercentPacketLoss" class="form-control" />
                   <span v-if="wan.errors.MaxPercentPacketLoss.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+wan.errors.MaxPercentPacketLoss.message)}}
@@ -564,7 +606,7 @@
                   for="textInput-modal-markup"
                 >{{$t('wan.ping_interval')}}</label>
                 <div class="col-sm-9">
-                  <input type="number" v-model="wan.PingInterval" class="form-control">
+                  <input type="number" v-model="wan.PingInterval" class="form-control" />
                   <span v-if="wan.errors.PingInterval.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+wan.errors.PingInterval.message)}}
@@ -602,7 +644,7 @@
                       :value="'provider;'+i.provider.name"
                     >
                       {{i.provider.name}}
-                      <span v-if="i.nslabel.length > 0"> - {{i.nslabel}}</span>
+                      <span v-if="i.nslabel.length > 0">- {{i.nslabel}}</span>
                     </option>
                   </select>
                   <span v-if="newRule.errors.Action.hasError" class="help-block">
@@ -748,7 +790,7 @@
               >
                 <label class="col-sm-3 control-label">{{$t('rules.description')}}</label>
                 <div class="col-sm-9">
-                  <input class="form-control" type="text" v-model="newRule.Description">
+                  <input class="form-control" type="text" v-model="newRule.Description" />
                   <span v-if="newRule.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newRule.errors.Description.message)}}
@@ -836,7 +878,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.name')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newObject.name" class="form-control">
+                  <input required type="text" v-model="newObject.name" class="form-control" />
                   <span
                     v-if="newObject.errors.name.hasError"
                     class="help-block"
@@ -852,7 +894,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.ip_address')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newObject.IpAddress" class="form-control">
+                  <input required type="text" v-model="newObject.IpAddress" class="form-control" />
                   <span
                     v-if="newObject.errors.IpAddress.hasError"
                     class="help-block"
@@ -868,7 +910,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.network')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newObject.Address" class="form-control">
+                  <input required type="text" v-model="newObject.Address" class="form-control" />
                   <span
                     v-if="newObject.errors.Address.hasError"
                     class="help-block"
@@ -883,7 +925,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newObject.Description" class="form-control">
+                  <input type="text" v-model="newObject.Description" class="form-control" />
                   <span
                     v-if="newObject.errors.Description.hasError"
                     class="help-block"
@@ -920,6 +962,7 @@ export default {
         opened: true
       },
       interfaces: [],
+      interfacesStatus: {},
       wan: {
         WanMode: "balance",
         CheckIP: "",
@@ -1444,7 +1487,10 @@ export default {
       this.newRule.Src = item.name;
 
       this.newRule.SrcFull = Object.assign({}, item);
-      this.newRule.SrcFull.name = this.newRule.SrcFull.typeId == 'role' ? this.newRule.SrcFull.name.toLowerCase() : this.newRule.SrcFull.name;
+      this.newRule.SrcFull.name =
+        this.newRule.SrcFull.typeId == "role"
+          ? this.newRule.SrcFull.name.toLowerCase()
+          : this.newRule.SrcFull.name;
       this.newRule.SrcFull.type = this.newRule.SrcFull.typeId;
       delete this.newRule.SrcFull.typeId;
 
@@ -1491,7 +1537,10 @@ export default {
       this.newRule.Dst = item.name;
 
       this.newRule.DstFull = Object.assign({}, item);
-      this.newRule.DstFull.name = this.newRule.DstFull.typeId == 'role' ? this.newRule.DstFull.name.toLowerCase() : this.newRule.DstFull.name;
+      this.newRule.DstFull.name =
+        this.newRule.DstFull.typeId == "role"
+          ? this.newRule.DstFull.name.toLowerCase()
+          : this.newRule.DstFull.name;
       this.newRule.DstFull.type = this.newRule.DstFull.typeId;
       delete this.newRule.DstFull.typeId;
 
@@ -2031,6 +2080,7 @@ export default {
           for (var i in success.configuration.interfaces) {
             var iface = success.configuration.interfaces[i];
             iface.isLoading = false;
+            iface.isUpdating = false;
             iface.speedtest = {
               isLoaded: false
             };
@@ -2049,6 +2099,7 @@ export default {
             interfaces.push(iface);
           }
           context.interfaces = interfaces;
+          context.interfacesStatus = success.status;
 
           context.wan = success.configuration.multiwan;
           context.wan.NotifyWan =
@@ -2168,6 +2219,40 @@ export default {
           }
         );
       }
+    },
+    toggleProvider(i) {
+      var context = this;
+
+      // notification
+      nethserver.notifications.success = context.$i18n.t(
+        "wan.provider_configured_ok"
+      );
+      nethserver.notifications.error = context.$i18n.t(
+        "wan.provider_configured_error"
+      );
+
+      i.isUpdating = true;
+      nethserver.exec(
+        ["nethserver-firewall-base/wan/update"],
+        {
+          name: i.provider.name,
+          action:
+            "provider-" +
+            (context.interfacesStatus[i.provider.name] ? "disable" : "enable")
+        },
+        function(stream) {
+          console.info("nethserver-firewall-base", stream);
+        },
+        function(success) {
+          i.isUpdating = false;
+          // get providers
+          context.getProviders();
+        },
+        function(error, data) {
+          i.isUpdating = false;
+          console.error(error, data);
+        }
+      );
     },
     openInterfaceDetails(iface) {
       iface.opened = !iface.opened;
@@ -2374,10 +2459,12 @@ export default {
         Time: r.Time ? r.Time : null,
         Position: r.Position,
         status: r.status == "enabled" ? "disabled" : "enabled",
-        Service: r.Service ? r.Service : {
-          "name": "any",
-          "type": "fwservice"
-        },
+        Service: r.Service
+          ? r.Service
+          : {
+              name: "any",
+              type: "fwservice"
+            },
         Action: r.Action ? r.Action : null,
         Dst: r.Dst ? r.Dst : null,
         id: r.id,
@@ -2425,8 +2512,8 @@ export default {
         Service: context.newRule.ServiceFull
           ? context.newRule.ServiceFull
           : {
-              "name": "any",
-              "type": "fwservice"
+              name: "any",
+              type: "fwservice"
             },
         Action: context.newRule.Action ? context.newRule.Action : null,
         Dst: context.newRule.DstFull
