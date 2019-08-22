@@ -409,8 +409,6 @@ export default {
             );
             context.charts["chart-connections"].initialData = success.data;
 
-            context.view.isChartLoaded = true;
-
             // start polling
             if (context.pollingIntervalIdChart == 0) {
               context.pollingIntervalIdChart = setInterval(function() {
@@ -421,6 +419,8 @@ export default {
             context.view.invalidChartsData = true;
             context.$forceUpdate();
           }
+
+          context.view.isChartLoaded = true;
         },
         function(error) {
           console.error(error);
