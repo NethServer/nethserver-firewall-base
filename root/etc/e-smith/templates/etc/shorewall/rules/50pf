@@ -34,7 +34,7 @@
         $status = $pf->prop('status') || "disabled";
         $log = $pf->prop('Log') || "";
         next unless ($status eq "enabled");
-        $src = $pf->prop('Src') || next;
+        $src = $pf->prop('Src') || '-';
         $dstHost = $pf->prop('DstHost') || next;
         $srcHost = $pf->prop('SrcHost') || "";
         $srcHost = $fw->getAddress($srcHost);
