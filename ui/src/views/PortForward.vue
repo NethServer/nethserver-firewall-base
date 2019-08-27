@@ -944,14 +944,7 @@ export default {
 
       this.newPf.name = duplicate ? "" : this.newPf.name;
 
-      this.newPf.SrcDisabled = !(
-        this.newPf.Proto.toLowerCase().includes("tcp") ||
-        this.newPf.Proto.toLowerCase().includes("udp")
-      );
-      this.newPf.DstDisabled = !(
-        this.newPf.Proto.toLowerCase().includes("tcp") ||
-        this.newPf.Proto.toLowerCase().includes("udp")
-      );
+      this.handleProto();
 
       this.$forceUpdate();
       $("#createPFModal").modal("show");
