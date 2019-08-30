@@ -188,7 +188,9 @@
         "tc_deleted_error": "Traffic shaping class not deleted.",
         "configuration": "Configuration",
         "classes": "Classes",
-        "all_wans": "All WANs"
+        "all_wans": "All WANs",
+        "charts_not_updated": "Charts cannot be updated. Set WAN bandwidth limits",
+        "set": "Set limits"
     },
     "snat": {
         "title": "SNAT",

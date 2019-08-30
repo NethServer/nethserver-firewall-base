@@ -16,7 +16,8 @@
       >
         <span class="pficon pficon-warning-triangle-o"></span>
         <strong>{{$t('warning')}}!</strong>
-        {{$t('charts_not_updated')}}.
+        {{$t('traffic_shaping.charts_not_updated')}}.
+        <a href="#/wan" class="btn btn-primary">{{$t('traffic_shaping.set')}}</a>
       </div>
       <div
         v-show="interfaces.length > 0 && view.isChartLoaded && tc.length > 0 && !view.invalidChartsData"
@@ -137,7 +138,7 @@
                     <div class="list-view-pf-additional-info">
                       <div class="list-view-pf-additional-info-item multi-line adjust-line">
                         <span>{{$t('download')}}</span>
-                        <br>
+                        <br />
                         <span>{{$t('upload')}}</span>
                       </div>
                       <div
@@ -155,7 +156,7 @@
                           v-if="t.MinInputRate.length > 0"
                         >{{t.MinInputRate}} {{$t('traffic_shaping.'+t.Unit)}}</strong>
                         <span v-if="t.MinInputRate.length > 0">{{$t('traffic_shaping.min')}}</span>
-                        <br>
+                        <br />
                         <span
                           v-if="t.MinOutputRate.length > 0"
                           data-toggle="tooltip"
@@ -183,7 +184,7 @@
                           v-if="t.MaxInputRate.length > 0"
                         >{{t.MaxInputRate}} {{$t('traffic_shaping.'+t.Unit)}}</strong>
                         <span v-if="t.MaxInputRate.length > 0">{{$t('traffic_shaping.max')}}</span>
-                        <br>
+                        <br />
                         <span
                           v-if="t.MaxOutputRate.length > 0"
                           data-toggle="tooltip"
@@ -420,7 +421,7 @@
                     type="text"
                     v-model="newTc.name"
                     class="form-control"
-                  >
+                  />
                   <span v-if="newTc.errors.name.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTc.errors.name.message)}}
@@ -433,7 +434,7 @@
                   for="textInput-modal-markup"
                 >{{$t('traffic_shaping.class_description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newTc.Description" class="form-control">
+                  <input type="text" v-model="newTc.Description" class="form-control" />
                   <span v-if="newTc.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTc.errors.Description.message)}}
@@ -449,7 +450,7 @@
                     type="radio"
                     v-model="newTc.Unit"
                     value="kbps"
-                  >
+                  />
                   <label
                     class="col-sm-10 col-xs-10 control-label text-align-left"
                     for="Bandwidth-Unit-1"
@@ -460,7 +461,7 @@
                     type="radio"
                     v-model="newTc.Unit"
                     value="%"
-                  >
+                  />
                   <label
                     class="col-sm-10 col-xs-10 control-label text-align-left"
                     for="Bandwidth-Unit-2"
@@ -476,7 +477,7 @@
                 >{{$t('traffic_shaping.down_bandwidth_limit')}}</label>
                 <div class="col-sm-4">
                   <label>{{$t('traffic_shaping.min')}} ({{$t('traffic_shaping.'+newTc.Unit)}})</label>
-                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MinInputRate">
+                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MinInputRate" />
                   <span v-if="newTc.errors.MinInputRate.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTc.errors.MinInputRate.message)}}
@@ -484,7 +485,7 @@
                 </div>
                 <div class="col-sm-4">
                   <label>{{$t('traffic_shaping.max')}} ({{$t('traffic_shaping.'+newTc.Unit)}})</label>
-                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MaxInputRate">
+                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MaxInputRate" />
                   <span v-if="newTc.errors.MaxInputRate.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTc.errors.MaxInputRate.message)}}
@@ -500,7 +501,7 @@
                 >{{$t('traffic_shaping.up_bandwidth_limit')}}</label>
                 <div class="col-sm-4">
                   <label>{{$t('traffic_shaping.min')}} ({{$t('traffic_shaping.'+newTc.Unit)}})</label>
-                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MinOutputRate">
+                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MinOutputRate" />
                   <span v-if="newTc.errors.MinOutputRate.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTc.errors.MinOutputRate.message)}}
@@ -508,7 +509,7 @@
                 </div>
                 <div class="col-sm-4">
                   <label>{{$t('traffic_shaping.max')}} ({{$t('traffic_shaping.'+newTc.Unit)}})</label>
-                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MaxOutputRate">
+                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MaxOutputRate" />
                   <span v-if="newTc.errors.MaxOutputRate.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTc.errors.MaxOutputRate.message)}}
@@ -773,7 +774,7 @@
               >
                 <label class="col-sm-3 control-label">{{$t('rules.description')}}</label>
                 <div class="col-sm-9">
-                  <input class="form-control" type="text" v-model="newRule.Description">
+                  <input class="form-control" type="text" v-model="newRule.Description" />
                   <span v-if="newRule.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newRule.errors.Description.message)}}
@@ -787,7 +788,7 @@
               >
                 <label class="col-sm-3 control-label">{{$t('rules.log')}}</label>
                 <div class="col-sm-9">
-                  <input class="form-control" type="checkbox" v-model="newRule.Log">
+                  <input class="form-control" type="checkbox" v-model="newRule.Log" />
                   <span v-if="newRule.errors.Log.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newRule.errors.Log.message)}}
@@ -875,7 +876,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.name')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newObject.name" class="form-control">
+                  <input required type="text" v-model="newObject.name" class="form-control" />
                   <span
                     v-if="newObject.errors.name.hasError"
                     class="help-block"
@@ -891,7 +892,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.ip_address')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newObject.IpAddress" class="form-control">
+                  <input required type="text" v-model="newObject.IpAddress" class="form-control" />
                   <span
                     v-if="newObject.errors.IpAddress.hasError"
                     class="help-block"
@@ -907,7 +908,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.network')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newObject.Address" class="form-control">
+                  <input required type="text" v-model="newObject.Address" class="form-control" />
                   <span
                     v-if="newObject.errors.Address.hasError"
                     class="help-block"
@@ -922,7 +923,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newObject.Description" class="form-control">
+                  <input type="text" v-model="newObject.Description" class="form-control" />
                   <span
                     v-if="newObject.errors.Description.hasError"
                     class="help-block"
@@ -1010,7 +1011,6 @@ export default {
       context.getZones();
       context.getTimeConditions();
       context.getServices();
-      context.getApplications();
       context.getRoles();
       context.initCharts();
     });
@@ -1498,7 +1498,10 @@ export default {
       this.newRule.Src = item.name;
 
       this.newRule.SrcFull = Object.assign({}, item);
-      this.newRule.SrcFull.name = this.newRule.SrcFull.typeId == 'role' ? this.newRule.SrcFull.name.toLowerCase() : this.newRule.SrcFull.name;
+      this.newRule.SrcFull.name =
+        this.newRule.SrcFull.typeId == "role"
+          ? this.newRule.SrcFull.name.toLowerCase()
+          : this.newRule.SrcFull.name;
       this.newRule.SrcFull.type = this.newRule.SrcFull.typeId;
       delete this.newRule.SrcFull.typeId;
 
@@ -1545,7 +1548,10 @@ export default {
       this.newRule.Dst = item.name;
 
       this.newRule.DstFull = Object.assign({}, item);
-      this.newRule.DstFull.name = this.newRule.DstFull.typeId == 'role' ? this.newRule.DstFull.name.toLowerCase() : this.newRule.DstFull.name;
+      this.newRule.DstFull.name =
+        this.newRule.DstFull.typeId == "role"
+          ? this.newRule.DstFull.name.toLowerCase()
+          : this.newRule.DstFull.name;
       this.newRule.DstFull.type = this.newRule.DstFull.typeId;
       delete this.newRule.DstFull.typeId;
 
@@ -2239,14 +2245,14 @@ export default {
 
           // notification
           nethserver.notifications.success = context.$i18n.t(
-            "traffic_shaping.tc_" + context.newTc.isEdit
-              ? "updated"
-              : "created" + "_ok"
+            "traffic_shaping.tc_" +
+              (context.newTc.isEdit ? "updated" : "created") +
+              "_ok"
           );
           nethserver.notifications.error = context.$i18n.t(
-            "traffic_shaping.tc_" + context.newTc.isEdit
-              ? "updated"
-              : "created" + "_error"
+            "traffic_shaping.tc_" +
+              (context.newTc.isEdit ? "updated" : "created") +
+              "_error"
           );
 
           // update values
@@ -2431,10 +2437,12 @@ export default {
         Time: r.Time ? r.Time : null,
         Position: r.Position,
         status: r.status == "enabled" ? "disabled" : "enabled",
-        Service: r.Service ? r.Service : {
-          "name": "any",
-          "type": "fwservice"
-        },
+        Service: r.Service
+          ? r.Service
+          : {
+              name: "any",
+              type: "fwservice"
+            },
         Action: r.Action ? r.Action : null,
         Dst: r.Dst ? r.Dst : null,
         id: r.id,
@@ -2482,8 +2490,8 @@ export default {
         Service: context.newRule.ServiceFull
           ? context.newRule.ServiceFull
           : {
-              "name": "any",
-              "type": "fwservice"
+              name: "any",
+              type: "fwservice"
             },
         Action: context.newRule.Action ? context.newRule.Action : null,
         Dst: context.newRule.DstFull
