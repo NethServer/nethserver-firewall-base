@@ -36,6 +36,7 @@ NethServer simple firewall
 %build
 %{makedocs}
 perl createlinks
+sed -i 's/_RELEASE_/%{version}/' %{name}.json
 mkdir -p root%{perl_vendorlib}
 mv -v NethServer root%{perl_vendorlib}
 
@@ -88,7 +89,7 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 - Fix read for host objects
 - Ui routing improvements
 - Fix delegation configuration
-- Exclude Cockpit UI from base package 
+- Exclude Cockpit UI from base package
 
 * Tue Apr 09 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.6.0-1
 - Cockpit: basic firewall configuration - NethServer/dev#5695
