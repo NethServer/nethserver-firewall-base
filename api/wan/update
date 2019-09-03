@@ -54,6 +54,15 @@ case $action in
             MaxNumberPacketLoss "$(_get MaxNumberPacketLoss)" MaxPercentPacketLoss "$(_get MaxPercentPacketLoss)" PingInterval "$(_get PingInterval)" \
             CheckIP "$(_get_array CheckIP)" NotifyWanTo "$notifyto" NotifyWanFrom "$notifywanfrom"
         ;;
+
+    "reorder")
+        save_db fwrules
+        echo $data | /usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-reorder
+        ;;
+
+    *)
+        error
+        ;;
 esac
 
 if [ $? -gt 0 ]; then
