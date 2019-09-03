@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.6.5
+Version: 3.6.6
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -70,6 +70,11 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Tue Sep 03 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.6.6-1
+- WAN policy routes on Cockpit: can't reorder rules - Bug NethServer/dev#5823
+- Cockpit. List correct application version - Nethserver/dev#5819
+- Apply port forward for non-TPC/UDP protocols
+
 * Mon Aug 26 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.6.5-1
 - Cockpit: updating QoS class breaks its shaping - Bug NethServer/dev#5807
 - Cockpit. fix various bugs - Bug Nethserver/dev#5810
