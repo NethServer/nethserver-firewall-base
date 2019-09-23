@@ -1,0 +1,48 @@
+#
+# nsapi_nethserver_firewall_base
+#
+Cmnd_Alias NSAPI_NETHSERVER_FIREWALL_BASE = \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/diagnostics/read, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/connections/delete, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/connections/read, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/dashboard/read, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/local-rules/create, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/local-rules/delete, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/local-rules/read, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/local-rules/update, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/local-rules/validate, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/objects/create, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/objects/delete, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/objects/update, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/objects/validate, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/objects/read, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/port-forward/create, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/port-forward/delete, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/port-forward/read, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/port-forward/update, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/port-forward/validate, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/rules/create, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/rules/delete, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/rules/read, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/rules/update, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/rules/validate, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/settings/read, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/settings/update, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/settings/validate, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/snat/create, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/snat/delete, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/snat/read, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/snat/update, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/snat/validate, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/traffic-shaping/create, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/traffic-shaping/delete, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/traffic-shaping/read, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/traffic-shaping/update, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/traffic-shaping/validate, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/wan/create, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/wan/delete, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/wan/read, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/wan/update, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/wan/validate
+
+Defaults!NSAPI_NETHSERVER_FIREWALL_BASE !requiretty
