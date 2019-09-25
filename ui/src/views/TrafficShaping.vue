@@ -738,11 +738,15 @@
                   >
                     <div slot="item" slot-scope="props" class="single-item">
                       <span>
+                        <span
+                          v-show="props.item.typeId == 'application'"
+                          :class="['fa', props.item.icon]"
+                        ></span>
                         {{props.item.name}}
                         <span
                           v-show="props.item.Ports"
                           class="gray"
-                        >({{props.item.Ports.join(', ')}})</span>
+                        >({{props.item.Ports && props.item.Ports.join(', ')}})</span>
                         <i class="mg-left-5">{{props.item.Description}}</i>
                       </span>
                     </div>
@@ -975,6 +979,7 @@ export default {
       zones: [],
       timeConditions: [],
       services: [],
+      applications: [],
       roles: [],
       autoOptions: {
         inputClass: "form-control"
@@ -996,6 +1001,7 @@ export default {
     this.getZones();
     this.getTimeConditions();
     this.getServices();
+    this.getApplications();
     this.getRoles();
     this.initCharts();
 
@@ -1011,6 +1017,7 @@ export default {
       context.getZones();
       context.getTimeConditions();
       context.getServices();
+      context.getApplications();
       context.getRoles();
       context.initCharts();
     });
@@ -1574,7 +1581,7 @@ export default {
         return null;
       }
 
-      var objects = this.services;
+      var objects = this.services.concat(this.applications);
 
       return objects.filter(function(service) {
         return (
@@ -1584,7 +1591,8 @@ export default {
               .toLowerCase()
               .includes(query.toLowerCase())) ||
           service.name.toLowerCase().includes(query.toLowerCase()) ||
-          service.Description.toLowerCase().includes(query.toLowerCase())
+          (service.Description &&
+            service.Description.toLowerCase().includes(query.toLowerCase()))
         );
       });
     },
@@ -1595,7 +1603,8 @@ export default {
       this.newRule.ServiceFull.type = this.newRule.ServiceFull.typeId;
       delete this.newRule.ServiceFull.typeId;
 
-      this.newRule.ServiceType = item.name + " (" + item.Ports.join(", ") + ")";
+      this.newRule.ServiceType =
+        item.name + (item.Ports ? " (" + item.Ports.join(", ") + ")" : "");
     },
     filterTimeAuto(query) {
       this.newRule.Time = null;
@@ -1805,6 +1814,33 @@ export default {
           context.services = context.services.map(function(i) {
             i.type = context.$i18n.t("objects.service");
             i.typeId = "fwservice";
+            return i;
+          });
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getApplications() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "applications"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.applications = success["applications"];
+          context.applications = context.applications.map(function(i) {
+            i.type = context.$i18n.t("objects.application");
+            i.typeId = "application";
             return i;
           });
         },
