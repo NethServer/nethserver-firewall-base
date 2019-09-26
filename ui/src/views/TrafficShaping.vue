@@ -378,7 +378,9 @@
                 :title="mapTitleService(r)"
                 class="list-view-pf-additional-info-item"
               >
-                <span class="fa fa-cogs"></span>
+                <span
+                  :class="['fa', r.Service && r.Service.type == 'application' ? r.Service.icon : 'fa-cogs']"
+                ></span>
                 <strong>{{r.Service && r.Service.name}}</strong>
               </div>
               <div
