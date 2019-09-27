@@ -2,6 +2,7 @@
 # nsapi_nethserver_firewall_base
 #
 Cmnd_Alias NSAPI_NETHSERVER_FIREWALL_BASE = \
+    /usr/libexec/nethserver/api/system-network/read, \
     /usr/libexec/nethserver/api/nethserver-firewall-base/diagnostics/read, \
     /usr/libexec/nethserver/api/nethserver-firewall-base/connections/delete, \
     /usr/libexec/nethserver/api/nethserver-firewall-base/connections/read, \
