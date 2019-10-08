@@ -1112,7 +1112,7 @@
                 >{{$t('objects.protocol')}}</label>
                 <div class="col-sm-9">
                   <select required type="text" v-model="newService.Protocol" class="form-control">
-                    <option v-for="(p,k) in protocols" v-bind:key="k" :value="p">{{p | uppercase}}</option>
+                    <option v-for="(p,k) in protocols" v-bind:key="k" :value="p">{{$t('protocols.'+p)}}</option>
                   </select>
                   <span
                     v-if="newService.errors.Protocol.hasError"
