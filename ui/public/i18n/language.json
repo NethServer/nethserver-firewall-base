@@ -514,6 +514,6 @@
         "pf_origin_port": "Insert a single port, a list of comma-separated ports, or a port range using \":\" as separator like \"100:200\".",
         "rules_source": "You may insert an IP address or a CIDR if you do not want to create a host or CIDR object.",
         "rules_destination": "You may insert an IP address or a CIDR if you do not want to create a host or CIDR object.",
-        "objects_ports": "Sintax supported: comma-separated, range (with -)"
+        "objects_ports": "Supported syntax: comma-separated port list or port range (i.e. 10000-20000)"
     }
 }
