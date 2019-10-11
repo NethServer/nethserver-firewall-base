@@ -1493,6 +1493,9 @@ export default {
         )
       );
 
+      // firewall object
+      objects.push({ "name": "FW", "Description": "Firewall", "typeId": "fw" });
+
       return objects.filter(function(service) {
         return (
           service.typeId.toLowerCase().includes(query.toLowerCase()) ||
@@ -1514,7 +1517,10 @@ export default {
       this.newRule.SrcFull.type = this.newRule.SrcFull.typeId;
       delete this.newRule.SrcFull.typeId;
 
-      this.newRule.SrcType =
+      if (item.typeId === "fw") {
+        this.newRule.SrcType = "Firewall"
+      } else {
+        this.newRule.SrcType =
         item.name +
         " " +
         (item.IpAddress ? item.IpAddress + " " : "") +
@@ -1523,6 +1529,7 @@ export default {
         "(" +
         item.type +
         ")";
+      }
     },
     filterDstAuto(query) {
       this.newRule.Dst = null;
