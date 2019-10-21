@@ -60,7 +60,7 @@
           <label
             class="col-sm-2 control-label"
             for="textInput-modal-markup"
-          >{{$t('settings.allowed')}}</label>
+          >{{$t('enabled')}}</label>
           <div class="col-sm-5">
             <toggle-button
               class="min-toggle"
@@ -198,7 +198,7 @@ export default {
           // mac
           context.settings.mac.MACValidationPolicy =
             success.settings.MACValidationPolicy == "accept";
-          context.settings.MACValidation =
+          context.settings.mac.MACValidation =
             success.settings.MACValidation == "enabled";
 
           context.view.isLoaded = true;
