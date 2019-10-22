@@ -515,7 +515,8 @@
         "valid_cidrBlock": "Must be a valid CIDR network",
         "valid_time": "The time must be in the form HH:mm",
         "port_number_or_port_range": "Must be a valid port number or port range (using dash)",
-        "protocol_doesnt_support_ports": "This protocol does not support ports"
+        "protocol_doesnt_support_ports": "This protocol does not support ports",
+        "valid_lessThan_65536": "Must be less than 65536"
     },
     "docs": {
         "pf_origin_port": "Insert a single port, a list of comma-separated ports, or a port range using \":\" as separator like \"100:200\".",
