@@ -68,6 +68,7 @@ case "update-service":
     $db = new EsmithDatabase('fwservices');
 
     if( $action == "create-service") {
+        $v->declareParameter('name', Validate::USERNAME);
         if ($db->getKey($data['name'])) {
             $v->addValidationError('name', 'service_exists', $data['name']);
         }
@@ -77,7 +78,7 @@ case "update-service":
         }
     }
 
-    if($data['Ports']) { 
+    if($data['Ports']) {
         if (strpos($data['Ports'][0], "-") !== false ) { # port range
             $tmp = explode("-",$data['Ports'][0]);
             # two non-zero integers, right number must be greater then left one
@@ -95,7 +96,7 @@ case "update-service":
         }
     }
 
-    $protocols = array('tcp','udp','tcpudp');
+    $protocols = array('tcpudp', 'tcp', 'udp', 'gre', 'ah', 'esp');
     $protoValidator = $v->createValidator()->memberOf($protocols);
 
     $v->declareParameter('Protocol', $protoValidator);

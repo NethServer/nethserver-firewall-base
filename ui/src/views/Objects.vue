@@ -666,7 +666,7 @@
                   <span
                     v-if="newHostGroup.errors.Members.hasError"
                     class="help-block"
-                  >{{newHostGroup.errors.Members.message}}</span>
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newHostGroup.errors.Members.message)}}</span>
                 </div>
               </div>
               <div class="form-group">
