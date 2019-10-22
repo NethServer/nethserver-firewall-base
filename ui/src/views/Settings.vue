@@ -60,7 +60,15 @@
           <label
             class="col-sm-2 control-label"
             for="textInput-modal-markup"
-          >{{$t('enabled')}}</label>
+          >
+            {{$t('enabled')}}
+            <doc-info
+              :placement="'top'"
+              :title="$t('settings.mac')"
+              :chapter="'mac_validation'"
+              :inline="true"
+            ></doc-info>
+          </label>
           <div class="col-sm-5">
             <toggle-button
               class="min-toggle"
@@ -84,7 +92,15 @@
           <label
             class="col-sm-2 control-label"
             for="textInput-modal-markup"
-          >{{$t('settings.allow_mac')}}</label>
+          >
+            {{$t('settings.block_mac')}}
+            <doc-info
+              :placement="'top'"
+              :title="$t('settings.mac')"
+              :chapter="'mac_validation_policy'"
+              :inline="true"
+            ></doc-info>
+          </label>
           <div class="col-sm-5">
             <input type="checkbox" v-model="settings.mac.MACValidationPolicy" class="form-control">
             <span
@@ -197,7 +213,7 @@ export default {
 
           // mac
           context.settings.mac.MACValidationPolicy =
-            success.settings.MACValidationPolicy == "accept";
+            success.settings.MACValidationPolicy == "drop";
           context.settings.mac.MACValidation =
             success.settings.MACValidation == "enabled";
 
@@ -224,8 +240,8 @@ export default {
         HairpinNat: context.settings.pf.HairpinNat ? "enabled" : "disabled",
         Policy: context.settings.internet.Policy ? "permissive" : "strict",
         MACValidationPolicy: context.settings.mac.MACValidationPolicy
-          ? "accept"
-          : "drop",
+          ? "drop"
+          : "accept",
         MACValidation: context.settings.mac.MACValidation
           ? "enabled"
           : "disabled"
