@@ -379,9 +379,9 @@ sub list_applications
         while (my $row = <$fh>) {
             next if ($row =~ /^#/);
             chomp $row;
-            my ($id, $mark, $name, $other) = split(/\s+/, $row, 4);
+            my ($id, $mark, $name, $hashtag, $counter) = split(/\s+/, $row, 6);
             my $icon = defined($icons->{lc($name)}) ? $icons->{lc($name)} : "fa-circle";
-            push(@applications, {"name" => $name, "id" => $id, "icon" => $icon});
+            push(@applications, {"name" => $name, "id" => $id, "icon" => $icon, "counter" => int($counter)});
         }
     }
 
