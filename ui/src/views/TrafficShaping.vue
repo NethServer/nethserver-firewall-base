@@ -17,7 +17,10 @@
         <span class="pficon pficon-warning-triangle-o"></span>
         <strong>{{$t('warning')}}!</strong>
         {{$t('traffic_shaping.charts_not_updated')}}.
-        <a href="#/wan" class="btn btn-primary">{{$t('traffic_shaping.set')}}</a>
+        <a
+          href="#/wan"
+          class="btn btn-primary"
+        >{{$t('traffic_shaping.set')}}</a>
       </div>
       <div
         v-show="interfaces.length > 0 && view.isChartLoaded && tc.length > 0 && !view.invalidChartsData"
@@ -558,7 +561,7 @@
               <div v-if="newTc.advanced" class="form-group">
                 <label class="col-sm-3 control-label" for="textInput-modal-markup"></label>
                 <div class="col-sm-9">
-                  <ul class="list-inline compact">
+                  <ul v-if="newTc.ifaceToBind != 'all'" class="list-inline compact">
                     <li v-for="(i, ki) in newTc.BindTo" v-bind:key="ki">
                       <span class="label label-info">
                         {{i}}
@@ -566,6 +569,11 @@
                           <span class="fa fa-times"></span>
                         </a>
                       </span>
+                    </li>
+                  </ul>
+                  <ul v-if="newTc.ifaceToBind == 'all'" class="list-inline compact">
+                    <li v-for="(i, ki) in interfaces" v-bind:key="ki">
+                      <span class="label label-default">{{i.name}}</span>
                     </li>
                   </ul>
                 </div>
@@ -1494,7 +1502,7 @@ export default {
       );
 
       // firewall object
-      objects.push({ "name": "FW", "Description": "Firewall", "typeId": "fw" });
+      objects.push({ name: "FW", Description: "Firewall", typeId: "fw" });
 
       return objects.filter(function(service) {
         return (
@@ -1518,17 +1526,17 @@ export default {
       delete this.newRule.SrcFull.typeId;
 
       if (item.typeId === "fw") {
-        this.newRule.SrcType = "Firewall"
+        this.newRule.SrcType = "Firewall";
       } else {
         this.newRule.SrcType =
-        item.name +
-        " " +
-        (item.IpAddress ? item.IpAddress + " " : "") +
-        (item.Address ? item.Address + " " : "") +
-        (item.Start && item.End ? item.Start + " - " + item.End + " " : "") +
-        "(" +
-        item.type +
-        ")";
+          item.name +
+          " " +
+          (item.IpAddress ? item.IpAddress + " " : "") +
+          (item.Address ? item.Address + " " : "") +
+          (item.Start && item.End ? item.Start + " - " + item.End + " " : "") +
+          "(" +
+          item.type +
+          ")";
       }
     },
     filterDstAuto(query) {
@@ -2125,7 +2133,7 @@ export default {
       return this.newTc.BindTo.indexOf(bind) > -1;
     },
     addIfaceToBind(bindTo) {
-      if (bindTo.length > 0 && bindTo != "-") {
+      if (bindTo.length > 0 && bindTo != "-" && bindTo != "all") {
         if (!this.groupAlreadyAdded(bindTo)) {
           this.newTc.BindTo.push(bindTo);
         }

@@ -63,7 +63,7 @@
               v-for="(s,k) in protocols[searchProto]"
               v-bind:key="k"
               :value="s"
-            >{{s ? s : "-" | uppercase}}</option>
+            >{{s ? s : $t("all") | uppercase}}</option>
           </select>
         </div>
       </div>

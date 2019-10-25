@@ -2188,23 +2188,28 @@ export default {
 
             popover.options.content +=
               '<span class="col-sm-6">' +
-              "<button onclick=\"setSpeedValues('" +
-              context.$options.filters.sanitize(iface.name) +
-              "'," +
-              Math.round(success.download / 1024) +
-              "," +
-              Math.round(success.upload / 1024) +
-              ')" class="btn btn-primary btn-sm no-mg-left mg-top-5">' +
+              '<span id="use_settings" class="btn btn-primary btn-sm no-mg-left mg-top-5">' +
               context.$i18n.t("wan.use_this_set") +
-              "</button>" +
-              "</span><script>" +
-              "function setSpeedValues(iface, down, up) {" +
-              "$('#'+iface+'-FwInBandwidth').val(down);" +
-              "$('#'+iface+'-FwOutBandwidth').val(up);" +
-              "}";
+              "</span>" +
+              "</span>";
+
+            window.setSpeedValues = function(iface, down, up) {
+              $("#" + iface + "-FwInBandwidth").val(down);
+              $("#" + iface + "-FwOutBandwidth").val(up);
+            };
 
             iface.speedtest.isLoaded = true;
             popover.show();
+
+            setTimeout(function() {
+              $("#use_settings").click(function() {
+                setSpeedValues(
+                  context.$options.filters.sanitize(iface.name),
+                  Math.round(success.download / 1024),
+                  Math.round(success.upload / 1024)
+                );
+              });
+            }, 1500);
           },
           function(error) {
             popover.options.content =
