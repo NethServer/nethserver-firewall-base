@@ -71,7 +71,7 @@
         class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2"
       >
         <span
-          :class="['card-pf-utilization-card-details-count stats-count', s ? 'pficon pficon-ok' : 'pficon-error-circle-o']"
+          :class="['card-pf-utilization-card-details-count stats-count', s ? 'pficon pficon-ok' : 'pficon-off']"
           data-toggle="tooltip"
           data-placement="top"
           :title="$t('dashboard.status')+': '+ (s ? $t('enabled') : $t('disabled'))"
