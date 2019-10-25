@@ -117,7 +117,11 @@
         "chilli": "Hotspot",
         "clamd@squidclamav": "Web antivirus",
         "squid": "Web proxy",
-        "suricata": "IPS"
+        "suricata": "IPS",
+        "ndpi": "nDPI",
+        "details_for": "Details for",
+        "name": "Name",
+        "counter": "Counter"
     },
     "wan": {
         "title": "WAN",
