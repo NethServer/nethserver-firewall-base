@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.7.2
+Version: 3.7.3
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -71,6 +71,13 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Mon Oct 28 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.7.3-1
+- Cockpit: add missing validation labels - Bug Nethserver/dev#5884
+- Logs page in Cockpit - Bug NethServer/dev#5866
+- Cockpit firewall dashboard: service status color - Nethserver/dev#5889
+- Cockpit: can't use custom services into local rules - Bug Nethserver/dev#5870
+- Shorewall stopped after ndpi update - Bug NethServer/dev#5890
+
 * Mon Oct 14 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.7.2-1
 - Firewall object in traffic shaping rules - NethServer/dev#5864
 
