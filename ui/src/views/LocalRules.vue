@@ -581,6 +581,7 @@ export default {
     this.getZones();
     this.getTimeConditions();
     this.getServices();
+    this.getLocalServices();
     this.getRoles();
 
     var context = this;
@@ -593,6 +594,7 @@ export default {
       context.getZones();
       context.getTimeConditions();
       context.getServices();
+      context.getLocalServices();
       context.getRoles();
     });
   },
@@ -613,6 +615,7 @@ export default {
       zones: [],
       timeConditions: [],
       services: [],
+      localServices: [],
       roles: [],
       autoOptions: {
         inputClass: "form-control"
@@ -1218,7 +1221,7 @@ export default {
         return null;
       }
 
-      var objects = this.services;
+      var objects = this.services.concat(this.localServices);
 
       return objects.filter(function(service) {
         return (
@@ -1449,6 +1452,32 @@ export default {
           context.services = context.services.map(function(i) {
             i.type = context.$i18n.t("objects.service");
             i.typeId = "fwservice";
+            return i;
+          });
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getLocalServices() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "local-services"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.localServices = success["local-services"];
+          context.localServices = context.localServices.map(function(i) {
+            i.type = context.$i18n.t("objects.service");
+            i.typeId = "service";
             return i;
           });
         },
