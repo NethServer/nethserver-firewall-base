@@ -454,7 +454,7 @@
                     class="col-sm-2 col-xs-2"
                     type="radio"
                     v-model="newTc.Unit"
-                    value="kbps"
+                    value="kbit"
                   />
                   <label
                     class="col-sm-10 col-xs-10 control-label text-align-left"
