@@ -170,7 +170,7 @@
         "class_name": "Class name",
         "class_description": "Description",
         "bandwidth_unit": "Bandwidth unit",
-        "kbps": "kbps",
+        "kbit": "kbit",
         "bandwidth": "Bandwidth",
         "%": "%",
         "down_bandwidth_limit": "Download bandwidth limits",

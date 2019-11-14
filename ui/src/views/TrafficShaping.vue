@@ -459,7 +459,7 @@
                   <label
                     class="col-sm-10 col-xs-10 control-label text-align-left"
                     for="Bandwidth-Unit-1"
-                  >{{$t('traffic_shaping.kbps')}}</label>
+                  >{{$t('traffic_shaping.kbit')}}</label>
                   <input
                     id="Bandwidth-Unit-2"
                     class="col-sm-2 col-xs-2"
