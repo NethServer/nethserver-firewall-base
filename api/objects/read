@@ -61,7 +61,7 @@ if($cmd eq 'hosts' || $cmd eq 'cidr-subs'  || $cmd eq 'host-groups' || $cmd eq '
             if ($type eq 'local' || $type eq 'remote' || $type eq 'host') {
                 my $ip = $_->prop('IpAddress') || next;
                 my $desc = $_->prop('Description') || '';
-                push(@objects, {"name" => $_->key, "IpAddress" => $ip, "Description" => $desc});
+                push(@objects, {"name" => $_->key, "IpAddress" => $ip, "Description" => $desc, "type" => $type});
             }
         } elsif ($cmd eq 'cidr-subs') {
             if ($type eq 'cidr') {
