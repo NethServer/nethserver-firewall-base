@@ -88,8 +88,12 @@
         >
           <template slot="table-row" slot-scope="props">
             <td class="fancy">
-              <a @click="openEditHost(props.row)">
+              <a
+                :class="[props.row.type != 'host' ? 'disabled-black' : '']"
+                @click="props.row.type != 'host' ? undefined : openEditHost(props.row)"
+              >
                 <strong>{{ props.row.name}}</strong>
+                <span class="mg-left-5" v-if="props.row.type != 'host'">({{props.row.type}})</span>
               </a>
             </td>
             <td class="fancy">
@@ -98,11 +102,15 @@
             </td>
             <td class="fancy">{{ props.row.Description}}</td>
             <td>
-              <button @click="openEditHost(props.row)" class="btn btn-default">
+              <button
+                v-if="props.row.type == 'host'"
+                @click="openEditHost(props.row)"
+                class="btn btn-default"
+              >
                 <span class="fa fa-pencil span-right-margin"></span>
                 {{$t('edit')}}
               </button>
-              <div class="dropup pull-right dropdown-kebab-pf">
+              <div v-if="props.row.type == 'host'" class="dropup pull-right dropdown-kebab-pf">
                 <button
                   class="btn btn-link dropdown-toggle"
                   type="button"
@@ -3181,4 +3189,11 @@ export default {
 </script>
 
 <style>
+.disabled-black {
+  cursor: initial;
+  color: #363636;
+}
+.disabled-black:hover {
+  color: #363636;
+}
 </style>
