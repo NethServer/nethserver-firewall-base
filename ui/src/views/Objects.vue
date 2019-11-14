@@ -93,7 +93,7 @@
                 @click="props.row.type != 'host' ? undefined : openEditHost(props.row)"
               >
                 <strong>{{ props.row.name}}</strong>
-                <span class="mg-left-5" v-if="props.row.type != 'host'">({{props.row.type}})</span>
+                <span class="mg-left-5" v-if="props.row.type != 'host'">({{$t('objects.'+props.row.type)}})</span>
               </a>
             </td>
             <td class="fancy">
