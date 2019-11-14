@@ -1,0 +1,18 @@
+{
+    #
+    # issue5897 - migrate kbps to kbit
+    #
+    
+    use esmith::ConfigDB;
+
+    my $db = esmith::ConfigDB->open('tc') || return '';
+
+    foreach ($db->get_all_by_prop('type', 'class')) {
+        my $unit = $_->prop('Unit') || next;
+        if ($unit eq 'kbps') {
+            $_->set_prop('Unit', 'kbit');
+        }
+    }
+
+    '';
+}
