@@ -88,8 +88,12 @@
         >
           <template slot="table-row" slot-scope="props">
             <td class="fancy">
-              <a @click="openEditHost(props.row)">
+              <a
+                :class="[props.row.type != 'host' ? 'disabled-black' : '']"
+                @click="props.row.type != 'host' ? undefined : openEditHost(props.row)"
+              >
                 <strong>{{ props.row.name}}</strong>
+                <span class="mg-left-5" v-if="props.row.type != 'host'">({{$t('objects.'+props.row.type)}})</span>
               </a>
             </td>
             <td class="fancy">
@@ -98,11 +102,15 @@
             </td>
             <td class="fancy">{{ props.row.Description}}</td>
             <td>
-              <button @click="openEditHost(props.row)" class="btn btn-default">
+              <button
+                v-if="props.row.type == 'host'"
+                @click="openEditHost(props.row)"
+                class="btn btn-default"
+              >
                 <span class="fa fa-pencil span-right-margin"></span>
                 {{$t('edit')}}
               </button>
-              <div class="dropup pull-right dropdown-kebab-pf">
+              <div v-if="props.row.type == 'host'" class="dropup pull-right dropdown-kebab-pf">
                 <button
                   class="btn btn-link dropdown-toggle"
                   type="button"
@@ -235,7 +243,7 @@
             <td class="fancy">
               <span class="col-sm-1">{{$t('objects.start')}}:</span>
               <b class="col-sm-2">{{ props.row.Start}}</b>
-              <br>
+              <br />
               <span class="col-sm-1">{{$t('objects.end')}}:</span>
               <b class="col-sm-2">{{ props.row.End}}</b>
             </td>
@@ -572,7 +580,7 @@
                     type="text"
                     v-model="newHost.name"
                     class="form-control"
-                  >
+                  />
                   <span
                     v-if="newHost.errors.name.hasError"
                     class="help-block"
@@ -585,7 +593,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.ip_address')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newHost.IpAddress" class="form-control">
+                  <input required type="text" v-model="newHost.IpAddress" class="form-control" />
                   <span
                     v-if="newHost.errors.IpAddress.hasError"
                     class="help-block"
@@ -598,7 +606,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newHost.Description" class="form-control">
+                  <input type="text" v-model="newHost.Description" class="form-control" />
                   <span
                     v-if="newHost.errors.Description.hasError"
                     class="help-block"
@@ -637,7 +645,7 @@
                     type="text"
                     v-model="newHostGroup.name"
                     class="form-control"
-                  >
+                  />
                   <span
                     v-if="newHostGroup.errors.name.hasError"
                     class="help-block"
@@ -692,7 +700,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newHostGroup.Description" class="form-control">
+                  <input type="text" v-model="newHostGroup.Description" class="form-control" />
                   <span
                     v-if="newHostGroup.errors.Description.hasError"
                     class="help-block"
@@ -731,7 +739,7 @@
                     type="text"
                     v-model="newIPRange.name"
                     class="form-control"
-                  >
+                  />
                   <span
                     v-if="newIPRange.errors.name.hasError"
                     class="help-block"
@@ -744,7 +752,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.start_ip')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newIPRange.Start" class="form-control">
+                  <input required type="text" v-model="newIPRange.Start" class="form-control" />
                   <span
                     v-if="newIPRange.errors.Start.hasError"
                     class="help-block"
@@ -757,7 +765,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.end_ip')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newIPRange.End" class="form-control">
+                  <input required type="text" v-model="newIPRange.End" class="form-control" />
                   <span
                     v-if="newIPRange.errors.End.hasError"
                     class="help-block"
@@ -772,7 +780,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newIPRange.Description" class="form-control">
+                  <input type="text" v-model="newIPRange.Description" class="form-control" />
                   <span
                     v-if="newIPRange.errors.Description.hasError"
                     class="help-block"
@@ -811,7 +819,7 @@
                     type="text"
                     v-model="newCIDRSub.name"
                     class="form-control"
-                  >
+                  />
                   <span
                     v-if="newCIDRSub.errors.name.hasError"
                     class="help-block"
@@ -824,7 +832,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.network')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newCIDRSub.Address" class="form-control">
+                  <input required type="text" v-model="newCIDRSub.Address" class="form-control" />
                   <span
                     v-if="newCIDRSub.errors.Address.hasError"
                     class="help-block"
@@ -839,7 +847,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newCIDRSub.Description" class="form-control">
+                  <input type="text" v-model="newCIDRSub.Description" class="form-control" />
                   <span
                     v-if="newCIDRSub.errors.Description.hasError"
                     class="help-block"
@@ -878,7 +886,7 @@
                     type="text"
                     v-model="newZone.name"
                     class="form-control"
-                  >
+                  />
                   <span
                     v-if="newZone.errors.name.hasError"
                     class="help-block"
@@ -891,7 +899,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.network')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newZone.Network" class="form-control">
+                  <input required type="text" v-model="newZone.Network" class="form-control" />
                   <span
                     v-if="newZone.errors.Network.hasError"
                     class="help-block"
@@ -919,7 +927,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newZone.Description" class="form-control">
+                  <input type="text" v-model="newZone.Description" class="form-control" />
                   <span
                     v-if="newZone.errors.Description.hasError"
                     class="help-block"
@@ -966,7 +974,7 @@
                     type="text"
                     v-model="newTimeCondition.name"
                     class="form-control"
-                  >
+                  />
                   <span
                     v-if="newTimeCondition.errors.name.hasError"
                     class="help-block"
@@ -988,7 +996,7 @@
                     type="text"
                     placeholder="00:15"
                     v-model="newTimeCondition.TimeStart"
-                  >
+                  />
                   <span v-if="newTimeCondition.errors.TimeStart.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTimeCondition.errors.TimeStart.message)}}
@@ -1002,7 +1010,7 @@
                     type="text"
                     placeholder="23:30"
                     v-model="newTimeCondition.TimeStop"
-                  >
+                  />
                   <span v-if="newTimeCondition.errors.TimeStop.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTimeCondition.errors.TimeStop.message)}}
@@ -1059,7 +1067,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newTimeCondition.Description" class="form-control">
+                  <input type="text" v-model="newTimeCondition.Description" class="form-control" />
                   <span
                     v-if="newTimeCondition.errors.Description.hasError"
                     class="help-block"
@@ -1098,7 +1106,7 @@
                     type="text"
                     v-model="newService.name"
                     class="form-control"
-                  >
+                  />
                   <span
                     v-if="newService.errors.name.hasError"
                     class="help-block"
@@ -1112,7 +1120,11 @@
                 >{{$t('objects.protocol')}}</label>
                 <div class="col-sm-9">
                   <select required type="text" v-model="newService.Protocol" class="form-control">
-                    <option v-for="(p,k) in protocols" v-bind:key="k" :value="p">{{$t('protocols.'+p)}}</option>
+                    <option
+                      v-for="(p,k) in protocols"
+                      v-bind:key="k"
+                      :value="p"
+                    >{{$t('protocols.'+p)}}</option>
                   </select>
                   <span
                     v-if="newService.errors.Protocol.hasError"
@@ -1131,7 +1143,7 @@
                   ></doc-info>
                 </label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newService.Ports" class="form-control">
+                  <input required type="text" v-model="newService.Ports" class="form-control" />
                   <span
                     v-if="newService.errors.Ports.hasError"
                     class="help-block"
@@ -1146,7 +1158,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newService.Description" class="form-control">
+                  <input type="text" v-model="newService.Description" class="form-control" />
                   <span
                     v-if="newService.errors.Description.hasError"
                     class="help-block"
@@ -3181,4 +3193,11 @@ export default {
 </script>
 
 <style>
+.disabled-black {
+  cursor: initial;
+  color: #363636;
+}
+.disabled-black:hover {
+  color: #363636;
+}
 </style>

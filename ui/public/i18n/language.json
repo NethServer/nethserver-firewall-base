@@ -316,7 +316,9 @@
         "fw": "Firewall",
         "ports_comma": "Insert (comma-separated) port(s)",
         "application": "Application",
-        "raw": "RAW value, no object found"
+        "raw": "RAW value, no object found",
+        "local": "DNS",
+        "remote": "DHCP"
     },
     "port_forward": {
         "title": "Port Forward",
