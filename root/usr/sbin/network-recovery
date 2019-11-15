@@ -30,6 +30,8 @@ product_version=$(config getprop sysconfig Version)
 
 xdialog_response=""
 dialog_name="main_menu"
+log_file=/var/log/network-recovery.log
+
 
 trap "" SIGINT
 
@@ -74,7 +76,8 @@ while [[ -n ${dialog_name} ]]; do
             fi
 
         else
-            dialog_name=""
+            echo "[WARNING] User canceled." > ${log_file}
+            dialog_name="" # quit
         fi
 
     elif [[ ${dialog_name} == "apply_static" ]]; then
@@ -115,15 +118,15 @@ while [[ -n ${dialog_name} ]]; do
             ip link set ${bridge} up
             echo "[NOTICE] Done."
         ) | \
-            tee /var/log/network-recovery.log | \
-            xdialog --begin 2 2 --progressbox "Applying config. See /var/log/network-recovery.log for details..." 20 72 \
+            tee ${log_file} | \
+            xdialog --begin 2 2 --progressbox "Applying config. See ${log_file} for details..." 20 72 \
                 --and-widget --begin 15 24 --keep-window --title "Temporary network configuration applied" \
                 --ok-label "Quit" --msgbox "${quitmessage}" 0 0
 
-        clear
         dialog_name="" # quit
     fi
 
 done
 
-cat /var/log/network-recovery.log
+clear
+cat ${log_file}
