@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.7.3
+Version: 3.7.4
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -71,6 +71,11 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Fri Nov 15 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.7.4-1
+- Wrong units passed to fireQoS - Bug Nethserver/dev#5897
+- Cockpit: network services not selectable in firewall rules - Bug Nethserver/dev#5894
+- Cockpit: DNS hosts can be changed from firewall application - Bug Nethserver/dev#5911
+
 * Mon Oct 28 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.7.3-1
 - Cockpit: add missing validation labels - Bug Nethserver/dev#5884
 - Logs page in Cockpit - Bug NethServer/dev#5866
