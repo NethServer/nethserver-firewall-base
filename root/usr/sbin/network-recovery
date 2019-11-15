@@ -97,6 +97,7 @@ while [[ -n ${dialog_name} ]]; do
             systemctl stop network
             shorewall clear
             ip address flush scope global
+            ip link set dev lo up
             bridge=$(ip -o link show type bridge | awk 'NR==1 { brnam=$2 ; gsub(/:$/,"",brnam) ; print brnam }')
             if [[ -z ${bridge} ]]; then
                 bridge=brdef
