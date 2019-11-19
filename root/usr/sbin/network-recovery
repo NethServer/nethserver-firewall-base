@@ -92,17 +92,16 @@ while [[ -n ${dialog_name} ]]; do
         quitmessage=$(IFS="" ; echo "${quitmessage[*]}")
 
         (
-            set -e
             exec 2>&1
             systemctl stop network
             shorewall clear
             ip address flush scope global
             ip link set dev lo up
-            bridge=$(ip -o link show type bridge | awk 'NR==1 { brnam=$2 ; gsub(/:$/,"",brnam) ; print brnam }')
-            if [[ -z ${bridge} ]]; then
-                bridge=brdef
-                echo "[NOTICE] Creating the brdef bridge"
-                ip link add brdef type bridge
+            set -e
+            bridge=brtmp
+            if ! ip link show ${bridge} &>/dev/null ; then
+                echo "[NOTICE] Creating the bridge ${bridge}"
+                ip link add ${bridge} type bridge
             fi
             for iname in $(/usr/libexec/nethserver/nic-info | cut -f 1 -d ,); do
                 echo "[NOTICE] Adding interface ${iname} to ${bridge}"
