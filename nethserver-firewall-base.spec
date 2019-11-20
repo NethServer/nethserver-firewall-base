@@ -14,6 +14,7 @@ Requires: shorewall >= 4.6
 Requires: ipset
 Requires: rp-pppoe
 Requires: firehol
+Requires: dialog
 
 Obsoletes: nethserver-shorewall
 Provides: nethserver-firewall
