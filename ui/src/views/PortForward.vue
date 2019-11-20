@@ -137,7 +137,7 @@
                   </div>
                   <div class="col-sm-2">
                     <button
-                      @click="p.status == 'disabled' ? enablePF(p, host) : openEditPF(p, host, false)"
+                      @click="p.status == 'disabled' ? toggleEnablePF(p, host) : openEditPF(p, host, false)"
                       :class="['btn btn-default', p.status == 'disabled' ? 'btn-primary' : '']"
                     >
                       <span
@@ -158,11 +158,11 @@
                       </button>
                       <ul class="dropdown-menu dropdown-menu-right">
                         <li>
-                          <a @click="enablePF(p, host)">
+                          <a @click="p.status == 'enabled' ? toggleEnablePF(p, host) : openEditPF(p, host, false)">
                             <span
-                              :class="['fa', p.status == 'enabled' ? 'fa-lock' : 'fa-check', 'span-right-margin']"
+                              :class="['fa', p.status == 'enabled' ? 'fa-lock' : 'fa-edit', 'span-right-margin']"
                             ></span>
-                            {{p.status == 'enabled' ? $t('disable') : $t('enable')}}
+                            {{p.status == 'enabled' ? $t('disable') : $t('edit')}}
                           </a>
                         </li>
                         <li>
@@ -504,7 +504,7 @@ export default {
       },
       pfList: null,
       snList: [],
-      wans: ["any", "192.168.5.59", "93.57.48.70"],
+      wans: ["any"],
       hosts: [],
       protocols: [],
       services: [],
@@ -570,7 +570,7 @@ export default {
         this.newPf.Proto != "tcpudp"
       ) {
         this.newPf.Dst = null;
-        this.newPf.Src = null;
+        this.newPf.Src = "";
         this.newPf.SrcType = null;
       }
     },
@@ -608,7 +608,7 @@ export default {
       this.newPf.DstHostIp = item.IpAddress;
 
       this.newPf.DstHostFull = Object.assign({}, item);
-      this.newPf.DstHostFull.name = this.newPf.DstHostFull.name.toLowerCase();
+      this.newPf.DstHostFull.name = this.newPf.DstHostFull.typeId == 'role' ? this.newPf.DstHostFull.name.toLowerCase() : this.newPf.DstHostFull.name;
       this.newPf.DstHostFull.type = "host";
     },
     filterSrcAuto(query) {
@@ -665,12 +665,12 @@ export default {
       return {
         name: null,
         Description: "",
-        Src: null,
+        Src: "",
         SrcDisabled: false,
         SrcType: "",
         DstHost: "",
         DstHostIp: "",
-        Dst: null,
+        Dst: "",
         DstDisabled: false,
         Proto: "tcpudp",
         OriDst: "any",
@@ -732,7 +732,7 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/objects/read"],
         {
-          action: "wan"
+          action: "wans"
         },
         null,
         function(success) {
@@ -825,7 +825,7 @@ export default {
           try {
             success = JSON.parse(success);
             context.view.isLoaded = true;
-            context.pfList = success.portforward;
+            context.pfList = Object.keys(success.portforward).length == 0 ? null : success.portforward;
           } catch (e) {
             console.error(e);
             context.view.isLoaded = true;
@@ -943,6 +943,9 @@ export default {
         : this.newPf.DstHost;
 
       this.newPf.name = duplicate ? "" : this.newPf.name;
+
+      this.handleProto();
+
       this.$forceUpdate();
       $("#createPFModal").modal("show");
     },
@@ -971,8 +974,6 @@ export default {
         Log: context.newPf.Log ? "info" : "none",
         status: context.newPf.isEdit
           ? context.newPf.status
-            ? "enabled"
-            : "disabled"
           : "enabled"
       };
 
@@ -1036,19 +1037,27 @@ export default {
         }
       );
     },
-    enablePF(p, host) {
+    toggleEnablePF(p, host) {
       var context = this;
 
       var pfObj = {
         action: "update",
         name: p.name,
-        Src: p.Src,
-        DstHost: host,
-        Dst: p.Dst,
+        Src: p.Src
+          ? p.Src.split(",").map(function(item) {
+              return item.trim();
+          })
+          : [],
+        DstHost: p.DstHostFull
+          ? { name: p.DstHost, type: "host" }
+          : { name: p.DstHost, type: "raw" },
+        Dst: p.Dst ? p.Dst : "",
         Proto: p.Proto,
         Description: p.Description,
         OriDst: p.OriDst == "any" ? "" : p.OriDst,
-        Allow: p.Allow,
+        Allow: p.Allow.length == 0
+          ? []
+          : p.Allow.split("\n"),
         Log: p.Log ? "info" : "none",
         status: p.status == "enabled" ? "disabled" : "enabled"
       };

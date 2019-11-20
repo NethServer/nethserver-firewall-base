@@ -53,7 +53,7 @@ if($cmd eq 'providers') {
     my $cdb = esmith::ConfigDB->open_ro();
 
     foreach ($ndb->get_all_by_prop('type' => 'provider')) {
-        $ret->{'status'}{$_->key} =  read_provider_status($_->key);
+        $ret->{'status'}{$_->key} = read_provider_status($_->prop('interface'));
     }
 
     my @interfaces;
@@ -73,7 +73,7 @@ if($cmd eq 'providers') {
     }
     $ret->{'configuration'}{'interfaces'} = \@interfaces;
     my @tmp = split(",",$cdb->get_prop('firewall','CheckIP'));
-    $ret->{'configuration'}{'multiwan'}{'CheckIP'} = \@tmp; 
+    $ret->{'configuration'}{'multiwan'}{'CheckIP'} = \@tmp;
     foreach (qw(MaxNumberPacketLoss MaxPercentPacketLoss NotifyWan PingInterval WanMode)) {
         $ret->{'configuration'}{'multiwan'}{$_} = $cdb->get_prop('firewall',$_);
     }

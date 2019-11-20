@@ -662,13 +662,15 @@ sub listZones($)
 
 =head2 isNdpiEnabled
 
-Return 1 if the current xt_ndpi module is loaded, 0 otherwise
+Return 1 if the current xt_ndpi module is loaded
+and ndpi kernel module has not failed the update.
+Return 0 otherwise.
 
 =cut
 
 sub isNdpiEnabled
 {
-    return ( -d '/proc/net/xt_ndpi/');
+    return ( -d '/proc/net/xt_ndpi/') && ( ! -f '/var/run/ndpi-lock');
 }
 
 

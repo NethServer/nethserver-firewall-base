@@ -36,6 +36,16 @@ case $action in
         /sbin/e-smith/db networks setprop "$(_get name)"  FwOutBandwidth "$(_get FwOutBandwidth)" FwInBandwidth  "$(_get FwInBandwidth)" nslabel  "$(_get nslabel)"
         ;;
 
+    "provider-enable")
+        save_db networks
+        /usr/sbin/shorewall enable "$(_get name)"
+        ;;
+
+    "provider-disable")
+        save_db networks
+        /usr/sbin/shorewall disable "$(_get name)"
+        ;;
+
     "wan")
         notifywanfrom=$(/sbin/e-smith/db configuration getprop root SenderAddress)
         notifyto=$(/sbin/e-smith/db configuration getprop root EmailAddress)
@@ -43,6 +53,15 @@ case $action in
         /sbin/e-smith/db configuration setprop firewall WanMode "$(_get WanMode)" NotifyWan "$(_get NotifyWan)" \
             MaxNumberPacketLoss "$(_get MaxNumberPacketLoss)" MaxPercentPacketLoss "$(_get MaxPercentPacketLoss)" PingInterval "$(_get PingInterval)" \
             CheckIP "$(_get_array CheckIP)" NotifyWanTo "$notifyto" NotifyWanFrom "$notifywanfrom"
+        ;;
+
+    "reorder")
+        save_db fwrules
+        echo $data | /usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-reorder
+        ;;
+
+    *)
+        error
         ;;
 esac
 

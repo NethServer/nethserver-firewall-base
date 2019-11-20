@@ -16,7 +16,11 @@
       >
         <span class="pficon pficon-warning-triangle-o"></span>
         <strong>{{$t('warning')}}!</strong>
-        {{$t('charts_not_updated')}}.
+        {{$t('traffic_shaping.charts_not_updated')}}.
+        <a
+          href="#/wan"
+          class="btn btn-primary"
+        >{{$t('traffic_shaping.set')}}</a>
       </div>
       <div
         v-show="interfaces.length > 0 && view.isChartLoaded && tc.length > 0 && !view.invalidChartsData"
@@ -137,7 +141,7 @@
                     <div class="list-view-pf-additional-info">
                       <div class="list-view-pf-additional-info-item multi-line adjust-line">
                         <span>{{$t('download')}}</span>
-                        <br>
+                        <br />
                         <span>{{$t('upload')}}</span>
                       </div>
                       <div
@@ -155,7 +159,7 @@
                           v-if="t.MinInputRate.length > 0"
                         >{{t.MinInputRate}} {{$t('traffic_shaping.'+t.Unit)}}</strong>
                         <span v-if="t.MinInputRate.length > 0">{{$t('traffic_shaping.min')}}</span>
-                        <br>
+                        <br />
                         <span
                           v-if="t.MinOutputRate.length > 0"
                           data-toggle="tooltip"
@@ -183,7 +187,7 @@
                           v-if="t.MaxInputRate.length > 0"
                         >{{t.MaxInputRate}} {{$t('traffic_shaping.'+t.Unit)}}</strong>
                         <span v-if="t.MaxInputRate.length > 0">{{$t('traffic_shaping.max')}}</span>
-                        <br>
+                        <br />
                         <span
                           v-if="t.MaxOutputRate.length > 0"
                           data-toggle="tooltip"
@@ -254,7 +258,7 @@
         </div>
         <div class="list-view-pf-actions">
           <button
-            @click="r.status == 'disabled' ? enableRule(r) : openEditRule(r, false)"
+            @click="r.status == 'disabled' ? toggleEnableRule(r) : openEditRule(r, false)"
             :class="['btn btn-default', r.status == 'disabled' ? 'btn-primary' : '']"
           >
             <span
@@ -275,11 +279,11 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownKebabRight9">
               <li>
-                <a @click="enableRule(r)">
+                <a @click="r.status == 'enabled' ? toggleEnableRule(r) : openEditRule(r, false)">
                   <span
-                    :class="['fa', r.status == 'enabled' ? 'fa-lock' : 'fa-check', 'span-right-margin']"
+                    :class="['fa', r.status == 'enabled' ? 'fa-lock' : 'fa-edit', 'span-right-margin']"
                   ></span>
-                  {{r.status == 'enabled' ? $t('disable') : $t('enable')}}
+                  {{r.status == 'enabled' ? $t('disable') : $t('edit')}}
                 </a>
               </li>
               <li @click="openEditRule(r, true)">
@@ -377,7 +381,9 @@
                 :title="mapTitleService(r)"
                 class="list-view-pf-additional-info-item"
               >
-                <span class="fa fa-cogs"></span>
+                <span
+                  :class="['fa', r.Service && r.Service.type == 'application' ? r.Service.icon : 'fa-cogs']"
+                ></span>
                 <strong>{{r.Service && r.Service.name}}</strong>
               </div>
               <div
@@ -420,7 +426,7 @@
                     type="text"
                     v-model="newTc.name"
                     class="form-control"
-                  >
+                  />
                   <span v-if="newTc.errors.name.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTc.errors.name.message)}}
@@ -433,7 +439,7 @@
                   for="textInput-modal-markup"
                 >{{$t('traffic_shaping.class_description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newTc.Description" class="form-control">
+                  <input type="text" v-model="newTc.Description" class="form-control" />
                   <span v-if="newTc.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTc.errors.Description.message)}}
@@ -448,19 +454,19 @@
                     class="col-sm-2 col-xs-2"
                     type="radio"
                     v-model="newTc.Unit"
-                    value="kbps"
-                  >
+                    value="kbit"
+                  />
                   <label
                     class="col-sm-10 col-xs-10 control-label text-align-left"
                     for="Bandwidth-Unit-1"
-                  >{{$t('traffic_shaping.kbps')}}</label>
+                  >{{$t('traffic_shaping.kbit')}}</label>
                   <input
                     id="Bandwidth-Unit-2"
                     class="col-sm-2 col-xs-2"
                     type="radio"
                     v-model="newTc.Unit"
                     value="%"
-                  >
+                  />
                   <label
                     class="col-sm-10 col-xs-10 control-label text-align-left"
                     for="Bandwidth-Unit-2"
@@ -476,7 +482,7 @@
                 >{{$t('traffic_shaping.down_bandwidth_limit')}}</label>
                 <div class="col-sm-4">
                   <label>{{$t('traffic_shaping.min')}} ({{$t('traffic_shaping.'+newTc.Unit)}})</label>
-                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MinInputRate">
+                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MinInputRate" />
                   <span v-if="newTc.errors.MinInputRate.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTc.errors.MinInputRate.message)}}
@@ -484,7 +490,7 @@
                 </div>
                 <div class="col-sm-4">
                   <label>{{$t('traffic_shaping.max')}} ({{$t('traffic_shaping.'+newTc.Unit)}})</label>
-                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MaxInputRate">
+                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MaxInputRate" />
                   <span v-if="newTc.errors.MaxInputRate.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTc.errors.MaxInputRate.message)}}
@@ -500,7 +506,7 @@
                 >{{$t('traffic_shaping.up_bandwidth_limit')}}</label>
                 <div class="col-sm-4">
                   <label>{{$t('traffic_shaping.min')}} ({{$t('traffic_shaping.'+newTc.Unit)}})</label>
-                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MinOutputRate">
+                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MinOutputRate" />
                   <span v-if="newTc.errors.MinOutputRate.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTc.errors.MinOutputRate.message)}}
@@ -508,7 +514,7 @@
                 </div>
                 <div class="col-sm-4">
                   <label>{{$t('traffic_shaping.max')}} ({{$t('traffic_shaping.'+newTc.Unit)}})</label>
-                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MaxOutputRate">
+                  <input class="col-sm-3 form-control" type="number" v-model="newTc.MaxOutputRate" />
                   <span v-if="newTc.errors.MaxOutputRate.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newTc.errors.MaxOutputRate.message)}}
@@ -555,7 +561,7 @@
               <div v-if="newTc.advanced" class="form-group">
                 <label class="col-sm-3 control-label" for="textInput-modal-markup"></label>
                 <div class="col-sm-9">
-                  <ul class="list-inline compact">
+                  <ul v-if="newTc.ifaceToBind != 'all'" class="list-inline compact">
                     <li v-for="(i, ki) in newTc.BindTo" v-bind:key="ki">
                       <span class="label label-info">
                         {{i}}
@@ -563,6 +569,11 @@
                           <span class="fa fa-times"></span>
                         </a>
                       </span>
+                    </li>
+                  </ul>
+                  <ul v-if="newTc.ifaceToBind == 'all'" class="list-inline compact">
+                    <li v-for="(i, ki) in interfaces" v-bind:key="ki">
+                      <span class="label label-default">{{i.name}}</span>
                     </li>
                   </ul>
                 </div>
@@ -737,11 +748,15 @@
                   >
                     <div slot="item" slot-scope="props" class="single-item">
                       <span>
+                        <span
+                          v-show="props.item.typeId == 'application'"
+                          :class="['fa', props.item.icon]"
+                        ></span>
                         {{props.item.name}}
                         <span
                           v-show="props.item.Ports"
                           class="gray"
-                        >({{props.item.Ports.join(', ')}})</span>
+                        >({{props.item.Ports && props.item.Ports.join(', ')}})</span>
                         <i class="mg-left-5">{{props.item.Description}}</i>
                       </span>
                     </div>
@@ -773,7 +788,7 @@
               >
                 <label class="col-sm-3 control-label">{{$t('rules.description')}}</label>
                 <div class="col-sm-9">
-                  <input class="form-control" type="text" v-model="newRule.Description">
+                  <input class="form-control" type="text" v-model="newRule.Description" />
                   <span v-if="newRule.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newRule.errors.Description.message)}}
@@ -787,7 +802,7 @@
               >
                 <label class="col-sm-3 control-label">{{$t('rules.log')}}</label>
                 <div class="col-sm-9">
-                  <input class="form-control" type="checkbox" v-model="newRule.Log">
+                  <input class="form-control" type="checkbox" v-model="newRule.Log" />
                   <span v-if="newRule.errors.Log.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newRule.errors.Log.message)}}
@@ -875,7 +890,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.name')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newObject.name" class="form-control">
+                  <input required type="text" v-model="newObject.name" class="form-control" />
                   <span
                     v-if="newObject.errors.name.hasError"
                     class="help-block"
@@ -891,7 +906,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.ip_address')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newObject.IpAddress" class="form-control">
+                  <input required type="text" v-model="newObject.IpAddress" class="form-control" />
                   <span
                     v-if="newObject.errors.IpAddress.hasError"
                     class="help-block"
@@ -907,7 +922,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.network')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newObject.Address" class="form-control">
+                  <input required type="text" v-model="newObject.Address" class="form-control" />
                   <span
                     v-if="newObject.errors.Address.hasError"
                     class="help-block"
@@ -922,7 +937,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newObject.Description" class="form-control">
+                  <input type="text" v-model="newObject.Description" class="form-control" />
                   <span
                     v-if="newObject.errors.Description.hasError"
                     class="help-block"
@@ -974,6 +989,7 @@ export default {
       zones: [],
       timeConditions: [],
       services: [],
+      applications: [],
       roles: [],
       autoOptions: {
         inputClass: "form-control"
@@ -995,6 +1011,7 @@ export default {
     this.getZones();
     this.getTimeConditions();
     this.getServices();
+    this.getApplications();
     this.getRoles();
     this.initCharts();
 
@@ -1484,6 +1501,9 @@ export default {
         )
       );
 
+      // firewall object
+      objects.push({ name: "FW", Description: "Firewall", typeId: "fw" });
+
       return objects.filter(function(service) {
         return (
           service.typeId.toLowerCase().includes(query.toLowerCase()) ||
@@ -1498,19 +1518,26 @@ export default {
       this.newRule.Src = item.name;
 
       this.newRule.SrcFull = Object.assign({}, item);
-      this.newRule.SrcFull.name = this.newRule.SrcFull.name.toLowerCase();
+      this.newRule.SrcFull.name =
+        this.newRule.SrcFull.typeId == "role"
+          ? this.newRule.SrcFull.name.toLowerCase()
+          : this.newRule.SrcFull.name;
       this.newRule.SrcFull.type = this.newRule.SrcFull.typeId;
       delete this.newRule.SrcFull.typeId;
 
-      this.newRule.SrcType =
-        item.name +
-        " " +
-        (item.IpAddress ? item.IpAddress + " " : "") +
-        (item.Address ? item.Address + " " : "") +
-        (item.Start && item.End ? item.Start + " - " + item.End + " " : "") +
-        "(" +
-        item.type +
-        ")";
+      if (item.typeId === "fw") {
+        this.newRule.SrcType = "Firewall";
+      } else {
+        this.newRule.SrcType =
+          item.name +
+          " " +
+          (item.IpAddress ? item.IpAddress + " " : "") +
+          (item.Address ? item.Address + " " : "") +
+          (item.Start && item.End ? item.Start + " - " + item.End + " " : "") +
+          "(" +
+          item.type +
+          ")";
+      }
     },
     filterDstAuto(query) {
       this.newRule.Dst = null;
@@ -1545,7 +1572,10 @@ export default {
       this.newRule.Dst = item.name;
 
       this.newRule.DstFull = Object.assign({}, item);
-      this.newRule.DstFull.name = this.newRule.DstFull.name.toLowerCase();
+      this.newRule.DstFull.name =
+        this.newRule.DstFull.typeId == "role"
+          ? this.newRule.DstFull.name.toLowerCase()
+          : this.newRule.DstFull.name;
       this.newRule.DstFull.type = this.newRule.DstFull.typeId;
       delete this.newRule.DstFull.typeId;
 
@@ -1568,7 +1598,7 @@ export default {
         return null;
       }
 
-      var objects = this.services;
+      var objects = this.services.concat(this.applications);
 
       return objects.filter(function(service) {
         return (
@@ -1578,7 +1608,8 @@ export default {
               .toLowerCase()
               .includes(query.toLowerCase())) ||
           service.name.toLowerCase().includes(query.toLowerCase()) ||
-          service.Description.toLowerCase().includes(query.toLowerCase())
+          (service.Description &&
+            service.Description.toLowerCase().includes(query.toLowerCase()))
         );
       });
     },
@@ -1589,7 +1620,8 @@ export default {
       this.newRule.ServiceFull.type = this.newRule.ServiceFull.typeId;
       delete this.newRule.ServiceFull.typeId;
 
-      this.newRule.ServiceType = item.name + " (" + item.Ports.join(", ") + ")";
+      this.newRule.ServiceType =
+        item.name + (item.Ports ? " (" + item.Ports.join(", ") + ")" : "");
     },
     filterTimeAuto(query) {
       this.newRule.Time = null;
@@ -1807,6 +1839,33 @@ export default {
         }
       );
     },
+    getApplications() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "applications"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.applications = success["applications"];
+          context.applications = context.applications.map(function(i) {
+            i.type = context.$i18n.t("objects.application");
+            i.typeId = "application";
+            return i;
+          });
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
     getRoles() {
       var context = this;
 
@@ -2001,6 +2060,7 @@ export default {
               context.view.isChartLoaded = true;
             }
           }
+          context.view.isChartLoaded = true;
         },
         function(error) {
           console.error(error);
@@ -2073,7 +2133,7 @@ export default {
       return this.newTc.BindTo.indexOf(bind) > -1;
     },
     addIfaceToBind(bindTo) {
-      if (bindTo.length > 0 && bindTo != "-") {
+      if (bindTo.length > 0 && bindTo != "-" && bindTo != "all") {
         if (!this.groupAlreadyAdded(bindTo)) {
           this.newTc.BindTo.push(bindTo);
         }
@@ -2238,14 +2298,14 @@ export default {
 
           // notification
           nethserver.notifications.success = context.$i18n.t(
-            "traffic_shaping.tc_" + context.newTc.isEdit
-              ? "updated"
-              : "created" + "_ok"
+            "traffic_shaping.tc_" +
+              (context.newTc.isEdit ? "updated" : "created") +
+              "_ok"
           );
           nethserver.notifications.error = context.$i18n.t(
-            "traffic_shaping.tc_" + context.newTc.isEdit
-              ? "updated"
-              : "created" + "_error"
+            "traffic_shaping.tc_" +
+              (context.newTc.isEdit ? "updated" : "created") +
+              "_error"
           );
 
           // update values
@@ -2421,7 +2481,7 @@ export default {
 
       $("#createRuleModal").modal("show");
     },
-    enableRule(r) {
+    toggleEnableRule(r) {
       var context = this;
 
       var ruleObj = {
@@ -2430,7 +2490,12 @@ export default {
         Time: r.Time ? r.Time : null,
         Position: r.Position,
         status: r.status == "enabled" ? "disabled" : "enabled",
-        Service: r.Service ? r.Service : null,
+        Service: r.Service
+          ? r.Service
+          : {
+              name: "any",
+              type: "fwservice"
+            },
         Action: r.Action ? r.Action : null,
         Dst: r.Dst ? r.Dst : null,
         id: r.id,
@@ -2477,7 +2542,10 @@ export default {
         status: context.newRule.isEdit ? context.newRule.status : "enabled",
         Service: context.newRule.ServiceFull
           ? context.newRule.ServiceFull
-          : null,
+          : {
+              name: "any",
+              type: "fwservice"
+            },
         Action: context.newRule.Action ? context.newRule.Action : null,
         Dst: context.newRule.DstFull
           ? context.newRule.DstFull

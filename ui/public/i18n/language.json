@@ -117,7 +117,11 @@
         "chilli": "Hotspot",
         "clamd@squidclamav": "Web antivirus",
         "squid": "Web proxy",
-        "suricata": "IPS"
+        "suricata": "IPS",
+        "ndpi": "nDPI",
+        "details_for": "Details for",
+        "name": "Name",
+        "counter": "Counter"
     },
     "wan": {
         "title": "WAN",
@@ -152,7 +156,8 @@
         "outbound_zero": "Upload bandwidth is not set",
         "in_out_bound_zero": "Upload or Download bandwidth is not set",
         "fireqos_temporary_disabled": "Traffic shaping is temporarily disabled during the speed test.",
-        "speedtest_error": "Speedtest failed: please check Internet connection."
+        "speedtest_error": "Speedtest failed: please check Internet connection.",
+        "click_to_open": "Click to expand details"
     },
     "traffic_shaping": {
         "title": "Traffic Shaping",
@@ -165,7 +170,7 @@
         "class_name": "Class name",
         "class_description": "Description",
         "bandwidth_unit": "Bandwidth unit",
-        "kbps": "kbps",
+        "kbit": "kbit",
         "bandwidth": "Bandwidth",
         "%": "%",
         "down_bandwidth_limit": "Download bandwidth limits",
@@ -187,7 +192,9 @@
         "tc_deleted_error": "Traffic shaping class not deleted.",
         "configuration": "Configuration",
         "classes": "Classes",
-        "all_wans": "All WANs"
+        "all_wans": "All WANs",
+        "charts_not_updated": "Charts cannot be updated. Set WAN bandwidth limits",
+        "set": "Set limits"
     },
     "snat": {
         "title": "SNAT",
@@ -309,7 +316,9 @@
         "fw": "Firewall",
         "ports_comma": "Insert (comma-separated) port(s)",
         "application": "Application",
-        "raw": "RAW value, no object found"
+        "raw": "RAW value, no object found",
+        "local": "DNS",
+        "remote": "DHCP"
     },
     "port_forward": {
         "title": "Port Forward",
@@ -441,7 +450,7 @@
         "external_ping": "Ping from Internet",
         "mac": "MAC validation (IP/MAC binding)",
         "allowed": "Allowed",
-        "allow_mac": "Allow hosts without IP/MAC binding (DHCP reservation)",
+        "block_mac": "Block hosts not listed in DHCP reservations",
         "settings_updated_ok": "Settings updated successfully!",
         "settings_updated_error": "Settings not updated.",
         "portforward": "Port forward",
@@ -449,9 +458,9 @@
     },
     "logs": {
         "title": "Logs",
-        "follow": "Follow",
-        "stop_follow": "Stop following",
-        "process_terminated": "Process terminated"
+        "start_follow_button": "Follow",
+        "stop_follow_button": "Stop following",
+        "filter_label": "Regexp filter"
     },
     "about": {
         "title": "About",
@@ -505,11 +514,22 @@
         "host_group_exists": "A host group with the same name already exists",
         "not_exists_host-group": "The host group does not exist",
         "host_group_cannot_be_delete": "This host group  can't be deleted because it is in use",
-        "valid_lessThan_256": "Must be less than 256"
+        "valid_lessThan_256": "Must be less than 256",
+        "valid_ipV4Address": "Invalid address",
+        "valid_username": "First character must be a letter, than only lower letters, numbers and symbols like '-' and '_'",
+        "valid_notEmpty": "Must be non-empty",
+        "valid_cidrBlock": "Must be a valid CIDR network",
+        "valid_time": "The time must be in the form HH:mm",
+        "port_number_or_port_range": "Must be a valid port number or port range (using dash)",
+        "protocol_doesnt_support_ports": "This protocol does not support ports",
+        "valid_lessThan_65536": "Must be less than 65536"
     },
     "docs": {
         "pf_origin_port": "Insert a single port, a list of comma-separated ports, or a port range using \":\" as separator like \"100:200\".",
         "rules_source": "You may insert an IP address or a CIDR if you do not want to create a host or CIDR object.",
-        "rules_destination": "You may insert an IP address or a CIDR if you do not want to create a host or CIDR object."
+        "rules_destination": "You may insert an IP address or a CIDR if you do not want to create a host or CIDR object.",
+        "objects_ports": "Supported syntax: comma-separated port list or port range (i.e. 10000-20000)",
+        "mac_validation": "Requests from IP addresses listed in DHCP reservations are allowed only if are originated from the associated MAC address (even if DHCP is disabled).",
+        "mac_validation_policy": "Requests from IP addresses not listed in DHCP reservations are blocked. Ensure admin hosts are listed in DHCP reservations."
     }
 }

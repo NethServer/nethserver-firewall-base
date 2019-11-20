@@ -63,7 +63,7 @@
               v-for="(s,k) in protocols[searchProto]"
               v-bind:key="k"
               :value="s"
-            >{{s ? s : "-" | uppercase}}</option>
+            >{{s ? s : $t("all") | uppercase}}</option>
           </select>
         </div>
       </div>
@@ -128,6 +128,7 @@
           :lineNumbers="false"
           :sort-options="{ enabled: false }"
           :globalSearch="true"
+          :globalSearchFn="searchFn"
           :paginate="true"
           styleClass="table condensed"
           :nextText="tableLangsTexts.nextText"
@@ -348,6 +349,11 @@ export default {
     }
   },
   methods: {
+    searchFn(row, col, cellValue, searchTerm) {
+      return JSON.stringify(row)
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+    },
     toggleCharts() {
       this.view.chartsShowed = !this.view.chartsShowed;
       if (this.view.chartsShowed) {
@@ -403,8 +409,6 @@ export default {
             );
             context.charts["chart-connections"].initialData = success.data;
 
-            context.view.isChartLoaded = true;
-
             // start polling
             if (context.pollingIntervalIdChart == 0) {
               context.pollingIntervalIdChart = setInterval(function() {
@@ -415,6 +419,8 @@ export default {
             context.view.invalidChartsData = true;
             context.$forceUpdate();
           }
+
+          context.view.isChartLoaded = true;
         },
         function(error) {
           console.error(error);

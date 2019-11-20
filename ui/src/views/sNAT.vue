@@ -48,7 +48,7 @@
               <div class="list-view-pf-additional-info-item">
                 <span class="pficon pficon-screen panel-icon"></span>
                 <select class="combobox form-control" v-model="s.FwObjectNat">
-                  <option>-</option>
+                  <option value="-">{{$t('disabled')}}</option>
                   <option
                     v-for="(h,k) in hosts"
                     v-bind:key="k"

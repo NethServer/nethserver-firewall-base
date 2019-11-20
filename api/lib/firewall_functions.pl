@@ -35,7 +35,7 @@ sub read_provider_status
         open my $fh, '<', $file;
         my $content = do { local $/; <$fh> };
         chomp $content;
-        if ($content == "0") {
+        if ($content eq "0") {
             return 1;
         } else {
             return 0;
@@ -62,7 +62,9 @@ sub read_addresses
 sub read_netdata
 {
     my $api = shift;
-    return `curl 'http://localhost:19999/$api' 2>/dev/null`;
+    my $output = `curl 'http://localhost:19999/$api' 2>/dev/null`;
+    $output =~ s/null/0/g;
+    return $output;
 }
 
 sub get_zone_name
@@ -377,9 +379,9 @@ sub list_applications
         while (my $row = <$fh>) {
             next if ($row =~ /^#/);
             chomp $row;
-            my ($id, $mark, $name, $other) = split(/\s+/, $row, 4);
+            my ($id, $mark, $name, $hashtag, $counter) = split(/\s+/, $row, 6);
             my $icon = defined($icons->{lc($name)}) ? $icons->{lc($name)} : "fa-circle";
-            push(@applications, {"name" => $name, "id" => $id, "icon" => $icon});
+            push(@applications, {"name" => $name, "id" => $id, "icon" => $icon, "counter" => int($counter)});
         }
     }
 

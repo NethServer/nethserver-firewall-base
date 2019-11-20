@@ -108,4 +108,9 @@ while( my $line = <$fh>)  {
 }
 close $fh;
 
+# Ndpi
+my $applications = list_applications();
+$ret->{'applications'} = $applications;
+$ret->{'services'}{'ndpi'} = scalar(@$applications) > 0 ? 1 : 0;
+
 print encode_json($ret);

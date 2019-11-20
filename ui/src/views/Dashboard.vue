@@ -71,13 +71,16 @@
         class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2"
       >
         <span
-          :class="['card-pf-utilization-card-details-count stats-count', s ? 'pficon pficon-ok' : 'pficon-error-circle-o']"
+          :class="['card-pf-utilization-card-details-count stats-count', s ? 'pficon pficon-ok' : 'pficon-off']"
           data-toggle="tooltip"
           data-placement="top"
           :title="$t('dashboard.status')+': '+ (s ? $t('enabled') : $t('disabled'))"
         ></span>
         <span class="card-pf-utilization-card-details-description stats-description">
-          <span class="card-pf-utilization-card-details-line-2 stats-text">{{$t('dashboard.'+i)}}</span>
+          <span class="card-pf-utilization-card-details-line-2 stats-text">
+            {{$t('dashboard.'+i)}}
+            <a v-if="i == 'ndpi' && applications.length > 0" @click="showDetails(i)">{{$t('details')}}</a>
+          </span>
         </span>
       </div>
       <div class="stats-container" v-if="!services">{{$t('dashboard.no_info_found')}}</div>
@@ -98,6 +101,49 @@
         </span>
       </div>
       <div class="stats-container" v-if="!connections">{{$t('dashboard.no_info_found')}}</div>
+    </div>
+
+    <div class="modal" id="detailsServiceModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4
+              class="modal-title"
+            >{{$t('dashboard.details_for')}} {{$t('dashboard.'+currentService.name)}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="undefined">
+            <div class="modal-body">
+              <vue-good-table
+                :customRowsPerPageDropdown="[5,10,25,50,100]"
+                :perPage="5"
+                :columns="detailsColumns"
+                :rows="currentService.detailsRows"
+                :lineNumbers="false"
+                :defaultSortBy="{field: 'counter', type: 'desc'}"
+                :globalSearch="true"
+                :paginate="true"
+                styleClass="table"
+                :nextText="tableLangsTexts.nextText"
+                :prevText="tableLangsTexts.prevText"
+                :rowsPerPageText="tableLangsTexts.rowsPerPageText"
+                :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
+                :ofText="tableLangsTexts.ofText"
+              >
+                <template slot="table-row" slot-scope="props">
+                  <td class="fancy">
+                    <span :class="['fa', props.row.icon, 'mg-right-10']"></span>
+                    <b>{{props.row.name | uppercase}}</b>
+                  </td>
+                  <td class="fancy">{{props.row.counter}}</td>
+                </template>
+              </vue-good-table>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -120,12 +166,16 @@ export default {
     return {
       view: {
         graphLoaded: false,
-        statsLoaded: false
+        statsLoaded: false,
+        details: false
       },
       stats: false,
       services: false,
       providers: false,
       connections: false,
+      currentService: {
+        detailsRows: []
+      },
       nodes: [
         {
           id: 0,
@@ -421,7 +471,21 @@ export default {
         interaction: {
           zoomView: false
         }
-      }
+      },
+      detailsColumns: [
+        {
+          label: this.$i18n.t("dashboard.name"),
+          field: "name",
+          filterable: true
+        },
+        {
+          label: this.$i18n.t("dashboard.counter"),
+          field: "counter",
+          filterable: true,
+          type: "number"
+        }
+      ],
+      tableLangsTexts: this.tableLangs()
     };
   },
   methods: {
@@ -572,6 +636,8 @@ export default {
               ? success.connections
               : false;
 
+          context.applications = success.applications;
+
           context.view.statsLoaded = true;
 
           setTimeout(function() {
@@ -585,6 +651,13 @@ export default {
           context.view.statsLoaded = true;
         }
       );
+    },
+    showDetails(service) {
+      this.currentService.name = service;
+      this.currentService.detailsRows = this.applications;
+      this.$forceUpdate();
+
+      $("#detailsServiceModal").modal("show");
     }
   }
 };

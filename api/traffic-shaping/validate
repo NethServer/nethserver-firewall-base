@@ -51,7 +51,7 @@ if ($action == "create-class" || $action == "update-class") {
     $v->declareParameter('MaxOutputRate', $rateValidator);
     $v->declareParameter('MinInputRate', $rateValidator);
     $v->declareParameter('MinOutputRate', $rateValidator);
-    $v->declareParameter('Unit', $v->createValidator()->memberOf(array('%','kbps')));
+    $v->declareParameter('Unit', $v->createValidator()->memberOf(array('%','kbit')));
     if ($data['BindTo']) {
         $ndb = new EsmithDatabase('networks');
         foreach ($data['BindTo'] as $i) {

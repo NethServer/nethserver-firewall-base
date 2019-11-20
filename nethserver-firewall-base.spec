@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.6.0
+Version: 3.7.4
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -14,6 +14,7 @@ Requires: shorewall >= 4.6
 Requires: ipset
 Requires: rp-pppoe
 Requires: firehol
+Requires: conntrack-tools
 Requires: dialog
 
 Obsoletes: nethserver-shorewall
@@ -37,6 +38,7 @@ NethServer simple firewall
 %build
 %{makedocs}
 perl createlinks
+sed -i 's/_RELEASE_/%{version}/' %{name}.json
 mkdir -p root%{perl_vendorlib}
 mv -v NethServer root%{perl_vendorlib}
 
@@ -56,9 +58,9 @@ tar xvf %{SOURCE1} -C %{buildroot}/usr/share/cockpit/%{name}/
 cp -a %{name}.json %{buildroot}/usr/share/cockpit/nethserver/applications/
 cp -a api/* %{buildroot}/usr/libexec/nethserver/api/%{name}/
 
-%{genfilelist} %{buildroot} > %{name}-%{version}-%{release}-filelist
+%{genfilelist} %{buildroot} --file /etc/sudoers.d/50_nsapi_nethserver_firewall_base 'attr(0440,root,root)' > %{name}-%{version}-%{release}-filelist
 grep -e php$ -e rst$ -e html$ -e cockpit %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-ui
-grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-core
+grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{release}-filelist > %{name}-%{version}-%{release}-filelist-core
 
 %files -f %{name}-%{version}-%{release}-filelist-core
 %defattr(-,root,root)
@@ -70,6 +72,54 @@ grep -v /usr/share/nethesis/NethServer %{name}-%{version}-%{release}-filelist > 
 
 
 %changelog
+* Fri Nov 15 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.7.4-1
+- Wrong units passed to fireQoS - Bug Nethserver/dev#5897
+- Cockpit: network services not selectable in firewall rules - Bug Nethserver/dev#5894
+- Cockpit: DNS hosts can be changed from firewall application - Bug Nethserver/dev#5911
+
+* Mon Oct 28 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.7.3-1
+- Cockpit: add missing validation labels - Bug Nethserver/dev#5884
+- Logs page in Cockpit - Bug NethServer/dev#5866
+- Cockpit firewall dashboard: service status color - Nethserver/dev#5889
+- Cockpit: can't use custom services into local rules - Bug Nethserver/dev#5870
+- Shorewall stopped after ndpi update - Bug NethServer/dev#5890
+
+* Mon Oct 14 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.7.2-1
+- Firewall object in traffic shaping rules - NethServer/dev#5864
+
+* Thu Oct 10 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.7.1-1
+- Cockpit: improve English labels - NethServer/dev#5856
+
+* Tue Oct 01 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.7.0-1
+- Firewall: can't create priority rules for L7 applications - Bug NethServer/dev#5846
+- Sudoers based authorizations for Cockpit UI - NethServer/dev#5805
+
+* Tue Sep 03 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.6.6-1
+- WAN policy routes on Cockpit: can't reorder rules - Bug NethServer/dev#5823
+- Cockpit. List correct application version - Nethserver/dev#5819
+- Apply port forward for non-TPC/UDP protocols
+
+* Mon Aug 26 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.6.5-1
+- Cockpit: updating QoS class breaks its shaping - Bug NethServer/dev#5807
+- Cockpit. fix various bugs - Bug Nethserver/dev#5810
+
+* Tue Jul 23 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.6.4-1
+- Cockpit: permit port range in service creation
+- Cockpit: added port search in connections list
+- Cockpit: various UI fixes
+
+* Wed Jun 19 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.6.3-1
+- Cockpit UI: display weight on WAN list page
+
+* Fri Jun 14 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.6.2-1
+- Multiple cosmetic Cockpit UI improvements
+
+* Thu May 16 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.6.1-1
+- Fix read for host objects
+- Ui routing improvements
+- Fix delegation configuration
+- Exclude Cockpit UI from base package
+
 * Tue Apr 09 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.6.0-1
 - Cockpit: basic firewall configuration - NethServer/dev#5695
 

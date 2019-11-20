@@ -31,8 +31,9 @@ case $action in
     "update-class")
         bindto=$(echo $data | jq -rc '.BindTo | map(tostring) | join(",")')
         save_db tc
+        mark=$(/sbin/e-smith/db tc getprop $(_get name) Mark)
         /sbin/e-smith/db tc set "$(_get name)" class MinOutputRate "$(_get MinOutputRate)" MaxOutputRate "$(_get MaxOutputRate)" MaxInputRate "$(_get MaxInputRate)" MinInputRate "$(_get MinInputRate)" \
-            Description "$(_get Description)" Unit "$(_get Unit)" BindTo "$bindto"
+            Description "$(_get Description)" Unit "$(_get Unit)" BindTo "$bindto" Mark "$mark"
         ;;
 
     "reorder")
