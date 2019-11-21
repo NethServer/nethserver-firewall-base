@@ -15,6 +15,7 @@ Requires: ipset
 Requires: rp-pppoe
 Requires: firehol
 Requires: conntrack-tools
+Requires: dialog
 
 Obsoletes: nethserver-shorewall
 Provides: nethserver-firewall

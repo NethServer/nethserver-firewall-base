@@ -1,0 +1,132 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+if ! [[ -t 1 && -t 0 ]]; then
+    echo "[ERROR] Cannot run network-recovery tool without a tty" 1>&2
+    exit 1
+fi
+
+product_name=$(config getprop sysconfig ProductName)
+product_version=$(config getprop sysconfig Version)
+
+xdialog_response=""
+dialog_name="main_menu"
+log_file=/var/log/network-recovery.log
+
+
+trap "" SIGINT
+
+xdialog () {
+    exec 3>&1
+    xdialog_response=$(dialog --backtitle "${product_name} ${product_version} -- Network Recovery Tool" "${@}" 2>&1 1>&3)
+    exit_code=$?
+    exec 3>&-
+    return $exit_code
+}
+
+while [[ -n ${dialog_name} ]]; do
+
+    if [[ ${dialog_name} == "main_menu" ]]; then
+
+        xdialog \
+            --ok-label "Assign IP" \
+            --cancel-label "Cancel" \
+            --inputbox "Enter the temporary IP address" 8 40 "${cidr}"
+
+        if [[ $? == 0 ]]; then
+            dialog_name="apply_static"
+            read cidr <<<"${xdialog_response}"
+
+            ipcalc_validation=$(ipcalc -4 -c -p "${cidr}" 2>&1)
+            if [[ $? != 0 ]] ; then
+                validation_error=(
+                    "Enter an IP address, like 192.168.1.12.\\n"
+                    "It is possible to specify the network\\n"
+                    "mask prefix in CIDR notation.\\n"
+                    "For example: 192.168.1.12/24\\n"
+                    "\\n"
+                    "Detailed error:\\n${ipcalc_validation}"
+                )
+                validation_error=$(IFS="" ; echo "${validation_error[*]}")
+
+                xdialog --title "IP address validation error" \
+                    --ok-label "Back" \
+                    --msgbox "${validation_error}" 0 0
+                dialog_name="main_menu"
+                continue
+            fi
+
+        else
+            echo "[WARNING] User canceled." > ${log_file}
+            dialog_name="" # quit
+        fi
+
+    elif [[ ${dialog_name} == "apply_static" ]]; then
+
+        quitmessage=(
+            "Access the Server manager at the following URLs\\n"
+            "and fix the network configuration:\\n"
+            "\\n"
+            "https://${cidr/\/*/}:980\\n"
+            "https://${cidr/\/*/}:9090\\n"
+        )
+        quitmessage=$(IFS="" ; echo "${quitmessage[*]}")
+
+        (
+            exec 2>&1
+            systemctl stop network
+            shorewall clear
+            ip address flush scope global
+            ip link set dev lo up
+            set -e
+            bridge=brtmp
+            if ! ip link show ${bridge} &>/dev/null ; then
+                echo "[NOTICE] Creating the bridge ${bridge}"
+                ip link add ${bridge} type bridge
+            fi
+            for iname in $(/usr/libexec/nethserver/nic-info | cut -f 1 -d ,); do
+                echo "[NOTICE] Adding interface ${iname} to ${bridge}"
+                ip link set "${iname}" up master "${bridge}"
+            done
+            ipaddr="${cidr/\/*/}"
+            prefix="${cidr/*\//}"
+            if [[ ${prefix} == ${ipaddr} || -z "${prefix}" ]]; then
+                prefix=$(ipcalc -4 -m ${ipaddr})
+                prefix="${prefix##NETMASK=}"
+            fi
+            echo "[NOTICE] Assign IP ${ipaddr}/${prefix} to ${bridge}"
+            ip address add "${ipaddr}/${prefix}" dev "${bridge}"
+            ip link set ${bridge} up
+            echo "[NOTICE] Done."
+        ) | \
+            tee ${log_file} | \
+            xdialog --begin 2 2 --progressbox "Applying config. See ${log_file} for details..." 20 72 \
+                --and-widget --begin 15 24 --keep-window --title "Temporary network configuration applied" \
+                --ok-label "Quit" --msgbox "${quitmessage}" 0 0
+
+        dialog_name="" # quit
+    fi
+
+done
+
+clear
+cat ${log_file}
