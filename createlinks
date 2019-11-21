@@ -44,6 +44,8 @@ my @templates = qw(
     /etc/shorewall/tcpri
     /etc/shorewall/nat
     /etc/shorewall/helpers
+    /etc/shorewall/initdone
+    /etc/shorewall/blrules
     /etc/lsm/lsm.conf
     /etc/firehol/fireqos.conf
 );
