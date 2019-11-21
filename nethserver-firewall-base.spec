@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.7.4
+Version: 3.8.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Thu Nov 21 2019 Davide Principi <davide.principi@nethesis.it> - 3.8.0-1
+- Network recovery console tool - NethServer/dev#5874
+
 * Fri Nov 15 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.7.4-1
 - Wrong units passed to fireQoS - Bug Nethserver/dev#5897
 - Cockpit: network services not selectable in firewall rules - Bug Nethserver/dev#5894
