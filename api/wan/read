@@ -80,7 +80,7 @@ if($cmd eq 'providers') {
     $ret->{'configuration'}{'multiwan'}{'EmailAddress'} = $cdb->get_prop('root', 'EmailAddress');
     if ($ret->{'configuration'}{'multiwan'}{'WanMode'} eq 'backup'){
 		my $externalip = `dig +short myip.opendns.com \@resolver1.opendns.com`;
-		$ret->{'configuration'}{'multiwan'}{'CurrentIp'} = substr($externalip, 0, length($externalip)-2);
+		$ret->{'configuration'}{'multiwan'}{'CurrentIp'} = substr($externalip, 0, length($externalip)-1);
 	}
     
     print encode_json($ret);
