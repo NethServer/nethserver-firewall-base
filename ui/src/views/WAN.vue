@@ -59,6 +59,7 @@
           >{{$t('configure')}}</button>
           <span class="panel-title">
             <span>{{$t('wan.mode')}}: {{wan.WanMode == 'balance' ? $t('wan.balance') : $t('wan.backup')}}</span>
+            <span v-if="wan.WanMode == 'backup'" class="mg-left-10"><small style="font-weight: 400">{{$t('wan.current_ip')}}: {{wan.CurrentIp}}</small></span>
           </span>
           <a
             class="mg-left-10"
