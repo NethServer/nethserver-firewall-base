@@ -157,8 +157,7 @@
         "in_out_bound_zero": "Upload or Download bandwidth is not set",
         "fireqos_temporary_disabled": "Traffic shaping is temporarily disabled during the speed test.",
         "speedtest_error": "Speedtest failed: please check Internet connection.",
-        "click_to_open": "Click to expand details",
-        "current_ip": "Current IP"
+        "click_to_open": "Click to expand details"
     },
     "traffic_shaping": {
         "title": "Traffic Shaping",
