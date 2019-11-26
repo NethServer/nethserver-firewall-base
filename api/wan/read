@@ -78,7 +78,12 @@ if($cmd eq 'providers') {
         $ret->{'configuration'}{'multiwan'}{$_} = $cdb->get_prop('firewall',$_);
     }
     $ret->{'configuration'}{'multiwan'}{'EmailAddress'} = $cdb->get_prop('root', 'EmailAddress');
-
+	if ($ret->{'configuration'}{'multiwan'}{'WanMode'} eq 'backup') {
+		my $externalip = `dig +short myip.opendns.com \@resolver1.opendns.com`;
+		chomp $externalip;
+		$ret->{'configuration'}{'multiwan'}{'CurrentIp'} = $externalip;
+	}
+	
     print encode_json($ret);
 } elsif ($cmd eq 'speedtest') {
 
