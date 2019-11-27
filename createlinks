@@ -46,6 +46,7 @@ my @templates = qw(
     /etc/shorewall/helpers
     /etc/shorewall/initdone
     /etc/shorewall/blrules
+    /etc/shorewall/stopped
     /etc/lsm/lsm.conf
     /etc/firehol/fireqos.conf
 );
