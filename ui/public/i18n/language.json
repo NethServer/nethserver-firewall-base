@@ -404,7 +404,9 @@
         "tc_add_rules_info": "Order is important: evaluation of rules will continue after a match. Priority is assigned by last match.",
         "wan_add_rules_info": "Order is important: evaluation of rules will continue after a match. Route is assigned by last match.",
         "type_to_search": "Type to search objects, roles...",
-        "two_providers_needed": "Policy routes can be created only if there are two or more configured red interfaces."
+        "two_providers_needed": "Policy routes can be created only if there are two or more configured red interfaces.",
+        "show_network_services": "Show network services",
+        "network_services": "Network services"
     },
     "protocols": {
         "ah": "AH",

@@ -21,7 +21,24 @@
 
     <div class="pf-container" v-if="rules.length > 0 && view.isLoaded">
       <h3>{{$t('rules.list')}}</h3>
-      <form v-if="rules.length > 0" role="form" class="search-pf has-button search">
+      <form class="mg-top-20">
+        <div class="form-group">
+          <label
+            class="col-sm-3 control-label show-network-services"
+            for="show-all-services"
+          >{{$t('rules.show_network_services')}}</label>
+          <div class="col-sm-1 mg-bottom-10">
+            <input
+              id="show-all-services"
+              type="checkbox"
+              :checked="showNetworkServices"
+              class="form-control mg-top-minus-2"
+              @click="toggleShowNetworkServices()"
+            />
+          </div>
+        </div>
+      </form>
+      <form v-if="rules.length > 0" role="form" class="search-pf has-button search clear">
         <div class="form-group has-clear">
           <div class="search-pf-input-group">
             <label class="sr-only">Search</label>
@@ -33,7 +50,7 @@
               :placeholder="$t('search')+'...'"
               @keyup="highlight"
               id="pf-search-list"
-            >
+            />
           </div>
         </div>
       </form>
@@ -199,6 +216,82 @@
           </div>
         </li>
       </ul>
+
+      <!-- network services -->
+      <div v-show="showNetworkServices && networkServices.length > 0">
+        <h3>{{$t('rules.network_services')}}</h3>
+        <ul class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10">
+          <li
+            class="green-list list-group-item"
+            v-for="(service, k) in networkServices"
+            v-bind:key="k"
+          >
+            <div class="list-view-pf-actions">
+              <button @click="openEditAccess(service)" class="btn btn-default">
+                <span class="fa fa-edit span-right-margin"></span>
+                {{$t('edit')}}
+              </button>
+            </div>
+            <div class="list-view-pf-main-info small-list">
+              <div class="list-view-pf-left">
+                <span
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  data-html="true"
+                  title="<b>ACCEPT</b>"
+                  class="fa fa-check green border-green list-view-pf-icon-sm"
+                ></span>
+              </div>
+              <div class="list-view-pf-body">
+                <div class="list-view-pf-description rules-src-dst">
+                  <div class="list-group-item-heading zone-network-service">
+                    <span
+                      v-for="(zone, k) in service.ports.access.split(',')"
+                      class="handle-overflow mg-right-10"
+                      v-bind:key="k"
+                    >
+                      <span v-if="zone">
+                        <span :class="mapZoneIcon(zone)"></span>
+                        <span :class="[zone, 'mg-left-5']">{{ zone.toUpperCase() }}</span>
+                      </span>
+                      <span v-else>
+                        <!-- empty access: localhost -->
+                        <span class="square-BLACK"></span>
+                        <span class="mg-left-5">LOCALHOST</span>
+                      </span>
+                    </span>
+                  </div>
+                  <div class="list-group-item-text fw-network-service">
+                    <span class="gray fa fa-arrow-right mg-right-10 big-icon]"></span>
+                    <span 
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    data-html="true"
+                    title="<b>FW</b><br><span class='type-info'><b>Firewall</b></span>"
+                    class="handle-overflow">
+                      <span class="fa fa-fire"></span>
+                      <span class="fw mg-left-5">FW</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="list-view-pf-additional-info rules-info">
+                  <div
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    data-html="true"
+                    :title="mapTitleNetworkService(service)"
+                    class="list-view-pf-additional-info-item"
+                  >
+                    <span class="fa fa-cogs"></span>
+                    <strong>{{ service.name }}</strong>
+                  </div>
+                  <div class="list-view-pf-additional-info-item"></div>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
 
     <div class="modal" id="createRuleModal" tabindex="-1" role="dialog" data-backdrop="static">
@@ -219,7 +312,7 @@
                   type="radio"
                   v-model="newRule.fwTarget"
                   value="to-fw"
-                >
+                />
                 <label
                   class="col-sm-6 control-label text-align-left"
                   for="to-fw-radio"
@@ -232,7 +325,7 @@
                   type="radio"
                   v-model="newRule.fwTarget"
                   value="from-fw"
-                >
+                />
                 <label
                   class="col-sm-6 control-label text-align-left"
                   for="from-fw-radio"
@@ -396,7 +489,7 @@
               >
                 <label class="col-sm-3 control-label">{{$t('rules.description')}}</label>
                 <div class="col-sm-9">
-                  <input class="form-control" type="text" v-model="newRule.Description">
+                  <input class="form-control" type="text" v-model="newRule.Description" />
                   <span v-if="newRule.errors.Description.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newRule.errors.Description.message)}}
@@ -410,7 +503,7 @@
               >
                 <label class="col-sm-3 control-label">{{$t('rules.log')}}</label>
                 <div class="col-sm-9">
-                  <input class="form-control" type="checkbox" v-model="newRule.Log">
+                  <input class="form-control" type="checkbox" v-model="newRule.Log" />
                   <span v-if="newRule.errors.Log.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+newRule.errors.Log.message)}}
@@ -499,7 +592,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.name')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newObject.name" class="form-control">
+                  <input required type="text" v-model="newObject.name" class="form-control" />
                   <span
                     v-if="newObject.errors.name.hasError"
                     class="help-block"
@@ -515,7 +608,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.ip_address')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newObject.IpAddress" class="form-control">
+                  <input required type="text" v-model="newObject.IpAddress" class="form-control" />
                   <span
                     v-if="newObject.errors.IpAddress.hasError"
                     class="help-block"
@@ -531,7 +624,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.network')}}</label>
                 <div class="col-sm-9">
-                  <input required type="text" v-model="newObject.Address" class="form-control">
+                  <input required type="text" v-model="newObject.Address" class="form-control" />
                   <span
                     v-if="newObject.errors.Address.hasError"
                     class="help-block"
@@ -546,7 +639,7 @@
                   for="textInput-modal-markup"
                 >{{$t('objects.description')}}</label>
                 <div class="col-sm-9">
-                  <input type="text" v-model="newObject.Description" class="form-control">
+                  <input type="text" v-model="newObject.Description" class="form-control" />
                   <span
                     v-if="newObject.errors.Description.hasError"
                     class="help-block"
@@ -583,6 +676,7 @@ export default {
     this.getServices();
     this.getLocalServices();
     this.getRoles();
+    this.getNetworkServices();
 
     var context = this;
     context.$parent.$on("changes-applied", function() {
@@ -596,6 +690,7 @@ export default {
       context.getServices();
       context.getLocalServices();
       context.getRoles();
+      context.getNetworkServices();
     });
   },
   beforeRouteLeave(to, from, next) {
@@ -626,7 +721,9 @@ export default {
       highlightInstance: null,
       expandInfo: true,
       status: {},
-      newObject: this.initObject()
+      newObject: this.initObject(),
+      showNetworkServices: true, //// TODO set to false
+      networkServices: []
     };
   },
   computed: {
@@ -866,6 +963,34 @@ export default {
         this.$i18n.t("objects." + rule.Dst.type) +
         "</b></span>";
 
+      return html;
+    },
+    mapTitleNetworkService(service) {
+      var html = "<b>" + service.name + "</b><br>";
+
+      if (service.ports.TCP.length > 0) {
+        html +=
+          '<div><span class="fa fa-arrows-h mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>TCP</span></div>";
+
+        html +=
+          '<div><span class="pficon pficon-template mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          service.ports.TCP.join(", ") +
+          "</span></div>";
+      }
+
+      if (service.ports.UDP.length > 0) {
+        html +=
+          '<div><span class="fa fa-arrows-h mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>UDP</span></div>";
+
+        html +=
+          '<div><span class="pficon pficon-template mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          service.ports.UDP.join(", ") +
+          "</span></div>";
+      }
       return html;
     },
     mapTitleService(rule) {
@@ -1153,7 +1278,10 @@ export default {
       this.newRule.Src = item.name;
 
       this.newRule.SrcFull = Object.assign({}, item);
-      this.newRule.SrcFull.name = this.newRule.SrcFull.typeId == 'role' ? this.newRule.SrcFull.name.toLowerCase() : this.newRule.SrcFull.name;
+      this.newRule.SrcFull.name =
+        this.newRule.SrcFull.typeId == "role"
+          ? this.newRule.SrcFull.name.toLowerCase()
+          : this.newRule.SrcFull.name;
       this.newRule.SrcFull.type = this.newRule.SrcFull.typeId;
       delete this.newRule.SrcFull.typeId;
 
@@ -1198,7 +1326,10 @@ export default {
       this.newRule.Dst = item.name;
 
       this.newRule.DstFull = Object.assign({}, item);
-      this.newRule.DstFull.name = this.newRule.DstFull.typeId == 'role' ? this.newRule.DstFull.name.toLowerCase() : this.newRule.DstFull.name;
+      this.newRule.DstFull.name =
+        this.newRule.DstFull.typeId == "role"
+          ? this.newRule.DstFull.name.toLowerCase()
+          : this.newRule.DstFull.name;
       this.newRule.DstFull.type = this.newRule.DstFull.typeId;
       delete this.newRule.DstFull.typeId;
 
@@ -1620,10 +1751,12 @@ export default {
         Time: r.Time ? r.Time : null,
         Position: r.Position,
         status: r.status == "enabled" ? "disabled" : "enabled",
-        Service: r.Service ? r.Service : {
-          "name": "any",
-          "type": "fwservice"
-        },
+        Service: r.Service
+          ? r.Service
+          : {
+              name: "any",
+              type: "fwservice"
+            },
         Action: r.Action ? r.Action : null,
         Dst: r.Dst ? r.Dst : null,
         id: r.id,
@@ -1671,8 +1804,8 @@ export default {
         Service: context.newRule.ServiceFull
           ? context.newRule.ServiceFull
           : {
-              "name": "any",
-              "type": "fwservice"
+              name: "any",
+              type: "fwservice"
             },
         Action: context.newRule.Action ? context.newRule.Action : null,
         Dst: context.newRule.DstFull
@@ -1863,6 +1996,54 @@ export default {
             console.error(e);
           }
           context.$forceUpdate();
+        }
+      );
+    },
+
+    toggleShowNetworkServices() {
+      this.showNetworkServices = !this.showNetworkServices;
+      // this.filterServices(); //// fix
+    },
+
+    getNetworkServices() {
+      var context = this;
+      nethserver.exec(
+        ["system-services/read"],
+        {
+          action: "list"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          for (var c in success.configuration) {
+            var config = success.configuration[c];
+            for (var s in success.status) {
+              var status = success.status[s];
+              if (status.name == config.name) {
+                config.running = status.running;
+              }
+            }
+          }
+          context.networkServices = success.configuration.filter(function(
+            service
+          ) {
+            return (
+              service.ports.access ||
+              service.ports.TCP.length > 0 ||
+              service.ports.UDP.length > 0
+            );
+          });
+
+          setTimeout(function() {
+            $('[data-toggle="tooltip"]').tooltip();
+          }, 750);
+        },
+        function(error) {
+          console.error(error);
         }
       );
     }
@@ -2095,5 +2276,44 @@ export default {
 .expand-text {
   margin-right: 5px;
   vertical-align: top;
+}
+
+.mg-top-minus-2 {
+  margin-top: -2px !important;
+}
+
+.clear {
+  clear: both;
+}
+
+.show-network-services {
+  padding-left: 0;
+  width: auto;
+}
+
+.mg-bottom-10 {
+  margin-bottom: 10px;
+}
+
+.mg-top-20 {
+  margin-top: 20px;
+}
+
+.zone-network-service {
+  width: calc(60% - 20px) !important;
+}
+
+.fw-network-service {
+  width: calc(40% - 20px) !important;
+}
+
+.square-BLACK {
+  background: black;
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  margin-bottom: -2px;
+  border-radius: 3px;
+  margin-right: 3px;
 }
 </style>
