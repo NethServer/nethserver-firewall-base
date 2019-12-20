@@ -227,7 +227,7 @@
             v-bind:key="k"
           >
             <div class="list-view-pf-actions">
-              <button @click="openEditAccess(service)" class="btn btn-default">
+              <button @click="openEditService(service)" class="btn btn-default">
                 <span class="fa fa-edit span-right-margin"></span>
                 {{$t('edit')}}
               </button>
@@ -252,7 +252,9 @@
                     >
                       <span v-if="zone">
                         <span :class="mapZoneIcon(zone)"></span>
-                        <span :class="[zone, 'mg-left-5']">{{ zone.toUpperCase() }}</span>
+                        <span
+                          :class="[defaultZones.includes(zone) ? zone : 'other', 'mg-left-5']"
+                        >{{ zone.toUpperCase() }}</span>
                       </span>
                       <span v-else>
                         <!-- empty access: localhost -->
@@ -263,12 +265,13 @@
                   </div>
                   <div class="list-group-item-text fw-network-service">
                     <span class="gray fa fa-arrow-right mg-right-10 big-icon]"></span>
-                    <span 
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    data-html="true"
-                    title="<b>FW</b><br><span class='type-info'><b>Firewall</b></span>"
-                    class="handle-overflow">
+                    <span
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      data-html="true"
+                      title="<b>FW</b><br><span class='type-info'><b>Firewall</b></span>"
+                      class="handle-overflow"
+                    >
                       <span class="fa fa-fire"></span>
                       <span class="fw mg-left-5">FW</span>
                     </span>
@@ -657,6 +660,117 @@
         </div>
       </div>
     </div>
+
+    <!-- edit service modal -->
+    <div class="modal" id="edit-service-modal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              <span>{{$t('rules.edit_service')}}</span>
+            </h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="editService()">
+            <div class="modal-body">
+              <!-- name -->
+              <div class="form-group">
+                <label class="col-sm-3 control-label">{{$t('rules.name')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="currentService.name" class="form-control" disabled />
+                </div>
+              </div>
+              <!-- tcp ports -->
+              <div
+                :class="['form-group', currentService.errorProps['tcpPorts'] || currentService.errorProps['no_tcp_udp_ports'] ? 'has-error' : '']"
+              >
+                <label class="col-sm-3 control-label">
+                  {{$t('rules.tcpPorts')}}
+                  <doc-info :placement="'top'" :chapter="'list_of_ports'" :inline="true"></doc-info>
+                </label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    v-model="currentService.tcpPorts"
+                    class="form-control"
+                    :disabled="!currentService.custom"
+                  />
+                  <span
+                    v-if="currentService.errorProps['tcpPorts']"
+                    class="help-block"
+                  >{{$t('validation.' + currentService.errorProps['tcpPorts'])}}</span>
+                </div>
+              </div>
+              <!-- udp ports -->
+              <div
+                :class="['form-group', currentService.errorProps['udpPorts'] || currentService.errorProps['no_tcp_udp_ports'] ? 'has-error' : '']"
+              >
+                <label class="col-sm-3 control-label">
+                  {{$t('rules.udpPorts')}}
+                  <doc-info :placement="'top'" :chapter="'list_of_ports'" :inline="true"></doc-info>
+                </label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    v-model="currentService.udpPorts"
+                    class="form-control"
+                    :disabled="!currentService.custom"
+                  />
+                  <span
+                    v-if="currentService.errorProps['udpPorts']"
+                    class="help-block"
+                  >{{$t('validation.' + currentService.errorProps['udpPorts'])}}</span>
+                </div>
+              </div>
+              <!-- access -->
+              <div :class="['form-group', currentService.errorProps['access'] ? 'has-error' : '']">
+                <label class="col-sm-3 control-label">{{$t('rules.access')}}</label>
+                <div class="col-sm-9">
+                  <select
+                    @change="addZoneToCurrentService(currentService.selectedZone)"
+                    v-model="currentService.selectedZone"
+                    class="combobox form-control"
+                  >
+                    <option v-for="(zone, i) in accessZones" v-bind:key="i">{{ zone }}</option>
+                  </select>
+                  <span
+                    v-if="currentService.errorProps['access']"
+                    class="help-block"
+                  >{{$t('validation.' + currentService.errorProps['access'])}}</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label"></label>
+                <div class="col-sm-9">
+                  <ul class="list-inline compact">
+                    <li v-for="(zone, i) in currentService.access" v-bind:key="i">
+                      <span
+                        :class="['label', 'label-info', defaultZones.includes(zone) ? 'bg-' + zone : 'bg-missing']"
+                      >
+                        {{ zone }}
+                        <a
+                          @click="removeZoneFromcurrentService(i)"
+                          class="remove-item-inline"
+                        >
+                          <span class="fa fa-times"></span>
+                        </a>
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer submit">
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button
+                class="btn btn-primary"
+                type="submit"
+              >{{ currentService.isEdit ? $t('edit') : $t('add') }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -677,6 +791,7 @@ export default {
     this.getLocalServices();
     this.getRoles();
     this.getNetworkServices();
+    this.getAccessZones();
 
     var context = this;
     context.$parent.$on("changes-applied", function() {
@@ -691,6 +806,7 @@ export default {
       context.getLocalServices();
       context.getRoles();
       context.getNetworkServices();
+      context.getAccessZones();
     });
   },
   beforeRouteLeave(to, from, next) {
@@ -722,8 +838,11 @@ export default {
       expandInfo: true,
       status: {},
       newObject: this.initObject(),
-      showNetworkServices: true, //// TODO set to false
-      networkServices: []
+      showNetworkServices: false,
+      networkServices: [],
+      defaultZones: ["green", "red", "blue", "orange"],
+      currentService: this.initService(),
+      accessZones: []
     };
   },
   computed: {
@@ -2002,7 +2121,6 @@ export default {
 
     toggleShowNetworkServices() {
       this.showNetworkServices = !this.showNetworkServices;
-      // this.filterServices(); //// fix
     },
 
     getNetworkServices() {
@@ -2039,13 +2157,180 @@ export default {
           });
 
           setTimeout(function() {
-            $('[data-toggle="tooltip"]').tooltip();
+            $('[data-toggle="tooltip"]').tooltip("fixTitle");
           }, 750);
         },
         function(error) {
           console.error(error);
         }
       );
+    },
+
+    openEditService(service) {
+      this.currentService = this.mapService(service);
+      this.currentService.isEdit = true;
+      $("#edit-service-modal").modal("show");
+    },
+
+    initService() {
+      return {
+        name: "",
+        access: [],
+        tcpPorts: "",
+        udpPorts: "",
+        custom: 1,
+        selectedZone: null,
+        errorProps: [],
+        isEdit: false
+      };
+    },
+
+    mapService(service) {
+      return {
+        name: service.name,
+        access:
+          service.ports.access === "" ? [] : service.ports.access.split(","),
+        tcpPorts: service.ports.TCP.join(", "),
+        udpPorts: service.ports.UDP.join(", "),
+        custom: service.custom,
+        selectedZone: null,
+        errorProps: [],
+        isEdit: false
+      };
+    },
+
+    editService() {
+      var context = this;
+      var tcpPorts = [];
+      var udpPorts = [];
+      context.currentService.errorProps = [];
+
+      if (context.currentService.tcpPorts) {
+        // remove spaces and convert to array
+        tcpPorts = context.currentService.tcpPorts
+          .replace(/\s/g, "")
+          .split(",");
+      }
+
+      if (context.currentService.udpPorts) {
+        // remove spaces and convert to array
+        udpPorts = context.currentService.udpPorts
+          .replace(/\s/g, "")
+          .split(",");
+      }
+
+      var editServiceObj = {
+        action: "edit",
+        serviceName: context.currentService.name.trim(),
+        access: context.currentService.access,
+        tcpPorts: tcpPorts,
+        udpPorts: udpPorts,
+        custom: context.currentService.custom
+      };
+
+      nethserver.exec(
+        ["system-services/validate"],
+        editServiceObj,
+        null,
+        function(success) {
+          $("#edit-service-modal").modal("hide");
+
+          nethserver.notifications.success = context.$i18n.t(
+            "rules.service_edited_successfully"
+          );
+          nethserver.notifications.error = context.$i18n.t(
+            "rules.service_edited_error"
+          );
+
+          nethserver.exec(
+            ["system-services/update"],
+            editServiceObj,
+            function(stream) {
+              console.info("serviceEdit", stream);
+            },
+            function(success) {
+              context.currentService = context.initService();
+              context.getNetworkServices();
+            },
+            function(error, data) {
+              console.error(error);
+            }
+          );
+        },
+        function(error, data) {
+          var errorData = {};
+
+          try {
+            errorData = JSON.parse(data);
+            for (var e in errorData.attributes) {
+              var attr = errorData.attributes[e];
+              context.currentService.errorProps[attr.parameter] = attr.error;
+            }
+            context.$forceUpdate();
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      );
+    },
+
+    zoneAlreadyAdded(zone) {
+      return this.currentService.access.indexOf(zone) > -1;
+    },
+
+    addZoneToCurrentService(zone) {
+      if (zone.length > 0 && zone != "-") {
+        if (!this.zoneAlreadyAdded(zone)) {
+          this.currentService.access.push(zone);
+        }
+      }
+    },
+
+    getAccessZones() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/rules/read"],
+        {
+          action: "roles"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          var roles = success.roles;
+
+          nethserver.exec(
+            ["nethserver-firewall-base/objects/read"],
+            {
+              action: "zones"
+            },
+            null,
+            function(success) {
+              try {
+                success = JSON.parse(success);
+              } catch (e) {
+                console.error(e);
+              }
+              var zones = success.zones.map(zone => zone.name);
+              context.accessZones = roles.concat(zones);
+            },
+            function(error) {
+              console.error(error);
+            }
+          );
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+
+    removeZoneFromcurrentService(index) {
+      this.currentService.access.splice(index, 1);
     }
   }
 };
@@ -2169,6 +2454,30 @@ export default {
   color: black;
 }
 
+.bg-green {
+  background-color: #3f9c35;
+}
+
+.bg-red {
+  background-color: #cc0000;
+}
+
+.bg-orange {
+  background-color: #ec7a08;
+}
+
+.bg-blue {
+  background-color: #0088ce;
+}
+
+.bg-black {
+  background-color: black;
+}
+
+.bg-missing {
+  background-color: #703fec;
+}
+
 .red-list {
   border-left: 3px solid #cc0000 !important;
 }
@@ -2268,11 +2577,13 @@ export default {
 }
 
 .rules-src-dst {
-  width: 70% !important;
+  width: calc(70% - 20px) !important;
 }
+
 .rules-info {
-  width: 30% !important;
+  width: calc(30% - 20px) !important;
 }
+
 .expand-text {
   margin-right: 5px;
   vertical-align: top;
@@ -2315,5 +2626,9 @@ export default {
   margin-bottom: -2px;
   border-radius: 3px;
   margin-right: 3px;
+}
+
+.remove-item-inline {
+  color: white !important;
 }
 </style>
