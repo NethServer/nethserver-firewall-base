@@ -23,10 +23,14 @@
       <h3>{{$t('rules.list')}}</h3>
       <form class="mg-top-20">
         <div class="form-group">
-          <label
-            class="col-sm-3 control-label show-network-services"
-            for="show-all-services"
-          >{{$t('rules.show_network_services')}}</label>
+          <label class="col-sm-3 control-label show-network-services" for="show-all-services">
+            {{$t('rules.show_network_services')}}
+            <doc-info
+              :placement="'top'"
+              :chapter="'network_services_system_services'"
+              :inline="true"
+            ></doc-info>
+          </label>
           <div class="col-sm-1 mg-bottom-10">
             <input
               id="show-all-services"
@@ -218,9 +222,14 @@
       </ul>
 
       <!-- network services -->
-      <div v-show="showNetworkServices && networkServices.length > 0">
+      <div v-show="showNetworkServices">
         <h3>{{$t('rules.network_services')}}</h3>
-        <ul class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10">
+        <div v-show="!networkServicesLoaded" class="spinner spinner-lg view-spinner"></div>
+
+        <ul
+          v-show="networkServicesLoaded && networkServices.length > 0"
+          class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10"
+        >
           <li
             class="green-list list-group-item"
             v-for="(service, k) in networkServices"
@@ -258,8 +267,8 @@
                       </span>
                       <span v-else>
                         <!-- empty access: localhost -->
-                        <span class="square-BLACK"></span>
-                        <span class="mg-left-5">LOCALHOST</span>
+                        <span class="square-GRAY"></span>
+                        <span class="gray mg-left-5">LOCALHOST</span>
                       </span>
                     </span>
                   </div>
@@ -287,6 +296,7 @@
                   >
                     <span class="fa fa-cogs"></span>
                     <strong>{{ service.name }}</strong>
+                    <span v-if="service.custom" class="gray">(custom)</span>
                   </div>
                   <div class="list-view-pf-additional-info-item"></div>
                 </div>
@@ -838,11 +848,14 @@ export default {
       expandInfo: true,
       status: {},
       newObject: this.initObject(),
-      showNetworkServices: false,
+      showNetworkServices:
+        localStorage.getItem("showNetworkServicesInLocalRules") === "true" ||
+        false,
       networkServices: [],
       defaultZones: ["green", "red", "blue", "orange"],
       currentService: this.initService(),
-      accessZones: []
+      accessZones: [],
+      networkServicesLoaded: false
     };
   },
   computed: {
@@ -2121,10 +2134,16 @@ export default {
 
     toggleShowNetworkServices() {
       this.showNetworkServices = !this.showNetworkServices;
+      localStorage.setItem(
+        "showNetworkServicesInLocalRules",
+        this.showNetworkServices
+      );
     },
 
     getNetworkServices() {
       var context = this;
+      context.networkServicesLoaded = false;
+
       nethserver.exec(
         ["system-services/read"],
         {
@@ -2136,6 +2155,7 @@ export default {
             success = JSON.parse(success);
           } catch (e) {
             console.error(e);
+            context.networkServicesLoaded = true;
           }
           for (var c in success.configuration) {
             var config = success.configuration[c];
@@ -2155,6 +2175,7 @@ export default {
               service.ports.UDP.length > 0
             );
           });
+          context.networkServicesLoaded = true;
 
           setTimeout(function() {
             $('[data-toggle="tooltip"]').tooltip("fixTitle");
@@ -2162,6 +2183,7 @@ export default {
         },
         function(error) {
           console.error(error);
+          context.networkServicesLoaded = true;
         }
       );
     },
@@ -2618,8 +2640,8 @@ export default {
   width: calc(40% - 20px) !important;
 }
 
-.square-BLACK {
-  background: black;
+.square-GRAY {
+  background: #72767b;
   width: 15px;
   height: 15px;
   display: inline-block;
