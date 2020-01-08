@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.8.1
+Version: 3.8.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,10 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Wed Jan 08 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.2-1
+- Cockpit firewall: show network services rules - NethServer/dev#6007
+- Cockpit: custom network services - NethServer/dev#6006
+
 * Mon Dec 02 2019 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.1-1
 - Fail2ban: Upgrade to fail2ban-0.10 - NethServer/dev#5943
 - Cockpit: show IP address on active backup configuration - NethServer/dev#5956
