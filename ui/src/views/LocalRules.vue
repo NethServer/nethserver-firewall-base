@@ -1,7 +1,24 @@
 <template>
   <div>
-    <h2>{{$t('rules.title_local')}}</h2>
+    <form v-if="view.isLoaded" class="mg-top-20">
+      <div class="form-group">
+        <label class="col-sm-3 control-label show-network-services" for="show-all-services">
+          {{$t('rules.show_network_services')}}
+          <doc-info :placement="'top'" :chapter="'network_services_system_services'" :inline="true"></doc-info>
+        </label>
+        <div class="col-sm-1 mg-bottom-10">
+          <input
+            id="show-all-services"
+            type="checkbox"
+            :checked="showNetworkServices"
+            class="form-control mg-top-minus-2"
+            @click="toggleShowNetworkServices()"
+          />
+        </div>
+      </div>
+    </form>
 
+    <h2 class="clear">{{$t('rules.title_local')}}</h2>
     <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
     <div v-if="rules.length == 0 && view.isLoaded" class="blank-slate-pf white">
       <div class="blank-slate-pf-icon">
@@ -21,27 +38,6 @@
 
     <div class="pf-container" v-if="rules.length > 0 && view.isLoaded">
       <h3>{{$t('rules.list')}}</h3>
-      <form class="mg-top-20">
-        <div class="form-group">
-          <label class="col-sm-3 control-label show-network-services" for="show-all-services">
-            {{$t('rules.show_network_services')}}
-            <doc-info
-              :placement="'top'"
-              :chapter="'network_services_system_services'"
-              :inline="true"
-            ></doc-info>
-          </label>
-          <div class="col-sm-1 mg-bottom-10">
-            <input
-              id="show-all-services"
-              type="checkbox"
-              :checked="showNetworkServices"
-              class="form-control mg-top-minus-2"
-              @click="toggleShowNetworkServices()"
-            />
-          </div>
-        </div>
-      </form>
       <form v-if="rules.length > 0" role="form" class="search-pf has-button search clear">
         <div class="form-group has-clear">
           <div class="search-pf-input-group">
@@ -220,91 +216,91 @@
           </div>
         </li>
       </ul>
+    </div>
 
-      <!-- network services -->
-      <div v-show="showNetworkServices">
-        <h3>{{$t('rules.network_services')}}</h3>
-        <div v-show="!networkServicesLoaded" class="spinner spinner-lg view-spinner"></div>
+    <!-- network services -->
+    <div v-show="showNetworkServices">
+      <h2>{{$t('rules.network_services')}}</h2>
+      <div v-show="!networkServicesLoaded" class="spinner spinner-lg view-spinner"></div>
 
-        <ul
-          v-show="networkServicesLoaded && networkServices.length > 0"
-          class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10"
+      <ul
+        v-show="networkServicesLoaded && networkServices.length > 0"
+        class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-20"
+      >
+        <li
+          class="green-list list-group-item"
+          v-for="(service, k) in networkServices"
+          v-bind:key="k"
         >
-          <li
-            class="green-list list-group-item"
-            v-for="(service, k) in networkServices"
-            v-bind:key="k"
-          >
-            <div class="list-view-pf-actions">
-              <button @click="openEditService(service)" class="btn btn-default">
-                <span class="fa fa-edit span-right-margin"></span>
-                {{$t('edit')}}
-              </button>
+          <div class="list-view-pf-actions">
+            <button @click="openEditService(service)" class="btn btn-default">
+              <span class="fa fa-edit span-right-margin"></span>
+              {{$t('edit')}}
+            </button>
+          </div>
+          <div class="list-view-pf-main-info small-list">
+            <div class="list-view-pf-left">
+              <span
+                data-toggle="tooltip"
+                data-placement="top"
+                data-html="true"
+                title="<b>ACCEPT</b>"
+                class="fa fa-check green border-green list-view-pf-icon-sm"
+              ></span>
             </div>
-            <div class="list-view-pf-main-info small-list">
-              <div class="list-view-pf-left">
-                <span
-                  data-toggle="tooltip"
-                  data-placement="top"
-                  data-html="true"
-                  title="<b>ACCEPT</b>"
-                  class="fa fa-check green border-green list-view-pf-icon-sm"
-                ></span>
-              </div>
-              <div class="list-view-pf-body">
-                <div class="list-view-pf-description rules-src-dst">
-                  <div class="list-group-item-heading zone-network-service">
-                    <span
-                      v-for="(zone, k) in service.ports.access.split(',')"
-                      class="handle-overflow mg-right-10"
-                      v-bind:key="k"
-                    >
-                      <span v-if="zone">
-                        <span :class="mapZoneIcon(zone)"></span>
-                        <span
-                          :class="[defaultZones.includes(zone) ? zone : 'other', 'mg-left-5']"
-                        >{{ zone.toUpperCase() }}</span>
-                      </span>
-                      <span v-else>
-                        <!-- empty access: localhost -->
-                        <span class="square-GRAY"></span>
-                        <span class="gray mg-left-5">LOCALHOST</span>
-                      </span>
+            <div class="list-view-pf-body">
+              <div class="list-view-pf-description rules-src-dst">
+                <div class="list-group-item-heading zone-network-service">
+                  <span
+                    v-for="(zone, k) in service.ports.access.split(',')"
+                    class="handle-overflow mg-right-10"
+                    v-bind:key="k"
+                  >
+                    <span v-if="zone">
+                      <span :class="mapZoneIcon(zone)"></span>
+                      <span
+                        :class="[defaultZones.includes(zone) ? zone : 'other', 'mg-left-5']"
+                      >{{ zone.toUpperCase() }}</span>
                     </span>
-                  </div>
-                  <div class="list-group-item-text fw-network-service">
-                    <span class="gray fa fa-arrow-right mg-right-10 big-icon]"></span>
-                    <span
-                      data-toggle="tooltip"
-                      data-placement="top"
-                      data-html="true"
-                      title="<b>FW</b><br><span class='type-info'><b>Firewall</b></span>"
-                      class="handle-overflow"
-                    >
-                      <span class="fa fa-fire"></span>
-                      <span class="fw mg-left-5">FW</span>
+                    <span v-else>
+                      <!-- empty access: localhost -->
+                      <span class="square-GRAY"></span>
+                      <span class="gray mg-left-5">LOCALHOST</span>
                     </span>
-                  </div>
+                  </span>
                 </div>
-                <div class="list-view-pf-additional-info rules-info">
-                  <div
+                <div class="list-group-item-text fw-network-service">
+                  <span class="gray fa fa-arrow-right mg-right-10 big-icon]"></span>
+                  <span
                     data-toggle="tooltip"
                     data-placement="top"
                     data-html="true"
-                    :title="mapTitleNetworkService(service)"
-                    class="list-view-pf-additional-info-item"
+                    title="<b>FW</b><br><span class='type-info'><b>Firewall</b></span>"
+                    class="handle-overflow"
                   >
-                    <span class="fa fa-cogs"></span>
-                    <strong>{{ service.name }}</strong>
-                    <span v-if="service.custom" class="gray">(custom)</span>
-                  </div>
-                  <div class="list-view-pf-additional-info-item"></div>
+                    <span class="fa fa-fire"></span>
+                    <span class="fw mg-left-5">FW</span>
+                  </span>
                 </div>
               </div>
+              <div class="list-view-pf-additional-info rules-info">
+                <div
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  data-html="true"
+                  :title="mapTitleNetworkService(service)"
+                  class="list-view-pf-additional-info-item"
+                >
+                  <span class="fa fa-cogs"></span>
+                  <strong>{{ service.name }}</strong>
+                  <span v-if="service.custom" class="gray">(custom)</span>
+                </div>
+                <div class="list-view-pf-additional-info-item"></div>
+              </div>
             </div>
-          </li>
-        </ul>
-      </div>
+          </div>
+        </li>
+      </ul>
     </div>
 
     <div class="modal" id="createRuleModal" tabindex="-1" role="dialog" data-backdrop="static">
