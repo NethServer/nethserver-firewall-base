@@ -495,7 +495,7 @@
               </div>
 
               <div
-                v-show="newRule.advanced && newRule.Service && newRule.ServiceFull.type != 'application'"
+                v-show="newRule.advanced && (newRule.ServiceFull.type != 'application' || newRule.Service == '')"
                 :class="['form-group', newRule.errors.Log.hasError ? 'has-error' : '']"
               >
                 <label class="col-sm-3 control-label">{{$t('rules.log')}}</label>
@@ -1159,6 +1159,9 @@ export default {
         DstType: "",
         Service: "",
         ServiceType: "",
+        ServiceFull: {
+          type: "fwservice"
+        },
         Action: "accept",
         Log: false,
         Quick: false,
@@ -1308,6 +1311,9 @@ export default {
     filterServiceAuto(query) {
       this.newRule.Service = null;
       this.newRule.ServiceFull = null;
+      this.newRule.ServiceFull = {
+        type: "fwservice"
+      }
       this.newRule.ServiceType = "";
 
       if (query.trim().length === 0) {
