@@ -4,7 +4,7 @@
       <div class="form-group">
         <label class="col-sm-3 control-label show-network-services" for="show-all-services">
           {{$t('rules.show_network_services')}}
-          <doc-info :placement="'top'" :chapter="'network_services_system_services'" :inline="true"></doc-info>
+          <doc-info :placement="'bottom'" :chapter="'network_services_system_services'" :inline="true"></doc-info>
         </label>
         <div class="col-sm-1 mg-bottom-10">
           <input
