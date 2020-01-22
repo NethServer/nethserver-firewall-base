@@ -38,6 +38,7 @@ sub _read_db
     while ($line = <$fh>) {
         chomp($line);
         my ($id, $mark, $mask, $name, $count) = split(m([\s#/]+), $line);
+        next if ($mark eq 'disabled');
         $db->{$id} = "ndpi|name|$name|mark|$mark|mask|$mask|count|$count";
     }
     close($fh);
