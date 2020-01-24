@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.8.3
+Version: 3.8.4
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Fri Jan 24 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.4-1
+- Wrong message showed by port forward validator - Bug NethServer/dev#6037
+
 * Wed Jan 08 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.3-1
 - Cockpit Firewall: log option not visible in rule creation - Bug Nethserver/dev#6019
 
