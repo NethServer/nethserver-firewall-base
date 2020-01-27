@@ -25,6 +25,7 @@ use strict;
 use esmith::ConfigDB;
 use esmith::NetworksDB;
 use NethServer::Firewall;
+use File::Basename;
 my $ndb = esmith::NetworksDB->open();
 my $cdb = esmith::ConfigDB->open();
 my $fw = new NethServer::Firewall();
@@ -48,4 +49,14 @@ if (scalar(@providers) >= 2) {
     $cdb->set_prop('lsm','status','enabled');
 } else {
     $cdb->set_prop('lsm','status','disabled');
+}
+
+# Delete shorewall status for non-existing interfaces
+my @status_files = glob('/var/lib/shorewall/*.status');
+foreach (@status_files) {
+    my $interface = basename($_,('.status'));
+    if (!defined($ndb->get($interface))) {
+        print "[INFO] Removing status file '$_'\n";
+        unlink($_);;
+    }
 }
