@@ -59,7 +59,9 @@
           >{{$t('configure')}}</button>
           <span class="panel-title">
             <span>{{$t('wan.mode')}}: {{wan.WanMode == 'balance' ? $t('wan.balance') : $t('wan.backup')}}</span>
-            <span v-if="wan.WanMode == 'backup'" class="mg-left-10"><small style="font-weight: 400">{{$t('wan.current_ip')}}: {{wan.CurrentIp}}</small></span>
+            <span v-if="wan.WanMode == 'backup'" class="mg-left-10">
+              <small style="font-weight: 400">{{$t('wan.current_ip')}}: {{wan.CurrentIp}}</small>
+            </span>
           </span>
           <a
             class="mg-left-10"
@@ -1474,6 +1476,9 @@ export default {
         )
       );
 
+      // firewall object
+      objects.push({ name: "FW", Description: "Firewall", typeId: "fw" });
+
       return objects.filter(function(service) {
         return (
           service.typeId.toLowerCase().includes(query.toLowerCase()) ||
@@ -1495,15 +1500,19 @@ export default {
       this.newRule.SrcFull.type = this.newRule.SrcFull.typeId;
       delete this.newRule.SrcFull.typeId;
 
-      this.newRule.SrcType =
-        item.name +
-        " " +
-        (item.IpAddress ? item.IpAddress + " " : "") +
-        (item.Address ? item.Address + " " : "") +
-        (item.Start && item.End ? item.Start + " - " + item.End + " " : "") +
-        "(" +
-        item.type +
-        ")";
+      if (item.typeId === "fw") {
+        this.newRule.SrcType = "Firewall";
+      } else {
+        this.newRule.SrcType =
+          item.name +
+          " " +
+          (item.IpAddress ? item.IpAddress + " " : "") +
+          (item.Address ? item.Address + " " : "") +
+          (item.Start && item.End ? item.Start + " - " + item.End + " " : "") +
+          "(" +
+          item.type +
+          ")";
+      }
     },
     filterDstAuto(query) {
       this.newRule.Dst = null;
@@ -1898,7 +1907,7 @@ export default {
           }
           for (var i in success) {
             var iface = success[i];
-            if (iface && (iface.in && iface.out)) {
+            if (iface && iface.in && iface.out) {
               var opts = {
                 angle: -0.15,
                 lineWidth: 0.2,
@@ -1999,7 +2008,7 @@ export default {
           }
           for (var i in success) {
             var iface = success[i];
-            if (iface && (iface.in && iface.out)) {
+            if (iface && iface.in && iface.out) {
               context.charts[i].in.set(parseInt(iface.in));
               context.charts[i].out.set(parseInt(iface.out));
             } else {
