@@ -120,6 +120,6 @@ $L['valid_platform,fwrule-modify,fwrule-trafficshaping,3'] = 'Traffic shaping ru
 $L['valid_platform,fwrule-modify,fwrule-trafficshaping,4'] = 'Traffic shaping rules allow only the following Destination types: zone, host, IP range, CIDR, red';
 
 $L['valid_platform,fwrule-modify,fwrule-ndpi,3'] = 'Rules using DPI protocol as a service do not allow "Any" as source nor destination.';
-$L['valid_platform,fwrule-modify,fwrule-ndpi,4'] = 'Rules using DPI protocol as a service do not allow "Firewall" as source.';
+$L['valid_platform,fwrule-modify,fwrule-ndpi,4'] = 'Rules using DPI protocol as a service do not allow "Firewall" as source nor destination.';
 $L['valid_platform,fwrule-modify,fwrule-ndpi,5'] = 'Route rules do not allow to set a DPI protocol as service.';
 $L['valid_platform,fwrule-modify,fwrule-ndpi,6'] = 'Action "Reject" is not supported for rules using a DPI protocol as service: use "Drop" action instead.';
