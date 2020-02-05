@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.8.4
+Version: 3.8.5
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,11 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Wed Feb 05 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.5-1
+- Cockpit - FW. Allow firewall zone as source in policy routing rules - Nethserver/dev#6050
+- Speedtest fails on PPPoE interface - Bug NethServer/dev#6048
+- save event: cleanup stale status files (#131)
+
 * Fri Jan 24 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.4-1
 - Wrong message showed by port forward validator - Bug NethServer/dev#6037
 
