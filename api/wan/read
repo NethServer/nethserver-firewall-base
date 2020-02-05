@@ -87,9 +87,20 @@ if($cmd eq 'providers') {
     print encode_json($ret);
 } elsif ($cmd eq 'speedtest') {
 
-    my $i = $input->{'interface'} || '';
-    my $addr = read_addresses($i);
-    my $ip = $addr->{'ipaddr'} || '';
+    my $ip = '';
+    if ($input->{'interface'} eq '') {
+        error();
+    }
+    my $addr = read_addresses($input->{'interface'});
+    # on PPPoE connections the IO address is inside the 'cidr' field
+    if ($input->{'interface'} eq 'ppp0') {
+        $ip = $addr->{'cidr'};
+    } else {
+        $ip = $addr->{'ipaddr'};
+    }
+    if ($ip eq '') {
+        error();
+    }
     system("fireqos stop &>/dev/null");
     my $out = `speedtest-cli --json --source $ip 2>/dev/null`;
 
