@@ -1793,7 +1793,7 @@ export default {
           ? context.newRule.Position
           : context.status.next,
         status: context.newRule.isEdit ? context.newRule.status : "enabled",
-        Service: context.newRule.ServiceFull
+        Service: context.newRule.ServiceFull && context.newRule.ServiceFull.name
           ? context.newRule.ServiceFull
           : {
               "name": "any",
