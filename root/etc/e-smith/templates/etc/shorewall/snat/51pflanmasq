@@ -46,13 +46,38 @@
         } else {
             $oriDst = "\t-";
         }
+
+        my $interface = '';
+        foreach ($ndb->get_all()) {
+            my $role = $_->prop('role') || next;
+            next if ($role eq 'slave' || $role eq 'bridged' || $role eq 'alias' || $role eq 'pppoe');
+            my $ipaddr = $_->prop('ipaddr') || next;
+            my $netmask = $_->prop('netmask') || next;
+            my $haystack = new NetAddr::IP->new($ipaddr, $netmask);
+            my $needle = NetAddr::IP->new($dstHost);
+            if ($needle->within($haystack)) {
+                $interface = $_->key;
+                last;
+            }
+        }
+        next if ($interface eq '');
+
         $OUT.="#\n# PF $oriDst:$src -> $dstHost $allow_cmt \n#\n";
         $OUT.="?COMMENT $description from lan\n";
 
         foreach ($ndb->get_by_role('green')) {
             my $net = esmith::util::computeLocalNetworkShortSpec($_->prop('ipaddr'),$_->prop('netmask'));
-            $OUT .= "SNAT(".$_->prop('ipaddr').")\t$net\t".$_->key.":$dstHost\t$proto\t$dst\n";
+            $OUT .= "SNAT(".$_->prop('ipaddr').")\t$net\t".$interface.":$dstHost\t$proto\t$dst\n";
         }
 
+        foreach ($ndb->get_by_role('blue')) {
+            my $net = esmith::util::computeLocalNetworkShortSpec($_->prop('ipaddr'),$_->prop('netmask'));
+            $OUT .= "SNAT(".$_->prop('ipaddr').")\t$net\t".$interface.":$dstHost\t$proto\t$dst\n";
+        }
+
+        foreach ($ndb->get_by_role('orange')) {
+            my $net = esmith::util::computeLocalNetworkShortSpec($_->prop('ipaddr'),$_->prop('netmask'));
+            $OUT .= "SNAT(".$_->prop('ipaddr').")\t$net\t".$interface.":$dstHost\t$proto\t$dst\n";
+        }
     }
 }
