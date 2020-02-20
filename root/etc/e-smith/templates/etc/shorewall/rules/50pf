@@ -23,6 +23,8 @@
     my @sources = ('net');
     if ($hairpin eq 'enabled') {
         @sources = ('net','loc');
+        if (defined($ndb->blue)) { push @sources, 'blue'; }
+        if (defined($ndb->orange)) { push @sources, 'orang'; }
     }
 
     my $fw = new NethServer::Firewall();
