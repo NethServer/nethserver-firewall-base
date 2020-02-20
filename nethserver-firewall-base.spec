@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.8.6
+Version: 3.8.7
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Thu Feb 20 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.7-1
+- Hairpin NAT broken in orange and blue - Bug NethServer/dev#6066
+
 * Wed Feb 19 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.6-1
 - Hairpin NAT broken in orange - Bug NethServer/dev#6045
 
