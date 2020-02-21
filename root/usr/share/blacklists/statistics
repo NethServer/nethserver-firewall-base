@@ -1,0 +1,206 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2020 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+#
+# Return blacklists statistics in JSON format
+#
+
+use strict;
+use warnings;
+use POSIX qw(strftime);
+use JSON;
+use esmith::NetworksDB;
+use NethServer::TrustedNetworks;
+use NetAddr::IP;
+
+my %category_cache;
+my %local_cache;
+
+sub is_local {
+    my @local_networks = ('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16');
+    my $ip = shift;
+
+    if (!defined($local_cache{$ip})) {
+        $local_cache{$ip} = 0;
+    } else {
+        return $local_cache{$ip};
+    }
+    my $needle = NetAddr::IP->new($ip);
+    foreach (@local_networks) {
+        my $haystack = NetAddr::IP->new($_);
+        if ($needle->within($haystack)) {
+            $local_cache{$ip} = 1;
+            last;
+        }
+    }
+
+    return $local_cache{$ip};
+}
+
+sub get_category {
+    my $sets = shift;
+    my $ip = shift;
+
+    if (!defined($category_cache{$ip})) {
+        $category_cache{$ip} = '';
+    } else {
+        return $category_cache{$ip};
+    }
+ 
+    my $needle = NetAddr::IP->new($ip);
+    foreach my $c (keys %{$sets}) {
+        foreach (@{$sets->{$c}}) {
+            my $haystack = NetAddr::IP->new($_);
+            if ($needle->within($haystack)) {
+                $category_cache{$ip} = $c;
+                last;
+            }
+        }
+    }
+
+    return $category_cache{$ip}
+}
+
+my $date = strftime "%b %d", localtime;
+
+my $filename = $ARGV[0] || "/var/log/firewall.log";
+
+if (! -f $filename) {
+    print STDERR "No such file or directory";
+    exit 1;
+}
+
+# Load local networks
+my @local_networks;
+my $ndb = esmith::NetworksDB->open_ro();
+foreach ($ndb->get_all()) {
+    my $ip = $_->prop('ipaddr') || next;
+    my $mask = $_->prop('netmask') || next;
+    push(@local_networks,NetAddr::IP->new($ip, $mask));
+
+}
+foreach (NethServer::TrustedNetworks::list_cidr()) {
+    push(@local_networks,NetAddr::IP->new($_));
+}
+
+# Load ipsets
+
+# search IP inside loaded ipset
+my %sets;
+
+# list blacklist sets
+open(PIPE, "ipset -L -name|");
+while (<PIPE>) {
+    chomp;
+    if ($_ =~ /^bl\-/) {
+        $sets{substr($_, 3)} = ();
+    }
+}
+close(PIPE);
+
+# load ipset ip addresses
+foreach my $set (keys %sets) {
+    my @ips;
+    open(PIPE, "ipset -L bl-$set|");
+    while (<PIPE>) {
+        chomp;
+        push(@ips, $_) if ($_ =~ /^\d/);
+    }
+    close(PIPE);
+    $sets{$set} = \@ips;
+}
+
+
+open(my $fh, '<:encoding(UTF-8)', $filename) or die "Could not open file '$filename' $!";
+
+my %stats = ('total' => 0, hour => {}, source => {}, destination => {}, 'categories' => {'bogons' => 0});
+foreach (keys %sets) {
+    $stats{'categories'}{$_} = 0;
+}
+while (my $row = <$fh>) {
+    # skip lines not from today
+    next if ($row !~ /^$date/);
+    chomp $row;
+
+    next if($row !~ /Shorewall\:blacklst/);
+    
+    my $src_is_local = 0;
+    my $dst_is_local = 0;
+    my ($month, $day, $time, $host, $prog, $chain, $out, $mac, $src, $dst, $len) = split(/\s/,$row, 11);
+    my ($h, $m, $s) = split(/:/,$time);
+
+    # sometimes mac is empty
+    if ($mac =~ /SRC/) {
+        $src = $mac;
+    }
+    if ($mac =~ /DST/) {
+        $dst = $mac;
+    }
+
+    # hits by hour
+    if (!defined($stats{'hour'}{$h})) {
+        $stats{'hour'}{$h} = 0;
+    }
+    $stats{'hour'}{$h}++;
+
+    # hits by source
+    if ($src =~ /^SRC/) {
+        $src = (split(/=/,$src))[1];
+        if (!defined($stats{'source'}{$src})) {
+            $stats{'source'}{$src} = 0;
+        }
+        $stats{'source'}{$src}++;
+        $src_is_local = is_local($src);
+
+        # find category
+        if (!$src_is_local) {
+            my $category = get_category(\%sets, $src);
+            $stats{'categories'}{$category}++ if ($category);
+        }
+    }
+
+    # hits by destination
+    if ($dst =~ /^DST/) {
+        $dst = (split(/=/,$dst))[1];
+        if (!defined($stats{'destination'}{$dst})) {
+            $stats{'destination'}{$dst} = 0;
+        }
+        $stats{'destination'}{$dst}++;
+        $dst_is_local = is_local($dst);
+
+        # find category
+        if (!$dst_is_local) {
+            my $category = get_category(\%sets, $dst);
+            $stats{'categories'}{$category}++ if ($category);
+        }
+    }
+
+    if ($src_is_local && $dst_is_local) {
+        $stats{'categories'}{'bogons'}++;
+    }
+
+    $stats{'total'}++;
+}
+
+close($fh);
+
+print encode_json(\%stats);
