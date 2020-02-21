@@ -134,12 +134,6 @@ function validate_rule($data, $type) {
         $dst = $data['Dst']['type'].";". $data['Dst']['name'];
     }
 
-    # Check if src and dst are on the same zone
-    exec("/usr/libexec/nethserver/api/nethserver-firewall-base/lib/same-zone '$src' '$dst'", $output, $ret);
-    if ($ret == 0) {
-        $v->addValidationError('Dst', 'src_dst_are_in_same_zone', $data['Dst']);
-    }
-
     $v->declareParameter('Position', Validate::POSITIVE_INTEGER);
     $v->declareParameter('status', Validate::SERVICESTATUS);
 
