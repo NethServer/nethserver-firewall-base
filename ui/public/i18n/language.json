@@ -498,7 +498,6 @@
         "rule_exists": "Rule already exists",
         "rule_not_exists": "Rule does not exist",
         "valid_ip_or_cidr": "Must be a valid ip or cidr",
-        "src_dst_are_in_same_zone": "Source and destination are in the same zone",
         "time_not_found": "Time object does not exist",
         "host_doesnt_exists": "Host does not exist",
         "non_existing_port-forward": "Port forward does not exist",
