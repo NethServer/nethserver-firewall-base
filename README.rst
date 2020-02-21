@@ -74,12 +74,20 @@ Properties of ``firewall`` key inside ``configuration`` db:
 * ``NotifyWan``: can be ``enabled`` or ``disabled``, if ``enabled`` a mail is sent every time a provider changes its own state
 * ``NotifyWanFrom``: sender address for mails sent if NotifyWAN is set to enabled
 * ``NotifyWanTo``: recipient address for mails sent if NotifyWAN is set to enabled
+* ``BlackListStatus``: can be ``enabled`` or ``disabled``, if ``enabled`` selected ``BlackListCategories`` will be blocked using ipsets
+* ``BlackListCategories``: a comma-separeted list of blacklist categories, a valid category must have a corresponding file inside ``/usr/share/blacklists/ipsets``.
+  Example: given the category ``test``, a file named ``/usr/share/blacklists/ipsets/test.netset`` or ``/usr/share/blacklists/ipsets/test.ipset`` must exists
+* ``BlackListUrl``: the GIT URL from where blacklists will be downloaded
+* ``Whitelist``: a comma-separated list of hosts excluded from the blacklists. The host can be an IP, a CIDR, an host object or a CIDR object
 
 Example
 
 ::
 
  firewall=configuration
+    BlackListCategories=firehol_level1
+    BlackListStatus=enabled
+    BlackListUrl=https://my.nethserver.com/git/ipsets
     CheckIP=8.8.8.8,208.67.222.222
     Docker=disabled
     ExternalPing=enabled
@@ -95,6 +103,8 @@ Example
     Policy=permissive
     TCLinklayer=
     WanMode=balance
+    WhiteList=
+    nfqueue=disabled
 
 
 Events
@@ -633,4 +643,59 @@ There is also a special type of static route called ``provider-static``.
 These routes have the same properties as described above and are used to correctly route traffic for link monitor.
 This type of rules should never be manually edited.
 
+Blacklists
+==========
+
+Blacklist implementation is based on ipset:
+
+* download ipset-based blacklist from a remote GIT repository
+* block access from/to black listed IPs
+* support whitelisting
+* lists are updated every 20 minute, ipsets are reloaded on change
+* all blocked IPs are logged inside ``/var/log/firewall.log``
+
+GIT repository
+--------------
+
+The remote GIT repository must contain:
+
+* one or more files with ``.netset`` or ``.ipset`` using `Firehol iplists format <http://iplists.firehol.org/>`, each file represent a category
+* a JSON index file which lists all categories
+
+JSON index format
+----------------
+
+A JSON containing an array of object, each object has the following fields:
+
+- ``id``: the category identifier, it reflects the name of file inside ``/usr/share/blacklists/ipsets`` without the extensio
+- ``confidence``: a value between ``0`` an ``10``, higher value means less false positives
+- ``name``: descriptive name
+- ``maintainer``: name of the maintainer, can contain an URL
+- ``category``: type of category, something like "malware", "tor", etc.
+- ``description``: a detailed description
+
+Example:
+::
+
+ [
+  {
+    "maintainer": "FireHOL",
+    "name": "Firehol proxies",
+    "category": "anonymizers",
+    "id": "firehol_proxies",
+    "description": "my long description",
+    "confidence": "5"
+
+  },
+  ...
+ ]
+
+Usage example
+-------------
+Just execute:
+
+```
+config setprop firewall BlackListStatus enabled BlackListUrl https://myserver.list.org/repo BlackListCategories category1,category2
+signal-event firewall-adjust
+```
 
