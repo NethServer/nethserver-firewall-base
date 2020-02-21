@@ -16,6 +16,7 @@ Requires: rp-pppoe
 Requires: firehol
 Requires: conntrack-tools
 Requires: dialog
+Requires: git
 
 Obsoletes: nethserver-shorewall
 Provides: nethserver-firewall
