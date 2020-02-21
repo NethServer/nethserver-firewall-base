@@ -49,6 +49,7 @@ my @templates = qw(
     /etc/shorewall/stopped
     /etc/lsm/lsm.conf
     /etc/firehol/fireqos.conf
+    /etc/cron.d/shorewall-blacklists
 );
 
 #--------------------------------------------------
@@ -82,6 +83,7 @@ $event = "nethserver-firewall-base-save";
 event_templates($event, @templates);
 event_actions($event,
 	      'providers-cleanup' => '02',
+          'nethserver-firewall-base-blacklists' => 40,
 	      'nethserver-shorewall-restart' => '89'
 );
 

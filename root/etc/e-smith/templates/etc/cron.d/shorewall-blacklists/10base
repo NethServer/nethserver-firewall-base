@@ -1,0 +1,8 @@
+{
+    my $status = $firewall{'BlackListStatus'} || 'disabled';
+    if ($status eq 'enabled') {
+        $OUT .= '*/20 * * * * root sleep $(( ( RANDOM \% 60 ) )); /usr/share/blacklists/download'
+    } else {
+        $OUT .= "# Blacklists are disabled"
+    }
+}
