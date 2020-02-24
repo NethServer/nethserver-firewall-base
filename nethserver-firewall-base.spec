@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.8.7
+Version: 3.8.8
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Mon Feb 24 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.8-1
+- Cockpit: firewall rule validation fails if source and destination objects belong to the same zone - NethServer/dev#6065
+
 * Thu Feb 20 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.7-1
 - Hairpin NAT broken in orange and blue - Bug NethServer/dev#6066
 
