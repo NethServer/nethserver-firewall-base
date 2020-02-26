@@ -665,30 +665,29 @@ The remote GIT repository must contain:
 JSON index format
 ----------------
 
-A JSON containing an array of object, each object has the following fields:
+A JSON containing an object of categories index by ``id``, each object has the following fields:
 
-- ``id``: the category identifier, it reflects the name of file inside ``/usr/share/blacklists/ipsets`` without the extensio
 - ``confidence``: a value between ``0`` an ``10``, higher value means less false positives
 - ``name``: descriptive name
 - ``maintainer``: name of the maintainer, can contain an URL
 - ``category``: type of category, something like "malware", "tor", etc.
 - ``description``: a detailed description
 
+The ``id`` is the category identifier, it reflects the name of file inside ``/usr/share/blacklists/ipsets`` without the extension.
+
 Example:
 ::
 
- [
-  {
-    "maintainer": "FireHOL",
-    "name": "Firehol proxies",
-    "category": "anonymizers",
-    "id": "firehol_proxies",
-    "description": "my long description",
-    "confidence": "5"
-
+ {
+    "firehol_proxies" : {
+      "maintainer": "FireHOL",
+      "name": "Firehol proxies",
+      "category": "anonymizers",
+      "description": "my long description",
+      "confidence": "5"
   },
   ...
- ]
+ }
 
 Usage example
 -------------
