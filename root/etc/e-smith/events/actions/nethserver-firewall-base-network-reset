@@ -28,9 +28,7 @@ use esmith::ConfigDB;
 my $ndb = esmith::NetworksDB->open();
 my $rdb = esmith::ConfigDB->open('fwrules');
 
-# ARGV[0] is the name of the event
-# ARGV[1] is the first real parameter
-if (defined($ARGV[1]) && $ARGV[1] eq '--skip-network') {
+if (grep(/^--skip-network$/, @ARGV)) {
 
     # Delete all red providers
     foreach my $item ($ndb->get_all_by_prop('type'=>'provider')) {
