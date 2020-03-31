@@ -176,6 +176,7 @@ event_actions('static-routes-save', qw(
 
 event_actions('post-restore-config', qw(
     nethserver-firewall-base-disable 01
+    nethserver-firewall-base-network-reset 02
     nethserver-firewall-base-condenable 98
 ));
 
