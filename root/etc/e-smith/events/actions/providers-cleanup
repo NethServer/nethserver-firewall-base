@@ -55,7 +55,9 @@ if (scalar(@providers) >= 2) {
 my @status_files = glob('/var/lib/shorewall/*.status');
 foreach (@status_files) {
     my $interface = basename($_,('.status'));
-    if (!defined($ndb->get($interface))) {
+    my $i = $ndb->get($interface) || undef;
+    my $role = $ndb->get_prop($interface, 'role') || '';
+    if (!defined($i) || $role ne 'red') {
         print "[INFO] Removing status file '$_'\n";
         unlink($_);;
     }
