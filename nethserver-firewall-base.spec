@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.8.8
+Version: 3.8.9
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,10 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Tue Apr 07 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.9-1
+- Shorewall providers configuration may remain dirty after removing a RED - Bug NethServer/dev#6105
+- Restore configuration without network override - NethServer/dev#6099
+
 * Mon Feb 24 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.8-1
 - Cockpit: firewall rule validation fails if source and destination objects belong to the same zone - NethServer/dev#6065
 
