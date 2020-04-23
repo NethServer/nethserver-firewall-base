@@ -20,6 +20,23 @@
         </div>
       </form>
 
+      <h3>{{$t('settings.traffic_vpn')}}</h3>
+      <form class="form-horizontal" v-on:submit.prevent="saveSettings('vpn')">
+        <div :class="['form-group', errors.VpnPolicy.hasError ? 'has-error' : '']">
+          <label
+            class="col-sm-2 control-label"
+            for="textInput-modal-markup"
+          >{{$t('settings.allowed')}}</label>
+          <div class="col-sm-5">
+            <input type="checkbox" v-model="settings.vpn.VpnPolicy" class="form-control">
+            <span v-if="errors.VpnPolicy.hasError" class="help-block">
+              {{$t('validation.validation_failed')}}:
+              {{$t('validation.'+errors.VpnPolicy.message)}}
+            </span>
+          </div>
+        </div>
+      </form>
+
       <h3>{{$t('settings.external_ping')}}</h3>
       <form class="form-horizontal" v-on:submit.prevent="saveSettings('ping')">
         <div :class="['form-group', errors.ExternalPing.hasError ? 'has-error' : '']">
@@ -143,6 +160,9 @@ export default {
         internet: {
           Policy: true
         },
+        vpn: {
+          Policy: true
+        },
         ping: {
           ExternalPing: true
         },
@@ -162,6 +182,10 @@ export default {
     initErrors() {
       return {
         Policy: {
+          hasError: false,
+          message: ""
+        },
+        VpnPolicy: {
           hasError: false,
           message: ""
         },
@@ -203,6 +227,10 @@ export default {
           context.settings.internet.Policy =
             success.settings.Policy == "permissive";
 
+          // vpn
+          context.settings.vpn.VpnPolicy =
+            success.settings.VpnPolicy == "permissive";
+
           // ping
           context.settings.ping.ExternalPing =
             success.settings.ExternalPing == "enabled";
@@ -239,6 +267,7 @@ export default {
           : "disabled",
         HairpinNat: context.settings.pf.HairpinNat ? "enabled" : "disabled",
         Policy: context.settings.internet.Policy ? "permissive" : "strict",
+        VpnPolicy: context.settings.vpn.VpnPolicy ? "permissive" : "strict",
         MACValidationPolicy: context.settings.mac.MACValidationPolicy
           ? "drop"
           : "accept",
@@ -296,7 +325,7 @@ export default {
             console.error(e);
           }
         },
-        true //sudo 
+        true //sudo
       );
     }
   }
