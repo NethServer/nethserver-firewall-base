@@ -458,6 +458,7 @@
     "settings": {
         "title": "Settings",
         "traffic_internet": "Traffic to Internet (red interface)",
+        "traffic_vpn": "Traffic between OpenVPN roadwarrior, OpenVPN tunnels and IPSec tunnels",
         "external_ping": "Ping from Internet",
         "mac": "MAC validation (IP/MAC binding)",
         "allowed": "Allowed",

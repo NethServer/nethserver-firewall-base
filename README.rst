@@ -74,6 +74,8 @@ Properties of ``firewall`` key inside ``configuration`` db:
 * ``NotifyWan``: can be ``enabled`` or ``disabled``, if ``enabled`` a mail is sent every time a provider changes its own state
 * ``NotifyWanFrom``: sender address for mails sent if NotifyWAN is set to enabled
 * ``NotifyWanTo``: recipient address for mails sent if NotifyWAN is set to enabled
+* ``VpnPolicy``: can be ``permissive`` or ``strict``. If set to ``permissive`` traffic between all VPNs (Rodwarrior OpenVPN, OpenVPN tunnels, IPSec tunnels)
+  will be permitted
 
 Example
 
@@ -94,6 +96,7 @@ Example
     PingInterval=5
     Policy=permissive
     TCLinklayer=
+    VpnPolicy=strict
     WanMode=balance
 
 

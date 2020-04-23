@@ -27,7 +27,7 @@ case $action in
     "settings")
         save_db configuration
         /sbin/e-smith/db configuration setprop firewall ExternalPing "$(_get ExternalPing)" Policy "$(_get Policy)" HairpinNat "$(_get HairpinNat)" \
-            MACValidationPolicy "$(_get MACValidationPolicy)" MACValidation "$(_get MACValidation)"
+            MACValidationPolicy "$(_get MACValidationPolicy)" MACValidation "$(_get MACValidation)" VpnPolicy "$(_get VpnPolicy)"
         /sbin/e-smith/signal-event -j firewall-adjust
         ;;
     "apply")
