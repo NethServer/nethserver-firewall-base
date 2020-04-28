@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.8.9
+Version: 3.9.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Tue Apr 28 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.9.0-1
+- VPN: allow traffic between roadwarrior clients and tunnels - NethServer/dev#6136
+
 * Tue Apr 07 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.8.9-1
 - Shorewall providers configuration may remain dirty after removing a RED - Bug NethServer/dev#6105
 - Restore configuration without network override - NethServer/dev#6099
