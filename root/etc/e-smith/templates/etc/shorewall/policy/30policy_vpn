@@ -4,9 +4,9 @@
 {
     my $policy = $firewall{'VpnPolicy'} || 'strict';
     # check if IPSec is installed
-    my $ipvn = (-f '/etc/e-smith/db/configuration/defaults/ipsec/status');
+    my $ivpn = (-f '/etc/e-smith/db/configuration/defaults/ipsec/status');
     # check if OpenVPN is installed
-    my $opvn = (-f '/etc/e-smith/db/configuration/defaults/openvpn@host-to-net/status');
+    my $ovpn = (-f '/etc/e-smith/db/configuration/defaults/openvpn@host-to-net/status');
 
     if ($policy eq 'permissive' && $ivpn && $ovpn) {
         $OUT .= "ovpn\tivpn\tACCEPT\n";
