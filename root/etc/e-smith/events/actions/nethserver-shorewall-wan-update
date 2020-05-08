@@ -59,6 +59,10 @@ fi
 if [ ${STATE} = up ]; then
   logger -i -p kern.info -t Shorewall Enabling device ${DEVICE}
   /usr/sbin/shorewall enable ${DEVICE} 2>>/var/log/firewall.log
+  if /usr/sbin/ip route | /usr/bin/grep -q -E '^default via'; then
+      # Force Shorewall restart if the defaut route is set
+      /usr/sbin/shorewall restart
+  fi
 else
   logger -i -p kern.info -t Shorewall Disabling device ${DEVICE}
   /usr/sbin/shorewall disable ${DEVICE} 2>>/var/log/firewall.log
