@@ -14,17 +14,6 @@
     my $fw = new NethServer::Firewall();
     my $ndb = esmith::NetworksDB->open_ro();
     $db = esmith::ConfigDB->open("portforward") || die "Can't open portforward database: $!\n";
-    my $ovpn_installed = (-f '/etc/e-smith/db/configuration/defaults/openvpn@host-to-net/status');
-    my $ovpn_status = ${'openvpn@host-to-net'}{'status'} || 'disabled';
-    my $ovpn_net = '';
-    my $ovpn_ip = '';
-    if ($ovpn_installed && $ovpn_status eq 'enabled') {
-        $ovpn_net = esmith::util::computeLocalNetworkShortSpec(${'openvpn@host-to-net'}{'Network'},${'openvpn@host-to-net'}{'Netmask'});
-        my ($tot, $first, $last) = esmith::util::computeHostRange(${'openvpn@host-to-net'}{'Network'},${'openvpn@host-to-net'}{'Netmask'});
-        $ovpn_ip = esmith::util::IPquadToAddr($first); # convert to integer
-        $ovpn_ip = esmith::util::IPaddrToQuad($ovpn_ip+1);
-    }
-
     foreach my $pf ( $db->get_all_by_prop('type' => 'pf') ) {
         $proto = $pf->prop('Proto') || 'tcp,udp';
         $status = $pf->prop('status') || "disabled";
@@ -79,9 +68,6 @@
         foreach ($ndb->get_by_role('green')) {
             my $net = esmith::util::computeLocalNetworkShortSpec($_->prop('ipaddr'),$_->prop('netmask'));
             $OUT .= "SNAT(".$_->prop('ipaddr').")\t$net\t".$interface.":$dstHost\t$proto\t$dst\n";
-            if ($ovpn_ip) {
-                $OUT .= "SNAT($ovpn_ip)\t$ovpn_net\t".$_->key.":$dstHost\t$proto\t$dst\n"
-            }
         }
 
         foreach ($ndb->get_by_role('blue')) {
