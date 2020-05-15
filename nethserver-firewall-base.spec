@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.9.1
+Version: 3.9.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Fri May 15 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.9.2-1
+- Hairpin NAT for OpenVPN roadwarrior - NethServer/dev#6165
+
 * Tue May 12 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.9.1-1
 - MultiWAN not restarted after reboot - Bug NethServer/dev#6157
 
