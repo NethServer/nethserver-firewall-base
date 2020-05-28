@@ -198,6 +198,11 @@ export default {
           to: 0
         },
         {
+          from: "hotspot",
+          to: 0,
+          dashes:[2,15]
+        },
+        {
           from: "other",
           to: 0,
           dashes: true
@@ -347,6 +352,31 @@ export default {
           },
           orangeIntDOWN: {
             color: { background: "#363636", border: "#ec7a08" }
+          },
+          hotspot: {
+            shape: "icon",
+            icon: {
+              face: "FontAwesome",
+              code: "\uf1eb",
+              size: 75,
+              color: "#008888"
+            },
+            font: {
+              color: "#363636"
+            },
+            margin: {
+              top: 20
+            }
+          },
+          hotspotIntUP: {
+            color: {
+              background: "#008888",
+              border: "#005555",
+              highlight: { background: "#002222", border: "#005555" }
+            }
+          },
+          hotspotIntDOWN: {
+            color: { background: "#363636", border: "#008888" }
           },
           other: {
             shape: "icon",
@@ -503,6 +533,10 @@ export default {
           return master ? 1 : 0;
           break;
 
+        case "hotspot":
+          return master ? 1 : 0;
+          break;
+
         case "red":
           return master ? 3 : 4;
           break;
@@ -594,7 +628,7 @@ export default {
                   role == "free" ||
                   role == "missing"
                     ? true
-                    : false
+                    : (role == "hotspot" ? [2,15] : false)
               });
             }
           }
