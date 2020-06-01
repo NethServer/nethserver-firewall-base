@@ -4,13 +4,6 @@
 {
     use esmith::NetworksDB;
     my $ndb = esmith::NetworksDB->open_ro();
-    my $nfqueue = $firewall{'nfqueue'} || 'disabled';
-    my $action = '';
-    if ($nfqueue eq 'enabled') {
-        $action = 'ACCEPT:NFQBY';
-    } else {
-        $action = 'ACCEPT';
-    }
 
     # generate policy for blue zone
     if ($ndb->blue) {
@@ -20,7 +13,7 @@
         $OUT .= "blue\t\t\$FW\t\tREJECT\t\tinfo\n";
         $OUT .= "\$FW\t\tblue\t\tACCEPT\n";
         if ($ndb->orange) {
-            $OUT .= "blue\t\torang\t\t$action\n"; #truncate zone name to 5 chars
+            $OUT .= "blue\t\torang\t\tACCEPT\n"; #truncate zone name to 5 chars
         }
     }
 

@@ -6,14 +6,9 @@
     use esmith::NetworksDB;
     my $ndb = esmith::NetworksDB->open_ro();
     my $policy = $firewall{'Policy'} || 'permissive';
-    my $nfqueue = $firewall{'nfqueue'} || 'disabled';
     my $action = '';
     if ( $policy eq 'permissive') {
-        if ($nfqueue eq 'enabled') {
-            $action = 'ACCEPT:NFQBY';
-        } else {
-            $action = 'ACCEPT';
-        }
+        $action = 'ACCEPT';
     } else {
         $action = 'REJECT';
     }
@@ -34,18 +29,10 @@
         $OUT .= "$z\t\tnet\t\t$action\n";
     }
 
-    if ($nfqueue eq 'enabled') {
-        $OUT .= "\n# firewall can always connect outside (via NFQ)\n";
-        $OUT .= "\$FW\tnet\tACCEPT:NFQBY\n";
+    $OUT .= "\n# firewall can always connect outside\n";
+    $OUT .= "\$FW\tnet\tACCEPT\n";
 
-        $OUT .="# Traffic from firewall to local network is always allowed (via NFQ)\n";
-        $OUT .= "\$FW\tloc\tACCEPT:NFQBY\n";
-    } else {
-        $OUT .= "\n# firewall can always connect outside\n";
-        $OUT .= "\$FW\tnet\tACCEPT\n";
-
-        $OUT .="# Traffic from firewall to local network is always allowed\n";
-        $OUT .= "\$FW\tloc\tACCEPT\n";
-    }
+    $OUT .="# Traffic from firewall to local network is always allowed\n";
+    $OUT .= "\$FW\tloc\tACCEPT\n";
 
 }

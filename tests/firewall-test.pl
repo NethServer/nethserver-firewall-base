@@ -20,7 +20,7 @@ zone1=zone|Network|192.168.2.0/24
 END
 
 my $sdb = <<"END";
-firewall=configuration|ExternalPing|enabled|Policy|permissive|WanMode|balance|event|nethserver-firewall-base-save|level|high|nfqueue|enabled|tc|Simple
+firewall=configuration|ExternalPing|enabled|Policy|permissive|WanMode|balance|event|nethserver-firewall-base-save|level|high|tc|Simple
 https=fwservice|Description||Ports|443,446,980|Protocol|tcp
 tcp1=fwservice|Description||Ports|25|Protocol|tcp
 udp1=fwservice|Description||Ports|1,2,3|Protocol|udp
