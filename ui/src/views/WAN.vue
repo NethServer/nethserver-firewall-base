@@ -348,8 +348,9 @@
         v-for="(r,k) in rules"
         v-bind:key="k"
       >
-        <div class="drag-size">
-          <span class="gray mg-right-5">{{r.Action.split(';')[1] | uppercase}}</span>
+        <div class="drag-size width-fixed">
+          <span v-if="r.Label" class="gray mg-right-5">{{ r.Label }}</span>
+          <span v-else class="gray mg-right-5">{{ r.Action.split(';')[1] | uppercase }}</span>
         </div>
         <div class="list-view-pf-checkbox drag-here">
           <span class="fa fa-bars"></span>
@@ -412,7 +413,7 @@
           </div>
           <div class="list-view-pf-body">
             <div class="list-view-pf-description rules-src-dst">
-              <div class="list-group-item-heading">
+              <div class="list-group-item-heading narrow">
                 <span
                   data-toggle="tooltip"
                   data-placement="top"
@@ -436,7 +437,7 @@
                   </span>
                 </span>
               </div>
-              <div class="list-group-item-text">
+              <div class="list-group-item-text narrow">
                 <span :class="[mapArrow(r.Action), 'mg-right-10 big-icon']"></span>
                 <span
                   data-toggle="tooltip"
@@ -2759,5 +2760,20 @@ export default {
 
 .small-font {
   font-size: 12px;
+}
+
+.drag-size.width-fixed {
+  width: 5%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 3px;
+}
+
+.list-group-item-heading.narrow {
+  width: calc(40% - 20px) !important;
+}
+
+.list-group-item-text.narrow {
+  width: calc(40% - 20px) !important;
 }
 </style>
