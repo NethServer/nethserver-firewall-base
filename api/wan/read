@@ -65,7 +65,7 @@ if($cmd eq 'providers') {
                 "provider" => $p,
                 'FwInBandwidth' => $_->prop('FwInBandwidth') || 0,
                 'FwOutBandwidth' => $_->prop('FwOutBandwidth') || 0,
-                'nslabel' => $_->prop('nslabel') || '',
+                'nslabel' => $_->prop('type') eq 'xdsl' ? 'PPPoE' : ($_->prop('nslabel') || ''),
                 'cidr' => $addr->{'cidr'},
                 'ipaddr' => $addr->{'ipaddr'},
                 'gateway' => $addr->{'gateway'}
@@ -128,8 +128,17 @@ if($cmd eq 'providers') {
     print encode_json($ret);
 
 } elsif ($cmd eq 'rules') {
+    my $tc_rules = list_tc_rules($input->{'expand'} || 0, 'provider');
+    my $ndb = esmith::NetworksDB->open_ro();
+    my $rules = $tc_rules->{'rules'};
 
-    print encode_json(list_tc_rules($input->{'expand'} || 0, 'provider'));
+    foreach (@$rules) {
+        my ($provider, $red) = split(";", $_->{'Action'});
+        my $interface = $ndb->get_prop($red, 'interface');
+        my $nslabel = $ndb->get_prop($interface, 'type') eq 'xdsl' ? 'PPPoE' : $ndb->get_prop($interface, 'nslabel');
+        $_->{'Label'} = $nslabel;
+    }
+    print encode_json($tc_rules);
 
 } else {
     error()
