@@ -13,7 +13,7 @@
     my $tdb = esmith::ConfigDB->open_ro('tc');
     our @providers = $fw->getProviders();
 
-    foreach my $rule ( reverse($fw->getTcRules()) ) {
+    foreach my $rule ( $fw->getTcRules() ) {
         my $src = $rule->prop("Src") || next;
         my $dst = $rule->prop("Dst") || next;
         my $status = $rule->prop("status") || 'disabled';
