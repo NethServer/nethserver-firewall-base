@@ -24,18 +24,13 @@
         my $type = shift;
         my $port = shift;
         my $zones = shift;
-        my $nfq = $firewall{'nfqueue'} || 'disabled';
-        my $action = 'ACCEPT';
-        if ($nfq eq 'enabled') {
-            $action = 'NFQBY';
-        }
         $OUT.="?COMMENT $name \n";
         foreach (@$zones) {
             $_ =~ s/^green$/loc/;
             $_ =~ s/^red$/net/;
             $_ = substr($_, 0, 5);
             if ($_ eq 'net' || $_ eq 'loc' || $fw->isZone($_)) {
-                $OUT.="$action\t$_\t\$FW\t$type\t$port\n";
+                $OUT.="ACCEPT\t$_\t\$FW\t$type\t$port\n";
             }
         }
 

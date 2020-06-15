@@ -18,7 +18,6 @@
         }
     }
 
-    my $nfqueue = $firewall{'nfqueue'} || 'disabled';
     my $hairpin = $firewall{'HairpinNat'} || 'disabled';
     my $ovpn_installed = (-f '/etc/e-smith/db/configuration/defaults/openvpn@host-to-net/status');
     my $ovpn_status = ${'openvpn@host-to-net'}{'status'} || 'disabled';
@@ -82,13 +81,7 @@
                $logAction = "";
              }
             $OUT.="?COMMENT $description from $_\n";
-            if ($nfqueue eq 'enabled') {
-                $OUT.="DNAT-$logAction\t$_$allow\t$dstHost$target_port\t$proto\t$src$srcHost$oriDst\n";
-                @z = split(/:/,$target_host);
-                $OUT.="NFQBY\t$_$allow\t".$z[0]."\t$proto\t$dst$srcHost$oriDst\n";
-            } else {
-                $OUT.="DNAT$logAction\t$_$allow\t$target_host$target_port\t$proto\t$src$srcHost$oriDst\n";
-            }
+            $OUT.="DNAT$logAction\t$_$allow\t$target_host$target_port\t$proto\t$src$srcHost$oriDst\n";
         }
     }
 }

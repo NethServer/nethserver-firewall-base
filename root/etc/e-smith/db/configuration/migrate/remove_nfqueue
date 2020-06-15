@@ -1,0 +1,9 @@
+{
+    #
+    # Remove unused 'nfqueue' prop
+    #
+
+    $DB->get_prop_and_delete('firewall','nfqueue');
+
+    '';
+}

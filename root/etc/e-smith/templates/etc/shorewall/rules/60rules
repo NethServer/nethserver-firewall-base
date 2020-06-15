@@ -5,7 +5,6 @@
     use NethServer::Firewall;
 
     my $fw = new NethServer::Firewall();
-    my $nfq = $firewall{'nfqueue'} || 'disabled';
     foreach my $rule ( $fw->getRules() ) {
         my $status = $rule->prop("status") || "disabled";
         next unless ($status eq 'enabled');
@@ -15,9 +14,6 @@
         my $action= $rule->prop("Action") || next;
         $action = uc($action);
 
-        if ($nfq eq 'enabled' && $action eq 'ACCEPT') {
-            $action = "NFQBY";
-        }
         my $service = $rule->prop("Service") || 'any';
         $service = '-' if ($service eq '' || $service eq 'any');
         my $log = $rule->prop('Log') || "";

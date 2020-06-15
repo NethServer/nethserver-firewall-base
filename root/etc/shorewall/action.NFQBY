@@ -1,2 +1,0 @@
-?format 2
-IPTABLES(NFQUEUE --queue-bypass)
