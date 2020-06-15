@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.9.3
+Version: 3.9.4
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Mon Jun 15 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.9.4-1
+- Order rules in traffic shaping not honored - NethServer/dev#6203
+
 * Thu Jun 04 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.9.3-1
 - Firewall: Interface label not shown in WAN rules - NethServer/dev#6190
 - Cockpit & Firewall: Hotspot interface shown as not recognized - Bug NethServer/dev#6186
