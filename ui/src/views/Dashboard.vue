@@ -39,7 +39,9 @@
           v-if="i != 'objects'"
           class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2"
         >
-          <span class="card-pf-utilization-card-details-count stats-count">{{s}}</span>
+          <span class="card-pf-utilization-card-details-count stats-count" :title="s">
+            {{s | humanFormat}}
+          </span>
           <span class="card-pf-utilization-card-details-description stats-description">
             <span class="card-pf-utilization-card-details-line-2 stats-text">{{$t('dashboard.'+i)}}</span>
           </span>
@@ -53,7 +55,9 @@
           :key="i"
           class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2"
         >
-          <span class="card-pf-utilization-card-details-count stats-count">{{o}}</span>
+          <span class="card-pf-utilization-card-details-count stats-count" :title="o">
+            {{o | humanFormat}}
+          </span>
           <span class="card-pf-utilization-card-details-description stats-description">
             <span class="card-pf-utilization-card-details-line-2 stats-text">{{$t('dashboard.'+i)}}</span>
           </span>
@@ -95,7 +99,9 @@
         v-if="i != 'total'"
         class="stats-container col-xs-12 col-sm-4 col-md-3 col-lg-2"
       >
-        <span class="card-pf-utilization-card-details-count stats-count">{{s}}</span>
+        <span class="card-pf-utilization-card-details-count stats-count" :title="s">
+          {{s | humanFormat}}
+        </span>
         <span class="card-pf-utilization-card-details-description stats-description">
           <span class="card-pf-utilization-card-details-line-2 stats-text">{{$t('dashboard.'+i)}}</span>
         </span>
