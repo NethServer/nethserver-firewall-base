@@ -122,7 +122,8 @@
         "ndpi": "nDPI",
         "details_for": "Details for",
         "name": "Name",
-        "counter": "Counter"
+        "counter": "Counter",
+        "unknown": "Unknown"
     },
     "wan": {
         "title": "WAN",
