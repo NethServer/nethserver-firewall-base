@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.10.0
+Version: 3.10.1
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Fri Jul 24 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.10.1-1
+- Firewall rule, description lost when disabled - Bug NethServer/dev#6239
+
 * Thu Jul 02 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.10.0-1
 - Human readable numbers in Cockpit dashboards - NethServer/dev#6206
 - Switch suricata to repeat mode - NethServer/dev#6205
