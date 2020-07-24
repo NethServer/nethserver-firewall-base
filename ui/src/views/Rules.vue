@@ -1751,6 +1751,7 @@ export default {
         Dst: r.Dst ? r.Dst : null,
         id: r.id,
         Src: r.Src ? r.Src : null,
+        Description: r.Description,
         type: "rule"
       };
 
