@@ -164,8 +164,8 @@ Each rule record has the following fields:
 * ``Src``, ``Dst``: {*literal*|*reference*} where
 
   * *literal* is an IP, a CIDR, ``any`` (any source/destination) or ``fw`` (the firewall itself)
-  * *reference* has the form ``prefix;value``, where prefix can be a DB type (``host``, ``host-group``,  ``zone``, ``iprange``, ``cidr``) or the string ``role``, 
-    ``value`` is a DB key or an interface role name (``green``, ``red``...)
+  * *reference* has the form ``prefix;value``, where prefix can be a DB type (``host``, ``host-group``,  ``zone``, ``iprange``, ``cidr``, ``mac``) or the string ``role``, 
+    ``value`` is a DB key or an interface role name (``green``, ``red``...).  ``mac`` objects are *not* supported inside the ``Dst`` field.
 * ``Action``: can be ``ACCEPT``, ``DROP`` or ``REJECT``
 
   * ``ACCEPT`` allows the traffic
@@ -262,6 +262,7 @@ Supported objects are:
 * Ip range
 * Zone
 * Time
+* MAC address
 
 A host is an already defined entry inside the ``hosts`` db, or a new key of type ``host``: ::
 
@@ -320,6 +321,14 @@ Database example: ::
 
     db fwtimes setprop officehours WeekDays 'Mon,Tue,Wed,Thu' TimeStart '09:00' TimeStop '18:00'
 
+A MAC address is a ``mac`` record entry inside ``macs`` database.
+The MAC must always have a ``Zone`` property which specifies the network segment where the device is connected.
+It's something like: ::
+
+ mac1=mac
+    Address=52:54:00:05:2d:c3
+    Description=My mac test
+    Zone=green
 
 
 Rules based on mac address
