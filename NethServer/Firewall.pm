@@ -983,9 +983,10 @@ sub countReferences($$)
 	'vlan' => 'role',
 	'alias' => 'role',
 	'bond' => 'role',
-        'cidr', => 'cidr',
-        'time', => 'time',
-        'iprange' => 'iprange'
+    'cidr', => 'cidr',
+    'time', => 'time',
+    'iprange' => 'iprange',
+    'mac' => 'mac'
 	};
 
     my $db = esmith::DB::db->open_ro($dbName);

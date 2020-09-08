@@ -263,6 +263,45 @@ case "delete-host-group":
         }
     }
     break;
+
+case "create-mac":
+case "update-mac":
+    $db = new EsmithDatabase('macs');
+    $ndb = new EsmithDatabase('networks');
+    $zones = array();
+    foreach ($ndb->getAll() as $k => $props) {
+        if (isset($props['role']) && $props['type'] != 'xdsl-disabled') {
+            $zones[$props['role']] = 1;
+        } else if ($props['type'] == 'zone') {
+            $zones[$k] = 1;
+        }
+    }
+
+    $zoneValidator = $v->createValidator()->memberOf(array_keys($zones));
+
+    $v->declareParameter('name', Validate::USERNAME);
+    $v->declareParameter('Description', Validate::ANYTHING);
+    $v->declareParameter('Address', Validate::MACADDRESS);
+    $v->declareParameter('Zone', $zoneValidator);
+
+    if( $action == 'create-mac' && $db->getKey($data['name']) ) {
+        $v->addValidationError('name', 'mac_exists', $data['name']);
+    } elseif ( $action == 'update-mac' && !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'mac_not_exists', $data['name']);
+    }
+    break;
+case "delete-mac":
+    $db = new EsmithDatabase('macs');
+    if ( !$db->getKey($data['name']) ){
+        $v->addValidationError('name', 'mac_not_exists', $data['name']);
+    } else {
+        $deleteValidator = $v->createValidator()->platform('fwobject-mac-delete', 'macs');
+        if( !$deleteValidator->evaluate($data['name']) ) {
+            $v->addValidationError('name', 'mac_cannot_be_delete', $data['name']);
+        }
+    }
+    break;
+
 default:
     error();
     break;

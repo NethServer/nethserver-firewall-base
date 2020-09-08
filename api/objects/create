@@ -71,6 +71,10 @@ case $action in
         save_db hosts
         /sbin/e-smith/db hosts set "$(_get name)" host-group Members "$(_get_array Members)" Description "$(_get Description)"
         ;;
+    "create-mac"|"update-mac")
+        save_db macs
+        /sbin/e-smith/db macs set "$(_get name)" mac Zone "$(_get Zone)" Address "$(_get Address)" Description "$(_get Description)"
+        ;;
     *)
         error
         ;;
