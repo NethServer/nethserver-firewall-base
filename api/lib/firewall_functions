@@ -271,7 +271,7 @@ function fw_rule
         Position "$(_get Position)"  Time "$Time" \
         Dst "$Dst" Service "$Service" \
         Src "$Src" status "$(_get status)" \
-        Description "$(_get Description)"
+        State "$(_get State)" Description "$(_get Description)"
     
     if [ $? -gt 0 ]; then
         error "SaveFailed" "check_logs"
