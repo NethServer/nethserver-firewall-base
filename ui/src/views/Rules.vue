@@ -128,6 +128,14 @@
                 v-show="r.Log"
                 class="fa fa-bookmark-o log-icon"
               ></span>
+              <span
+                data-toggle="tooltip"
+                data-placement="top"
+                data-html="true"
+                :title="$t('rules.state_enabled')"
+                v-show="r.State"
+                class="pficon pficon-security pf-orange state-icon"
+              ></span>
             </div>
             <div class="list-view-pf-body">
               <div class="list-view-pf-description rules-src-dst">
@@ -537,6 +545,29 @@
                   </span>
                 </div>
               </div>
+
+              <div
+                v-show="newRule.advanced"
+                :class="['form-group', newRule.errors.State.hasError ? 'has-error' : '']"
+              >
+                <label class="col-sm-3 control-label">
+                  {{$t('rules.state')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('rules.state_enabled')"
+                    :chapter="'rules_state'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
+                <div class="col-sm-9">
+                  <input class="form-control" type="checkbox" v-model="newRule.State">
+                  <span v-if="newRule.errors.State.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newRule.errors.State.message)}}
+                  </span>
+                </div>
+              </div>
+
             </div>
             <div class="modal-footer no-mg-top">
               <div v-if="newRule.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
@@ -789,6 +820,14 @@ export default {
           '<div class="type-info"><span class="fa fa-bookmark-o mg-right-5 mg-top-5 detail-icon"></span>' +
           "<span>" +
           this.$i18n.t("rules.log_enabled") +
+          "</span></div>";
+      }
+
+      if (rule.State) {
+        html +=
+          '<div class="type-info"><span class="pficon pficon-security mg-right-5 mg-top-5 detail-icon"></span>' +
+          "<span>" +
+          this.$i18n.t("rules.state") +
           "</span></div>";
       }
 
@@ -1173,6 +1212,7 @@ export default {
         Quick: false,
         Time: "",
         Description: "",
+        State: false,
         isLoading: false,
         isEdit: false,
         isDuplicate: false,
@@ -1214,7 +1254,7 @@ export default {
           hasError: false,
           message: ""
         },
-        Log: {
+        State: {
           hasError: false,
           message: ""
         },
@@ -1647,6 +1687,7 @@ export default {
             success = JSON.parse(success);
             var rules = success.rules.map(function(r) {
               r.Log = r.Log == "none" ? false : true;
+              r.State = (r.State == "new" || r.State == "" || !r.State) ? false : true;
               return r;
             });
             context.rules = rules;
@@ -1764,6 +1805,7 @@ export default {
         id: r.id,
         Src: r.Src ? r.Src : null,
         Description: r.Description,
+        State: r.State ? "all" : "new",
         type: "rule"
       };
 
@@ -1821,6 +1863,7 @@ export default {
           ? context.newRule.SrcFull
           : { name: context.newRule.Src, type: "raw" },
         type: "rule",
+        State: context.newRule.State ? "all" : "new",
         Description: context.newRule.Description
       };
 
@@ -2252,6 +2295,14 @@ export default {
   bottom: 9px;
   margin-left: -40px;
   font-size: 12px !important;
+}
+
+.state-icon {
+  position: absolute;
+  bottom: 50px;
+  margin-left: -40px;
+  font-size: 12px !important;
+  color: #ec7a08;
 }
 
 .type-info {
