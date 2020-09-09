@@ -1854,7 +1854,7 @@ export default {
         },
         {
           label: this.$i18n.t("objects.zone"),
-          field: "Zone",
+          field: "Zone.name",
           filterable: true
         },
         {
