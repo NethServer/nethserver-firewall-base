@@ -121,47 +121,66 @@
           class="pull-right table-counter"
         >{{$t('connections.total')}}: {{filteredConnections.length}}</h3>
         <vue-good-table
-          :customRowsPerPageDropdown="[25,50,100]"
-          :perPage="25"
           :columns="columns"
           :rows="connections"
-          :lineNumbers="false"
-          :sort-options="{ enabled: false }"
-          :globalSearch="true"
-          :globalSearchFn="searchFn"
-          :paginate="true"
-          styleClass="table condensed"
-          :nextText="tableLangsTexts.nextText"
-          :prevText="tableLangsTexts.prevText"
-          :rowsPerPageText="tableLangsTexts.rowsPerPageText"
-          :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
-          :ofText="tableLangsTexts.ofText"
+          :pagination-options="{
+            enabled: true,
+            perPageDropdown: [25, 50, 100],
+            perPage: 25,
+            nextLabel: tableLangsTexts.nextText,
+            prevLabel: tableLangsTexts.prevText,
+            ofLabel: tableLangsTexts.ofText,
+            rowsPerPageLabel: tableLangsTexts.rowsPerPageText,
+          }"
+          :sort-options="{
+            enabled: false
+          }"
+          :search-options="{
+            enabled: true,
+            placeholder: tableLangsTexts.globalSearchPlaceholder,
+            searchFn: searchFn
+          }"
+          styleClass="table vgt2"
         >
           <template slot="table-row" slot-scope="props">
-            <td class="fancy">
+            <span v-if="props.column.field == 'src'">
               <span class="semi-bold">{{props.row.src}}</span>
               <span v-if="props.row.sport">: {{props.row.sport}}</span>
-            </td>
-            <td class="fancy">
+            </span>
+            <span v-if="props.column.field == 'dst'">
               <span class="semi-bold">{{props.row.dst}}</span>
               <span v-if="props.row.dport">: {{props.row.dport}}</span>
-            </td>
-            <td class="fancy">{{props.row.state ? props.row.state : '-'}}</td>
-            <td class="fancy">{{props.row.bytes_total | byteFormat}}</td>
-            <td class="fancy">{{props.row.timeout + " s"}}</td>
-            <td
-              class="fancy"
-            >{{props.row['delta-time'] ? props.row['delta-time'] : null | secondsInHour }}</td>
-            <td class="fancy">{{formatNatField(props.row)}}</td>
-            <td class="fancy">{{props.row.provider ? props.row.provider : "-" }}</td>
-            <td class="fancy">{{props.row.ndpi ? props.row.ndpi : "-" }}</td>
-            <td class="fancy">{{props.row.prio ? props.row.prio : "-" }}</td>
-            <td class="fancy">
+            </span>
+            <span v-if="props.column.field == 'state'">
+              {{props.row.state ? props.row.state : '-'}}
+            </span>
+            <span v-if="props.column.field == 'bytes_total'">
+              {{props.row.bytes_total | byteFormat}}
+            </span>
+            <span v-if="props.column.field == 'timeout'">
+              {{props.row.timeout + " s"}}
+            </span>
+            <span v-if="props.column.field == 'delta-time'">
+              {{props.row['delta-time'] ? props.row['delta-time'] : null | secondsInHour }}
+            </span>
+            <span v-if="props.column.field == 'nat'">
+              {{formatNatField(props.row)}}
+            </span>
+            <span v-if="props.column.field == 'provider'">
+              {{props.row.provider ? props.row.provider : "-" }}
+            </span>
+            <span v-if="props.column.field == 'ndpi'">
+              {{props.row.ndpi ? props.row.ndpi : "-" }}
+            </span>
+            <span v-if="props.column.field == 'prio'">
+              {{props.row.prio ? props.row.prio : "-" }}
+            </span>
+            <span v-if="props.column.field == 'actions'">
               <button @click="openDeleteConnection(props.row)" :class="['btn btn-danger']">
                 <span :class="['fa', 'fa-times', 'span-right-margin']"></span>
                 {{$t('delete')}}
               </button>
-            </td>
+            </span>
           </template>
         </vue-good-table>
       </div>
@@ -328,7 +347,7 @@ export default {
         },
         {
           label: "",
-          field: "",
+          field: "actions",
           filterable: true,
           sortable: false
         }
