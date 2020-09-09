@@ -284,8 +284,16 @@ case "update-mac":
     $v->declareParameter('Address', Validate::MACADDRESS);
     $v->declareParameter('Zone', $zoneValidator);
 
-    if( $action == 'create-mac' && $db->getKey($data['name']) ) {
-        $v->addValidationError('name', 'mac_exists', $data['name']);
+    if( $action == 'create-mac') {
+        if ( $db->getKey($data['name']) ) {
+            $v->addValidationError('name', 'mac_exists', $data['name']);
+        }
+
+        foreach ($db->getAll() as $i => $n) {
+            if ($n['Address'] == $data['Address']) {
+                $v->addValidationError('Address', 'mac_address_exists', $data['Address']);
+            }
+        }
     } elseif ( $action == 'update-mac' && !$db->getKey($data['name']) ){
         $v->addValidationError('name', 'mac_not_exists', $data['name']);
     }

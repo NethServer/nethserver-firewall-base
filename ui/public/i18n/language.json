@@ -321,7 +321,18 @@
         "application": "Application",
         "raw": "RAW value, no object found",
         "local": "DNS",
-        "remote": "DHCP"
+        "remote": "DHCP",
+        "add_mac_address": "Add MAC address",
+        "mac_addresses": "MAC addresses",
+        "mac_address": "MAC address",
+        "edit_mac_address": "Edit MAC address",
+        "mac_address_created_ok": "MAC address created successfully!",
+        "mac_address_created_error": "MAC address not created.",
+        "mac_address_updated_ok": "MAC address updated successfully!",
+        "mac_address_updated_error": "MAC address not updated.",
+        "mac_address_deleted_ok": "MAC address deleted successfully!",
+        "mac_address_deleted_error": "MAC address not deleted.",
+        "delete_mac_address": "Delete MAC address"
     },
     "port_forward": {
         "title": "Port Forward",
@@ -501,6 +512,7 @@
         "rule_not_exists": "Rule does not exist",
         "valid_ip_or_cidr": "Must be a valid ip or cidr",
         "time_not_found": "Time object does not exist",
+        "host_key_exists": "A host with the same name already exists",
         "host_doesnt_exists": "Host does not exist",
         "non_existing_port-forward": "Port forward does not exist",
         "non_existing_host": "Host does not exist",
@@ -539,7 +551,12 @@
         "access_invalid": "Invalid access attribute",
         "port_list_empty": "This attribute is mandatory",
         "port_list_invalid": "Invalid list of ports",
-        "tcp_ports_and_udp_ports_empty": "At least one TCP or UDP port must be specified"
+        "tcp_ports_and_udp_ports_empty": "At least one TCP or UDP port must be specified",
+        "mac_exists": "A MAC address with the same name already exists",
+        "mac_not_exists": "MAC address does not exist",
+        "mac_address_exists": "A MAC address with the same address already exists",
+        "valid_macAddress": "Invalid MAC address",
+        "mac_cannot_be_delete": "This MAC address can't be deleted because it is in use"
     },
     "docs": {
         "pf_origin_port": "Insert a single port, a list of comma-separated ports, or a port range using \":\" as separator like \"100:200\".",
