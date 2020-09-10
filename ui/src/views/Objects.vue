@@ -23,6 +23,14 @@
         <a
           class="nav-link"
           data-toggle="tab"
+          href="#mac-addresses-tab"
+          id="mac-addresses-tab-parent"
+        >{{$t('objects.mac_addresses')}}</a>
+      </li>
+      <li>
+        <a
+          class="nav-link"
+          data-toggle="tab"
           href="#ip-ranges-tab"
           id="ip-ranges-tab-parent"
         >{{$t('objects.ip_ranges')}}</a>
@@ -58,14 +66,6 @@
           href="#services-tab"
           id="services-tab-parent"
         >{{$t('objects.services')}}</a>
-      </li>
-      <li>
-        <a
-          class="nav-link"
-          data-toggle="tab"
-          href="#mac-addresses-tab"
-          id="mac-addresses-tab-parent"
-        >{{$t('objects.mac_addresses')}}</a>
       </li>
     </ul>
 
@@ -1294,20 +1294,6 @@
                   >{{$t('validation.validation_failed')}}: {{$t('validation.'+newMacAddress.errors.Address.message)}}</span>
                 </div>
               </div>
-              <div
-                :class="['form-group', newMacAddress.errors.Description.hasError ? 'has-error' : '']"
-              >
-                <label
-                  class="col-sm-3 control-label"
-                >{{$t('objects.description')}}</label>
-                <div class="col-sm-9">
-                  <input type="text" v-model="newMacAddress.Description" class="form-control" />
-                  <span
-                    v-if="newMacAddress.errors.Description.hasError"
-                    class="help-block"
-                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newMacAddress.errors.Description.message)}}</span>
-                </div>
-              </div>
               <div :class="['form-group', newMacAddress.errors.Zone.hasError ? 'has-error' : '']">
                 <label class="col-sm-3 control-label">
                   {{$t('objects.zone')}}
@@ -1339,7 +1325,21 @@
                   <span
                     v-if="newMacAddress.errors.Zone.hasError"
                     class="help-block"
-                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newMacAddress.errors.Zone.message)}}</span>
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.must_be_one_of') + " " + accessZonesList}} </span>
+                </div>
+              </div>
+              <div
+                :class="['form-group', newMacAddress.errors.Description.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                >{{$t('objects.description')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="newMacAddress.Description" class="form-control" />
+                  <span
+                    v-if="newMacAddress.errors.Description.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newMacAddress.errors.Description.message)}}</span>
                 </div>
               </div>
             </div>
@@ -1896,6 +1896,13 @@ export default {
       interfaces: [],
       weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     };
+  },
+  computed: {
+    accessZonesList() {
+      return this.accessZones.map(function(accessZone) {
+        return accessZone.name;
+      }).join(", ");
+    }
   },
   methods: {
     hostAlreadyAdded(bind) {

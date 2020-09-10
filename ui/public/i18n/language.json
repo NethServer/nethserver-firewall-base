@@ -322,6 +322,7 @@
         "raw": "RAW value, no object found",
         "local": "DNS",
         "remote": "DHCP",
+        "mac": "MAC address",
         "add_mac_address": "Add MAC address",
         "mac_addresses": "MAC addresses",
         "mac_address": "MAC address",
@@ -556,7 +557,8 @@
         "mac_not_exists": "MAC address does not exist",
         "mac_address_exists": "A MAC address with the same address already exists",
         "valid_macAddress": "Invalid MAC address",
-        "mac_cannot_be_delete": "This MAC address can't be deleted because it is in use"
+        "mac_cannot_be_delete": "This MAC address can't be deleted because it is in use",
+        "must_be_one_of": "Must be one of"
     },
     "docs": {
         "pf_origin_port": "Insert a single port, a list of comma-separated ports, or a port range using \":\" as separator like \"100:200\".",
