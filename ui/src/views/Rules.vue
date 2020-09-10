@@ -753,7 +753,13 @@ export default {
       highlightInstance: null,
       expandInfo: true,
       status: {},
-      newObject: this.initObject()
+      newObject: this.initObject(),
+      any: {
+        name: "any",
+        type: "any",
+        typeId: "any",
+        Description: ""
+      }
     };
   },
   computed: {
@@ -1276,7 +1282,7 @@ export default {
       var objects = this.roles.concat(
         this.hosts.concat(
           this.hostGroups.concat(
-            this.ipRanges.concat(this.cidrSubs.concat(this.zones.concat(this.macAddresses)))
+            this.ipRanges.concat(this.cidrSubs.concat(this.zones.concat(this.macAddresses.concat(this.any))))
           )
         )
       );
@@ -1321,7 +1327,7 @@ export default {
       var objects = this.roles.concat(
         this.hosts.concat(
           this.hostGroups.concat(
-            this.ipRanges.concat(this.cidrSubs.concat(this.zones))
+            this.ipRanges.concat(this.cidrSubs.concat(this.zones.concat(this.any)))
           )
         )
       );
