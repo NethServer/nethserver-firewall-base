@@ -971,22 +971,22 @@ sub countReferences($$)
     my $key = shift;
 
     my $typeMap = {
-	'provider' => 'provider',
-	'host-group' => 'host-group',
-	'host' => 'host',
-	'remote' => 'host',
-	'local' => 'host',
-	'fwservice' => 'fwservice',
-	'zone' => 'zone',
-	'ethernet' => 'role',
-	'bridge' => 'role',
-	'vlan' => 'role',
-	'alias' => 'role',
-	'bond' => 'role',
-    'cidr', => 'cidr',
-    'time', => 'time',
-    'iprange' => 'iprange',
-    'mac' => 'mac'
+        'provider' => 'provider',
+        'host-group' => 'host-group',
+        'host' => 'host',
+        'remote' => 'host',
+        'local' => 'host',
+        'fwservice' => 'fwservice',
+        'zone' => 'zone',
+        'ethernet' => 'role',
+        'bridge' => 'role',
+        'vlan' => 'role',
+        'alias' => 'role',
+        'bond' => 'role',
+        'cidr', => 'cidr',
+        'time', => 'time',
+        'iprange' => 'iprange',
+        'mac' => 'mac'
 	};
 
     my $db = esmith::DB::db->open_ro($dbName);
