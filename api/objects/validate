@@ -269,6 +269,7 @@ case "update-mac":
     $db = new EsmithDatabase('macs');
     $ndb = new EsmithDatabase('networks');
     $zones = array();
+    $zones['red'] = 1; # always include red role
     foreach ($ndb->getAll() as $k => $props) {
         if (isset($props['role']) && $props['type'] != 'xdsl-disabled') {
             $zones[$props['role']] = 1;
@@ -284,16 +285,17 @@ case "update-mac":
     $v->declareParameter('Address', Validate::MACADDRESS);
     $v->declareParameter('Zone', $zoneValidator);
 
-    if( $action == 'create-mac') {
-        if ( $db->getKey($data['name']) ) {
-            $v->addValidationError('name', 'mac_exists', $data['name']);
-        }
+    # check MAC address does not already exist, excluding current MAC object
+    $exclude = $db->getKey($data['name']);
 
-        foreach ($db->getAll() as $i => $n) {
-            if ($n['Address'] == $data['Address']) {
-                $v->addValidationError('Address', 'mac_address_exists', $data['Address']);
-            }
+    foreach ($db->getAll() as $i => $n) {
+        if ($n['Address'] == $data['Address'] && $i != $exclude) {
+            $v->addValidationError('Address', 'mac_address_exists', $data['Address']);
         }
+    }
+
+    if( $action == 'create-mac' && $db->getKey($data['name']) ) {
+        $v->addValidationError('name', 'mac_exists', $data['name']);
     } elseif ( $action == 'update-mac' && !$db->getKey($data['name']) ){
         $v->addValidationError('name', 'mac_not_exists', $data['name']);
     }
