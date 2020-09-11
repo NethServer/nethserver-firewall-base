@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueI18n from "vue-i18n";
 import VueGoodTable from "vue-good-table";
+import 'vue-good-table/dist/vue-good-table.css'
 import VueToggleButton from 'vue-js-toggle-button';
 import Sortable from 'sortablejs'
 

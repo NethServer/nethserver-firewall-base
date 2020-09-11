@@ -120,27 +120,35 @@
           <form class="form-horizontal" v-on:submit.prevent="undefined">
             <div class="modal-body">
               <vue-good-table
-                :customRowsPerPageDropdown="[5,10,25,50,100]"
-                :perPage="5"
                 :columns="detailsColumns"
                 :rows="currentService.detailsRows"
-                :lineNumbers="false"
-                :defaultSortBy="{field: 'counter', type: 'desc'}"
-                :globalSearch="true"
-                :paginate="true"
-                styleClass="table"
-                :nextText="tableLangsTexts.nextText"
-                :prevText="tableLangsTexts.prevText"
-                :rowsPerPageText="tableLangsTexts.rowsPerPageText"
-                :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
-                :ofText="tableLangsTexts.ofText"
+                :pagination-options="{
+                  enabled: true,
+                  perPageDropdown: [5, 10, 25, 50, 100],
+                  perPage: 5,
+                  nextLabel: tableLangsTexts.nextText,
+                  prevLabel: tableLangsTexts.prevText,
+                  ofLabel: tableLangsTexts.ofText,
+                  rowsPerPageLabel: tableLangsTexts.rowsPerPageText,
+                }"
+                :sort-options="{
+                  enabled: true,
+                  initialSortBy: {field: 'counter', type: 'desc'},
+                }"
+                :search-options="{
+                  enabled: true,
+                  placeholder: tableLangsTexts.globalSearchPlaceholder,
+                }"
+                styleClass="table vgt2"
               >
                 <template slot="table-row" slot-scope="props">
-                  <td class="fancy">
+                  <span v-if="props.column.field == 'name'">
                     <span :class="['fa', props.row.icon, 'mg-right-10']"></span>
                     <b>{{props.row.name | uppercase}}</b>
-                  </td>
-                  <td class="fancy">{{props.row.counter}}</td>
+                  </span>
+                  <span v-if="props.column.field == 'counter'">
+                    {{props.row.counter}}
+                  </span>
                 </template>
               </vue-good-table>
             </div>

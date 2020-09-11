@@ -79,23 +79,29 @@
         <div v-if="!view.hosts.isLoaded" class="spinner spinner-lg"></div>
         <vue-good-table
           v-show="view.hosts.isLoaded"
-          :customRowsPerPageDropdown="[25,50,100]"
-          :perPage="25"
           :columns="hostsColumns"
           :rows="hostsRows"
-          :lineNumbers="false"
-          :defaultSortBy="{field: 'name', type: 'asc'}"
-          :globalSearch="true"
-          :paginate="true"
-          styleClass="table"
-          :nextText="tableLangsTexts.nextText"
-          :prevText="tableLangsTexts.prevText"
-          :rowsPerPageText="tableLangsTexts.rowsPerPageText"
-          :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
-          :ofText="tableLangsTexts.ofText"
+          :pagination-options="{
+            enabled: true,
+            perPageDropdown: [25, 50, 100],
+            perPage: 25,
+            nextLabel: tableLangsTexts.nextText,
+            prevLabel: tableLangsTexts.prevText,
+            ofLabel: tableLangsTexts.ofText,
+            rowsPerPageLabel: tableLangsTexts.rowsPerPageText,
+          }"
+          :sort-options="{
+            enabled: true,
+            initialSortBy: {field: 'name', type: 'asc'},
+          }"
+          :search-options="{
+            enabled: true,
+            placeholder: tableLangsTexts.globalSearchPlaceholder,
+          }"
+          styleClass="table vgt2"
         >
           <template slot="table-row" slot-scope="props">
-            <td class="fancy">
+            <span v-if="props.column.field == 'name'">
               <a
                 :class="[props.row.type != 'host' ? 'disabled-black' : '']"
                 @click="props.row.type != 'host' ? undefined : openEditHost(props.row)"
@@ -103,13 +109,15 @@
                 <strong>{{ props.row.name}}</strong>
                 <span class="mg-left-5" v-if="props.row.type != 'host'">({{$t('objects.'+props.row.type)}})</span>
               </a>
-            </td>
-            <td class="fancy">
+            </span>
+            <span v-if="props.column.field == 'IpAddress'">
               <span class="pficon pficon-screen"></span>
               {{props.row.IpAddress}}
-            </td>
-            <td class="fancy">{{ props.row.Description}}</td>
-            <td>
+            </span>
+            <span v-if="props.column.field == 'Description'">
+              {{ props.row.Description}}
+            </span>
+            <span v-if="props.column.field == 'action'">
               <button
                 v-if="props.row.type == 'host'"
                 @click="openEditHost(props.row)"
@@ -137,7 +145,7 @@
                   </li>
                 </ul>
               </div>
-            </td>
+            </span>
           </template>
         </vue-good-table>
       </div>
@@ -159,29 +167,37 @@
         <div v-if="!view.hostGroups.isLoaded" class="spinner spinner-lg"></div>
         <vue-good-table
           v-show="view.hostGroups.isLoaded"
-          :customRowsPerPageDropdown="[25,50,100]"
-          :perPage="25"
           :columns="hostGroupsColumns"
           :rows="hostGroupsRows"
-          :lineNumbers="false"
-          :defaultSortBy="{field: 'name', type: 'asc'}"
-          :globalSearch="true"
-          :paginate="true"
-          styleClass="table"
-          :nextText="tableLangsTexts.nextText"
-          :prevText="tableLangsTexts.prevText"
-          :rowsPerPageText="tableLangsTexts.rowsPerPageText"
-          :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
-          :ofText="tableLangsTexts.ofText"
+          :pagination-options="{
+            enabled: true,
+            perPageDropdown: [25, 50, 100],
+            perPage: 25,
+            nextLabel: tableLangsTexts.nextText,
+            prevLabel: tableLangsTexts.prevText,
+            ofLabel: tableLangsTexts.ofText,
+            rowsPerPageLabel: tableLangsTexts.rowsPerPageText,
+          }"
+          :sort-options="{
+            enabled: true,
+            initialSortBy: {field: 'name', type: 'asc'},
+          }"
+          :search-options="{
+            enabled: true,
+            placeholder: tableLangsTexts.globalSearchPlaceholder,
+          }"
+          styleClass="table vgt2"
         >
           <template slot="table-row" slot-scope="props">
-            <td class="fancy">
+            <span v-if="props.column.field == 'name'">
               <a @click="openEditHostGroup(props.row)">
                 <strong>{{ props.row.name}}</strong>
               </a>
-            </td>
-            <td class="fancy">{{ props.row.Description}}</td>
-            <td>
+            </span>
+            <span v-if="props.column.field == 'Description'">
+              {{ props.row.Description}}
+            </span>
+            <span v-if="props.column.field == 'action'">
               <button @click="openEditHostGroup(props.row)" class="btn btn-default">
                 <span class="fa fa-pencil span-right-margin"></span>
                 {{$t('edit')}}
@@ -205,7 +221,7 @@
                   </li>
                 </ul>
               </div>
-            </td>
+            </span>
           </template>
         </vue-good-table>
       </div>
@@ -227,36 +243,44 @@
         <div v-if="!view.ipRanges.isLoaded" class="spinner spinner-lg"></div>
         <vue-good-table
           v-show="view.ipRanges.isLoaded"
-          :customRowsPerPageDropdown="[25,50,100]"
-          :perPage="25"
           :columns="ipRangesColumns"
           :rows="ipRangesRows"
-          :lineNumbers="false"
-          :defaultSortBy="{field: 'name', type: 'asc'}"
-          :globalSearch="true"
-          :paginate="true"
-          styleClass="table"
-          :nextText="tableLangsTexts.nextText"
-          :prevText="tableLangsTexts.prevText"
-          :rowsPerPageText="tableLangsTexts.rowsPerPageText"
-          :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
-          :ofText="tableLangsTexts.ofText"
+          :pagination-options="{
+            enabled: true,
+            perPageDropdown: [25, 50, 100],
+            perPage: 25,
+            nextLabel: tableLangsTexts.nextText,
+            prevLabel: tableLangsTexts.prevText,
+            ofLabel: tableLangsTexts.ofText,
+            rowsPerPageLabel: tableLangsTexts.rowsPerPageText,
+          }"
+          :sort-options="{
+            enabled: true,
+            initialSortBy: {field: 'name', type: 'asc'},
+          }"
+          :search-options="{
+            enabled: true,
+            placeholder: tableLangsTexts.globalSearchPlaceholder,
+          }"
+          styleClass="table vgt2"
         >
           <template slot="table-row" slot-scope="props">
-            <td class="fancy">
+            <span v-if="props.column.field == 'name'">
               <a @click="openEditIPRange(props.row)">
                 <strong>{{ props.row.name}}</strong>
               </a>
-            </td>
-            <td class="fancy">
+            </span>
+            <span v-if="props.column.field == 'range'">
               <span class="col-sm-1">{{$t('objects.start')}}:</span>
               <b class="col-sm-2">{{ props.row.Start}}</b>
               <br />
               <span class="col-sm-1">{{$t('objects.end')}}:</span>
               <b class="col-sm-2">{{ props.row.End}}</b>
-            </td>
-            <td class="fancy">{{ props.row.Description}}</td>
-            <td>
+            </span>
+            <span v-if="props.column.field == 'Description'">
+              {{ props.row.Description}}
+            </span>
+            <span v-if="props.column.field == 'action'">
               <button @click="openEditIPRange(props.row)" class="btn btn-default">
                 <span class="fa fa-pencil span-right-margin"></span>
                 {{$t('edit')}}
@@ -280,7 +304,7 @@
                   </li>
                 </ul>
               </div>
-            </td>
+            </span>
           </template>
         </vue-good-table>
       </div>
@@ -302,33 +326,41 @@
         <div v-if="!view.cidrSubs.isLoaded" class="spinner spinner-lg"></div>
         <vue-good-table
           v-show="view.cidrSubs.isLoaded"
-          :customRowsPerPageDropdown="[25,50,100]"
-          :perPage="25"
           :columns="cidrSubsColumns"
           :rows="cidrSubsRows"
-          :lineNumbers="false"
-          :defaultSortBy="{field: 'name', type: 'asc'}"
-          :globalSearch="true"
-          :paginate="true"
-          styleClass="table"
-          :nextText="tableLangsTexts.nextText"
-          :prevText="tableLangsTexts.prevText"
-          :rowsPerPageText="tableLangsTexts.rowsPerPageText"
-          :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
-          :ofText="tableLangsTexts.ofText"
+          :pagination-options="{
+            enabled: true,
+            perPageDropdown: [25, 50, 100],
+            perPage: 25,
+            nextLabel: tableLangsTexts.nextText,
+            prevLabel: tableLangsTexts.prevText,
+            ofLabel: tableLangsTexts.ofText,
+            rowsPerPageLabel: tableLangsTexts.rowsPerPageText,
+          }"
+          :sort-options="{
+            enabled: true,
+            initialSortBy: {field: 'name', type: 'asc'},
+          }"
+          :search-options="{
+            enabled: true,
+            placeholder: tableLangsTexts.globalSearchPlaceholder,
+          }"
+          styleClass="table vgt2"
         >
           <template slot="table-row" slot-scope="props">
-            <td class="fancy">
+            <span v-if="props.column.field == 'name'">
               <a @click="openEditCIDRSub(props.row)">
                 <strong>{{ props.row.name}}</strong>
               </a>
-            </td>
-            <td class="fancy">
+            </span>
+            <span v-if="props.column.field == 'Address'">
               <span class="pficon pficon-screen"></span>
               {{props.row.Address}}
-            </td>
-            <td class="fancy">{{ props.row.Description}}</td>
-            <td>
+            </span>
+            <span v-if="props.column.field == 'Description'">
+              {{ props.row.Description}}
+            </span>
+            <span v-if="props.column.field == 'action'">
               <button @click="openEditCIDRSub(props.row)" class="btn btn-default">
                 <span class="fa fa-pencil span-right-margin"></span>
                 {{$t('edit')}}
@@ -352,7 +384,7 @@
                   </li>
                 </ul>
               </div>
-            </td>
+            </span>
           </template>
         </vue-good-table>
       </div>
@@ -366,37 +398,45 @@
         <div v-if="!view.zones.isLoaded" class="spinner spinner-lg"></div>
         <vue-good-table
           v-show="view.zones.isLoaded"
-          :customRowsPerPageDropdown="[25,50,100]"
-          :perPage="25"
           :columns="zonesColumns"
           :rows="zonesRows"
-          :lineNumbers="false"
-          :defaultSortBy="{field: 'name', type: 'asc'}"
-          :globalSearch="true"
-          :paginate="true"
-          styleClass="table"
-          :nextText="tableLangsTexts.nextText"
-          :prevText="tableLangsTexts.prevText"
-          :rowsPerPageText="tableLangsTexts.rowsPerPageText"
-          :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
-          :ofText="tableLangsTexts.ofText"
+          :pagination-options="{
+            enabled: true,
+            perPageDropdown: [25, 50, 100],
+            perPage: 25,
+            nextLabel: tableLangsTexts.nextText,
+            prevLabel: tableLangsTexts.prevText,
+            ofLabel: tableLangsTexts.ofText,
+            rowsPerPageLabel: tableLangsTexts.rowsPerPageText,
+          }"
+          :sort-options="{
+            enabled: true,
+            initialSortBy: {field: 'name', type: 'asc'},
+          }"
+          :search-options="{
+            enabled: true,
+            placeholder: tableLangsTexts.globalSearchPlaceholder,
+          }"
+          styleClass="table vgt2"
         >
           <template slot="table-row" slot-scope="props">
-            <td class="fancy">
+            <span v-if="props.column.field == 'name'">
               <a @click="openEditZone(props.row)">
                 <strong>{{ props.row.name}}</strong>
               </a>
-            </td>
-            <td class="fancy">
+            </span>
+            <span v-if="props.column.field == 'Interface'">
               <span class="pficon pficon-plugged"></span>
               {{props.row.Interface}}
-            </td>
-            <td class="fancy">
+            </span>
+            <span v-if="props.column.field == 'Network'">
               <span class="pficon pficon-screen"></span>
               {{props.row.Network}}
-            </td>
-            <td class="fancy">{{ props.row.Description}}</td>
-            <td>
+            </span>
+            <span v-if="props.column.field == 'Description'">
+              {{ props.row.Description}}
+            </span>
+            <span v-if="props.column.field == 'action'">
               <button @click="openEditZone(props.row)" class="btn btn-default">
                 <span class="fa fa-pencil span-right-margin"></span>
                 {{$t('edit')}}
@@ -420,7 +460,7 @@
                   </li>
                 </ul>
               </div>
-            </td>
+            </span>
           </template>
         </vue-good-table>
       </div>
@@ -442,29 +482,37 @@
         <div v-if="!view.timeConditions.isLoaded" class="spinner spinner-lg"></div>
         <vue-good-table
           v-show="view.timeConditions.isLoaded"
-          :customRowsPerPageDropdown="[25,50,100]"
-          :perPage="25"
           :columns="timeConditionsColumns"
           :rows="timeConditionsRows"
-          :lineNumbers="false"
-          :defaultSortBy="{field: 'name', type: 'asc'}"
-          :globalSearch="true"
-          :paginate="true"
-          styleClass="table"
-          :nextText="tableLangsTexts.nextText"
-          :prevText="tableLangsTexts.prevText"
-          :rowsPerPageText="tableLangsTexts.rowsPerPageText"
-          :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
-          :ofText="tableLangsTexts.ofText"
+          :pagination-options="{
+            enabled: true,
+            perPageDropdown: [25, 50, 100],
+            perPage: 25,
+            nextLabel: tableLangsTexts.nextText,
+            prevLabel: tableLangsTexts.prevText,
+            ofLabel: tableLangsTexts.ofText,
+            rowsPerPageLabel: tableLangsTexts.rowsPerPageText,
+          }"
+          :sort-options="{
+            enabled: true,
+            initialSortBy: {field: 'name', type: 'asc'},
+          }"
+          :search-options="{
+            enabled: true,
+            placeholder: tableLangsTexts.globalSearchPlaceholder,
+          }"
+          styleClass="table vgt2"
         >
           <template slot="table-row" slot-scope="props">
-            <td class="fancy">
+            <span v-if="props.column.field == 'name'">
               <a @click="openEditTimeCondition(props.row)">
                 <strong>{{ props.row.name}}</strong>
               </a>
-            </td>
-            <td class="fancy">{{ props.row.Description}}</td>
-            <td>
+            </span>
+            <span v-if="props.column.field == 'Description'">
+              {{ props.row.Description}}
+            </span>
+            <span v-if="props.column.field == 'action'">
               <button @click="openEditTimeCondition(props.row)" class="btn btn-default">
                 <span class="fa fa-pencil span-right-margin"></span>
                 {{$t('edit')}}
@@ -488,7 +536,7 @@
                   </li>
                 </ul>
               </div>
-            </td>
+            </span>
           </template>
         </vue-good-table>
       </div>
@@ -510,31 +558,43 @@
         <div v-if="!view.services.isLoaded" class="spinner spinner-lg"></div>
         <vue-good-table
           v-show="view.services.isLoaded"
-          :customRowsPerPageDropdown="[25,50,100]"
-          :perPage="25"
           :columns="servicesColumns"
           :rows="servicesRows"
-          :lineNumbers="false"
-          :defaultSortBy="{field: 'name', type: 'asc'}"
-          :globalSearch="true"
-          :paginate="true"
-          styleClass="table"
-          :nextText="tableLangsTexts.nextText"
-          :prevText="tableLangsTexts.prevText"
-          :rowsPerPageText="tableLangsTexts.rowsPerPageText"
-          :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
-          :ofText="tableLangsTexts.ofText"
+          :pagination-options="{
+            enabled: true,
+            perPageDropdown: [25, 50, 100],
+            perPage: 25,
+            nextLabel: tableLangsTexts.nextText,
+            prevLabel: tableLangsTexts.prevText,
+            ofLabel: tableLangsTexts.ofText,
+            rowsPerPageLabel: tableLangsTexts.rowsPerPageText,
+          }"
+          :sort-options="{
+            enabled: true,
+            initialSortBy: {field: 'name', type: 'asc'},
+          }"
+          :search-options="{
+            enabled: true,
+            placeholder: tableLangsTexts.globalSearchPlaceholder,
+          }"
+          styleClass="table vgt2"
         >
           <template slot="table-row" slot-scope="props">
-            <td class="fancy">
+            <span v-if="props.column.field == 'name'">
               <a @click="openEditService(props.row)">
                 <strong>{{ props.row.name}}</strong>
               </a>
-            </td>
-            <td class="fancy">{{ props.row.Protocol | uppercase}}</td>
-            <td class="fancy">{{ props.row.Ports.join(', ')}}</td>
-            <td class="fancy">{{ props.row.Description}}</td>
-            <td>
+            </span>
+            <span v-if="props.column.field == 'Protocol'">
+              {{ props.row.Protocol | uppercase}}
+            </span>
+            <span v-if="props.column.field == 'Ports'">
+              {{ props.row.Ports.join(', ')}}
+            </span>
+            <span v-if="props.column.field == 'Description'">
+              {{ props.row.Description}}
+            </span>
+            <span v-if="props.column.field == 'action'">
               <button @click="openEditService(props.row)" class="btn btn-default">
                 <span class="fa fa-pencil span-right-margin"></span>
                 {{$t('edit')}}
@@ -558,7 +618,7 @@
                   </li>
                 </ul>
               </div>
-            </td>
+            </span>
           </template>
         </vue-good-table>
       </div>
@@ -572,35 +632,45 @@
         <div v-if="!view.macAddresses.isLoaded" class="spinner spinner-lg"></div>
         <vue-good-table
           v-show="view.macAddresses.isLoaded"
-          :customRowsPerPageDropdown="[25,50,100]"
-          :perPage="25"
           :columns="macAddressesColumns"
           :rows="macAddresses"
-          :lineNumbers="false"
-          :defaultSortBy="{field: 'name', type: 'asc'}"
-          :globalSearch="true"
-          :paginate="true"
-          styleClass="table"
-          :nextText="tableLangsTexts.nextText"
-          :prevText="tableLangsTexts.prevText"
-          :rowsPerPageText="tableLangsTexts.rowsPerPageText"
-          :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
-          :ofText="tableLangsTexts.ofText"
+          :pagination-options="{
+            enabled: true,
+            perPageDropdown: [25, 50, 100],
+            perPage: 25,
+            nextLabel: tableLangsTexts.nextText,
+            prevLabel: tableLangsTexts.prevText,
+            ofLabel: tableLangsTexts.ofText,
+            rowsPerPageLabel: tableLangsTexts.rowsPerPageText,
+          }"
+          :sort-options="{
+            enabled: true,
+            initialSortBy: {field: 'name', type: 'asc'},
+          }"
+          :search-options="{
+            enabled: true,
+            placeholder: tableLangsTexts.globalSearchPlaceholder,
+          }"
+          styleClass="table vgt2"
         >
           <template slot="table-row" slot-scope="props">
-            <td class="fancy">
+            <span v-if="props.column.field == 'name'">
               <a @click="openEditMacAddress(props.row)">
                 <strong>{{ props.row.name}}</strong>
               </a>
-            </td>
-            <td class="fancy">{{ props.row.Address}}</td>
-            <td class="fancy">{{ props.row.Description}}</td>
-            <td class="fancy">
+            </span>
+            <span v-if="props.column.field == 'Address'">
+              {{ props.row.Address}}
+            </span>
+            <span v-if="props.column.field == 'Description'">
+              {{ props.row.Description}}
+            </span>
+            <span v-if="props.column.field == 'Zone'">
               <span :class="['label', 'label-info', mapBgColor(props.row.Zone.name)]">
                 {{ props.row.Zone.name}}
               </span>
-            </td>
-            <td>
+            </span>
+            <span v-if="props.column.field == 'action'">
               <button @click="openEditMacAddress(props.row)" class="btn btn-default">
                 <span class="fa fa-pencil span-right-margin"></span>
                 {{$t('edit')}}
@@ -624,7 +694,7 @@
                   </li>
                 </ul>
               </div>
-            </td>
+            </span>
           </template>
         </vue-good-table>
       </div>
@@ -1693,7 +1763,7 @@ export default {
         },
         {
           label: this.$i18n.t("action"),
-          field: "",
+          field: "action",
           filterable: true,
           sortable: false
         }
@@ -1711,7 +1781,7 @@ export default {
         },
         {
           label: this.$i18n.t("action"),
-          field: "",
+          field: "action",
           filterable: true,
           sortable: false
         }
@@ -1734,7 +1804,7 @@ export default {
         },
         {
           label: this.$i18n.t("action"),
-          field: "",
+          field: "action",
           filterable: true,
           sortable: false
         }
@@ -1757,7 +1827,7 @@ export default {
         },
         {
           label: this.$i18n.t("action"),
-          field: "",
+          field: "action",
           filterable: true,
           sortable: false
         }
@@ -1770,12 +1840,12 @@ export default {
         },
         {
           label: this.$i18n.t("objects.interface"),
-          field: "Network",
+          field: "Interface",
           filterable: true
         },
         {
           label: this.$i18n.t("objects.network"),
-          field: "Description",
+          field: "Network",
           filterable: true
         },
         {
@@ -1785,7 +1855,7 @@ export default {
         },
         {
           label: this.$i18n.t("action"),
-          field: "",
+          field: "action",
           filterable: true,
           sortable: false
         }
@@ -1803,7 +1873,7 @@ export default {
         },
         {
           label: this.$i18n.t("action"),
-          field: "",
+          field: "action",
           filterable: true,
           sortable: false
         }
@@ -1816,12 +1886,12 @@ export default {
         },
         {
           label: this.$i18n.t("objects.protocol"),
-          field: "Description",
+          field: "Protocol",
           filterable: true
         },
         {
           label: this.$i18n.t("objects.ports"),
-          field: "Description",
+          field: "Ports",
           filterable: true
         },
         {
@@ -1831,7 +1901,7 @@ export default {
         },
         {
           label: this.$i18n.t("action"),
-          field: "",
+          field: "action",
           filterable: true,
           sortable: false
         }
@@ -1854,12 +1924,12 @@ export default {
         },
         {
           label: this.$i18n.t("objects.zone"),
-          field: "Zone.name",
+          field: "Zone",
           filterable: true
         },
         {
           label: this.$i18n.t("action"),
-          field: "",
+          field: "action",
           filterable: true,
           sortable: false
         }
