@@ -23,6 +23,14 @@
         <a
           class="nav-link"
           data-toggle="tab"
+          href="#mac-addresses-tab"
+          id="mac-addresses-tab-parent"
+        >{{$t('objects.mac_addresses')}}</a>
+      </li>
+      <li>
+        <a
+          class="nav-link"
+          data-toggle="tab"
           href="#ip-ranges-tab"
           id="ip-ranges-tab-parent"
         >{{$t('objects.ip_ranges')}}</a>
@@ -555,6 +563,72 @@
         </vue-good-table>
       </div>
       <!-- END SERVICES -->
+      <!-- MAC ADDRESSES -->
+      <div class="tab-pane fade active" id="mac-addresses-tab" role="tabpanel" aria-labelledby="mac-addresses-tab">
+        <h3>{{$t('actions')}}</h3>
+        <button @click="openCreateMacAddress()" class="btn btn-primary btn-lg">{{$t('objects.add_mac_address')}}</button>
+
+        <h3>{{$t('list')}}</h3>
+        <div v-if="!view.macAddresses.isLoaded" class="spinner spinner-lg"></div>
+        <vue-good-table
+          v-show="view.macAddresses.isLoaded"
+          :customRowsPerPageDropdown="[25,50,100]"
+          :perPage="25"
+          :columns="macAddressesColumns"
+          :rows="macAddresses"
+          :lineNumbers="false"
+          :defaultSortBy="{field: 'name', type: 'asc'}"
+          :globalSearch="true"
+          :paginate="true"
+          styleClass="table"
+          :nextText="tableLangsTexts.nextText"
+          :prevText="tableLangsTexts.prevText"
+          :rowsPerPageText="tableLangsTexts.rowsPerPageText"
+          :globalSearchPlaceholder="tableLangsTexts.globalSearchPlaceholder"
+          :ofText="tableLangsTexts.ofText"
+        >
+          <template slot="table-row" slot-scope="props">
+            <td class="fancy">
+              <a @click="openEditMacAddress(props.row)">
+                <strong>{{ props.row.name}}</strong>
+              </a>
+            </td>
+            <td class="fancy">{{ props.row.Address}}</td>
+            <td class="fancy">{{ props.row.Description}}</td>
+            <td class="fancy">
+              <span :class="['label', 'label-info', mapBgColor(props.row.Zone.name)]">
+                {{ props.row.Zone.name}}
+              </span>
+            </td>
+            <td>
+              <button @click="openEditMacAddress(props.row)" class="btn btn-default">
+                <span class="fa fa-pencil span-right-margin"></span>
+                {{$t('edit')}}
+              </button>
+              <div class="dropup pull-right dropdown-kebab-pf">
+                <button
+                  class="btn btn-link dropdown-toggle"
+                  type="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="true"
+                >
+                  <span class="fa fa-ellipsis-v"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                  <li>
+                    <a @click="openDeleteMacAddress(props.row)">
+                      <span class="fa fa-times span-right-margin"></span>
+                      {{$t('delete')}}
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </template>
+        </vue-good-table>
+      </div>
+      <!-- END MAC ADDRESSES -->
     </div>
 
     <!-- CREATE MODALS -->
@@ -1175,6 +1249,109 @@
         </div>
       </div>
     </div>
+    <div class="modal" id="newMacAddressModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4
+              class="modal-title"
+            >{{newMacAddress.isEdit ? $t('objects.edit_mac_address') + ' '+ newMacAddress.name : $t('objects.add_mac_address')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="saveMacAddress(newMacAddress)">
+            <div class="modal-body">
+              <div :class="['form-group', newMacAddress.errors.name.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                >{{$t('objects.name')}}</label>
+                <div class="col-sm-9">
+                  <input
+                    :disabled="newMacAddress.isEdit"
+                    required
+                    type="text"
+                    v-model="newMacAddress.name"
+                    class="form-control"
+                  />
+                  <span
+                    v-if="newMacAddress.errors.name.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newMacAddress.errors.name.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newMacAddress.errors.Address.hasError ? 'has-error' : '']">
+                <label
+                  class="col-sm-3 control-label"
+                >{{$t('objects.mac_address')}}</label>
+                <div class="col-sm-9">
+                  <input
+                    required
+                    type="text"
+                    v-model="newMacAddress.Address"
+                    class="form-control"
+                  />
+                  <span
+                    v-if="newMacAddress.errors.Address.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newMacAddress.errors.Address.message)}}</span>
+                </div>
+              </div>
+              <div :class="['form-group', newMacAddress.errors.Zone.hasError ? 'has-error' : '']">
+                <label class="col-sm-3 control-label">
+                  {{$t('objects.zone')}}
+                </label>
+                <div class="col-sm-9">
+                  <suggestions
+                    v-model="newMacAddress.Zone.name"
+                    required
+                    :options="autoOptions"
+                    :onInputChange="filterAccessZoneAuto"
+                    :onItemSelected="selectAccessZoneAuto"
+                  >
+                    <div slot="item" slot-scope="props" class="single-item">
+                      <span>
+                        <span
+                          v-show="props.item.typeId == 'role'"
+                          :class="['square-'+ props.item.name.toUpperCase()]"
+                        ></span>
+                        {{props.item.name}}
+                        <i class="mg-left-5">{{props.item.Description}}</i>
+                        <b class="mg-left-5">{{props.item.type | capitalize}}</b>
+                      </span>
+                    </div>
+                  </suggestions>
+                  <span
+                    v-if="newMacAddress.Zone.type && newMacAddress.Zone.type.length > 0"
+                    class="help-block gray"
+                  >{{newMacAddress.Zone.typeFull}}</span>
+                  <span
+                    v-if="newMacAddress.errors.Zone.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.must_be_one_of') + " " + accessZonesList}} </span>
+                </div>
+              </div>
+              <div
+                :class="['form-group', newMacAddress.errors.Description.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                >{{$t('objects.description')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="newMacAddress.Description" class="form-control" />
+                  <span
+                    v-if="newMacAddress.errors.Description.hasError"
+                    class="help-block"
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newMacAddress.errors.Description.message)}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div v-if="newMacAddress.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-primary" type="submit">{{$t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
     <!-- END CREATE MODALS -->
     <!-- DELETE MODALS -->
     <div class="modal" id="deleteHostModal" tabindex="-1" role="dialog" data-backdrop="static">
@@ -1397,6 +1574,34 @@
         </div>
       </div>
     </div>
+    <div class="modal" id="deleteMacAddressModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{$t('objects.delete_mac_address')}} {{currentMacAddress.name}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="deleteMacAddress(currentMacAddress)">
+            <div class="modal-body">
+              <div v-show="currentMacAddress.isError" class="alert alert-warning alert-dismissable">
+                <span class="pficon pficon-warning-triangle-o"></span>
+                <strong>{{$t('warning')}}.</strong>
+                {{$t('validation.'+currentMacAddress.isError)}}.
+              </div>
+              <div class="form-group">
+                <label
+                  class="col-sm-3 control-label"
+                >{{$t('are_you_sure')}}?</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div v-if="currentMacAddress.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-danger" type="submit">{{$t('delete')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
     <!-- DELETE END MODALS -->
   </div>
 </template>
@@ -1456,7 +1661,10 @@ export default {
         },
         services: {
           isLoaded: false
-        }
+        },
+        macAddresses: {
+          isLoaded: false
+        },
       },
       tableLangsTexts: this.tableLangs(),
       hostsColumns: [
@@ -1628,6 +1836,34 @@ export default {
           sortable: false
         }
       ],
+      macAddressesColumns: [
+        {
+          label: this.$i18n.t("objects.name"),
+          field: "name",
+          filterable: true
+        },
+        {
+          label: this.$i18n.t("objects.mac_address"),
+          field: "Address",
+          filterable: true
+        },
+        {
+          label: this.$i18n.t("objects.description"),
+          field: "Description",
+          filterable: true
+        },
+        {
+          label: this.$i18n.t("objects.zone"),
+          field: "Zone.name",
+          filterable: true
+        },
+        {
+          label: this.$i18n.t("action"),
+          field: "",
+          filterable: true,
+          sortable: false
+        }
+      ],
       hostsRows: [],
       hostGroupsRows: [],
       ipRangesRows: [],
@@ -1635,6 +1871,7 @@ export default {
       zonesRows: [],
       timeConditionsRows: [],
       servicesRows: [],
+      macAddresses: [],
       currentHost: {},
       newHost: this.initHost(),
       currentHostGroup: {},
@@ -1649,10 +1886,23 @@ export default {
       newTimeCondition: this.initTimeCondition(),
       currentService: {},
       newService: this.initService(),
+      currentMacAddress: {},
+      newMacAddress: this.initMacAddress(),
+      autoOptions: {
+        inputClass: "form-control"
+      },
+      accessZones: [],
       protocols: [],
       interfaces: [],
       weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     };
+  },
+  computed: {
+    accessZonesList() {
+      return this.accessZones.map(function(accessZone) {
+        return accessZone.name;
+      }).join(", ");
+    }
   },
   methods: {
     hostAlreadyAdded(bind) {
@@ -1763,6 +2013,24 @@ export default {
         Ports: "",
         Description: "",
         errors: this.initServiceErrors()
+      };
+    },
+    initMacAddress() {
+      return {
+        isLoading: false,
+        isEdit: false,
+        isError: false,
+        name: "",
+        Address: "",
+        Description: "",
+        Zone: {
+          name: "",
+          Description: "",
+          typeId: "",
+          type: "",
+          typeFull: "",
+        },
+        errors: this.initMacAddressErrors()
       };
     },
     initHostErrors() {
@@ -1895,6 +2163,26 @@ export default {
           hasError: false,
           message: ""
         }
+      };
+    },
+    initMacAddressErrors() {
+      return {
+        name: {
+          hasError: false,
+          message: ""
+        },
+        Address: {
+          hasError: false,
+          message: ""
+        },
+        Description: {
+          hasError: false,
+          message: ""
+        },
+        Zone: {
+          hasError: false,
+          message: ""
+        },
       };
     },
     getInterfaces() {
@@ -2071,6 +2359,7 @@ export default {
           }
           context.view.zones.isLoaded = true;
           context.zonesRows = success["zones"];
+          context.getRoles();
 
           context.$forceUpdate();
           context.$parent.getFirewallStatus();
@@ -2125,6 +2414,41 @@ export default {
           }
           context.view.services.isLoaded = true;
           context.servicesRows = success["services"];
+
+          context.$forceUpdate();
+          context.$parent.getFirewallStatus();
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getMacAddresses() {
+      var context = this;
+
+      context.view.macAddresses.isLoaded = false;
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "macs"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.view.macAddresses.isLoaded = true;
+          var macAddresses = success["macs"];
+          context.macAddresses = macAddresses.map(function(mac) {
+            var accessZoneName = mac.Zone;
+            var accessZone = context.accessZones.find(function(elem) {
+              return elem.name === accessZoneName;
+            });
+            mac.Zone = accessZone;
+            return mac;
+          });
 
           context.$forceUpdate();
           context.$parent.getFirewallStatus();
@@ -3187,6 +3511,243 @@ export default {
           }
         }
       );
+    },
+    openCreateMacAddress() {
+      this.newMacAddress = this.initMacAddress();
+      $("#newMacAddressModal").modal("show");
+    },
+    openEditMacAddress(macAddress) {
+      this.newMacAddress = Object.assign({}, macAddress);
+      this.newMacAddress.errors = this.initMacAddressErrors();
+      this.newMacAddress.isLoading = false;
+      this.newMacAddress.isEdit = true;
+
+      this.newMacAddress.Zone.typeFull =
+        macAddress.Zone.name +
+        " " +
+        (macAddress.Zone.Interface ? macAddress.Zone.Interface + " " : "") +
+        (macAddress.Zone.Network ? macAddress.Zone.Network + " " : "") +
+        "(" +
+        this.$i18n.t("objects." + macAddress.Zone.typeId) +
+        ")";
+      $("#newMacAddressModal").modal("show");
+    },
+    saveMacAddress(macAddress) {
+      var context = this;
+
+      var macAddressObj = Object.assign({}, macAddress);
+      delete macAddressObj.isLoading;
+      delete macAddressObj.isEdit;
+      delete macAddressObj.isError;
+      delete macAddressObj.errors;
+      macAddressObj.Zone = macAddressObj.Zone.name;
+      macAddressObj.action = macAddress.isEdit ? "update-mac" : "create-mac";
+
+      context.newMacAddress.isLoading = true;
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/validate"],
+        macAddressObj,
+        null,
+        function(success) {
+          context.newMacAddress.isLoading = false;
+          $("#newMacAddressModal").modal("hide");
+
+          // notification
+          nethserver.notifications.success = context.$i18n.t(
+            "objects.mac_address_" +
+              (context.newMacAddress.isEdit ? "updated" : "created") +
+              "_ok"
+          );
+          nethserver.notifications.error = context.$i18n.t(
+            "objects.mac_address_" +
+              (context.newMacAddress.isEdit ? "updated" : "created") +
+              "_error"
+          );
+
+          // update values
+          if (macAddress.isEdit) {
+            nethserver.exec(
+              ["nethserver-firewall-base/objects/update"],
+              macAddressObj,
+              function(stream) {
+                console.info("macAddresses", stream);
+              },
+              function(success) {
+                // get mac addresses
+                context.getMacAddresses();
+              },
+              function(error, data) {
+                console.error(error, data);
+              }
+            );
+          } else {
+            nethserver.exec(
+              ["nethserver-firewall-base/objects/create"],
+              macAddressObj,
+              function(stream) {
+                console.info("macAddresses", stream);
+              },
+              function(success) {
+                // get mac addresses
+                context.getMacAddresses();
+              },
+              function(error, data) {
+                console.error(error, data);
+              }
+            );
+          }
+        },
+        function(error, data) {
+          var errorData = {};
+          context.newMacAddress.isLoading = false;
+          context.newMacAddress.errors = context.initMacAddressErrors();
+
+          try {
+            errorData = JSON.parse(data);
+            for (var e in errorData.attributes) {
+              var attr = errorData.attributes[e];
+              context.newMacAddress.errors[attr.parameter].hasError = true;
+              context.newMacAddress.errors[attr.parameter].message = attr.error;
+            }
+            context.$forceUpdate();
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      );
+    },
+    openDeleteMacAddress(macAddress) {
+      this.currentMacAddress = Object.assign({}, macAddress);
+      $("#deleteMacAddressModal").modal("show");
+    },
+    deleteMacAddress(macAddress) {
+      var context = this;
+
+      // notification
+      nethserver.notifications.success = context.$i18n.t(
+        "objects.mac_address_deleted_ok"
+      );
+      nethserver.notifications.error = context.$i18n.t(
+        "objects.mac_address_deleted_error"
+      );
+
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/validate"],
+        {
+          name: macAddress.name,
+          action: "delete-mac"
+        },
+        null,
+        function(success) {
+          $("#deleteMacAddressModal").modal("hide");
+          nethserver.exec(
+            ["nethserver-firewall-base/objects/delete"],
+            {
+              name: macAddress.name,
+              action: "delete-mac"
+            },
+            function(stream) {
+              console.info("macAddresses", stream);
+            },
+            function(success) {
+              // get mac addresses
+              context.getMacAddresses();
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
+        },
+        function(error, data) {
+          console.error(error, data);
+          try {
+            var errorData = JSON.parse(data);
+            macAddress.isError = errorData.attributes[0].error;
+            context.$forceUpdate();
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      );
+    },
+    getRoles() {
+      var context = this;
+
+      nethserver.exec(
+        ["nethserver-firewall-base/rules/read"],
+        {
+          action: "roles"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          var roles = success.roles;
+          roles = roles.map(function(r) {
+            var i = {};
+            i.name = r;
+            i.Description = r.toUpperCase() + " " + context.$i18n.t("objects.role");
+            i.type = context.$i18n.t("objects.role");
+            i.typeId = "role";
+            return i;
+          });
+
+          var zones = context.zonesRows.map(function(i) {
+            i.type = context.$i18n.t("objects.zone");
+            i.typeId = "zone";
+            return i;
+          });
+          context.accessZones = roles.concat(zones);
+
+          if (!context.view.macAddresses.isLoaded) {
+            context.getMacAddresses();
+          }
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    filterAccessZoneAuto(query) {
+      this.newMacAddress.Zone = {};
+
+      if (query.trim().length === 0) {
+        return null;
+      }
+
+      return this.accessZones.filter(function(item) {
+        return (
+          item.typeId.toLowerCase().includes(query.toLowerCase()) ||
+          item.name.toLowerCase().includes(query.toLowerCase()) ||
+          item.Description.toLowerCase().includes(query.toLowerCase())
+        );
+      });
+    },
+    selectAccessZoneAuto(item) {
+      this.newMacAddress.Zone = item;
+      this.newMacAddress.Zone.typeFull =
+        item.name +
+        " " +
+        (item.Interface ? item.Interface + " " : "") +
+        (item.Network ? item.Network + " " : "") +
+        "(" +
+        this.$i18n.t("objects." + item.typeId) +
+        ")";
+    },
+    mapBgColor(accesZoneName) {
+      switch (accesZoneName) {
+      case "green":
+      case "red":
+      case "orange":
+      case "blue":
+        return "bg-" + accesZoneName;
+        break;
+      default:
+        return "bg-missing";
+      }
     }
   }
 };

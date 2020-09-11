@@ -43,6 +43,10 @@ case $action in
         save_db fwtimes
         /sbin/e-smith/db fwtimes delete "$(_get name)"
         ;;
+    "delete-mac")
+        save_db fwtimes
+        /sbin/e-smith/db macs delete "$(_get name)"
+        ;;
     *)
         error
         ;;

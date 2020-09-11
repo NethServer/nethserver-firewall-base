@@ -136,6 +136,7 @@ sub new
     my $cdb_path = shift || '';
     my $pfdb_path = shift || 'portforward';
     my $ftdb_path = shift || 'fwtimes';
+    my $mdb_path = shift || 'macs';
 
     my $self = {
         sdb_path => $sdb_path,
@@ -144,7 +145,8 @@ sub new
         fdb_path => $fdb_path,
         pfdb_path => $pfdb_path,
         ftdb_path => $ftdb_path,
-        cdb_path => $cdb_path
+        cdb_path => $cdb_path,
+        mdb_path => $mdb_path
     };
     bless $self, $class;
     $self->_initialize();
@@ -163,6 +165,7 @@ sub _initialize()
     $self->{'cdb'} = esmith::ConfigDB->open_ro($self->{'cdb_path'});
     $self->{'pfdb'} = esmith::ConfigDB->open_ro($self->{'pfdb_path'});
     $self->{'ftdb'} = esmith::ConfigDB->open_ro($self->{'ftdb_path'});
+    $self->{'mdb'} = esmith::ConfigDB->open_ro($self->{'mdb_path'});
 }
 
 =head2 getAddress(id, expand_zone = 0)
@@ -227,10 +230,12 @@ sub getAddress($)
             } else { 
                 return substr($key, 0, 5); # truncate zone name to 5 chars
             }
-        } elsif ( $db eq 'cidr') {
+        } elsif ( $db eq 'cidr' ) {
             return $self->_getCidrAddress($key);
-        } elsif ( $db eq 'iprange') {
+        } elsif ( $db eq 'iprange' ) {
             return $self->_getIpRangeAddress($key);
+        } elsif ($db eq 'mac' ) {
+            return $self->_getMacAddress($key);
         }
     } 
 
@@ -471,6 +476,21 @@ sub getZone($)
         $original_value = $value;
         my @tmp = split('-',$value);
         $value = $tmp[0];
+    }
+
+    # check mac address in Shorewall format
+    if ($value =~ m/^\~([0-9a-fA-F][0-9a-fA-F]\-){5}([0-9a-fA-F][0-9a-fA-F])$/) {
+        # reverse zone search inside macs db
+        my $mk = substr($value, 1);
+        $mk =~ s/\-/:/g;
+        foreach my $m ($self->{'mdb'}->get_all_by_prop('type'=>'mac')) {
+            if ($m->prop('Address') eq $mk && $m->prop('Zone') ne '') {
+                # translate zone name for Shorewall syntax
+                my %zones = $self->listZones();
+                my $z = $zones{$m->prop('Zone')};
+                return $z.':'.$value;
+            }
+        }
     }
 
     # host group or not: always pick the first element:
@@ -922,6 +942,18 @@ sub _getIpRangeAddress($)
     return $start.'-'.$end;
 }
 
+sub _getMacAddress($)
+{
+    my $self = shift;
+    my $key = shift;
+
+    my $record = $self->{'mdb'}->get($key) || return '';
+    my $address = $record->prop('Address') || return '';
+    $address = lc($address);
+    $address =~ s/:/-/g;
+    return '~'.$address;
+}
+
 =head2 countReferences(db, key)
 
 Returns the number of references of the given <DB, key>. 
@@ -939,21 +971,22 @@ sub countReferences($$)
     my $key = shift;
 
     my $typeMap = {
-	'provider' => 'provider',
-	'host-group' => 'host-group',
-	'host' => 'host',
-	'remote' => 'host',
-	'local' => 'host',
-	'fwservice' => 'fwservice',
-	'zone' => 'zone',
-	'ethernet' => 'role',
-	'bridge' => 'role',
-	'vlan' => 'role',
-	'alias' => 'role',
-	'bond' => 'role',
+        'provider' => 'provider',
+        'host-group' => 'host-group',
+        'host' => 'host',
+        'remote' => 'host',
+        'local' => 'host',
+        'fwservice' => 'fwservice',
+        'zone' => 'zone',
+        'ethernet' => 'role',
+        'bridge' => 'role',
+        'vlan' => 'role',
+        'alias' => 'role',
+        'bond' => 'role',
         'cidr', => 'cidr',
         'time', => 'time',
-        'iprange' => 'iprange'
+        'iprange' => 'iprange',
+        'mac' => 'mac'
 	};
 
     my $db = esmith::DB::db->open_ro($dbName);

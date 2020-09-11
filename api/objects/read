@@ -181,6 +181,18 @@ if($cmd eq 'hosts' || $cmd eq 'cidr-subs'  || $cmd eq 'host-groups' || $cmd eq '
 
     print encode_json({"local-services" => \@services});
 
+} elsif ($cmd eq 'macs') {
+
+    my $db = esmith::ConfigDB->open_ro('macs');
+    my @macs;
+    foreach ($db->get_all_by_prop('type' => 'mac')) {
+        my %m = $_->props;
+        $m{'name'} = $_->key;
+            push(@macs, \%m);
+    }
+
+    print encode_json({"macs" => \@macs});
+
 } else {
     error()
 }

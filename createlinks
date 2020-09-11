@@ -128,6 +128,7 @@ validator_actions($_, qw(
    fwobject-iprange-delete
    fwobject-provider-delete
    fwobject-time-delete
+   fwobject-mac-delete
 ));
 
 validator_actions('fwobject-zone-delete', qw(

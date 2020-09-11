@@ -673,7 +673,6 @@ export default {
     this.getTimeConditions();
     this.getServices();
     this.getApplications();
-    this.getRoles();
 
     var context = this;
     context.$parent.$on("changes-applied", function() {
@@ -687,7 +686,6 @@ export default {
       context.getTimeConditions();
       context.getServices();
       context.getApplications();
-      context.getRoles();
     });
   },
   beforeRouteLeave(to, from, next) {
@@ -697,7 +695,10 @@ export default {
   data() {
     return {
       view: {
-        isLoaded: false
+        isLoaded: false,
+        macAddresses: {
+          isLoaded: false
+        },
       },
       rules: [],
       policies: [],
@@ -710,6 +711,8 @@ export default {
       services: [],
       applications: [],
       roles: [],
+      macAddresses: [],
+      accessZones: [],
       autoOptions: {
         inputClass: "form-control"
       },
@@ -1064,6 +1067,9 @@ export default {
             "square-" + (status == "disabled" ? "GRAY" : obj.name.toUpperCase())
           );
           break;
+        case "mac":
+          return "pficon pficon-memory";
+          break;
         case "any":
           return "fa fa-globe";
           break;
@@ -1230,7 +1236,7 @@ export default {
       var objects = this.roles.concat(
         this.hosts.concat(
           this.hostGroups.concat(
-            this.ipRanges.concat(this.cidrSubs.concat(this.zones))
+            this.ipRanges.concat(this.cidrSubs.concat(this.zones.concat(this.macAddresses)))
           )
         )
       );
@@ -1501,6 +1507,7 @@ export default {
             i.typeId = "zone";
             return i;
           });
+          context.getRoles();
         },
         function(error) {
           console.error(error);
@@ -1613,6 +1620,11 @@ export default {
             i.typeId = "role";
             return i;
           });
+          context.accessZones = context.roles.concat(context.zones);
+
+          if (!context.view.macAddresses.isLoaded) {
+            context.getMacAddresses();
+          }
         },
         function(error) {
           console.error(error);
@@ -1978,7 +1990,44 @@ export default {
           context.$forceUpdate();
         }
       );
-    }
+    },
+    getMacAddresses() {
+      var context = this;
+
+      context.view.macAddresses.isLoaded = false;
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "macs"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.view.macAddresses.isLoaded = true;
+          var macAddresses = success["macs"];
+          context.macAddresses = macAddresses.map(function(mac) {
+            mac.type = context.$i18n.t("objects.mac_address");
+            mac.typeId = "mac";
+            var accessZoneName = mac.Zone;
+            var accessZone = context.accessZones.find(function(elem) {
+              return elem.name === accessZoneName;
+            });
+            mac.Zone = accessZone;
+            return mac;
+          });
+
+          context.$forceUpdate();
+          context.$parent.getFirewallStatus();
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
   }
 };
 </script>
