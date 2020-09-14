@@ -400,8 +400,10 @@
         "reject": "Reject",
         "drop": "Drop",
         "log": "Log",
+        "state_enabled": "This rule is applied to new, established and related connections",
         "quick_rule": "Quick rule (acts immediately on every connection)",
         "log_enabled": "Log enabled",
+        "state": "Apply to existing connections",
         "duplicate": "Duplicate",
         "expand": "Expand info",
         "to_firewall": "To Firewall",
@@ -563,6 +565,7 @@
     "docs": {
         "pf_origin_port": "Insert a single port, a list of comma-separated ports, or a port range using \":\" as separator like \"100:200\".",
         "rules_source": "You may insert an IP address or a CIDR if you do not want to create a host or CIDR object.",
+        "rules_state": "As default, rules are applied only to new connections. When this option is enabled, the rule will be applied to all connections including already established ones.",
         "rules_destination": "You may insert an IP address or a CIDR if you do not want to create a host or CIDR object.",
         "objects_ports": "Supported syntax: comma-separated port list or port range (i.e. 10000-20000)",
         "mac_validation": "Requests from IP addresses listed in DHCP reservations are allowed only if are originated from the associated MAC address (even if DHCP is disabled).",

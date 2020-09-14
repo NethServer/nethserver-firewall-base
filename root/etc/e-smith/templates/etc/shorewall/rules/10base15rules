@@ -1,5 +1,5 @@
 #
-# 60rules
+# 10base15rules
 #
 {
     use NethServer::Firewall;
@@ -9,8 +9,8 @@
         my $status = $rule->prop("status") || "disabled";
         my $state = $rule->prop("State") || "new";
         next unless ($status eq 'enabled');
-        next if ($state ne "new");
-
+        next if ($state ne "all");
+ 
         my $src = $rule->prop("Src") || next; 
         my $dst = $rule->prop("Dst") || next;
         my $action = $rule->prop("Action") || next;
@@ -34,8 +34,8 @@
         $action .= ":$log" unless ($log eq '');
 
         # Replace empty values with "-", for column count consistency:
-        $src_addr = $src_addr eq '' ? '-' : $src_addr;
-        $dst_addr = $dst_addr eq '' ? '-' : $dst_addr;
+	    $src_addr = $src_addr eq '' ? '-' : $src_addr;
+	    $dst_addr = $dst_addr eq '' ? '-' : $dst_addr;
 
         my $params = {
             'action' => $action,

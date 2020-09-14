@@ -175,6 +175,10 @@ Each rule record has the following fields:
 * ``Time``: (optional) can be a time object, the rule will be enabled only if the time conditions is matched
 * ``Log``: can be ``none`` or ``info``. If value is ``info``, all matched packets will be logged in ``/var/log/firewall.log``. Defaults to ``none``
 * ``status``: can be ``enabled`` or ``disabled``. Default is ``enabled``
+* ``State``: (optional) select on which type of connection the rule will be applied to:
+
+  * ``new`` or empty: default, the rule will be applied only to new connections
+  * ``all``: the rule will be applied to new and established/related connections
 * ``Description``: (optional)
 
 Example of a rule accepting traffic: ::

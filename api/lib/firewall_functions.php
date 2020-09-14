@@ -148,6 +148,10 @@ function validate_rule($data, $type) {
         }
     }
 
+    if ($data['State']) {
+        $v->declareParameter('State', $v->createValidator()->memberOf('all', 'new'));
+    }
+
     # Validate the input
     if ($v->validate()) {
         success();
