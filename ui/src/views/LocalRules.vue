@@ -816,6 +816,7 @@ export default {
     });
   },
   beforeRouteLeave(to, from, next) {
+    this.$parent.$off("changes-applied");
     $(".modal").modal("hide");
     next();
   },
