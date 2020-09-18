@@ -2474,6 +2474,7 @@ export default {
         Log: r.Log ? "info" : " none",
         Time: r.Time ? r.Time : null,
         Position: r.Position,
+        Description: r.Description,
         status: r.status == "enabled" ? "disabled" : "enabled",
         Service: r.Service
           ? r.Service
