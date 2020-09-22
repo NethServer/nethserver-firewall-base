@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.11.0
+Version: 3.11.1
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,10 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Tue Sep 22 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.11.1-1
+- Firewall Rule wan description lost when disabled - Bug NethServer/dev#6274
+- Firewall: Rules page doesn't load after applying changes - Bug NethServer/dev#6275
+
 * Thu Sep 17 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.11.0-1
 - Support MAC addresses on firewall rules - NethServer/dev#6269
 - Firewall rules for established and new connections - NethServer/dev#6270
