@@ -441,7 +441,7 @@
                 <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Service"
-                    :options="autoOptions"
+                    :options="serviceOptions"
                     :onInputChange="filterServiceAuto"
                     :onItemSelected="selectServiceAuto"
                   >
@@ -835,6 +835,10 @@ export default {
       services: [],
       localServices: [],
       roles: [],
+      serviceOptions: {
+        placeholder: 'any',
+        inputClass: "form-control"
+      },
       autoOptions: {
         inputClass: "form-control"
       },
