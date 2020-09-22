@@ -437,7 +437,15 @@
               </div>
 
               <div :class="['form-group', newRule.errors.Service.hasError ? 'has-error' : '']">
-                <label class="col-sm-3 control-label">{{$t('rules.service')}}</label>
+                <label class="col-sm-3 control-label">
+                  {{$t('rules.service')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('rules.service')"
+                    :chapter="'rules_service'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
                 <div class="col-sm-9">
                   <suggestions
                     v-model="newRule.Service"
