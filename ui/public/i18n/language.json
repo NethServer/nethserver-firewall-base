@@ -571,6 +571,7 @@
         "mac_validation": "Requests from IP addresses listed in DHCP reservations are allowed only if are originated from the associated MAC address (even if DHCP is disabled).",
         "mac_validation_policy": "Requests from IP addresses not listed in DHCP reservations are blocked. Ensure admin hosts are listed in DHCP reservations.",
         "list_of_ports": "Enter one or more port numbers separated by a comma, e.g.: '8081, 9292'",
-        "network_services_system_services": "Network services can be added in System -> Services page"
+        "network_services_system_services": "Network services can be added in System -> Services page",
+        "rules_service": "Enter the name of a network service running on the firewall, otherwise leave empty to match any service"
     }
 }
