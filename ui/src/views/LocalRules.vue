@@ -844,7 +844,6 @@ export default {
       localServices: [],
       roles: [],
       serviceOptions: {
-        placeholder: 'any',
         inputClass: "form-control"
       },
       autoOptions: {
