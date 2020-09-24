@@ -834,7 +834,11 @@ export default {
       );
     },
     moveRuleTop(index) {
-      var ids = this.status.order;
+      // retrieve the array order of indexes.
+      var ids = this.rules.map(function(i) {
+        return i.id;
+      });
+
       ids.unshift(index);
       // notification
       nethserver.notifications.success = this.$i18n.t("rules.rule_updated_ok");

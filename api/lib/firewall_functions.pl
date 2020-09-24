@@ -294,7 +294,6 @@ sub list_fw_rules
     my $i = 1;
     my $max_pos = 0;
     my $nextID = 0;
-    my @order = ();
     foreach ($fw->getRules()) {
         my %props = $_->props;
 
@@ -315,12 +314,11 @@ sub list_fw_rules
         $props{'Position'} = int($props{'Position'});
         $max_pos = max($max_pos, $props{'Position'});
         $nextID =`/usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-next-id`;
-        splice @order, ($props{'Position'} -1),0,$props{'id'};
         push(@rules, \%props);
         $i++;
     }
 
-    return {"status" => {"count" => scalar(@rules), "next" => $max_pos+1, "nextID" => $nextID, "order" => \@order }, "rules" => \@rules};
+    return {"status" => {"count" => scalar(@rules), "next" => $max_pos+1, "nextID" => $nextID }, "rules" => \@rules};
 }
 
 sub list_policies
