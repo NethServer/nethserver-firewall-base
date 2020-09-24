@@ -136,7 +136,7 @@ function validate_rule($data, $type) {
 
     $v->declareParameter('Position', Validate::POSITIVE_INTEGER);
     $v->declareParameter('status', Validate::SERVICESTATUS);
-
+    $v->declareParameter('Order', $v->createValidator()->memberOf('top', 'bottom'));
 
     if ($data['Log']) {
         $v->declareParameter('Log', $v->createValidator()->memberOf('none', 'info'));
