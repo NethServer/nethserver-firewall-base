@@ -567,7 +567,21 @@
                   </span>
                 </div>
               </div>
-
+              <div 
+                v-show="newRule.advanced && (!newRule.isEdit || newRule.isDuplicate)"
+                :class="['form-group', newRule.errors.order.hasError ? 'has-error' : '']">
+                <label class="col-sm-3 control-label">{{$t('rules.order')}}</label>
+                <div class="col-sm-9">
+                  <select v-model="newRule.order" class="form-control">
+                    <option value="top">{{$t('rules.create_first_label')}}</option>
+                    <option value="bottom">{{$t('rules.create_last_label')}}</option>
+                  </select>
+                  <span v-if="newRule.errors.order.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newRule.errors.order.message)}}
+                  </span>
+                </div>
+              </div>
             </div>
             <div class="modal-footer no-mg-top">
               <div v-if="newRule.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
@@ -797,6 +811,35 @@ export default {
         return i.id;
       });
 
+      // notification
+      nethserver.notifications.success = this.$i18n.t("rules.rule_updated_ok");
+      nethserver.notifications.error = this.$i18n.t("rules.rule_updated_error");
+
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/rules/update"],
+        {
+          action: "reorder",
+          rules: ids
+        },
+        function(stream) {
+          console.info("firewall-base-update", stream);
+        },
+        function(success) {
+          context.getRules();
+        },
+        function(error, data) {
+          console.error(error, data);
+        }
+      );
+    },
+    moveRuleTop(index) {
+      // retrieve the array order of indexes.
+      var ids = this.rules.map(function(i) {
+        return i.id;
+      });
+
+      ids.unshift(index);
       // notification
       nethserver.notifications.success = this.$i18n.t("rules.rule_updated_ok");
       nethserver.notifications.error = this.$i18n.t("rules.rule_updated_error");
@@ -1224,6 +1267,7 @@ export default {
         isEdit: false,
         isDuplicate: false,
         advanced: false,
+        order: "bottom",
         errors: this.initRuleErrors()
       };
     },
@@ -1266,6 +1310,10 @@ export default {
           message: ""
         },
         Position: {
+          hasError: false,
+          message: ""
+        },
+        order: {
           hasError: false,
           message: ""
         }
@@ -1791,6 +1839,7 @@ export default {
           r.Time.name +
           (r.Time.Description ? " (" + r.Time.Description + ")" : "");
       }
+      this.newRule.order = 'bottom';
 
       $("#createRuleModal").modal("show");
     },
@@ -1861,6 +1910,7 @@ export default {
               "name": "any",
               "type": "fwservice"
             },
+        order: context.newRule.order,
         Action: context.newRule.Action ? context.newRule.Action : null,
         Dst: context.newRule.DstFull
           ? context.newRule.DstFull
@@ -1873,7 +1923,6 @@ export default {
         State: context.newRule.State ? "all" : "new",
         Description: context.newRule.Description
       };
-
       context.newRule.isLoading = true;
       context.$forceUpdate();
       nethserver.exec(
@@ -1907,8 +1956,15 @@ export default {
               console.info("firewall-base-update", stream);
             },
             function(success) {
-              // get rules
-              context.getRules();
+
+              if ( context.newRule.order === 'top' ) {
+                //We retrieve order of ruleS by status.order 
+                //and we unshift with status.nextID
+                var nextID = context.status.nextID;
+                context.moveRuleTop(nextID);
+              } else {
+                context.getRules();
+              }
             },
             function(error, data) {
               console.error(error, data);
