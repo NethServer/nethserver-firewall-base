@@ -573,8 +573,8 @@
                 <label class="col-sm-3 control-label">{{$t('rules.order')}}</label>
                 <div class="col-sm-9">
                   <select v-model="newRule.order" class="form-control">
-                    <option value="top">{{$t('rules.Create_first_label')}}</option>
-                    <option value="bottom">{{$t('rules.Create_last_label')}}</option>
+                    <option value="top">{{$t('rules.create_first_label')}}</option>
+                    <option value="bottom">{{$t('rules.create_last_label')}}</option>
                   </select>
                   <span v-if="newRule.errors.order.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:

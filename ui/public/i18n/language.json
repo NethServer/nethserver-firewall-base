@@ -431,8 +431,8 @@
         "service_edited_successfully": "Service edited successfully",
         "service_edited_error": "Service not edited",
         "order": "Rule position",
-        "Create_first_label": "Create at the top",
-        "Create_last_label": "Create at the bottom"
+        "create_first_label": "Create at the top",
+        "create_last_label": "Create at the bottom"
     },
     "protocols": {
         "ah": "AH",
