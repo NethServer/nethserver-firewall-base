@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.11.2
+Version: 3.12.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Tue Sep 29 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.12.0-1
+- Firewall rules: create a rule at the top of the list - NethServer/dev#6284
+
 * Thu Sep 24 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.11.2-1
 - Firewall: "any" services also in local rules - NethServer/dev#6277
 
