@@ -457,8 +457,8 @@
                     {{r.Dst.type == 'fw' || r.Dst.type == 'role' || r.Dst.type == 'any' ? (r.Dst.name.toUpperCase()): r.Dst.name}}
                     <a
                       v-show="r.Dst.type == 'raw'"
-                      @click="openCreateObject(r.Src)"
-                    >{{$t('create')}} {{$t('objects.'+r.Src.object)}}</a>
+                      @click="openCreateObject(r.Dst)"
+                    >{{$t('create')}} {{$t('objects.'+r.Dst.object)}}</a>
                   </span>
                 </span>
               </div>
