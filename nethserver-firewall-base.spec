@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.12.0
+Version: 3.12.1
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Thu Oct 01 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.12.1-1
+- Firewall WAN: Undefined values to create object in WAN rules - Bug NethServer/dev#6289
+
 * Tue Sep 29 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.12.0-1
 - Firewall rules: create a rule at the top of the list - NethServer/dev#6284
 
