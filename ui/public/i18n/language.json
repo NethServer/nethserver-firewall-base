@@ -575,6 +575,7 @@
         "mac_validation_policy": "Requests from IP addresses not listed in DHCP reservations are blocked. Ensure admin hosts are listed in DHCP reservations.",
         "list_of_ports": "Enter one or more port numbers separated by a comma, e.g.: '8081, 9292'",
         "network_services_system_services": "Network services can be added in System -> Services page",
-        "rules_service": "Enter the name of a network service running on the firewall, otherwise leave empty to match any service"
+        "rules_service": "Enter the name of a network service running on the firewall, otherwise leave empty to match any service",
+        "allow_only": "You can allow here a list of IP, a CIDR, a list of CIDR, a range of IP, of a list of network with negations"
     }
 }

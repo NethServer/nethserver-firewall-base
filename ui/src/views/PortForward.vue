@@ -347,7 +347,14 @@
                 <label
                   class="col-sm-3 control-label"
                   for="textInput-modal-markup"
-                >{{$t('port_forward.allow_only')}}</label>
+                >{{$t('port_forward.allow_only')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('port_forward.allow_only')"
+                    :chapter="'allow_only'"
+                    :inline="true"
+                  ></doc-info>
+                </label>
                 <div class="col-sm-9">
                   <textarea v-model="newPf.Allow" class="form-control textarea-mid-height"></textarea>
                   <span v-if="newPf.errors.Allow.hasError" class="help-block">
@@ -952,6 +959,9 @@ export default {
     savePF() {
       var context = this;
 
+      // Remove empty lines and whitespace at begin and end of Allow
+      var CleanAllow = ((context.newPf.Allow.split("\n")).filter(e => String(e).trim())).map(str => str.trim());
+
       var pfObj = {
         action: context.newPf.isEdit ? "update" : "create",
         name: context.newPf.isEdit ? context.newPf.name : null,
@@ -970,7 +980,7 @@ export default {
         Allow:
           context.newPf.Allow.length == 0
             ? []
-            : context.newPf.Allow.split("\n"),
+            : CleanAllow,
         Log: context.newPf.Log ? "info" : "none",
         status: context.newPf.isEdit
           ? context.newPf.status
