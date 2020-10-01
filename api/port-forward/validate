@@ -91,9 +91,15 @@ case "create":
 
     $v->declareParameter('OriDst', Validate::IPv4_OR_EMPTY);
     $v->declareParameter('status', Validate::SERVICESTATUS);
-    $v->declareParameter('Allow', Validate::ANYTHING);
     $v->declareParameter('Description', $v->createValidator()->maxLength(35));
     $v->declareParameter('Log', $logValidator);
+
+    $ipValidator = $v->createValidator()->ipV4Address();
+    foreach ( $data['Allow'] as $el) {
+        if (!$ipValidator->evaluate($el) ) {
+            $v->addValidationError('Allow', 'valid_ipV4Address', $el);
+        }
+    }
 
     if (is_array($data['Src'])) {
         foreach ($data['Src'] as $el) {
