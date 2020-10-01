@@ -359,7 +359,7 @@
                   <textarea v-model="newPf.Allow" class="form-control textarea-mid-height"></textarea>
                   <span v-if="newPf.errors.Allow.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
-                    {{$t('validation.'+newPf.errors.Allow.message)}}
+                    {{$t('validation.'+newPf.errors.Allow.message)}}: '{{newPf.errors.Allow.value}}'
                   </span>
                 </div>
               </div>
@@ -1039,6 +1039,7 @@ export default {
               var attr = errorData.attributes[e];
               context.newPf.errors[attr.parameter].hasError = true;
               context.newPf.errors[attr.parameter].message = attr.error;
+              context.newPf.errors[attr.parameter].value = attr.value;
             }
           } catch (e) {
             console.error(e);
