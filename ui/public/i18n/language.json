@@ -563,7 +563,8 @@
         "mac_address_exists": "A MAC address with the same address already exists",
         "valid_macAddress": "Invalid MAC address",
         "mac_cannot_be_delete": "This MAC address can't be deleted because it is in use",
-        "must_be_one_of": "Must be one of"
+        "must_be_one_of": "Must be one of",
+        "Not_valid_ipV4Address_or_CIDR": "It must be a IPV4 address like 1.2.3.4 or a CIDR network like 192.168.1.0/24"
     },
     "docs": {
         "pf_origin_port": "Insert a single port, a list of comma-separated ports, or a port range using \":\" as separator like \"100:200\".",
@@ -576,6 +577,6 @@
         "list_of_ports": "Enter one or more port numbers separated by a comma, e.g.: '8081, 9292'",
         "network_services_system_services": "Network services can be added in System -> Services page",
         "rules_service": "Enter the name of a network service running on the firewall, otherwise leave empty to match any service",
-        "allow_only": "You can allow here a list of IP, a CIDR, a list of CIDR, a range of IP, of a list of network with negations"
+        "allow_only": "You can allow here a list of IPs (192.168.1.2) or a list of CIDR network (192.168.1.0/24)"
     }
 }

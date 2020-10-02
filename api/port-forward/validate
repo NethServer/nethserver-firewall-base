@@ -94,10 +94,15 @@ case "create":
     $v->declareParameter('Description', $v->createValidator()->maxLength(35));
     $v->declareParameter('Log', $logValidator);
 
-    $ipValidator = $v->createValidator()->ipV4Address();
+    $ipCidrAllow = $v->createValidator()
+        ->orValidator(
+            $v->createValidator(Validate::IPv4),
+            $v->createValidator(Validate::CIDR_BLOCK)
+        );
+
     foreach ( $data['Allow'] as $el) {
-        if (!$ipValidator->evaluate($el) ) {
-            $v->addValidationError('Allow', 'valid_ipV4Address', $el);
+        if (!$ipCidrAllow->evaluate($el) ) {
+            $v->addValidationError('Allow', 'Not_valid_ipV4Address_or_CIDR', $el);
         }
     }
 
