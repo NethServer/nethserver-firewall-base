@@ -960,7 +960,7 @@ export default {
       var context = this;
 
       // Remove empty lines and whitespace at begin and end of Allow
-      var CleanAllow = context.newPf.Allow.split("\n").map(str => String(str).trim());
+      var CleanAllow = ((context.newPf.Allow.split("\n")).filter(e => String(e).trim())).map(str => str.trim());
 
       var pfObj = {
         action: context.newPf.isEdit ? "update" : "create",
