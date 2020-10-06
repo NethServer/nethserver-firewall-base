@@ -545,7 +545,7 @@
         "not_exists_host-group": "The host group does not exist",
         "host_group_cannot_be_delete": "This host group  can't be deleted because it is in use",
         "valid_lessThan_256": "Must be less than 256",
-        "valid_ipV4Address": "Invalid address",
+        "valid_ipV4Address": "Invalid IPv4 address",
         "valid_username": "First character must be a letter, than only lower letters, numbers and symbols like '-' and '_'",
         "valid_notEmpty": "Must be non-empty",
         "valid_cidrBlock": "Must be a valid CIDR network",
@@ -563,7 +563,8 @@
         "mac_address_exists": "A MAC address with the same address already exists",
         "valid_macAddress": "Invalid MAC address",
         "mac_cannot_be_delete": "This MAC address can't be deleted because it is in use",
-        "must_be_one_of": "Must be one of"
+        "must_be_one_of": "Must be one of",
+        "Not_valid_ipV4Address_or_CIDR": "It must be a IPv4 address like '1.2.3.4' or a CIDR network like '192.168.1.0/24'"
     },
     "docs": {
         "pf_origin_port": "Insert a single port, a list of comma-separated ports, or a port range using \":\" as separator like \"100:200\".",
@@ -575,6 +576,7 @@
         "mac_validation_policy": "Requests from IP addresses not listed in DHCP reservations are blocked. Ensure admin hosts are listed in DHCP reservations.",
         "list_of_ports": "Enter one or more port numbers separated by a comma, e.g.: '8081, 9292'",
         "network_services_system_services": "Network services can be added in System -> Services page",
-        "rules_service": "Enter the name of a network service running on the firewall, otherwise leave empty to match any service"
+        "rules_service": "Enter the name of a network service running on the firewall, otherwise leave empty to match any service",
+        "allow_only": "Restrict access to port forward only from a list of public IP addresses or networks (written in CIDR format). Add one entry per line. Leave the field empty to allow access by anyone."
     }
 }

@@ -91,9 +91,20 @@ case "create":
 
     $v->declareParameter('OriDst', Validate::IPv4_OR_EMPTY);
     $v->declareParameter('status', Validate::SERVICESTATUS);
-    $v->declareParameter('Allow', Validate::ANYTHING);
     $v->declareParameter('Description', $v->createValidator()->maxLength(35));
     $v->declareParameter('Log', $logValidator);
+
+    $ipCidrAllow = $v->createValidator()
+        ->orValidator(
+            $v->createValidator(Validate::IPv4),
+            $v->createValidator(Validate::CIDR_BLOCK)
+        );
+
+    foreach ( $data['Allow'] as $el) {
+        if (!$ipCidrAllow->evaluate($el) ) {
+            $v->addValidationError('Allow', 'Not_valid_ipV4Address_or_CIDR', $el);
+        }
+    }
 
     if (is_array($data['Src'])) {
         foreach ($data['Src'] as $el) {
