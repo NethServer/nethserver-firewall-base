@@ -133,7 +133,7 @@
                     <span class="col-sm-2">{{$t('protocols.'+p.Proto)}}</span>
                     <span class="col-sm-2">{{p.Description || '-'}}</span>
                     <span class="col-sm-2">{{p.OriDst || '-'}}</span>
-                    <span class="col-sm-2">{{p.Allow || '-' | prettyNewLine}}</span>
+                    <span class="col-sm-2">{{p.Allow || $t('port_forward.any') | prettyNewLine}}</span>
                   </div>
                   <div class="col-sm-2">
                     <button
