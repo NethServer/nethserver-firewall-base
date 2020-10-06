@@ -350,7 +350,7 @@
         "protocol": "Protocol",
         "description": "Description",
         "wan_ip": "WAN IP",
-        "allow_only": "Allowed external public IPs (one per line)",
+        "allow_only": "Restrict access to",
         "allow_only_short": "Allowed public IPs",
         "write_log": "Write log",
         "tcp": "TCP",
