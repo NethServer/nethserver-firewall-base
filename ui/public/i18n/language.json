@@ -373,7 +373,8 @@
         "pf_updated_ok": "Port forward updated successfully!",
         "pf_updated_error": "Port forward not updated.",
         "pf_deleted_ok": "Port forward deleted successfully!",
-        "pf_deleted_error": "Port forward not deleted."
+        "pf_deleted_error": "Port forward not deleted.",
+        "any": "Any"
     },
     "rules": {
         "title": "Rules",
