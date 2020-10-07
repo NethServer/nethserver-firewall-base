@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.12.2
+Version: 3.12.3
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Wed Oct 07 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.12.3-1
+- Firewall port forward: the textarea for Allow property has no validator - Bug NethServer/dev#6296
+
 * Mon Oct 05 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.12.2-1
 - DNS and DHCP objects are inverted in Firewall Objects - Bug NethServer/dev#6295
 
