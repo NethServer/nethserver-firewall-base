@@ -1,0 +1,15 @@
+{
+    if ($firewall{'SipAlg'} eq 'enabled') {
+    $OUT .= q(
+
+?if __SIP_HELPER
+CT:helper:sip:PO	-		-		udp	5060
+?endif
+
+?if __H323_HELPER
+CT:helper:RAS:PO	-		-		udp	1719
+CT:helper:Q.931:PO	-		-		tcp	1720
+?endif
+);
+    }
+}
