@@ -71,6 +71,31 @@
         </div>
       </form>
 
+      <h3>{{$t('settings.application_level_gateway')}}</h3>
+      <form class="form-horizontal" v-on:submit.prevent="saveSettings('sip')">
+        <div :class="['form-group', errors.SipAlg.hasError ? 'has-error' : '']">
+          <label
+            class="col-sm-2 control-label"
+            for="textInput-modal-markup"
+          >
+              {{$t('settings.enable_SipAlg')}}
+              <doc-info
+              :placement="'top'"
+              :title="$t('settings.enable_SipAlg')"
+              :chapter="'SipAlg'"
+              :inline="true"
+              ></doc-info>
+          </label>
+          <div class="col-sm-5">
+            <input type="checkbox" v-model="settings.alg.SipAlg" class="form-control">
+            <span v-if="errors.SipAlg.hasError" class="help-block">
+              {{$t('validation.validation_failed')}}:
+              {{$t('validation.'+errors.SipAlg.message)}}
+            </span>
+          </div>
+        </div>
+      </form>
+
       <h3>{{$t('settings.mac')}}</h3>
       <form class="form-horizontal" v-on:submit.prevent="saveSettings('mac')">
         <div :class="['form-group', errors.MACValidation.hasError ? 'has-error' : '']">
@@ -169,6 +194,9 @@ export default {
         pf: {
           HairpinNat: false
         },
+        alg: {
+          SipAlg: false
+        },
         mac: {
           MACValidationPolicy: false,
           MACValidation: false
@@ -194,6 +222,10 @@ export default {
           message: ""
         },
         HairpinNat: {
+          hasError: false,
+          message: ""
+        },
+        SipAlg: {
           hasError: false,
           message: ""
         },
@@ -239,6 +271,10 @@ export default {
           context.settings.pf.HairpinNat =
             success.settings.HairpinNat == "enabled";
 
+          // Application level gateway
+          context.settings.alg.SipAlg =
+            success.settings.SipAlg == "enabled";
+
           // mac
           context.settings.mac.MACValidationPolicy =
             success.settings.MACValidationPolicy == "drop";
@@ -266,6 +302,7 @@ export default {
           ? "enabled"
           : "disabled",
         HairpinNat: context.settings.pf.HairpinNat ? "enabled" : "disabled",
+        SipAlg: context.settings.alg.SipAlg ? "enabled" : "disabled",
         Policy: context.settings.internet.Policy ? "permissive" : "strict",
         VpnPolicy: context.settings.vpn.VpnPolicy ? "permissive" : "strict",
         MACValidationPolicy: context.settings.mac.MACValidationPolicy
