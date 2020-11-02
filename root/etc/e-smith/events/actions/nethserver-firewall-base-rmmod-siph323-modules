@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Copyright (C) 2020 Nethesis S.r.l.
+# http://www.nethesis.it - support@nethesis.it
+# 
+# This script is part of NethServer.
+# 
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+# 
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+#
+# Disable SIP ALG for asterisk
+#
+SIPALG=$(/usr/sbin/e-smith/config getprop firewall SipAlg)
+
+if [[ $SIPALG != 'enabled' ]];then
+
+    # reset conntrack then remove kernel module for sip
+    /usr/sbin/conntrack -D -p udp --sport=5060 >/dev/null 2>&1
+    /usr/sbin/conntrack -D -p udp --dport=5060 >/dev/null 2>&1
+    /usr/sbin/modprobe -r nf_nat_sip
+    /usr/sbin/modprobe -r nf_conntrack_sip
+
+    # reset conntrack then remove kernel module for h323
+    /usr/sbin/conntrack -D -p udp --sport=1719 >/dev/null 2>&1
+    /usr/sbin/conntrack -D -p udp --dport=1719 >/dev/null 2>&1
+    /usr/sbin/conntrack -D -p tcp --sport=1720 >/dev/null 2>&1
+    /usr/sbin/conntrack -D -p tcp --dport=1720 >/dev/null 2>&1
+    /usr/sbin/modprobe -r nf_nat_h323
+    /usr/sbin/modprobe -r nf_conntrack_h323
+fi
