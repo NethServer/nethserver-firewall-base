@@ -76,6 +76,7 @@ Properties of ``firewall`` key inside ``configuration`` db:
 * ``NotifyWanTo``: recipient address for mails sent if NotifyWAN is set to enabled
 * ``VpnPolicy``: can be ``permissive`` or ``strict``. If set to ``permissive`` traffic between all VPNs (Rodwarrior OpenVPN, OpenVPN tunnels, IPSec tunnels)
   will be permitted
+* ``SipAlg`` can be ``enabled``(default) or ``disabled``. It enables/disables the application level gateway (ALG) for SIP|H323 protocol (the netfilter conntrack kernel modules for these protocols)
 
 Example
 
@@ -95,6 +96,7 @@ Example
     NotifyWanTo=root@localhost
     PingInterval=5
     Policy=permissive
+    SipAlg=enabled
     TCLinklayer=
     VpnPolicy=strict
     WanMode=balance
@@ -110,6 +112,7 @@ Other events:
 * lokkit-save: base firewall implementation using lokkit
 * nethserver-firewall-base-save:  firewall implementation using Shorewall 
 * wan-uplink-update:  fired when the status of an external interface changes
+* conntrack-adjust: fired when we want to reset the conntrack and remove kernel modules used by shorewall
 
 The ``wan-uplink-event`` event takes at least two parameters:
 
@@ -648,5 +651,3 @@ Each record has the following properties:
 There is also a special type of static route called ``provider-static``.
 These routes have the same properties as described above and are used to correctly route traffic for link monitor.
 This type of rules should never be manually edited.
-
-
