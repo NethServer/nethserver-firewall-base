@@ -486,8 +486,8 @@
         "settings_updated_error": "Settings not updated.",
         "portforward": "Port forward",
         "enable_hairpinnat": "Enable hairpin NAT",
-        "application_level_gateway": "Application level gateway",
-        "enable_SipAlg": "Enable SIP-ALG"
+        "application_level_gateway": "Application Layer Gateway (ALG)",
+        "enable_SipAlg": "Enable SIP-ALG and H.323-ALG"
     },
     "logs": {
         "title": "Logs",
@@ -581,6 +581,6 @@
         "network_services_system_services": "Network services can be added in System -> Services page",
         "rules_service": "Enter the name of a network service running on the firewall, otherwise leave empty to match any service",
         "allow_only": "Restrict access to port forward only from a list of public IP addresses or networks (written in CIDR format). Add one entry per line. Leave the field empty to allow access by anyone.",
-        "SipAlg": "ALG allows SIP|H323 to operate through NAT. When enabled on your device, SIP ALG will respond automatically to Voice over Internet Protocol (VoIP) applications and open the needed ports. In case of issue with the SIP client you might try to disable it."
+        "SipAlg": "ALG allows SIP and H.323 protocols to operate through NAT. When enabled, ALG will inspect and rewrite Voice over Internet Protocol (VoIP) network packets and open required ports. Try to disable this option only if you're experiencing audio and call problems with your PBX or VoIP client."
     }
 }
