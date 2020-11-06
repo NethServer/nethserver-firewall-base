@@ -40,7 +40,7 @@ if ($cmd eq 'settings') {
 
     my $db = esmith::ConfigDB->open();
     my $firewall = $db->get('firewall');
-    foreach (qw(ExternalPing MACValidation MACValidationPolicy Policy HairpinNat VpnPolicy)) {
+    foreach (qw(ExternalPing MACValidation MACValidationPolicy Policy HairpinNat VpnPolicy SipAlg)) {
         $ret{$_} = $firewall->prop($_)
     }
 

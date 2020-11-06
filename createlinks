@@ -47,6 +47,7 @@ my @templates = qw(
     /etc/shorewall/initdone
     /etc/shorewall/blrules
     /etc/shorewall/stopped
+    /etc/shorewall/conntrack
     /etc/lsm/lsm.conf
     /etc/firehol/fireqos.conf
 );
@@ -88,6 +89,16 @@ event_actions($event,
 event_services($event, 
                      'lsm' => 'restart' );
 
+
+#--------------------------------------------------
+# actions for conntrack-adjust event
+#--------------------------------------------------
+
+$event = "conntrack-adjust";
+
+event_actions($event,
+          'nethserver-firewall-base-rmmod-siph323-modules' => '10'
+);
 
 #--------------------------------------------------
 # actions for firewall-objects-modify event
