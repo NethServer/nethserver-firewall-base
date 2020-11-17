@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.12.3
+Version: 3.13.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Tue Nov 17 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.13.0-1
+- Firewall: Disable SIP-ALG - NethServer/dev#6326
+
 * Wed Oct 07 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.12.3-1
 - Firewall port forward: the textarea for Allow property has no validator - Bug NethServer/dev#6296
 
