@@ -40,8 +40,10 @@ function validate_rule($data, $type) {
     $timesdb = new EsmithDatabase('fwtimes');
 
     # set validActions for each type of rule
-    if ($type == 'rules' || $type == 'local-rules') {
+    if (($type == 'rules' && $data['Service']['type'] != 'application') || $type == 'local-rules') {
         $validActions = array('accept', 'reject', 'drop');
+    } else if ($type == 'rules' && $data['Service']['type'] == 'application') {
+        $validActions = array('accept', 'drop');
     } else if ($type == 'wan') {
         $validActions = array_map( function ($x) {
             return 'provider;' . $x;
