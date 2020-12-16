@@ -468,7 +468,7 @@
                 <div class="col-sm-9">
                   <select v-model="newRule.Action" class="form-control">
                     <option value="accept">{{$t('rules.accept')}}</option>
-                    <option value="reject">{{$t('rules.reject')}}</option>
+                    <option :disabled="newRule.ServiceFull.type == 'application'" value="reject">{{$t('rules.reject')}}</option>
                     <option value="drop">{{$t('rules.drop')}}</option>
                   </select>
                   <span v-if="newRule.errors.Action.hasError" class="help-block">
