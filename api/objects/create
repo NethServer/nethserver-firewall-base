@@ -73,7 +73,8 @@ case $action in
         ;;
     "create-mac"|"update-mac")
         save_db macs
-        /sbin/e-smith/db macs set "$(_get name)" mac Zone "$(_get Zone)" Address "$(_get Address)" Description "$(_get Description)"
+        mac_addr=$(_get Address | tr '[:upper:]' '[:lower:]')
+        /sbin/e-smith/db macs set "$(_get name)" mac Zone "$(_get Zone)" Address "$mac_addr" Description "$(_get Description)"
         ;;
     *)
         error
