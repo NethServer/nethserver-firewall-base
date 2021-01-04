@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.13.1
+Version: 3.13.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Mon Jan 04 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.13.2-1
+- Firewall error with uppercase MAC address - Bug NethServer/dev#6377
+
 * Wed Dec 16 2020 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.13.1-1
 - NDPI: a firewall rule cannot use REJECT for applications service - Bug NethServer/dev#6367
 
