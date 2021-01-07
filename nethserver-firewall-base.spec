@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.13.2
+Version: 3.13.3
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,10 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Thu Jan 07 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.13.3-1
+- Speedtest: multiple instances and upload test not accurate - Bug NethServer/dev#6385
+- Uninstall firewall application removes nethserver-firewall-base - Bug NethServer/dev#6382
+
 * Mon Jan 04 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.13.2-1
 - Firewall error with uppercase MAC address - Bug NethServer/dev#6377
 
