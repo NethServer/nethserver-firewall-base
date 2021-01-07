@@ -2146,11 +2146,14 @@ export default {
     },
     speedTest(iface) {
       iface.opened = true;
+
+      $("#" + this.$options.filters.sanitize("popover-" + iface.name)).popover('hide');
+
       var popover = $(
         "#" + this.$options.filters.sanitize("popover-" + iface.name)
       ).data("bs.popover");
 
-      if (!iface.speedtest.isLoaded && popover) {
+      if (popover) {
         popover.options.content =
           '<div class="spinner spinner-sm"></div><small>' +
           this.$i18n.t("wan.fireqos_temporary_disabled") +
@@ -2172,44 +2175,51 @@ export default {
               console.error(e);
             }
 
-            popover.options.content =
-              '<b class="col-sm-6">' +
-              context.$i18n.t("download") +
-              '</b><span class="col-sm-6">' +
-              ((success.download &&
-                context.$options.filters.byteFormat(success.download)) ||
-                "-") +
-              "</span>";
+            if (success.speedtestRunning) {
+              popover.options.content =
+              '<div class="spinner spinner-sm"></div><small>' +
+              context.$i18n.t("wan.fireqos_temporary_disabled") +
+              "</small>";
+            }
+            else {
+              popover.options.content =
+                '<b class="col-sm-6">' +
+                context.$i18n.t("download") +
+                '</b><span class="col-sm-6">' +
+                ((success.download &&
+                  context.$options.filters.byteFormat(success.download)+'/s') ||
+                  "-") +
+                "</span>";
 
-            popover.options.content +=
-              '<b class="col-sm-6">' +
-              context.$i18n.t("upload") +
-              '</b><span class="col-sm-6">' +
-              ((success.upload &&
-                context.$options.filters.byteFormat(success.upload)) ||
-                "-") +
-              "</span>";
+              popover.options.content +=
+                '<b class="col-sm-6">' +
+                context.$i18n.t("upload") +
+                '</b><span class="col-sm-6">' +
+                ((success.upload &&
+                  context.$options.filters.byteFormat(success.upload)+'/s') ||
+                  "-") +
+                "</span>";
 
-            popover.options.content +=
-              '<b class="col-sm-6">' +
-              context.$i18n.t("wan.ping") +
-              '</b><span class="col-sm-6">' +
-              (success.ping ? success.ping + " ms" : "-") +
-              "</span>";
+              popover.options.content +=
+                '<b class="col-sm-6">' +
+                context.$i18n.t("wan.ping") +
+                '</b><span class="col-sm-6">' +
+                (success.ping ? success.ping + " ms" : "-") +
+                "</span>";
 
-            popover.options.content +=
-              '<span class="col-sm-6">' +
-              '<span id="use_settings" class="btn btn-primary btn-sm no-mg-left mg-top-5">' +
-              context.$i18n.t("wan.use_this_set") +
-              "</span>" +
-              "</span>";
+              popover.options.content +=
+                '<span class="col-sm-6">' +
+                '<span id="use_settings" class="btn btn-primary btn-sm no-mg-left mg-top-5">' +
+                context.$i18n.t("wan.use_this_set") +
+                "</span>" +
+                "</span>";
 
-            window.setSpeedValues = function(iface, down, up) {
-              $("#" + iface + "-FwInBandwidth").val(down);
-              $("#" + iface + "-FwOutBandwidth").val(up);
-            };
+              window.setSpeedValues = function(iface, down, up) {
+                $("#" + iface + "-FwInBandwidth").val(down);
+                $("#" + iface + "-FwOutBandwidth").val(up);
+              };
+            }
 
-            iface.speedtest.isLoaded = true;
             popover.show();
 
             setTimeout(function() {

@@ -87,6 +87,12 @@ if($cmd eq 'providers') {
     print encode_json($ret);
 } elsif ($cmd eq 'speedtest') {
 
+    my $exit = `/usr/bin/pgrep speedtest-cli`;
+    if ($exit) {
+        print '{"speedtestRunning": true}';
+        exit 0;
+    }
+
     my $ip = '';
     if ($input->{'interface'} eq '') {
         error();
