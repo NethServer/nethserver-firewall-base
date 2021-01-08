@@ -57,7 +57,7 @@ export default {
         ["system-apps/read"],
         {
           action: "info",
-          name: "nethserver-firewall-base-ui"
+          name: "nethserver-firewall-base"
         },
         null,
         function(success) {
