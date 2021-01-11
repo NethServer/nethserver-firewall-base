@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.13.4
+Version: 3.13.5
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Mon Jan 11 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.13.5-1
+- UI issue on tables using vue-good-table - Bug NethServer/dev#6390
+
 * Fri Jan 08 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.13.4-1
 - Firewall: application name change breaks delegation - Bug NethServer/dev#6388
 
