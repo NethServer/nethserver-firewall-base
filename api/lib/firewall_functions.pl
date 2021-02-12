@@ -56,14 +56,12 @@ sub read_addresses
     my %props = $ndb->get($interface)->props;
     my $gw;
 
-    if ((exists($props{'bootproto'}) && $props{'bootproto'} eq 'dhcp') || $interface eq 'ppp0' ) {
-        if ($props{'bootproto'} eq 'dhcp') {
-            # DHCP
-            $gw = `/sbin/ip -4 route show dev $interface default | /usr/bin/awk '{print \$3}'`;
-        } else {
-            # PPPoE
-            $gw = `/sbin/ip -4 route show dev ppp0 | /usr/bin/grep src | /usr/bin/awk '{print \$1}'`;
-        }
+    if (exists($props{'bootproto'}) && $props{'bootproto'} eq 'dhcp') {
+        # DHCP
+        $gw = `/sbin/ip -4 route show dev $interface default | /usr/bin/awk '{print \$3}'`;
+    } elsif ($interface eq 'ppp0') {
+        # PPPoE
+        $gw = `/sbin/ip -4 route show dev ppp0 | /usr/bin/grep src | /usr/bin/awk '{print \$1}'`;
     } else {
         $gw = $ndb->get($interface)->prop('gateway');
     }
