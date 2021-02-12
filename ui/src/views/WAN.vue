@@ -191,7 +191,7 @@
                       </div>
                       <div class="list-view-pf-additional-info-item">
                         <span class="pficon pficon-middleware"></span>
-                        <strong>{{i.gateway}}</strong> GW
+                        <strong>{{i.gateway || '-'}}</strong> GW
                       </div>
                       <div
                         v-if="i.FwInBandwidth == 0 || i.FwOutBandwidth == 0"

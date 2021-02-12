@@ -52,7 +52,19 @@ sub read_addresses
     chomp $cidr;
     $cidr =~ /^(.*)\/(.*)$/;
     my $ipaddr = $1;
-    my $gw = `ip -o route list dev $interface  | tail -n 1 | awk '{print \$1}'`;
+    my $ndb = esmith::NetworksDB->open_ro();
+    my %props = $ndb->get($interface)->props;
+    my $gw;
+
+    if (exists($props{'bootproto'}) && $props{'bootproto'} eq 'dhcp') {
+        # DHCP
+        $gw = `/sbin/ip -4 route show dev $interface default | /usr/bin/awk '{print \$3}'`;
+    } elsif ($interface eq 'ppp0') {
+        # PPPoE
+        $gw = `/sbin/ip -4 route show dev ppp0 | /usr/bin/grep src | /usr/bin/awk '{print \$1}'`;
+    } else {
+        $gw = $ndb->get($interface)->prop('gateway');
+    }
     chomp $gw;
 
     my %ret = ('cidr' => $cidr, 'ipaddr' => $ipaddr, 'gateway' => $gw);
