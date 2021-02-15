@@ -58,7 +58,7 @@ sub read_addresses
 
     if (exists($props{'bootproto'}) && $props{'bootproto'} eq 'dhcp') {
         # DHCP
-        $gw = `/sbin/ip -4 route show dev $interface default | /usr/bin/awk '{print \$3}'`;
+        $gw = `/usr/bin/grep routers /var/lib/dhclient/dhclient--$interface.lease | /usr/bin/tail -n 1 | /usr/bin/awk '{print \$3}' | /usr/bin/cut -d ';' -f 1`;
     } elsif ($interface eq 'ppp0') {
         # PPPoE
         $gw = `/sbin/ip -4 route show dev ppp0 | /usr/bin/grep src | /usr/bin/awk '{print \$1}'`;
