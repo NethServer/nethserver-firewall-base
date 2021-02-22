@@ -3,20 +3,11 @@
     <h2>{{$t('rules.title')}}</h2>
 
     <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
-    <div v-if="rules.length == 0 && view.isLoaded" class="blank-slate-pf white">
-      <div class="blank-slate-pf-icon">
-        <span class="fa fa-ban"></span>
-      </div>
-      <h1>{{$t('rules.no_rules_found')}}</h1>
-      <p>{{$t('rules.no_rules_found_text')}}.</p>
-      <div class="blank-slate-pf-main-action">
-        <button class="btn btn-primary btn-lg" @click="openCreateRule()">{{$t('rules.create_rule')}}</button>
-      </div>
-    </div>
-
-    <div v-if="rules.length > 0 && view.isLoaded">
+    <div v-if="view.isLoaded">
       <h3>
-        {{$t('actions')}}
+        <span v-if="rules.length > 0">
+          {{$t('actions')}}
+        </span>
         <a
           id="routing-info"
           data-toggle="modal"
@@ -27,7 +18,17 @@
           {{$t('rules.policies')}}
         </a>
       </h3>
-      <button @click="openCreateRule()" class="btn btn-primary btn-lg">{{$t('rules.create_rule')}}</button>
+      <div v-if="rules.length == 0" class="blank-slate-pf white">
+        <div class="blank-slate-pf-icon">
+          <span class="fa fa-ban"></span>
+        </div>
+        <h1>{{$t('rules.no_rules_found')}}</h1>
+        <p>{{$t('rules.no_rules_found_text')}}.</p>
+        <div class="blank-slate-pf-main-action">
+          <button class="btn btn-primary btn-lg" @click="openCreateRule()">{{$t('rules.create_rule')}}</button>
+        </div>
+      </div>
+      <button v-if="rules.length > 0" @click="openCreateRule()" class="btn btn-primary btn-lg">{{$t('rules.create_rule')}}</button>
     </div>
 
     <div class="pf-container" v-if="rules.length > 0 && view.isLoaded">
