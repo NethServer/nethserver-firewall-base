@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.13.6
+Version: 3.13.7
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Tue Feb 23 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.13.7-1
+- Firewall: policies are not showed if no rules are present - NethServer/dev#6432
+
 * Tue Feb 16 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.13.6-1
 - Firewall WAN: wrong gateway IP - Bug NethServer/dev#6425
 
