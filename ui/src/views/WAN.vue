@@ -2208,9 +2208,12 @@ export default {
                 "</span>";
 
               popover.options.content +=
-                '<span class="col-sm-6">' +
+                '<span class="col-sm-12">' +
                 '<span id="use_settings" class="btn btn-primary btn-sm no-mg-left mg-top-5">' +
                 context.$i18n.t("wan.use_this_set") +
+                "</span>" +
+                '<span id="close_popover" class="btn btn-default btn-sm mg-left-5 mg-top-5">' +
+                context.$i18n.t("close") +
                 "</span>" +
                 "</span>";
 
@@ -2230,6 +2233,10 @@ export default {
                   Math.round(success.upload / 1024)
                 );
               });
+              
+              $("#close_popover").click(function() {
+                popover.hide();
+              });
             }, 1500);
           },
           function(error) {
@@ -2238,8 +2245,19 @@ export default {
               context.$i18n.t("warning") +
               ".</strong> " +
               context.$i18n.t("wan.speedtest_error") +
-              "</div>";
+              "</div>" +
+              '<span id="close_popover" class="btn btn-default btn-sm no-mg-left no-mg-top">' +
+              context.$i18n.t("close") +
+              '</span>';
+              
             popover.show();
+            
+            setTimeout(function() {
+              $("#close_popover").click(function() {
+                popover.hide();
+              });
+            }, 1500);
+            
             iface.speedtest.isLoaded = true;
             console.error(error);
           }
