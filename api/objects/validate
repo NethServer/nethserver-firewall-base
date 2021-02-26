@@ -104,8 +104,12 @@ case "update-service":
     break;
 
 case "delete-service":
+    $deleteValidator = $v->createValidator()->platform('fwobject-fwservice-delete', 'fwservices');
     $db = new EsmithDatabase('fwservices');
-    if (!$db->getKey($data['name'])) {
+    
+    if (!$deleteValidator->evaluate($data['name'])) {
+        $v->addValidationError('name', 'service_not_removable');
+    } else if (!$db->getKey($data['name'])) {
         $v->addValidationError('name', 'not_exists_service', $data['name']);
     }
     break;
