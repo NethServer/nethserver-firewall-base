@@ -46,7 +46,7 @@
             </div>
             <div class="list-view-pf-additional-info">
               <div class="list-view-pf-additional-info-item">
-                <span class="pficon pficon-screen panel-icon"></span>
+                <span class="fa fa-cubes"></span>
                 <div>
                   <select
                     class="combobox form-control"
@@ -75,7 +75,6 @@
                     </ul>
                   </div>
                 </div>
-                <span class="mg-left-5 info-desc-local">{{$t('snat.local_host')}}</span>
               </div>
             </div>
           </div>
