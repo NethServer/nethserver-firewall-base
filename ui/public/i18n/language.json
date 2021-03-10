@@ -571,7 +571,8 @@
         "must_be_one_of": "Must be one of",
         "Not_valid_ipV4Address_or_CIDR": "It must be a IPv4 address like '1.2.3.4' or a CIDR network like '192.168.1.0/24'",
         "valid_memberOf_accept,drop": "The valid actions are 'Accept' or 'Drop'",
-        "non_existing_firewall_object": "Firewall object does not exist"
+        "non_existing_firewall_object": "Firewall object does not exist",
+        "snat_fw_object_duplicated": "Firewall object duplicated"
     },
     "docs": {
         "pf_origin_port": "Insert a single port, a list of comma-separated ports, or a port range using \":\" as separator like \"100:200\".",

@@ -2,6 +2,17 @@
   <div>
     <h2>{{$t('snat.title')}}</h2>
 
+    <!-- error notification -->
+    <div v-if="error.message" class="toast-pf alert alert-warning toast-pf-top-right alert-dismissable">
+      <button type="button" class="close" aria-hidden="true" @click="clearError()">
+        <span class="pficon pficon-close"></span>
+      </button>
+      <span class="pficon pficon-warning-triangle-o"></span>
+      <div>
+        <span>{{$t(error.message)}}</span><strong v-if="error.param">: {{error.param}}</strong>
+      </div>
+    </div>
+
     <div v-if="!view.isLoaded" class="spinner spinner-lg view-spinner"></div>
     <div v-if="snList.length == 0 && view.isLoaded" class="blank-slate-pf white">
       <div class="blank-slate-pf-icon">
@@ -117,6 +128,10 @@ export default {
         cidrSubnets: false,
         ipRanges: false,
       },
+      error: {
+        message: "",
+        param: "",
+      }
     };
   },
   computed: {
@@ -313,9 +328,30 @@ export default {
         }
       );
     },
+    clearError() {
+      this.error = {message: "", param: ""};
+    },
+    checkFwObjectsDuplicated(snat) {
+      for (const fwObject of snat.firewallObjects) {
+        for (const s of this.snList) {
+          for (const otherFwObject of s.firewallObjects) {
+            if (snat != s && fwObject.type == otherFwObject.type && fwObject.name == otherFwObject.name) {
+              this.error = {message: "validation.snat_fw_object_duplicated", param: fwObject.name};
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    },
     saveSN(s) {
       var context = this;
       let fwObjectNatList = []
+      this.clearError();
+
+      if (!context.checkFwObjectsDuplicated(s)) {
+        return;
+      }
 
       for (let fwObject of s.firewallObjects) {
         fwObjectNatList.push(fwObject.type + ";" + fwObject.name);
