@@ -47,14 +47,34 @@
             <div class="list-view-pf-additional-info">
               <div class="list-view-pf-additional-info-item">
                 <span class="pficon pficon-screen panel-icon"></span>
-                <select class="combobox form-control" v-model="s.FwObjectNat">
-                  <option value="-">{{$t('disabled')}}</option>
-                  <option
-                    v-for="(h,k) in hosts"
-                    v-bind:key="k"
-                    :value="h.name"
-                  >{{h.name}} | {{h.IpAddress}}</option>
-                </select>
+                <div>
+                  <select
+                    class="combobox form-control"
+                    v-model="objectToAdd"
+                    @change="addObjectSnat(s, objectToAdd)"
+                  >
+                    <option
+                      v-for="(h, k) in firewallObjects"
+                      v-bind:key="k"
+                      :value="h"
+                    >{{h.name}} ({{$t('objects.' + h.type)}}) | {{h.textValue}}</option>
+                  </select>
+                  <div>
+                    <span v-if="!s.firewallObjects.length" class="help-block float-left">
+                      {{$t('snat.no_object')}}
+                    </span>
+                    <ul v-else class="list-inline compact mg-top-10">
+                      <li v-for="(i, ki) in s.firewallObjects" v-bind:key="ki" class="selected-fw-object">
+                        <span class="label label-info">
+                          {{i.name}} ({{$t('objects.' + i.type)}})
+                          <a @click="removeObjectSnat(s, ki)" class="remove-item-inline">
+                            <span class="fa fa-times"></span>
+                          </a>
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
                 <span class="mg-left-5 info-desc-local">{{$t('snat.local_host')}}</span>
               </div>
             </div>
@@ -69,16 +89,15 @@
 export default {
   name: "sNAT",
   mounted() {
-    this.getSN();
-    this.getHosts();
+    this.getFirewallObjects();
 
     var context = this;
     context.$parent.$on("changes-applied", function() {
-      context.getSN();
-      context.getHosts();
+      context.getFirewallObjects();
     });
   },
   beforeRouteLeave(to, from, next) {
+    this.$parent.$off("changes-applied");
     $(".modal").modal("hide");
     next();
   },
@@ -88,10 +107,53 @@ export default {
         isLoaded: false
       },
       snList: [],
-      hosts: []
+      hosts: [],
+      hostGroups: [],
+      cidrSubnets: [],
+      ipRanges: [],
+      maxLengthMembers: 40,
+      objectToAdd: {},
+      loaded: {
+        hosts: false,
+        cidrSubnets: false,
+        ipRanges: false,
+      },
     };
   },
+  computed: {
+    firewallObjects() {
+      return this.hosts.concat(this.hostGroups, this.cidrSubnets, this.ipRanges);
+    },
+    firewallObjectsLoaded() {
+      return this.loaded.hosts && this.loaded.cidrSubnets && this.loaded.ipRanges;
+    }
+  },
+  watch: {
+    firewallObjectsLoaded: function(loaded) {
+      if (loaded) {
+        this.getSN();
+      }
+    },
+  },
   methods: {
+    getFirewallObjects() {
+      this.fwObjects = [];
+      this.loaded = {hosts: false, cidrSubnets: false, ipRanges: false};
+      this.getHosts();
+      this.getCidrSubnets();
+      this.getIpRanges();
+    },
+    addObjectSnat(snat, fwObj) {
+      if (fwObj && fwObj.name) {
+        if (!snat.firewallObjects.includes(fwObj)) {
+          snat.firewallObjects.push(fwObj);
+        }
+      }
+      this.objectToAdd = {};
+    },
+    removeObjectSnat(snat, index) {
+      snat.firewallObjects.splice(index, 1);
+    },
     getHosts() {
       var context = this;
       nethserver.exec(
@@ -103,7 +165,87 @@ export default {
         function(success) {
           try {
             success = JSON.parse(success);
-            context.hosts = success.hosts;
+            context.hosts = success.hosts.map( h => {
+              return {name: h.name, type: 'host', textValue: h.IpAddress}
+            });
+            context.getHostGroups();
+          } catch (e) {
+            console.error(e);
+          }
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getHostGroups() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "host-groups"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+            context.hostGroups = success['host-groups'].map( h => {
+              let membersText =  h.Members.join(", ");
+
+              if (membersText.length > context.maxLengthMembers) {
+                membersText = membersText.slice(0, context.maxLengthMembers) + "...";
+              }
+              return {name: h.name, type: 'host-group', textValue: membersText}
+            });
+            context.loaded.hosts = true;
+          } catch (e) {
+            console.error(e);
+          }
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getCidrSubnets() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "cidr-subs"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+            context.cidrSubnets = success['cidr-subs'].map( h => {
+              return {name: h.name, type: 'cidr', textValue: h.Address}
+            });
+            context.loaded.cidrSubnets = true;
+          } catch (e) {
+            console.error(e);
+          }
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    getIpRanges() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/objects/read"],
+        {
+          action: "ip-ranges"
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+            context.ipRanges = success['ip-ranges'].map( h => {
+              return {name: h.name, type: 'iprange', textValue: h.Start + " - " + h.End}
+            });
+            context.loaded.ipRanges = true;
           } catch (e) {
             console.error(e);
           }
@@ -126,17 +268,41 @@ export default {
         function(success) {
           try {
             success = JSON.parse(success);
-            context.snList = success.aliases;
+            let snList = success.aliases;
 
-            for (var s in context.snList) {
-              context.snList[s].isLoading = false;
-              context.snList[s].FwObjectNat = context.snList[s].FwObjectNat
-                ? context.snList[s].FwObjectNat.split(";")[1]
-                : "-";
+            for (let snat of snList) {
+              snat.isLoading = false;
+              snat.firewallObjects = [];
+
+              if (snat.FwObjectNat) {
+                const fwObjects = snat.FwObjectNat.split(",");
+
+                for (let fwObject of fwObjects) {
+                  const [objType, objName] = fwObject.split(";");
+
+                  switch (objType) {
+                    case "host":
+                      const host = context.hosts.find(h => h.name == objName);
+                      snat.firewallObjects.push(host);
+                      break;
+                    case "host-group":
+                      const hostGroup = context.hostGroups.find(hg => hg.name == objName);
+                      snat.firewallObjects.push(hostGroup);
+                      break;
+                    case "cidr":
+                      const cidr = context.cidrSubnets.find(c => c.name == objName);
+                      snat.firewallObjects.push(cidr);
+                      break;
+                    case "iprange":
+                      const ipRange = context.ipRanges.find(ir => ir.name == objName);
+                      snat.firewallObjects.push(ipRange);
+                      break;
+                  }
+                }
+              }
             }
-
+            context.snList = snList;
             context.view.isLoaded = true;
-
             context.$parent.getFirewallStatus();
           } catch (e) {
             console.error(e);
@@ -150,10 +316,15 @@ export default {
     },
     saveSN(s) {
       var context = this;
+      let fwObjectNatList = []
+
+      for (let fwObject of s.firewallObjects) {
+        fwObjectNatList.push(fwObject.type + ";" + fwObject.name);
+      }
 
       var snObj = {
         action: "update",
-        FwObjectNat: s.FwObjectNat == "-" ? "" : "host;" + s.FwObjectNat,
+        FwObjectNat: fwObjectNatList.join(),
         name: s.name
       };
 
@@ -182,8 +353,8 @@ export default {
               console.info("firewall-base-update", stream);
             },
             function(success) {
-              // get interfaces
-              context.getSN();
+              // reload data
+              context.getFirewallObjects();
             },
             function(error, data) {
               console.error(error);
@@ -217,5 +388,14 @@ export default {
 
 .flex-50 {
   flex: 1 0 calc(50% - 20px) !important;
+}
+
+.selected-fw-object {
+  margin-bottom: 7px;
+  float: left;
+}
+
+.float-left {
+  float: left;
 }
 </style>
