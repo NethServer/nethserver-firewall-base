@@ -79,7 +79,7 @@
                   <ul v-else class="list-inline compact mg-top-10">
                     <li v-for="(i, ki) in s.firewallObjects" v-bind:key="ki" class="selected-fw-object">
                       <span class="label label-info">
-                        {{i.name}} ({{$t('objects.' + i.type)}})
+                        {{i.name}} ({{i.type | capitalize}})
                         <a @click="removeObjectSnat(s, ki)" class="remove-item-inline">
                           <span class="fa fa-times"></span>
                         </a>
