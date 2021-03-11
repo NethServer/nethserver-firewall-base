@@ -211,7 +211,9 @@
         "no_aliases_found": "No aliases found",
         "no_aliases_found_text": "It seems that you have not configured any aliases. Go to the Network page to configure some",
         "go_to_network": "Go to the Network settings",
-        "no_object": "No object"
+        "no_object": "No object",
+        "source_objects": "Source objects",
+        "map_to": "map to"
     },
     "objects": {
         "title": "Objects",

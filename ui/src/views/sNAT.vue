@@ -32,7 +32,7 @@
     <h3 v-if="snList.length > 0 && view.isLoaded">{{$t('list')}}</h3>
     <div
       v-if="snList.length > 0 && view.isLoaded"
-      class="list-group list-view-pf list-view-pf-view no-mg-top"
+      class="list-group list-view-pf list-view-pf-view no-mg-top snat-container"
     >
       <div class="list-group-item" v-for="(s,k) in snList" v-bind:key="k">
         <div class="list-view-pf-actions">
@@ -44,48 +44,62 @@
         </div>
         <div class="list-view-pf-main-info">
           <div class="list-view-pf-left">
-            <span class="fa fa-random list-view-pf-icon-sm"></span>
+            <!-- <span class="fa fa-random list-view-pf-icon-sm"></span> -->
+            <span class="fa fa-cubes list-view-pf-icon-sm"></span>
           </div>
           <div class="list-view-pf-body">
             <div class="list-view-pf-description">
-              <div class="list-group-item-heading">
-                <span>{{s.ipaddr}}</span>
-              </div>
-              <div class="list-group-item-text">
-                <span>{{s.name}}</span>
+              <!-- <div class="list-group-item-heading">
+              </div> -->
+              <div class="fw-object-continer">
+                <label>{{ $t('snat.source_objects') }}</label>
+                <suggestions
+                  v-model="s.selectedFwObject.name"
+                  :options="autoOptions"
+                  :onInputChange="filterFwObjAuto"
+                  :onItemSelected="selectFwObjAuto"
+                  @keydown.native="setCurrentSnat(s)"
+                >
+                  <div slot="item" slot-scope="props" class="single-item">
+                    <span>
+                      {{props.item.name}}
+                      <span
+                        v-show="props.item.IpAddress || props.item.Address"
+                        class="gray"
+                      >({{ props.item.IpAddress || props.item.Address }})</span>
+                      <i class="mg-left-5">{{props.item.Description}}</i>
+                      <b class="mg-left-5">{{props.item.type | capitalize}}</b>
+                    </span>
+                  </div>
+                </suggestions>
+                <div>
+                  <span v-if="!s.firewallObjects.length" class="help-block float-left">
+                    {{$t('snat.no_object')}}
+                  </span>
+                  <ul v-else class="list-inline compact mg-top-10">
+                    <li v-for="(i, ki) in s.firewallObjects" v-bind:key="ki" class="selected-fw-object">
+                      <span class="label label-info">
+                        {{i.name}} ({{$t('objects.' + i.type)}})
+                        <a @click="removeObjectSnat(s, ki)" class="remove-item-inline">
+                          <span class="fa fa-times"></span>
+                        </a>
+                      </span>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
             <div class="list-view-pf-additional-info">
               <div class="list-view-pf-additional-info-item">
-                <span class="fa fa-cubes"></span>
-                <div>
-                  <select
-                    class="combobox form-control"
-                    v-model="objectToAdd"
-                    @change="addObjectSnat(s, objectToAdd)"
-                  >
-                    <option
-                      v-for="(h, k) in firewallObjects"
-                      v-bind:key="k"
-                      :value="h"
-                    >{{h.name}} ({{$t('objects.' + h.type)}}) | {{h.textValue}}</option>
-                  </select>
-                  <div>
-                    <span v-if="!s.firewallObjects.length" class="help-block float-left">
-                      {{$t('snat.no_object')}}
-                    </span>
-                    <ul v-else class="list-inline compact mg-top-10">
-                      <li v-for="(i, ki) in s.firewallObjects" v-bind:key="ki" class="selected-fw-object">
-                        <span class="label label-info">
-                          {{i.name}} ({{$t('objects.' + i.type)}})
-                          <a @click="removeObjectSnat(s, ki)" class="remove-item-inline">
-                            <span class="fa fa-times"></span>
-                          </a>
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
+                <span class="list-group-item-text">{{ $t('snat.map_to') }}
+                  <span class="fa fa-arrow-right mg-left-5"></span>
+                </span>
+              </div>
+              <div class="list-view-pf-additional-info-item">
+                <span class="list-group-item-text">{{s.ipaddr}}</span>
+              </div>
+              <div class="list-view-pf-additional-info-item">
+                <span class="list-group-item-text">{{s.name}}</span>
               </div>
             </div>
           </div>
@@ -122,7 +136,10 @@ export default {
       cidrSubnets: [],
       ipRanges: [],
       maxLengthMembers: 40,
-      objectToAdd: {},
+      autoOptions: {
+        inputClass: "form-control",
+      },
+      currentSnat: null,
       loaded: {
         hosts: false,
         cidrSubnets: false,
@@ -157,14 +174,6 @@ export default {
       this.getCidrSubnets();
       this.getIpRanges();
     },
-    addObjectSnat(snat, fwObj) {
-      if (fwObj && fwObj.name) {
-        if (!snat.firewallObjects.includes(fwObj)) {
-          snat.firewallObjects.push(fwObj);
-        }
-      }
-      this.objectToAdd = {};
-    },
     removeObjectSnat(snat, index) {
       snat.firewallObjects.splice(index, 1);
     },
@@ -179,9 +188,12 @@ export default {
         function(success) {
           try {
             success = JSON.parse(success);
-            context.hosts = success.hosts.map( h => {
-              return {name: h.name, type: 'host', textValue: h.IpAddress}
+            context.hosts = success.hosts.map(function(i) {
+              i.type = context.$i18n.t("objects.host");
+              i.typeId = "host";
+              return i;
             });
+
             context.getHostGroups();
           } catch (e) {
             console.error(e);
@@ -203,13 +215,10 @@ export default {
         function(success) {
           try {
             success = JSON.parse(success);
-            context.hostGroups = success['host-groups'].map( h => {
-              let membersText =  h.Members.join(", ");
-
-              if (membersText.length > context.maxLengthMembers) {
-                membersText = membersText.slice(0, context.maxLengthMembers) + "...";
-              }
-              return {name: h.name, type: 'host-group', textValue: membersText}
+            context.hostGroups = success['host-groups'].map(function(i) {
+              i.type = context.$i18n.t("objects.host_group");
+              i.typeId = "host-group";
+              return i;
             });
             context.loaded.hosts = true;
           } catch (e) {
@@ -232,8 +241,10 @@ export default {
         function(success) {
           try {
             success = JSON.parse(success);
-            context.cidrSubnets = success['cidr-subs'].map( h => {
-              return {name: h.name, type: 'cidr', textValue: h.Address}
+            context.cidrSubnets = success['cidr-subs'].map(function(i) {
+              i.type = context.$i18n.t("objects.cidr_sub");
+              i.typeId = "cidr";
+              return i;
             });
             context.loaded.cidrSubnets = true;
           } catch (e) {
@@ -256,8 +267,10 @@ export default {
         function(success) {
           try {
             success = JSON.parse(success);
-            context.ipRanges = success['ip-ranges'].map( h => {
-              return {name: h.name, type: 'iprange', textValue: h.Start + " - " + h.End}
+            context.ipRanges = success['ip-ranges'].map(function(i) {
+              i.type = context.$i18n.t("objects.ip_range");
+              i.typeId = "iprange";
+              return i;
             });
             context.loaded.ipRanges = true;
           } catch (e) {
@@ -268,6 +281,38 @@ export default {
           console.error(error);
         }
       );
+    },
+    setCurrentSnat(snat) {
+      this.currentSnat = snat;
+    },
+    filterFwObjAuto(query) {
+      this.currentSnat.selectedFwObject.name = null;
+      this.currentSnat.selectedFwObject.detail = null;
+
+      if (query.trim().length === 0) {
+        return [];
+      }
+
+      return this.firewallObjects.filter(function(service) {
+        return (
+          service.typeId.toLowerCase().includes(query.toLowerCase()) ||
+          service.name.toLowerCase().includes(query.toLowerCase()) ||
+          service.Description.toLowerCase().includes(query.toLowerCase()) ||
+          (service.IpAddress &&
+            service.IpAddress.toLowerCase().includes(query.toLowerCase()))
+        );
+      });
+    },
+    selectFwObjAuto(item) {
+      this.currentSnat.selectedFwObject.name = "";
+
+      this.currentSnat.selectedFwObject.detail = Object.assign({}, item);
+      this.currentSnat.selectedFwObject.detail.type = this.currentSnat.selectedFwObject.detail.typeId;
+      delete this.currentSnat.selectedFwObject.detail.typeId;
+
+      if (!this.currentSnat.firewallObjects.includes(item)) {
+        this.currentSnat.firewallObjects.push(item);
+      }
     },
     getSN() {
       var context = this;
@@ -286,6 +331,7 @@ export default {
 
             for (let snat of snList) {
               snat.isLoading = false;
+              snat.selectedFwObject = { name: "", detail: ""};
               snat.firewallObjects = [];
 
               if (snat.FwObjectNat) {
@@ -354,7 +400,7 @@ export default {
       }
 
       for (let fwObject of s.firewallObjects) {
-        fwObjectNatList.push(fwObject.type + ";" + fwObject.name);
+        fwObjectNatList.push(fwObject.typeId + ";" + fwObject.name);
       }
 
       var snObj = {
@@ -432,5 +478,14 @@ export default {
 
 .float-left {
   float: left;
+}
+
+.snat-container {
+  margin-bottom: 300px;
+}
+
+.fw-object-continer {
+  flex-grow: 1;
+  padding-right: 30px;
 }
 </style>
