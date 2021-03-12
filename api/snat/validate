@@ -37,10 +37,16 @@ case "delete":
         $v->addValidationError('name', 'non_existing_alias', $data['name']);
     }
     if ($data['FwObjectNat']) {
+        $fwObjects = explode(",", $data['FwObjectNat']);
         $db = new EsmithDatabase('hosts');
-        $tmp = explode(";", $data['FwObjectNat']);
-        if (!$db->getKey($tmp[1])) {
-            $v->addValidationError('name', 'non_existing_host', $data['FwObjectNat']);
+
+        foreach ($fwObjects as $fwObject) {
+            $tmp = explode(";", $fwObject);
+            $name = $tmp[1];
+
+            if (!$db->getKey($name)) {
+                $v->addValidationError('name', 'non_existing_firewall_object', $fwObject);
+            }
         }
     }
     break;

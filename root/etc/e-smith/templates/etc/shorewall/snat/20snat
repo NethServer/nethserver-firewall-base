@@ -34,15 +34,22 @@
         my $alias_interface_ip = $i->prop('ipaddr');    
 
         # get ip from firewall obj
-        my $fw_obj = $i->prop('FwObjectNat') || "";
+        my $fw_objects_string = $i->prop('FwObjectNat') || "";
 
         # if nat exist add it
-        if($fw_obj ne "") {
-            # get hostname
-            $internal_ip = $fw->getAddress($fw_obj);
+        if($fw_objects_string ne "") {
+            my @internal_ips = ();
+            my @fw_objects = split /,/, $fw_objects_string;
+
+            foreach my $fw_obj (@fw_objects) {
+                $internal_ip = $fw->getAddress($fw_obj);
+                push @internal_ips, $internal_ip;
+            }
+
+            $internal_ips_string = join(',', @internal_ips);
 
             # print config
-            $OUT .= "SNAT($alias_interface_ip)\t$internal_ip\t$interface\n";
+            $OUT .= "SNAT($alias_interface_ip)\t$internal_ips_string\t$interface\n";
         }
     }
 }

@@ -210,7 +210,10 @@
         "source_nat_configured_error": "Source NAT not configured.",
         "no_aliases_found": "No aliases found",
         "no_aliases_found_text": "It seems that you have not configured any aliases. Go to the Network page to configure some",
-        "go_to_network": "Go to the Network settings"
+        "go_to_network": "Go to the Network settings",
+        "no_object": "No object",
+        "source_objects": "Source objects",
+        "map_to": "map to"
     },
     "objects": {
         "title": "Objects",
@@ -569,7 +572,9 @@
         "mac_cannot_be_delete": "This MAC address can't be deleted because it is in use",
         "must_be_one_of": "Must be one of",
         "Not_valid_ipV4Address_or_CIDR": "It must be a IPv4 address like '1.2.3.4' or a CIDR network like '192.168.1.0/24'",
-        "valid_memberOf_accept,drop": "The valid actions are 'Accept' or 'Drop'"
+        "valid_memberOf_accept,drop": "The valid actions are 'Accept' or 'Drop'",
+        "non_existing_firewall_object": "Firewall object does not exist",
+        "snat_fw_object_duplicated": "Firewall object is duplicated"
     },
     "docs": {
         "pf_origin_port": "Insert a single port, a list of comma-separated ports, or a port range using \":\" as separator like \"100:200\".",
