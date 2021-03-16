@@ -1,6 +1,13 @@
 <template>
   <div>
     <h2>{{$t('snat.title')}}</h2>
+    <doc-info
+      :placement="'top'"
+      :title="$t('snat.title')"
+      :chapter="'firewall'"
+      :section="'snat-1-1'"
+      :inline="false"
+    ></doc-info>
 
     <!-- error notification -->
     <div v-if="error.message" class="toast-pf alert alert-warning toast-pf-top-right alert-dismissable">
@@ -29,7 +36,16 @@
       </div>
     </div>
 
-    <h3 v-if="snList.length > 0 && view.isLoaded">{{$t('list')}}</h3>
+    <h3 v-if="snList.length > 0 && view.isLoaded">
+      {{$t('list')}}
+      <doc-info
+        :placement="'top'"
+        :title="$t('snat.title')"
+        :chapter="'snat_order'"
+        :section="''"
+        :inline="true"
+      ></doc-info>
+    </h3>
     <div
       v-if="snList.length > 0 && view.isLoaded"
       class="list-group list-view-pf list-view-pf-view no-mg-top snat-container"
