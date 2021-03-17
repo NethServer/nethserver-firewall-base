@@ -39,7 +39,7 @@
     <h3 v-if="snList.length > 0 && view.isLoaded">
       {{$t('list')}}
       <doc-info
-        :placement="'top'"
+        :placement="'right'"
         :title="$t('snat.title')"
         :chapter="'snat_order'"
         :section="''"
