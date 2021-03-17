@@ -590,6 +590,6 @@
         "allow_only": "Restrict access to port forward only from a list of public IP addresses or networks (written in CIDR format). Add one entry per line. Leave the field empty to allow access by anyone.",
         "SipAlg": "ALG allows SIP and H.323 protocols to operate through NAT. When enabled, ALG will inspect and rewrite Voice over Internet Protocol (VoIP) network packets and open required ports. Try to disable this option only if you're experiencing audio and call problems with your PBX or VoIP client.",
         "more_info_about": "More info about",
-        "snat_order": "The following entries are order-sensitive. The first entry that matches a particular connection will be the one that is used"
+        "snat_order": "The following entries are order-sensitive. The first entry that matches a particular connection will be the one that is used."
     }
 }
