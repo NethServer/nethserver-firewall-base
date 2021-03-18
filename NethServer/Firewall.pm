@@ -962,6 +962,7 @@ The object is searched inside one of following lists:
 * proxy bypasses
 * traffic shaping rules
 * port forwards
+* source nat rules
 
 =cut
 sub countReferences($$)
@@ -1008,6 +1009,7 @@ sub countReferences($$)
 	return ();
     }
 
+    my $target = $type . ';' . $key;
     my $found = 0;
     my @fwrules = $self->getRules();
     my @tcrules = $self->getTcRules(); 
@@ -1019,8 +1021,6 @@ sub countReferences($$)
 
     foreach my $rule (@fwrules) {
 	my @props = qw(Src Dst DstHost Host Service Action Time);
-
-	my $target = $type . ';' . $key;
 
 	if ($type eq 'role') {
 	    $target = 'role;' . $record->prop('role');
@@ -1037,6 +1037,20 @@ sub countReferences($$)
 		$found++;
 	    }
 	}
+    }
+
+    # source nat rules
+    my @aliases = $self->{'ndb'}->aliases;
+
+    foreach my $alias (@aliases) {
+        my $prop = $alias->prop('FwObjectNat') || next;
+        my @snatObjects = split(',', $prop);
+
+        foreach(@snatObjects) {
+            if($_ eq $target) {
+                $found++;
+            }
+        }
     }
     
     return $found;
