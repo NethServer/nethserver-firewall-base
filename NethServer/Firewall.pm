@@ -857,19 +857,6 @@ sub getPortForwards
     return @list;
 }
 
-=head2 getAliases
-
-Return the list of interface aliases.
-Each record has all database properties.
-
-=cut
-sub getAliases
-{
-    my $self = shift;
-    my @list = $self->{'ndb'}->aliases;
-    return @list;
-}
-
 =head2 getInterfaceFromIP
 
 Return the name of the interfa connected to the given ip,
@@ -975,7 +962,7 @@ The object is searched inside one of following lists:
 * proxy bypasses
 * traffic shaping rules
 * port forwards
-* interface aliases
+* source nat rules
 
 =cut
 sub countReferences($$)
@@ -1022,21 +1009,18 @@ sub countReferences($$)
 	return ();
     }
 
+    my $target = $type . ';' . $key;
     my $found = 0;
     my @fwrules = $self->getRules();
     my @tcrules = $self->getTcRules(); 
     my @pfrules = $self->getPortForwards();
     my @bypass = $self->getBypassRules();
-    my @aliases = $self->getAliases();
     push(@fwrules, @tcrules);
     push(@fwrules, @pfrules);
     push(@fwrules, @bypass);
-    push(@fwrules, @aliases);
 
     foreach my $rule (@fwrules) {
-	my @props = qw(Src Dst DstHost Host Service Action Time FwObjectNat);
-
-	my $target = $type . ';' . $key;
+	my @props = qw(Src Dst DstHost Host Service Action Time);
 
 	if ($type eq 'role') {
 	    $target = 'role;' . $record->prop('role');
@@ -1049,20 +1033,24 @@ sub countReferences($$)
 
 	foreach(@props) {
             my $prop = $rule->prop($_) || next;
-        if ($_ eq 'FwObjectNat') {
-            my @snatObjects = split(',', $prop);
-
-            foreach(@snatObjects) {
-                if($_ eq $target) {
-                    $found++;
-                }
-            }
-        } else {
 	    if($prop eq $target) {
 		$found++;
 	    }
-        }
 	}
+    }
+
+    # source nat rules
+    my @aliases = $self->{'ndb'}->aliases;
+
+    foreach my $alias (@aliases) {
+        my $prop = $alias->prop('FwObjectNat') || next;
+        my @snatObjects = split(',', $prop);
+
+        foreach(@snatObjects) {
+            if($_ eq $target) {
+                $found++;
+            }
+        }
     }
     
     return $found;
