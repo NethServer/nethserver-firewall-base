@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.14.0
+Version: 3.14.1
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Fri Mar 19 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.14.1-1
+- Firewall: you can delete object used in sNAT - Bug NethServer/dev#6457
+
 * Fri Mar 12 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.14.0-1
 - sNAT 1:1. add other firewall objects in addition to hosts - NethServer/dev#6449
 
