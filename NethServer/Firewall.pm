@@ -186,7 +186,7 @@ sub getAddress($)
     my $expand_zone = shift || 0;
 
     if ( lc($id) eq 'any') {
-        return 'any';
+        return 'any+';
     }
 
     if ( lc($id) eq 'fw') {
