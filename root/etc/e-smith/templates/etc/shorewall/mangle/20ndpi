@@ -19,7 +19,7 @@
    $OUT .= "RESTORE:F       -               -               -\n";
    $OUT .= "# Restore the connection mark for packets from/to firewall (Squid).\n";
    $OUT .= "# This is useful only for QoS\n";
-   $OUT .= "RESTORE        \$FW             -               -\n";
-   $OUT .= "RESTORE        -                \$FW            -\n";
+   $OUT .= "RESTORE        \$FW             -               - - - - 0x00\n";
+   $OUT .= "RESTORE        -                \$FW            - - - - 0x00\n";
 
 }
