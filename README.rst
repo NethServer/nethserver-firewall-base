@@ -77,6 +77,7 @@ Properties of ``firewall`` key inside ``configuration`` db:
 * ``VpnPolicy``: can be ``permissive`` or ``strict``. If set to ``permissive`` traffic between all VPNs (Rodwarrior OpenVPN, OpenVPN tunnels, IPSec tunnels)
   will be permitted
 * ``SipAlg`` can be ``enabled``(default) or ``disabled``. It enables/disables the application level gateway (ALG) for SIP|H323 protocol (the netfilter conntrack kernel modules for these protocols)
+* ``AnyPlus`` can be ``disabled`` (default) or ``enabled``. It enables/disables usage of ``any+`` instead of ``any`` in firewall rules
 
 Example
 
