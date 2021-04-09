@@ -186,11 +186,7 @@ sub getAddress($)
     my $expand_zone = shift || 0;
 
     if ( lc($id) eq 'any') {
-        if ($self->{'cdb'}->get_prop('firewall','AnyPlus') eq 'enabled') {
-            return 'any+';
-        } else {
-            return 'any';
-        }
+        return 'any+';
     }
 
     if ( lc($id) eq 'fw') {
