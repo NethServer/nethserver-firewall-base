@@ -1998,7 +1998,8 @@ export default {
                     axes: {
                       y: {
                         axisLabelFormatter: function(y) {
-                          return context.$options.filters.byteFormat(y);
+                          // netdata values are expressed in KB
+                          return context.$options.filters.byteFormat(y * 1024);
                         }
                       }
                     }
@@ -2036,7 +2037,8 @@ export default {
                     axes: {
                       y: {
                         axisLabelFormatter: function(y) {
-                          return context.$options.filters.byteFormat(y);
+                          // netdata values are expressed in KB
+                          return context.$options.filters.byteFormat(y * 1024);
                         }
                       }
                     }
