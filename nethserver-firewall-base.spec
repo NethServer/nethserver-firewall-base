@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.14.2
+Version: 3.15.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,10 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Mon Apr 12 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.15.0-1
+- Firewall: Use any+ in firewall rules - NethServer/dev#6461
+- Firewall: wrong unit of measurement in traffic shaping bandwidth chart - Bug NethServer/dev#6475
+
 * Mon Mar 29 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.14.2-1
 - Priority web proxy rules not honoured - Bug nethserver/dev#6465
 
