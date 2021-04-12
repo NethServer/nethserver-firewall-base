@@ -1973,7 +1973,7 @@ export default {
               if (provider.in && provider.in.data) {
                 for (var t in provider.in.data) {
                   provider.in.data[t][0] = new Date(
-                    provider.in.data[t][0] * 1000
+                    provider.in.data[t][0] * 1000000
                   );
                 }
                 context.charts["chart-in-" + i] = new Dygraph(
@@ -2011,7 +2011,7 @@ export default {
               if (provider.out && provider.out.data) {
                 for (var t in provider.out.data) {
                   provider.out.data[t][0] = new Date(
-                    provider.out.data[t][0] * 1000
+                    provider.out.data[t][0] * 1000000
                   );
                 }
 
@@ -2099,7 +2099,7 @@ export default {
               if (provider.in && provider.in.data) {
                 for (var t in provider.in.data) {
                   provider.in.data[t][0] = new Date(
-                    provider.in.data[t][0] * 1000
+                    provider.in.data[t][0] * 1000000
                   );
                 }
                 context.charts["chart-in-" + i].updateOptions({
@@ -2110,7 +2110,7 @@ export default {
               if (provider.out && provider.out.data) {
                 for (var t in provider.out.data) {
                   provider.out.data[t][0] = new Date(
-                    provider.out.data[t][0] * 1000
+                    provider.out.data[t][0] * 1000000
                   );
                 }
                 context.charts["chart-out-" + i].updateOptions({
