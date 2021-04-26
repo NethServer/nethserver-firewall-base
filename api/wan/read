@@ -74,7 +74,7 @@ if($cmd eq 'providers') {
     $ret->{'configuration'}{'interfaces'} = \@interfaces;
     my @tmp = split(",",$cdb->get_prop('firewall','CheckIP'));
     $ret->{'configuration'}{'multiwan'}{'CheckIP'} = \@tmp;
-    foreach (qw(MaxNumberPacketLoss MaxPercentPacketLoss NotifyWan PingInterval WanMode)) {
+    foreach (qw(MaxNumberPacketLoss MaxPercentPacketLoss NotifyWan NotifyWanFrom NotifyWanTo PingInterval WanMode)) {
         $ret->{'configuration'}{'multiwan'}{$_} = $cdb->get_prop('firewall',$_);
     }
     $ret->{'configuration'}{'multiwan'}{'EmailAddress'} = $cdb->get_prop('root', 'EmailAddress');

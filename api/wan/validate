@@ -54,6 +54,8 @@ if ($action == "wan") {
         }
     }
     $v->declareParameter('NotifyWan', Validate::SERVICESTATUS);
+    $v->declareParameter('NotifyWanTo', Validate::EMAIL);
+    $v->declareParameter('NotifyWanFrom', Validate::EMAIL);
     $v->declareParameter('MaxNumberPacketLoss', $mnplv);
     $v->declareParameter('MaxPercentPacketLoss', $mpplv);
     $v->declareParameter('PingInterval', $piv);
