@@ -536,10 +536,41 @@
                 >{{$t('wan.notify_status_change')}}</label>
                 <div class="col-sm-9">
                   <input type="checkbox" v-model="wan.NotifyWan" class="form-control" />
-                  <small v-if="wan.EmailAddress">{{wan.EmailAddress}}</small>
                   <span v-if="wan.errors.NotifyWan.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+wan.errors.NotifyWan.message)}}
+                  </span>
+                </div>
+              </div>
+              <div
+                v-show="wan.NotifyWan"
+                :class="['form-group', wan.errors.NotifyWanFrom.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('wan.email_notification_from')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="wan.NotifyWanFrom" class="form-control" />
+                  <span v-if="wan.errors.NotifyWanFrom.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+wan.errors.NotifyWanFrom.message)}}
+                  </span>
+                </div>
+              </div>
+              <div
+                v-show="wan.NotifyWan"
+                :class="['form-group', wan.errors.NotifyWanTo.hasError ? 'has-error' : '']"
+              >
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('wan.email_notification_to')}}</label>
+                <div class="col-sm-9">
+                  <input type="text" v-model="wan.NotifyWanTo" class="form-control" />
+                  <span v-if="wan.errors.NotifyWanTo.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+wan.errors.NotifyWanTo.message)}}
                   </span>
                 </div>
               </div>
@@ -974,6 +1005,8 @@ export default {
         MaxPercentPacketLoss: 0,
         PingInterval: 0,
         NotifyWan: false,
+        NotifyWanFrom: "",
+        NotifyWanTo: "",
         errors: this.initWANErrors(),
         advanced: false,
         isLoading: false
@@ -2068,6 +2101,14 @@ export default {
         NotifyWan: {
           hasError: false,
           message: ""
+        },
+        NotifyWanFrom: {
+          hasError: false,
+          message: ""
+        },
+        NotifyWanTo: {
+          hasError: false,
+          message: ""
         }
       };
     },
@@ -2382,6 +2423,8 @@ export default {
         WanMode: context.wan.WanMode,
         CheckIP: context.wan.CheckIP.split("\n"),
         NotifyWan: context.wan.NotifyWan ? "enabled" : "disabled",
+        NotifyWanFrom: context.wan.NotifyWanFrom,
+        NotifyWanTo: context.wan.NotifyWanTo,
         MaxNumberPacketLoss: context.wan.MaxNumberPacketLoss,
         MaxPercentPacketLoss: context.wan.MaxPercentPacketLoss,
         PingInterval: context.wan.PingInterval

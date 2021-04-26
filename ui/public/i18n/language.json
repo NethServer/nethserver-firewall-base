@@ -145,6 +145,8 @@
         "check_ip": "Check IP (one per line)",
         "max_number_packet_loss": "Disable provider after # lost pings (2-99)",
         "max_percent_packet_loss": "Disable provider over % lost pings (1-100)",
+        "email_notification_from": "From",
+        "email_notification_to": "To",
         "ping_interval": "Ping interval in seconds (1-60)",
         "ping": "Ping",
         "speed_info": "Speedtest results",
@@ -574,6 +576,7 @@
         "Not_valid_ipV4Address_or_CIDR": "It must be a IPv4 address like '1.2.3.4' or a CIDR network like '192.168.1.0/24'",
         "valid_memberOf_accept,drop": "The valid actions are 'Accept' or 'Drop'",
         "non_existing_firewall_object": "Firewall object does not exist",
+        "valid_email,generic_failure": "Invalid email address",
         "snat_fw_object_duplicated": "Firewall object is duplicated"
     },
     "docs": {
