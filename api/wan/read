@@ -77,7 +77,9 @@ if($cmd eq 'providers') {
     foreach (qw(MaxNumberPacketLoss MaxPercentPacketLoss NotifyWan PingInterval WanMode)) {
         $ret->{'configuration'}{'multiwan'}{$_} = $cdb->get_prop('firewall',$_);
     }
-    $ret->{'configuration'}{'multiwan'}{'EmailAddress'} = $cdb->get_prop('root', 'EmailAddress');
+    my $EmailNotifications = $cdb->get_prop('root', 'EmailAddress');
+    $EmailNotifications =~ s/,/ /g;
+    $ret->{'configuration'}{'multiwan'}{'EmailAddress'} = $EmailNotifications;
 	if ($ret->{'configuration'}{'multiwan'}{'WanMode'} eq 'backup') {
 		my $externalip = `dig +short myip.opendns.com \@resolver1.opendns.com`;
 		chomp $externalip;

@@ -47,12 +47,14 @@ case $action in
         ;;
 
     "wan")
-        notifywanfrom=$(/sbin/e-smith/db configuration getprop root SenderAddress)
         notifyto=$(/sbin/e-smith/db configuration getprop root EmailAddress)
         save_db configuration
-        /sbin/e-smith/db configuration setprop firewall WanMode "$(_get WanMode)" NotifyWan "$(_get NotifyWan)" \
-            MaxNumberPacketLoss "$(_get MaxNumberPacketLoss)" MaxPercentPacketLoss "$(_get MaxPercentPacketLoss)" PingInterval "$(_get PingInterval)" \
-            CheckIP "$(_get_array CheckIP)" NotifyWanTo "$notifyto" NotifyWanFrom "$notifywanfrom"
+        /sbin/e-smith/db configuration setprop firewall WanMode "$(_get WanMode)" MaxNumberPacketLoss "$(_get MaxNumberPacketLoss)" \
+            MaxPercentPacketLoss "$(_get MaxPercentPacketLoss)" PingInterval "$(_get PingInterval)" \
+            CheckIP "$(_get_array CheckIP)"
+        if [[ -n $notifyto ]]; then
+           /sbin/e-smith/db configuration setprop firewall NotifyWan "$(_get NotifyWan)"
+        fi
         ;;
 
     "reorder")
