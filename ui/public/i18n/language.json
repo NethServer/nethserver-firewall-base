@@ -160,6 +160,8 @@
         "fireqos_temporary_disabled": "Traffic shaping is temporarily disabled during the speed test.",
         "speedtest_error": "Speedtest failed: please check Internet connection.",
         "click_to_open": "Click to expand details",
+        "email_notifications_is_not_set":"The email for notification is not set",
+        "settings_email_notifications":"Email notifications",
         "current_ip": "Current public IP"
     },
     "traffic_shaping": {
