@@ -535,8 +535,23 @@
                   for="textInput-modal-markup"
                 >{{$t('wan.notify_status_change')}}</label>
                 <div class="col-sm-9">
-                  <input type="checkbox" v-model="wan.NotifyWan" class="form-control" />
-                  <small v-if="wan.EmailAddress">{{wan.EmailAddress}}</small>
+                  <input v-if="wan.EmailAddress !== 'root@localhost'" type="checkbox" v-model="wan.NotifyWan" class="form-control" />
+                  <div
+                      v-if="wan.EmailAddress === 'root@localhost'"
+                      class="alert alert-info"
+                    >
+                      <span class="pficon pficon-info"></span>
+                      {{$t('wan.email_notifications_is_not_set')}}.
+                      <a
+                        target="_blank"
+                        class="pull-right"
+                        href="/nethserver#/settings"
+                      >
+                      {{$t('wan.settings_email_notifications')}}
+                      <span class="fa fa-external-link"></span>
+                      </a>
+                  </div>
+                  <small v-if="wan.EmailAddress && wan.EmailAddress !== 'root@localhost'">{{wan.EmailAddress}}</small>
                   <span v-if="wan.errors.NotifyWan.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+wan.errors.NotifyWan.message)}}
