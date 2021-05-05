@@ -551,7 +551,7 @@
                       <span class="fa fa-external-link"></span>
                       </a>
                   </div>
-                  <small v-if="wan.EmailAddress && wan.EmailAddress !== 'root@localhost'">{{wan.EmailAddress}}</small>
+                  <small v-if="wan.EmailAddress !== 'root@localhost'">{{wan.EmailAddress}}</small>
                   <span v-if="wan.errors.NotifyWan.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
                     {{$t('validation.'+wan.errors.NotifyWan.message)}}
