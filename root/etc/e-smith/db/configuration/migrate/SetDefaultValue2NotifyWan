@@ -1,0 +1,15 @@
+{
+    # with cockpit the $firewall{'NotifyWanTo} and $firewall{'NotifyWanFrom} 
+    # could have been blanked with the firewall WAN notification panel 
+    # https://github.com/NethServer/dev/issues/6497
+    
+    use esmith::ConfigDB;
+    my $db = esmith::ConfigDB->open();
+
+    my $NotifyWanTo = $db->get_prop('firewall','NotifyWanTo') || '';
+    my $NotifyWanFrom = $db->get_prop('firewall','NotifyWanFrom') || '';
+
+    $db->set_prop('firewall','NotifyWanFrom','root@localhost') if ($NotifyWanFrom eq '');
+    $db->set_prop('firewall','NotifyWanTo','root@localhost') if ($NotifyWanTo eq '');
+    '';
+}
