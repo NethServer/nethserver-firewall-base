@@ -1,0 +1,19 @@
+{
+    # with cockpit the $firewall{'NotifyWanTo} and $firewall{'NotifyWanFrom}
+    # could have been blanked with the firewall WAN notification panel
+    # https://github.com/NethServer/dev/issues/6497
+
+    my $NotifyWanTo = $DB->get_prop('firewall','NotifyWanTo') || '';
+    my $EmailAddress = $DB->get_prop('root','EmailAddress') || '';
+    my $SenderAddress = $DB->get_prop('root','SenderAddress') || '';
+
+    if ( $NotifyWanTo eq '' && $EmailAddress eq '' ) {
+        $DB->set_prop('firewall','NotifyWanFrom','root@localhost');
+        $DB->set_prop('firewall','NotifyWanTo','root@localhost');
+    } elsif ( $NotifyWanTo eq '' && $EmailAddress ne '' ) {
+        $DB->set_prop('firewall','NotifyWanTo', $EmailAddress);
+        $DB->set_prop('firewall','NotifyWanFrom', $SenderAddress);
+    }
+
+    '';
+}
