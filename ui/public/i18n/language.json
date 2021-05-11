@@ -534,7 +534,7 @@
         "service_exists": "A service with the same name already exists",
         "not_exists_service": "Service does not exist",
         "service_not_removable": "This service can't be removed because it is in use",
-        "not_valid_port_range": "Invalid port range.",
+        "not_valid_port_range": "Invalid port range",
         "not_valid_port_number": "Invalid port number",
         "zone_exists": "A zone with the same name already exists",
         "not_exists_zone": "Zone does not exist",
