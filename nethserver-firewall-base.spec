@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.15.1
+Version: 3.15.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,10 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Tue May 11 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.15.2-1
+- WAN: notification of wan down not sent - Bug NethServer/dev#6497
+- WAN: speedtest is not converted to bytes - Bug NethServer/dev#6502
+
 * Fri Apr 30 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.15.1-1
 - PPPoE doesn't load rp-pppoe plugin - Bug NethServer/dev#6500
 
