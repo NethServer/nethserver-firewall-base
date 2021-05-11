@@ -32,7 +32,20 @@ else
     error
 fi
 
-src=$(echo $data | jq -rc '.Src | map(tostring) | join(",")')
+arr=($(echo $data | jq -rc '.Src | map(tostring) | join(" ")'))
+
+# /etc/shorewall/rules wants port range in good order : 80:90
+# we need to sort ports and port ranges, then reorder port ranges
+reorder=''
+for i in ${!arr[@]}
+do
+    if [[ ! ${arr[i]} =~ ':' ]]; then
+    reorder+="${arr[i]},"
+else
+    reorder+=$(echo ${arr[i]} | tr : "\n" | sort -n | tr "\n" : | sed 's/.$//'),
+fi
+done
+
 proto=$(_get Proto)
 if [ "$proto" == "tcpudp" ]; then
     proto="tcp,udp"
@@ -43,10 +56,11 @@ save_db portforward
     Description "$(_get Description)" Dst "$(_get Dst)" \
     DstHost "$(_get_fw_object "$(_get DstHost)")" Log "$(_get Log)" \
     OriDst "$(_get OriDst)" Proto "$proto" \
-    Src "$src" status "$(_get status)"
+    Src "${reorder%?}" status "$(_get status)"
 
 if [ $? -gt 0 ]; then
     error "SaveFailed" "check_logs"
 else
     success
 fi
+
