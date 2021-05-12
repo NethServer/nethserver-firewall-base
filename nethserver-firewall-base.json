@@ -1,8 +1,8 @@
 {
     "id": "nethserver-firewall-base",
     "name": "Firewall",
-    "summary": "NethServer firewall implementation based on Shorewall",
-    "description": "NethServer firewall implementation based on Shorewall",
+    "summary": "Firewall implementation based on Shorewall",
+    "description": "Firewall implementation based on Shorewall",
     "url": "",
     "homepage": "https://github.com/NethServer/nethserver-firewall-base",
     "provides": ["nethserver-firewall-base"],
