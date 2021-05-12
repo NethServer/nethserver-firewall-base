@@ -246,7 +246,7 @@
                   >{{newPf.SrcType}}</span>
                   <span v-if="newPf.errors.Src.hasError" class="help-block">
                     {{$t('validation.validation_failed')}}:
-                    {{$t('validation.'+newPf.errors.Src.message)}}
+                    {{$t('validation.'+newPf.errors.Src.message)}} : {{newPf.errors.Src.value}}
                   </span>
                 </div>
               </div>
@@ -702,7 +702,8 @@ export default {
         },
         Src: {
           hasError: false,
-          message: ""
+          message: "",
+          value: ""
         },
         DstHost: {
           hasError: false,
