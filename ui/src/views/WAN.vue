@@ -2201,18 +2201,14 @@ export default {
                 '<b class="col-sm-6">' +
                 context.$i18n.t("download") +
                 '</b><span class="col-sm-6">' +
-                ((success.download &&
-                  context.$options.filters.byteFormat(success.download / 8)+'/s') ||
-                  "-") +
+                (! success.download ? "-" : success.download > 1048576 ? (Math.round(success.download / 1048576)+' Mbit/s') : (Math.round(success.download / 1024)+' Kbit/s')) +
                 "</span>";
 
               popover.options.content +=
                 '<b class="col-sm-6">' +
                 context.$i18n.t("upload") +
                 '</b><span class="col-sm-6">' +
-                ((success.upload &&
-                  context.$options.filters.byteFormat(success.upload / 8)+'/s') ||
-                  "-") +
+                (! success.upload ? "-" : success.upload > 1048576 ? (Math.round(success.upload / 1048576)+' Mbit/s') : (Math.round(success.upload / 1024)+' Kbit/s')) +
                 "</span>";
 
               popover.options.content +=
