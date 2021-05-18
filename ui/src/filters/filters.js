@@ -1,6 +1,36 @@
 import Vue from "vue"
 
 var Filters = {
+    bitFormat: function (size) {
+        var result;
+
+        switch (true) {
+            case size === null || size === "" || isNaN(size):
+                result = "-";
+                break;
+
+            case size >= 0 && size < 1024:
+                result = size + " bit";
+                break;
+
+            case size >= 1024 && size < Math.pow(1024, 2):
+                result = Math.round(size / 1024) + " Kbit";
+                break;
+
+            case size >= Math.pow(1024, 2) && size < Math.pow(1024, 3):
+                result = Math.round(size / Math.pow(1024, 2)) + " Mbit";
+                break;
+
+            case size >= Math.pow(1024, 3) && size < Math.pow(1024, 4):
+                result = Math.round(size / Math.pow(1024, 3)) + " Gbit";
+                break;
+
+            default:
+                result = Math.round(size / Math.pow(1024, 4)) + " Tbit";
+        }
+
+        return result;
+    },
     byteFormat: function (size) {
         var result;
 
