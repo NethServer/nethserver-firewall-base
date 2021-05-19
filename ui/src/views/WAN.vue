@@ -2202,7 +2202,7 @@ export default {
                 context.$i18n.t("download") +
                 '</b><span class="col-sm-6">' +
                 ((success.download &&
-                  context.$options.filters.byteFormat(success.download / 8)+'/s') ||
+                  context.$options.filters.bitFormat(success.download)+'/s') ||
                   "-") +
                 "</span>";
 
@@ -2211,7 +2211,7 @@ export default {
                 context.$i18n.t("upload") +
                 '</b><span class="col-sm-6">' +
                 ((success.upload &&
-                  context.$options.filters.byteFormat(success.upload / 8)+'/s') ||
+                  context.$options.filters.bitFormat(success.upload)+'/s') ||
                   "-") +
                 "</span>";
 
