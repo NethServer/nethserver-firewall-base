@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.15.4
+Version: 3.15.5
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Thu May 20 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.15.5-1
+- Display the speetest result in bits - NethServer/dev#6513
+
 * Fri May 14 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.15.4-1
 - White-label support on Cockpit applications - NethServer/dev#6510
 
