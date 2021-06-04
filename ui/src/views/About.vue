@@ -17,14 +17,14 @@
         <span class="fa fa-globe m-right-sm"></span>
         <a
           target="_blank"
-          href="https://github.com/NethServer/nethserver-firewall-base"
+          :href="info.homepage"
         >{{$t('about.website')}}</a>
       </div>
       <div class="list-group-item info-item">
         <span class="fa fa-bug m-right-sm"></span>
         <a
           target="_blank"
-          href="https://github.com/NethServer/dev/issues"
+          :href="info.bugs.url"
         >{{$t('about.bug_tracker')}}</a>
       </div>
 
