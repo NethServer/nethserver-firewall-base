@@ -117,7 +117,7 @@ case "delete-service":
 case "create-zone":
 case "update-zone":
     $ndb = new EsmithDatabase('networks');
-    $nameValidator = $nameValidator = $v->createValidator()->maxLength(5)->regexp('/^[A-Za-z0-9_]+$/');
+    $nameValidator = $v->createValidator()->maxLength(5)->regexp('/^[A-Za-z][A-Za-z0-9_]+$/');
     $forbiddenName = array('all','none','any','source','dest');
     $interfaces = readInterfaces();
     $interfaceValidator = $v->createValidator()->memberOf($interfaces);
