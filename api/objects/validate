@@ -117,7 +117,8 @@ case "delete-service":
 case "create-zone":
 case "update-zone":
     $ndb = new EsmithDatabase('networks');
-    $nameValidator = $v->createValidator()->maxLength(5)->username();
+    $nameValidator = $v->createValidator()->maxLength(5)->regexp('/^[A-Za-z][A-Za-z0-9_]+$/');
+    $forbiddenName = array('all','none','any','source','dest');
     $interfaces = readInterfaces();
     $interfaceValidator = $v->createValidator()->memberOf($interfaces);
 
@@ -125,6 +126,9 @@ case "update-zone":
     $v->declareParameter('Network', Validate::CIDR_BLOCK);
     $v->declareParameter('Interface', $interfaceValidator);
     $v->declareParameter('Description', Validate::ANYTHING);
+    if (in_array(strtolower($data['name']), $forbiddenName)){
+        $v->addValidationError('name', 'forbbiden_name_for_zone', $data['name']);
+    }
 
     if( $action == 'create-zone' && $ndb->getKey($data['name']) ) {
         $v->addValidationError('name', 'zone_exists', $data['name']);
