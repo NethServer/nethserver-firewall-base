@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.15.6
+Version: 3.15.7
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Mon Jul 05 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.15.7-1
+- Firewall Object: validate zone name - Bug NethServer/dev#6537
+
 * Wed Jun 09 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.15.6-1
 - Firewall: The apply banner is triggered awhen we save the form in the settings page - Bug NethServer/dev#6519
 - Cockpit applications: honor URLs inside manifest - NethServer/dev#6517
