@@ -79,18 +79,27 @@ case "update-service":
     }
 
     if($data['Ports']) {
+        $portValidator = $v->createValidator(Validate::PORTNUMBER);
         if (strpos($data['Ports'][0], "-") !== false ) { # port range
-            $tmp = explode("-",$data['Ports'][0]);
-            # two non-zero integers, right number must be greater then left one
-            if ( !isset($tmp[0], $tmp[1]) || !(int)$tmp[0] || !(int)$tmp[1] || (int)$tmp[0] >= (int)$tmp[1] ) {
-                $v->addValidationError('Ports', 'not_valid_port_range');
+            # Verify that we use either a comma separated list OR a range of ports    
+            if (isset ($data['Ports'][1])) {
+                $v->addValidationError('Ports', 'must_be_port_list_or_a_port_range');
+            } else {
+                list($lower_port, $upper_port) = explode("-", $data['Ports'][0], 2);
+                if (!$portValidator->evaluate($lower_port) || !$portValidator->evaluate($upper_port)) {
+                    $v->addValidationError('Ports', 'not_valid_port_range', $data['Ports'][0]);
+                    break;
+                }
+                # Verify we have right number must be greater then left one
+                if ( $lower_port >= $upper_port ) {
+                    $v->addValidationError('Ports', 'not_valid_port_range_order', $data['Ports'][0]);
+                }
             }
         } else {
-            $portValidator = $v->createValidator(Validate::PORTNUMBER);
-            foreach( $data['Ports'] as $port)
-            {
+            # verify that each array value is a good port value
+            foreach( $data['Ports'] as $port) {
                 if(!$portValidator->evaluate($port)) {
-                    $v->addValidationError('Ports', 'not_valid_port_number');
+                    $v->addValidationError('Ports', 'not_valid_port_number', $port);
                 }
             }
         }
