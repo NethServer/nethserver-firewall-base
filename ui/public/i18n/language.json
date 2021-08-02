@@ -536,6 +536,8 @@
         "service_not_removable": "This service can't be removed because it is in use",
         "not_valid_port_range": "Invalid port range",
         "not_valid_port_number": "Invalid port number",
+        "not_valid_port_range_order":"Right side of port range must be higher than left side",
+        "must_be_port_list_or_a_port_range":"Must be either a port range (dash separated) or a port list (comma separated)",
         "forbbiden_name_for_zone":"This name of zone is reserved by the firewall",
         "valid_regexp_/^[A-Za-z][A-Za-z0-9_]+$/": "Must start by a letter then only digits and letters with '_' are allowed",
         "valid_maxLength_5": "The maximum length is 5 characters",

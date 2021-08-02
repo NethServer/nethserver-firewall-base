@@ -1291,7 +1291,7 @@
                   <span
                     v-if="newService.errors.Ports.hasError"
                     class="help-block"
-                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newService.errors.Ports.message)}}</span>
+                  >{{$t('validation.validation_failed')}}: {{$t('validation.'+newService.errors.Ports.message)}} {{newService.errors.Ports.value}}</span>
                 </div>
               </div>
               <div
@@ -3520,6 +3520,7 @@ export default {
               var attr = errorData.attributes[e];
               context.newService.errors[attr.parameter].hasError = true;
               context.newService.errors[attr.parameter].message = attr.error;
+              context.newService.errors[attr.parameter].value = attr.value;
             }
             context.$forceUpdate();
           } catch (e) {
