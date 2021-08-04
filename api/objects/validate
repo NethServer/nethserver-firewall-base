@@ -88,7 +88,7 @@ case "update-service":
                 $v->addValidationError('Ports', 'not_valid_port_range', $data['Ports'][0]);
             }
             # Verify the right number is greater than left one
-            if ( $lower_port >= $upper_port ) {
+            elseif ( $lower_port >= $upper_port ) {
                 $v->addValidationError('Ports', 'not_valid_port_range_order', $data['Ports'][0]);
             }
         } else {
