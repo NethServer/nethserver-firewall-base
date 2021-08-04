@@ -80,25 +80,26 @@ case "update-service":
 
     if($data['Ports']) {
         $portValidator = $v->createValidator(Validate::PORTNUMBER);
-        if (strpos($data['Ports'][0], "-") !== false ) { # port range
-            # Verify that we use either a comma separated list OR a range of ports    
-            if (isset ($data['Ports'][1])) {
-                $v->addValidationError('Ports', 'must_be_port_list_or_a_port_range');
-            } else {
-                list($lower_port, $upper_port) = explode("-", $data['Ports'][0], 2);
-                if (!$portValidator->evaluate($lower_port) || !$portValidator->evaluate($upper_port)) {
-                    $v->addValidationError('Ports', 'not_valid_port_range', $data['Ports'][0]);
-                    break;
-                }
-                # Verify we have right number must be greater then left one
-                if ( $lower_port >= $upper_port ) {
-                    $v->addValidationError('Ports', 'not_valid_port_range_order', $data['Ports'][0]);
-                }
+        # Verify that we use either a list OR a range of ports
+        if (count($data['Ports']) == 1 and strpos($data['Ports'][0], "-") !== false ) { # port range first element of array
+            list($lower_port, $upper_port) = explode("-", $data['Ports'][0], 2);
+            # Verify the two sides are port values
+            if (!$portValidator->evaluate($lower_port) || !$portValidator->evaluate($upper_port)) {
+                $v->addValidationError('Ports', 'not_valid_port_range', $data['Ports'][0]);
+            }
+            # Verify the right number is greater than left one
+            if ( $lower_port >= $upper_port ) {
+                $v->addValidationError('Ports', 'not_valid_port_range_order', $data['Ports'][0]);
             }
         } else {
-            # verify that each array value is a good port value
+            # Verify that each array value is a good port value and we do not have a port range
             foreach( $data['Ports'] as $port) {
-                if(!$portValidator->evaluate($port)) {
+                # It cannot be a port range
+                if (strpos($port, "-") !== false) {
+                    $v->addValidationError('Ports', 'must_be_port_list_or_a_port_range');
+                }
+                # It must be a port value
+                elseif(!$portValidator->evaluate($port)) {
                     $v->addValidationError('Ports', 'not_valid_port_number', $port);
                 }
             }
