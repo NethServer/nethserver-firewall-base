@@ -104,6 +104,19 @@ function validate_rule($data, $type) {
         }
     }
 
+    # we cannot use *VPN zone as SRC and DST with NDPI Service
+    if ($type == 'rules' && $data['Service']['type'] == 'application') {
+        if ($data['Src']['name'] == 'ivpn' || $data['Dst']['name'] == 'ivpn') {
+            $v->addValidationError('Service', 'ivpn_zone_not_allowed_as_dst_and_src', $data['Service']);
+        }
+        elseif ($data['Src']['name'] == 'ovpn' || $data['Dst']['name'] == 'ovpn') {
+            $v->addValidationError('Service', 'openvpn_zone_not_allowed_as_dst_and_src', $data['Service']);
+        }
+        elseif ($data['Src']['name'] == 'vpn' || $data['Dst']['name'] == 'vpn') {
+            $v->addValidationError('Service', 'vpn_zone_not_allowed_as_dst_and_src', $data['Service']);
+        }
+    }
+
     # check for id on creation/update
     if ($data['action'] == 'create-rule') {
         if ($rulesdb->getKey($data['id'])) {
