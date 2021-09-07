@@ -70,11 +70,16 @@ class Modify extends \Nethgui\Controller\Table\Modify
                         $report->addValidationErrorMessage($this, 'Ports', 'Ports_validator');
                     }
                 }
-            } else if ( strpos($this->parameters['Ports'], "-") !== false ) { # port range
-                $tmp = explode("-",$this->parameters['Ports']);
-                # two non-zero integers, right number must be greater then left one
-                if ( !isset($tmp[0], $tmp[1]) || !(int)$tmp[0] || !(int)$tmp[1] || (int)$tmp[0] >= (int)$tmp[1] ) {
-                    $report->addValidationErrorMessage($this, 'Ports', 'Port_range_validator');
+            } else if ( strpos($this->parameters['Ports'], "-") !== false ) {
+                $portValidator = $this->createValidator(Validate::PORTNUMBER);
+                list($lower_port, $upper_port) = explode("-", $this->parameters['Ports']);
+                # Verify the two sides are port values
+                if (!$portValidator->evaluate($lower_port) || !$portValidator->evaluate($upper_port)) {
+                    $report->addValidationErrorMessage($this, 'Ports', 'not_valid_port_range');
+                }
+                # Verify the right number is greater than left one
+                elseif ( $lower_port >= $upper_port ) {
+                    $report->addValidationErrorMessage($this, 'Ports', 'not_valid_port_range_order');
                 }
             }
         }
