@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.15.7
+Version: 3.15.8
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,11 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Wed Sep 08 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.15.8-1
+- Firewall Object Service allows to create bad range of ports - Bug NethServer/dev#6556
+- VPN role firewall rules that use DPI services is not working  - Bug NethServer/dev#6560
+- Sometimes port forwardings stop to work  if red interface is a PPPoE  - Bug NethServer/dev#6568
+
 * Mon Jul 05 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.15.7-1
 - Firewall Object: validate zone name - Bug NethServer/dev#6537
 
