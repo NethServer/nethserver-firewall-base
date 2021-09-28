@@ -17,9 +17,9 @@
         my $interface = $interface_parts[0];
         #get fw obj
         my $nat_obj = $i->prop('FwObjectNat') || "";
-        if($nat_obj ne "") {
+        foreach $obj (split(",", $nat_obj)) {
             # get hostname
-            $internal_ip = $fw->getAddress($nat_obj);
+            $internal_ip = $fw->getAddress($obj);
 
             foreach $j (@providers) {
                 my $provider_name = $j->{'name'};
