@@ -18,7 +18,9 @@
         #get fw obj
         my $nat_obj = $i->prop('FwObjectNat') || "";
         foreach $obj (split(",", $nat_obj)) {
-            # get hostname
+            # skip non supported ip ranges
+            next if ($obj =~ m/^iprange/);
+            # get address
             $internal_ip = $fw->getAddress($obj);
 
             foreach $j (@providers) {
