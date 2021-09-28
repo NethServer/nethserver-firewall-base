@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2021 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+##
+## Parse the output of rrd file in a json content
+##
+
+
+use strict;
+use warnings;
+use JSON;
+use esmith::ConfigDB;
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
+my $input = readInput();
+my $cmd = $input->{'action'};
+my $time = $input->{'time'} || 900;
+my $cdb = esmith::ConfigDB->open_ro();
+my $systemname = $cdb->get_value('SystemName');
+my $domainname = $cdb->get_value('DomainName');
+my @ret;
+
+if ($cmd eq 'ping') {
+    open(FH, "rrdtool fetch /var/lib/collectd/rrd/$systemname.$domainname/ping/ping-*.rrd AVERAGE -s e-$time|");
+    while (<FH>) {
+    chomp;
+    my @lines = split("\r\n");
+        foreach my $line (@lines) {
+            my @values = split(":",$line);
+            next unless $values[0] =~ m/\d/;
+            next unless $values[1] =~ m/\d/;
+            $values[1] =~ s/ //g;
+            # be sure to output a numeric value
+            $values[1] += 0;
+            push(@ret, \@values);
+        }
+    }
+    close(FH);
+    print encode_json ({labels => [ 'time','latency' ], data => \@ret});
+}

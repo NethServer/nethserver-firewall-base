@@ -123,6 +123,10 @@
         "details_for": "Details for",
         "name": "Name",
         "counter": "Counter",
+        "Ping": "Ping",
+        "Latency_in_ms": "Latency in ms",
+        "charts": "Network Charts",
+        "ping_charts_not_updated":"Charts cannot be updated. Maybe collectd is not running",
         "unknown": "Unknown"
     },
     "wan": {

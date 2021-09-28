@@ -3,9 +3,38 @@
     <h2>{{$t('dashboard.title')}}</h2>
 
     <h3>{{$t('dashboard.topology')}}</h3>
-    <div v-if="!view.graphLoaded" class="spinner spinner-lg view-spinner"></div>
+    <div v-if="!view.graphLoaded && !view.isChartLoaded " class="spinner spinner-lg view-spinner"></div>
     <div id="network-graph" class="divider"></div>
 
+    <h3>{{$t('dashboard.charts')}}</h3>
+    <div v-if="!view.graphLoaded && !view.isChartLoaded " class="spinner spinner-lg view-spinner"></div>
+    <a
+      v-if="view.isChartLoaded"
+      @click="toggleCharts()"
+    >{{view.chartsShowed ? $t('hide_charts') : $t('show_charts')}}</a>
+    <div :class="view.chartsShowed ? '' : 'hidden'">
+      <div
+        v-if="view.invalidChartsPingData"
+        class="alert alert-warning alert-dismissable col-sm-12"
+      >
+        <span class="pficon pficon-warning-triangle-o"></span>
+        <strong>{{$t('warning')}}!</strong>
+        {{$t('dashboard.ping_charts_not_updated')}}.
+      </div>
+      <div
+        v-show="view.isChartLoaded && !view.invalidChartsPingData"
+        class="row"
+      >
+        <div class="col-sm-11">
+          <h4 class="col-sm-12">
+            {{$t('dashboard.Ping')}}
+            <div id="chart-status" class="legend"></div>
+          </h4>
+          <div id="chart-ping" class="col-sm-12"></div>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
     <h3>{{$t('dashboard.providers')}}</h3>
     <div v-if="!view.statsLoaded" class="spinner spinner-lg view-spinner"></div>
     <div class="row divider row-status" v-if="view.statsLoaded">
@@ -164,6 +193,8 @@
 
 <script>
 import vis from "vis";
+var Mark = require("mark.js");
+import Dygraph from "dygraphs";
 
 export default {
   name: "Dashboard",
@@ -175,10 +206,20 @@ export default {
       context.initGraph();
     });
     context.getStats();
+    context.initPingChart();
+  },
+  beforeRouteLeave(to, from, next) {
+    $(".modal").modal("hide");
+    clearInterval(this.pollingIntervalId);
+    clearInterval(this.pollingIntervalIdChart);
+    next();
   },
   data() {
     return {
       view: {
+        isChartLoaded: false,
+        invalidChartsPingData: false,
+        chartsShowed: false,
         graphLoaded: false,
         statsLoaded: false,
         details: false
@@ -190,6 +231,11 @@ export default {
       currentService: {
         detailsRows: []
       },
+      charts: {
+        connections: null
+      },
+      pollingIntervalId: 0,
+      pollingIntervalIdChart: 0,
       nodes: [
         {
           id: 0,
@@ -706,7 +752,114 @@ export default {
       this.$forceUpdate();
 
       $("#detailsServiceModal").modal("show");
-    }
+    },
+    toggleCharts() {
+      this.view.chartsShowed = !this.view.chartsShowed;
+      if (this.view.chartsShowed) {
+        this.initPingChart();
+      }
+    },
+    initPingChart() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base//dashboard/charts"],
+        { action: "ping",
+          time: 900
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+
+          if (success.data.length > 0) {
+            context.view.invalidChartsPingData = false;
+
+            for (var t in success.data) {
+              success.data[t][0] = new Date(success.data[t][0] * 1000);
+            }
+
+            context.charts["chart-ping"] = new Dygraph(
+              document.getElementById("chart-ping"),
+              success.data,
+              {
+                fillGraph: true,
+                stackedGraph: true,
+                labels: success.labels,
+                height: 150,
+                strokeWidth: 1,
+                strokeBorderWidth: 1,
+                ylabel: context.$i18n.t("dashboard.Latency_in_ms"),
+                axisLineColor: "white",
+                labelsDiv: document.getElementById("chart-status"),
+                labelsSeparateLines: true,
+                legend: "always",
+                axes: {
+                  y: {
+                    axisLabelFormatter: function(y) {
+                      return Math.ceil(y);
+                    }
+                  }
+                }
+              }
+            );
+            context.charts["chart-ping"].initialData = success.data;
+
+            // start polling
+            if (context.pollingIntervalIdChart == 0) {
+              context.pollingIntervalIdChart = setInterval(function() {
+                context.updateCharts(900);
+              }, 1000);
+            }
+          } else {
+            context.view.invalidChartsPingData = true;
+            context.$forceUpdate();
+          }
+
+          context.view.isChartLoaded = true;
+        },
+        function(error) {
+          console.error(error);
+          context.view.isChartLoaded = true;
+        }
+      );
+    },
+    updateCharts(time) {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/dashboard/charts"],
+        { action: "ping",
+          time: time
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          if (success.data.length > 0) {
+            context.view.invalidChartsPingData = false;
+
+            for (var t in success.data) {
+              success.data[t][0] = new Date(success.data[t][0] * 1000);
+            }
+
+            context.charts["chart-ping"].updateOptions({
+              file: success.data
+            });
+          } else {
+            context.view.invalidChartsPingData = true;
+            context.$forceUpdate();
+          }
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
   }
 };
 </script>
@@ -716,6 +869,9 @@ export default {
   width: 100%;
 }
 
+#chart-ping {
+  margin-bottom: 10px;
+}
 .divider {
   border-bottom: 1px solid #d1d1d1;
 }
