@@ -51,6 +51,7 @@ if ($cmd eq 'ping') {
             $values[1] =~ s/ //g;
             # be sure to output a numeric value
             $values[1] += 0;
+            $values[0] = int($values[0]);
             push(@ret, \@values);
         }
     }
