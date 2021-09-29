@@ -762,7 +762,7 @@ export default {
     initPingChart() {
       var context = this;
       nethserver.exec(
-        ["nethserver-firewall-base//dashboard/charts"],
+        ["nethserver-firewall-base/dashboard/charts"],
         { action: "ping",
           time: 900
         },
