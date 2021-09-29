@@ -42,6 +42,8 @@
             my @fw_objects = split /,/, $fw_objects_string;
 
             foreach my $fw_obj (@fw_objects) {
+                # skip ip ranges
+                next if ($fw_obj =~ m/^iprange/);
                 $internal_ip = $fw->getAddress($fw_obj);
                 push @internal_ips, $internal_ip;
             }

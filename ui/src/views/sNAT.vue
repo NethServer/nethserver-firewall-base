@@ -150,7 +150,6 @@ export default {
       hosts: [],
       hostGroups: [],
       cidrSubnets: [],
-      ipRanges: [],
       maxLengthMembers: 40,
       autoOptions: {
         inputClass: "form-control",
@@ -159,7 +158,6 @@ export default {
       loaded: {
         hosts: false,
         cidrSubnets: false,
-        ipRanges: false,
       },
       error: {
         message: "",
@@ -169,10 +167,10 @@ export default {
   },
   computed: {
     firewallObjects() {
-      return this.hosts.concat(this.hostGroups, this.cidrSubnets, this.ipRanges);
+      return this.hosts.concat(this.hostGroups, this.cidrSubnets);
     },
     firewallObjectsLoaded() {
-      return this.loaded.hosts && this.loaded.cidrSubnets && this.loaded.ipRanges;
+      return this.loaded.hosts && this.loaded.cidrSubnets;
     }
   },
   watch: {
@@ -185,10 +183,9 @@ export default {
   methods: {
     getFirewallObjects() {
       this.fwObjects = [];
-      this.loaded = {hosts: false, cidrSubnets: false, ipRanges: false};
+      this.loaded = {hosts: false, cidrSubnets: false};
       this.getHosts();
       this.getCidrSubnets();
-      this.getIpRanges();
     },
     removeObjectSnat(snat, index) {
       snat.firewallObjects.splice(index, 1);
@@ -272,32 +269,6 @@ export default {
         }
       );
     },
-    getIpRanges() {
-      var context = this;
-      nethserver.exec(
-        ["nethserver-firewall-base/objects/read"],
-        {
-          action: "ip-ranges"
-        },
-        null,
-        function(success) {
-          try {
-            success = JSON.parse(success);
-            context.ipRanges = success['ip-ranges'].map(function(i) {
-              i.type = context.$i18n.t("objects.ip_range");
-              i.typeId = "iprange";
-              return i;
-            });
-            context.loaded.ipRanges = true;
-          } catch (e) {
-            console.error(e);
-          }
-        },
-        function(error) {
-          console.error(error);
-        }
-      );
-    },
     setCurrentSnat(snat) {
       this.currentSnat = snat;
     },
@@ -368,10 +339,6 @@ export default {
                     case "cidr":
                       const cidr = context.cidrSubnets.find(c => c.name == objName);
                       snat.firewallObjects.push(cidr);
-                      break;
-                    case "iprange":
-                      const ipRange = context.ipRanges.find(ir => ir.name == objName);
-                      snat.firewallObjects.push(ipRange);
                       break;
                   }
                 }
