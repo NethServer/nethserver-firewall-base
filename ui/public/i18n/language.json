@@ -500,6 +500,18 @@
         "stop_follow_button": "Stop following",
         "filter_label": "Regexp filter"
     },
+    "troubleshooting": {
+        "title": "Troubleshooting",
+        "services": "Services",
+        "wans": "WANs",
+        "hosts": "Hosts",
+        "ping": "Ping",
+        "proxy": "Web proxy",
+        "details": "Details",
+        "charts": "Charts",
+        "latency": "Latency (ms)",
+        "ping_charts_not_updated":"Charts cannot be updated. Maybe collectd is not running"
+    },
     "about": {
         "title": "About",
         "website": "Website",

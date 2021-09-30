@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import Dashboard from './views/Dashboard.vue'
+import Troubleshooting from './views/Troubleshooting.vue'
 import WAN from './views/WAN.vue'
 import TrafficShaping from './views/TrafficShaping.vue'
 import sNAT from './views/sNAT.vue'
@@ -23,6 +24,11 @@ export default new Router({
       path: '/',
       name: 'dashboard',
       component: Dashboard
+    },
+    {
+      path: '/troubleshooting',
+      name: 'troubleshooting',
+      component: Troubleshooting
     },
     {
       path: '/wan',
