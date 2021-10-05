@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.15.8
+Version: 3.16.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Tue Oct 05 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.16.0-1
+- sNAT doesn't work in some cases - Bug NethServer/dev#6575
+
 * Wed Sep 08 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.15.8-1
 - Firewall Object Service allows to create bad range of ports - Bug NethServer/dev#6556
 - VPN role firewall rules that use DPI services is not working  - Bug NethServer/dev#6560
