@@ -42,7 +42,7 @@
             <div class="col-xs-3 col-sm-2 col-md-2">
                 <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="fa fa-shield"></span>{{ $t('troubleshooting.internet') }}
+                <span class="fa fa-globe"></span>{{ $t('troubleshooting.internet') }}
                 </h2>
                 <div class="card-pf-body">
                   <div v-if="!view.internet.isLoaded" class="spinner spinner-lg view-spinner"></div>
@@ -63,7 +63,7 @@
             <div class="col-xs-3 col-sm-2 col-md-2">
                 <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="fa fa-shield"></span>{{ $t('troubleshooting.multiwan') }}
+                <span class="pf-icon pficon-network"></span>{{ $t('troubleshooting.multiwan') }}
                 </h2>
                 <div class="card-pf-body">
                   <div v-if="!view.multiwan.isLoaded" class="spinner spinner-lg view-spinner"></div>
@@ -105,7 +105,7 @@
             <div class="col-xs-3 col-sm-2 col-md-2">
                 <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="fa fa-shield"></span>{{ $t('troubleshooting.systemd') }}
+                <span class="pf-icon pficon-services"></span>{{ $t('troubleshooting.systemd') }}
                 </h2>
                 <div class="card-pf-body">
                   <div v-if="!view.systemd.isLoaded" class="spinner spinner-lg view-spinner"></div>
@@ -130,7 +130,7 @@
             <div class="col-xs-6 col-sm-4 col-md-4">
                 <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="fa fa-shield"></span>{{ $t('troubleshooting.proxy') }}
+                <span class="pf-icon pficon-filter"></span>{{ $t('troubleshooting.proxy') }}
                 </h2>
                 <div class="card-pf-body">
                   <div v-if="!view.squid.isLoaded" class="spinner spinner-lg view-spinner"></div>
@@ -177,7 +177,7 @@
             <div class="col-xs-3 col-sm-2 col-md-2">
                 <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="fa fa-shield"></span>{{ $t('troubleshooting.ipblacklist') }}
+                <span class="pf-icon pficon-cloud-security"></span>{{ $t('troubleshooting.ipblacklist') }}
                 </h2>
                 <div class="card-pf-body">
                   <div v-if="!view.ipblacklist.isLoaded" class="spinner spinner-lg view-spinner"></div>
@@ -245,7 +245,7 @@
           <div class="col-xs-3 col-sm-2 col-md-2">
               <div class="card-pf card-pf-accented card-pf-aggregate-status">
               <h2 class="card-pf-title">
-              <span class="fa fa-shield"></span>{{ $t('troubleshooting.templates') }}
+              <span class="pf-icon pficon-settings"></span>{{ $t('troubleshooting.templates') }}
               </h2>
               <div class="card-pf-body">
                 <div v-if="!view.templates.isLoaded" class="spinner spinner-lg view-spinner"></div>
@@ -451,5 +451,9 @@ export default {
 
 .blue {
   color: blue
+}
+
+.card-pf-title > .pf-icon {
+  margin-right: 7px
 }
 </style>
