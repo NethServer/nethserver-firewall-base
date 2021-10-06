@@ -307,7 +307,6 @@ export default {
       context.updatePingChart(900);
     }, 5000);
 
-    //context.getSquidStatus();
     const services = ["internet", "shorewall", "multiwan", "systemd", "ipblacklist", "templates", "squid"]
     services.forEach(function (item, index) {
       context.getServiceStatus(item);
@@ -359,29 +358,6 @@ export default {
         function(error) {
           console.error(error);
           context["view"][service]["isLoaded"] = false;
-        }
-      );
-    },
-    getSquidStatus() {
-      var context = this;
-      nethserver.exec(
-        ["nethserver-firewall-base/troubleshooting/read"],
-        { action: "service",
-          service: "squid"
-        },
-        null,
-        function(success) {
-          try {
-            success = JSON.parse(success);
-          } catch (e) {
-            console.error(e);
-          }
-          context.view.squid.isLoaded = true;
-          context.view.squid.status = success.proxy.status;
-        },
-        function(error) {
-          console.error(error);
-          this.view.squid.isLoaded = false;
         }
       );
     },
