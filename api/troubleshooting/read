@@ -25,19 +25,36 @@
 ##
 
 
+
 use strict;
 use warnings;
 use JSON;
 use esmith::ConfigDB;
-require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+use NethServer::Service;
+use NethServer::ApiTools qw(readInput safe_decode_json);
+
 require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
+
 my $input = readInput();
 my $cmd = $input->{'action'};
 my $time = $input->{'time'} || 900;
 my $cdb = esmith::ConfigDB->open_ro();
+my $ndb = esmith::NetworksDB->open_ro();
 my $systemname = $cdb->get_value('SystemName');
 my $domainname = $cdb->get_value('DomainName');
 my @ret;
+
+sub slurp {
+    my $file = shift;
+    my $content;
+    open(my $fh, '<', $file) or return '';
+    {
+        local $/;
+        $content = <$fh>;
+    }
+    close($fh);
+    return $content;
+}
 
 if ($cmd eq 'ping') {
     open(FH, "rrdtool fetch /var/lib/collectd/rrd/$systemname.$domainname/ping/ping-*.rrd AVERAGE -s e-$time|");
@@ -61,9 +78,17 @@ if ($cmd eq 'ping') {
 
     my $service = $input->{'service'};
 
+    # Each response must return a JSON object with the 'status' field.
+    # Valid values for status are:
+    #   - running
+    #   - failed
+    #   - disabled
+    #   - warning
+    # The response can also contain a 'details' field which can have any type.
+
     if ($service eq 'shorewall') {
         my $out = `/usr/sbin/shorewall status`;
-        my $status = "dead";
+        my $status = "failed";
         if ($? == 0) {
             $status = "running";
         }
@@ -71,9 +96,85 @@ if ($cmd eq 'ping') {
     }
 
     if ($service eq 'squid') {
-        if (-x '/usr/libexec/nethserver/api/nethserver-squid/dashboard/read') {
-            system('echo \'{"action": "status"}\'  |/usr/libexec/nethserver/api/nethserver-squid/dashboard/read');
+        my $status = $cdb->get_prop('squid', 'status') || "disabled";
+        my $details = {
+            "green" => $cdb->get_prop('squid', 'GreenMode') || 'disabled',
+            "blue" => $cdb->get_prop('squid', 'BlueMode') || 'disabled',
+        };
+
+        if ($status eq 'enabled') {
+            my $s = NethServer::Service->new('squid', $cdb);
+            if ($s->is_running()) {
+                $status = 'running';
+            } else {
+                $status = 'failed';
+            }
         }
+        print encode_json({"status" => $status, "details" => $details});
     }
+
+    if ($service eq 'internet') {
+        my $dns = safe_decode_json(`/usr/libexec/nethserver/api/system-dns/hints`);
+        my $ping = `/usr/bin/ping -c 1 www.nethserver.org`;
+        my $ping_status = $?;
+        my $status = "failed";
+        if ($dns->{'count'} == 0 && $ping_status == 0) {
+            $status = "running";
+        } elsif ($dns->{'count'} > 0 && $ping_status == 0) {
+            $status = "warning";
+        }
+        print encode_json({"status" => $status});
+    }
+
+    if ($service eq 'multiwan') {
+        my $count = 0;
+        my $failed = 0;
+        my $status = 'disabled';
+        foreach  ($ndb->red()) {
+            $count++;
+            my $file = '/var/lib/shorewall/'.$_->key.'.status';
+            if (-f $file) {
+                if (slurp($file) eq '1') {
+                    $failed++;
+                }
+            }
+        }
+        if ($count > 1 && $failed == 0) {
+            $status = 'running';
+        } elsif ($count > 1 && $failed > 0 && $failed < $count) {
+            $status = 'warning';
+        } elsif ($count > 1 && $failed == $count) {
+            $status = 'failed';
+        }
+        print encode_json({"status" => $status});
+    }
+
+    if ($service eq 'systemd') {
+        my $status = "running";
+        my $services = safe_decode_json(`/usr/libexec/nethserver/api/system-services/hints`);
+        if ($services->{'count'} > 0) {
+            $status = "warning";
+        }
+        print encode_json({"status" => $status});
+    }
+
+    if ($service eq 'ipblacklist') {
+        my $status = "disabled";
+        if (-x '/usr/libexec/nethserver/api/api/ipsets/read') {
+            # TODO
+        }
+        print encode_json({"status" => $status});
+    }
+
+    if ($service eq 'templates') {
+        my $status = "disabled";
+        my @files = `/usr/bin/find /etc/e-smith/templates-custom/ -type f`;
+        if (@files) {
+            $status = "warning";
+        }
+        print encode_json({"status" => $status, "details" => \@files});
+    }
+
+
 }
 
