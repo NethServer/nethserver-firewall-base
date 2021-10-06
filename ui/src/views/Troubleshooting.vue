@@ -106,6 +106,9 @@
                 <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
                 <span class="pf-icon pficon-services"></span>{{ $t('troubleshooting.systemd') }}
+                <a href="#" class="card-pf-link-with-icon">
+                  <span class="fa fa-external-link pl-21"></span>
+                </a>
                 </h2>
                 <div class="card-pf-body">
                   <div v-if="!view.systemd.isLoaded" class="spinner spinner-lg view-spinner"></div>
@@ -131,22 +134,21 @@
                 <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
                 <span class="pf-icon pficon-filter"></span>{{ $t('troubleshooting.proxy') }}
+                <a href="#" class="card-pf-link-with-icon">
+                  <span class="fa fa-external-link pl-21"></span>
+                </a>
                 </h2>
                 <div class="card-pf-body">
                   <div v-if="!view.squid.isLoaded" class="spinner spinner-lg view-spinner"></div>
                   <p v-if="view.squid.isLoaded && view.squid.status == 'running'" class="card-pf-aggregate-status-notifications">
                     <span class="card-pf-aggregate-status-notification">
-                      <div class="row">
-                        <div class="col-xs-1 col-sm-1 col-md-1">
-                          <span class="pficon pficon-ok"></span>
-                        </div>
-                        <div class="col-xs-1 col-sm-1 col-md-1">
-                          <p class="green small">{{ $t('troubleshooting.'+view.squid.details.green)}}</p>
-                          <p class="blue small">{{ $t('troubleshooting.'+view.squid.details.blue)}}</p>
-                        </div>
-                      </div>
+                        <span class="pficon pficon-ok"></span>
                     </span>
                   </p>
+                  <div v-if="view.squid.isLoaded && view.squid.status == 'running'">
+                    <p class="green small">{{ $t('troubleshooting.'+view.squid.details.green)}}</p>
+                    <p class="blue small">{{ $t('troubleshooting.'+view.squid.details.blue)}}</p>
+                  </div>
                   <p v-if="view.squid.isLoaded && view.squid.status == 'disabled' " class="card-pf-aggregate-status-notifications">
                     <span class="card-pf-aggregate-status-notification">
                       <span class="fa fa-ban gray"></span>
@@ -157,15 +159,50 @@
                       <span class="pficon pficon-error-circle-o"></span>
                     </span>
                   </p>
-                  <p>
-                    <a href="#" class="card-pf-link-with-icon">
-                      <span class="fa fa-external-link"></span>{{ $t('troubleshooting.details') }}
-                    </a>
-                  </p>
                 </div>
               </div>
             </div>
             <!-- END PROXY -->
+
+            <!-- FILTER -->
+            <div class="col-xs-3 col-sm-2 col-md-2">
+                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+                <h2 class="card-pf-title">
+                <span class="pf-icon pficon-filter"></span>{{ $t('troubleshooting.filter') }}
+                </h2>
+                <div class="card-pf-body">
+                  <div v-if="!view.filter.isLoaded" class="spinner spinner-lg view-spinner"></div>
+                  <p v-if="view.filter.isLoaded" class="card-pf-aggregate-status-notifications">
+                  <span class="card-pf-aggregate-status-notification">
+                    <span v-if="view.filter.status == 'disabled'" class="fa fa-ban gray"></span>
+                    <span v-if="view.filter.status == 'running'" class="pficon pficon-ok"></span>
+                    <span v-if="view.filter.status == 'failed'" class="pficon pficon-error-circle-o"></span>
+                  </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- END FILTER -->
+
+            <!-- ANTIVIRUS -->
+            <div class="col-xs-3 col-sm-2 col-md-2">
+                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+                <h2 class="card-pf-title">
+                <span class="pf-icon pficon-filter"></span>{{ $t('troubleshooting.antivirus') }}
+                </h2>
+                <div class="card-pf-body">
+                  <div v-if="!view.antivirus.isLoaded" class="spinner spinner-lg view-spinner"></div>
+                  <p v-if="view.antivirus.isLoaded" class="card-pf-aggregate-status-notifications">
+                  <span class="card-pf-aggregate-status-notification">
+                    <span v-if="view.antivirus.status == 'disabled'" class="fa fa-ban gray"></span>
+                    <span v-if="view.antivirus.status == 'running'" class="pficon pficon-ok"></span>
+                    <span v-if="view.antivirus.status == 'failed'" class="pficon pficon-error-circle-o"></span>
+                  </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- END ANTIVIRUS -->
 
           </div>
 
@@ -246,6 +283,9 @@
               <div class="card-pf card-pf-accented card-pf-aggregate-status">
               <h2 class="card-pf-title">
               <span class="pf-icon pficon-settings"></span>{{ $t('troubleshooting.templates') }}
+              <a href="#" class="card-pf-link-with-icon">
+                <span class="pf-icon pficon-arrow fa-external-link"></span>
+              </a>
               </h2>
               <div class="card-pf-body">
                 <div v-if="!view.templates.isLoaded" class="spinner spinner-lg view-spinner"></div>
@@ -254,11 +294,6 @@
                   <span v-if="view.templates.status == 'disabled'" class="fa fa-ban gray"></span>
                   <span v-if="view.templates.status == 'warning'" class="pficon pficon-warning-triangle-o"></span>
                 </span>
-                </p>
-                <p>
-                  <a href="#" class="card-pf-link-with-icon">
-                    <span class="fa fa-external-link"></span>{{ $t('troubleshooting.details') }}
-                  </a>
                 </p>
               </div>
             </div>
@@ -307,7 +342,7 @@ export default {
       context.updatePingChart(900);
     }, 5000);
 
-    const services = ["internet", "shorewall", "multiwan", "systemd", "ipblacklist", "templates", "squid"]
+    const services = ["internet", "shorewall", "multiwan", "systemd", "ipblacklist", "templates", "squid", "filter", "antivirus"]
     services.forEach(function (item, index) {
       context.getServiceStatus(item);
     });
@@ -319,13 +354,19 @@ export default {
       view: {
         isChartLoaded: false,
         invalidChartsPingData: false,
-        squid: {status: 'disabled', isLoaded: false, details: {}},
+
         internet: {status: "disabled", isLoaded: false},
         shorewall: {status: "disabled", isLoaded: false},
         multiwan: {status: "disabled", isLoaded: false},
         systemd: {status: "disabled", isLoaded: false},
+
+        squid: {status: 'disabled', isLoaded: false, details: {}},
+        antivirus: {status: "disabled", isLoaded: false},
+        filter: {status: "disabled", isLoaded: false},
+
         ipblacklist: {status: "disabled", isLoaded: false},
         dnsblacklist: {status: "disabled", isLoaded: false},
+
         templates: {status: "disabled", isLoaded: false, details: []},
 
       },
@@ -431,5 +472,9 @@ export default {
 
 .card-pf-title > .pf-icon {
   margin-right: 7px
+}
+
+.pl-21 {
+  padding-left: 21px
 }
 </style>

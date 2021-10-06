@@ -113,6 +113,34 @@ if ($cmd eq 'ping') {
         print encode_json({"status" => $status, "details" => $details});
     }
 
+    if ($service eq 'filter') {
+        my $status = $cdb->get_prop('ufdbGuard', 'status') || "disabled";
+
+        if ($status eq 'enabled') {
+            my $s = NethServer::Service->new('ufdbGuard', $cdb);
+            if ($s->is_running()) {
+                $status = 'running';
+            } else {
+                $status = 'failed';
+            }
+        }
+        print encode_json({"status" => $status});
+    }
+
+    if ($service eq 'antivirus') {
+        my $status = $cdb->get_prop('c-icap', 'status') || "disabled";
+
+        if ($status eq 'enabled') {
+            my $s = NethServer::Service->new('c-icap', $cdb);
+            if ($s->is_running()) {
+                $status = 'running';
+            } else {
+                $status = 'failed';
+            }
+        }
+        print encode_json({"status" => $status});
+    }
+
     if ($service eq 'internet') {
         my $dns = safe_decode_json(`/usr/libexec/nethserver/api/system-dns/hints`);
         my $ping = `/usr/bin/ping -c 1 www.nethserver.org`;

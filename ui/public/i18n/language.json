@@ -519,6 +519,8 @@
         "authenticated": "Authenticated",
         "transparent": "Transparent",
         "transparent_ssl": "Transparent SSL",
+        "antivirus": "Web antivirus",
+        "filter": "Web filter",
         "manual": "Manual",
         "latency": "Latency (ms)",
         "ping_charts_not_updated":"Charts cannot be updated. Maybe collectd is not running"
