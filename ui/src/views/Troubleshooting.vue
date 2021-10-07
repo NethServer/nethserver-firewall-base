@@ -164,19 +164,19 @@
             </div>
             <!-- END PROXY -->
 
-            <!-- FILTER -->
+            <!-- ufdbGuard FILTER -->
             <div class="col-xs-3 col-sm-2 col-md-2">
                 <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="pf-icon pficon-filter"></span>{{ $t('troubleshooting.filter') }}
+                <span class="pf-icon pficon-filter"></span>{{ $t('troubleshooting.ufdbGuard') }}
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.filter.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <p v-if="view.filter.isLoaded" class="card-pf-aggregate-status-notifications">
+                  <div v-if="!view.ufdbGuard.isLoaded" class="spinner spinner-lg view-spinner"></div>
+                  <p v-if="view.ufdbGuard.isLoaded" class="card-pf-aggregate-status-notifications">
                   <span class="card-pf-aggregate-status-notification">
-                    <span v-if="view.filter.status == 'disabled'" class="fa fa-ban gray"></span>
-                    <span v-if="view.filter.status == 'running'" class="pficon pficon-ok"></span>
-                    <span v-if="view.filter.status == 'failed'" class="pficon pficon-error-circle-o"></span>
+                    <span v-if="view.ufdbGuard.status == 'disabled'" class="fa fa-ban gray"></span>
+                    <span v-if="view.ufdbGuard.status == 'running'" class="pficon pficon-ok"></span>
+                    <span v-if="view.ufdbGuard.status == 'failed'" class="pficon pficon-error-circle-o"></span>
                   </span>
                   </p>
                 </div>
@@ -224,55 +224,144 @@
                     <span v-if="view.ipblacklist.status == 'enabled'" class="pficon pficon-ok"></span>
                   </span>
                   </p>
-                  <p>
-                    <a href="#" class="card-pf-link-with-icon">
-                      <span class="fa fa-external-link"></span>{{ $t('troubleshooting.details') }}
-                    </a>
-                  </p>
                 </div>
               </div>
             </div>
             <!-- END IP BLACKLIST -->
 
+            <!-- FTL DNS BLACKLIST -->
+            <div class="col-xs-3 col-sm-2 col-md-2">
+                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+                <h2 class="card-pf-title">
+                <span class="pf-icon pficon-cloud-security"></span>{{ $t('troubleshooting.ftl') }}
+                </h2>
+                <div class="card-pf-body">
+                  <div v-if="!view.ftl.isLoaded" class="spinner spinner-lg view-spinner"></div>
+                  <p v-if="view.ftl.isLoaded" class="card-pf-aggregate-status-notifications">
+                  <span class="card-pf-aggregate-status-notification">
+                    <span v-if="view.ftl.status == 'disabled'" class="fa fa-ban gray"></span>
+                    <span v-if="view.ftl.status == 'enabled'" class="pficon pficon-ok"></span>
+                  </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- END FTL -->
+
+            <!-- FAIL2BAN -->
+            <div class="col-xs-3 col-sm-2 col-md-2">
+                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+                <h2 class="card-pf-title">
+                <span class="pf-icon pficon-locked"></span>{{ $t('troubleshooting.fail2ban') }}
+                </h2>
+                <div class="card-pf-body">
+                  <div v-if="!view.fail2ban.isLoaded" class="spinner spinner-lg view-spinner"></div>
+                  <p v-if="view.fail2ban.isLoaded" class="card-pf-aggregate-status-notifications">
+                  <span class="card-pf-aggregate-status-notification">
+                    <span v-if="view.fail2ban.status == 'disabled'" class="fa fa-ban gray"></span>
+                    <span v-if="view.fail2ban.status == 'enabled'" class="pficon pficon-ok"></span>
+                  </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- END FAIL2BAN -->
+
+            <!-- SURICATA -->
+            <div class="col-xs-3 col-sm-2 col-md-2">
+                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+                <h2 class="card-pf-title">
+                <span class="pf-icon pficon-security"></span>{{ $t('troubleshooting.suricata') }}
+                </h2>
+                <div class="card-pf-body">
+                  <div v-if="!view.suricata.isLoaded" class="spinner spinner-lg view-spinner"></div>
+                  <p v-if="view.suricata.isLoaded" class="card-pf-aggregate-status-notifications">
+                  <span class="card-pf-aggregate-status-notification">
+                    <span v-if="view.suricata.status == 'disabled'" class="fa fa-ban gray"></span>
+                    <span v-if="view.suricata.status == 'enabled'" class="pficon pficon-ok"></span>
+                  </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- END SURICATA -->
+
           </div>
 
+          <h3>{{$t('Network')}}</h3>
 
+          <div class="row row-cards-pf">
 
-        <div class="row row-cards-pf">
-          <h3>{{$t('troubleshooting.charts')}}</h3>
-
-          <div class="col-xs-6 col-sm-4 col-md-4">
-            <div class="card-pf">
-              <div v-if="!view.graphLoaded && !view.isChartLoaded " class="spinner spinner-lg view-spinner"></div>
-              <div class="panel panel-default" id="network-graph"></div>
-
-              <div v-if="!view.graphLoaded && !view.isChartLoaded " class="spinner spinner-lg view-spinner"></div>
-              <div>
-                <div
-                  v-if="view.invalidChartsPingData"
-                  class="alert alert-warning alert-dismissable col-sm-12"
-                >
-                  <span class="pficon pficon-warning-triangle-o"></span>
-                  <strong>{{$t('warning')}}!</strong>
-                  {{$t('troubleshooting.ping_charts_not_updated')}}.
+            <!-- NTOPNG -->
+            <div class="col-xs-3 col-sm-2 col-md-2">
+                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+                <h2 class="card-pf-title">
+                <span class="pf-icon pficon-storage-domain"></span>{{ $t('troubleshooting.ntopng') }}
+                <a href="#" class="card-pf-link-with-icon">
+                  <span class="fa fa-external-link pl-21"></span>
+                </a>
+                </h2>
+                <div class="card-pf-body">
+                  <div v-if="!view.ntopng.isLoaded" class="spinner spinner-lg view-spinner"></div>
+                  <div v-if="view.ntopng.isLoaded && view.ntopng.status == 'running'">
+                    <p class="green small">{{ $t('troubleshooting.'+view.ntopng.green)}}</p>
+                  </div>
+                  <p v-if="view.ntopng.isLoaded && view.ntopng.status == 'disabled' " class="card-pf-aggregate-status-notifications">
+                    <span class="card-pf-aggregate-status-notification">
+                      <span class="fa fa-ban gray"></span>
+                    </span>
+                  </p>
+                  <p v-if="view.ntopng.isLoaded && view.ntopng.status == 'failed' " class="card-pf-aggregate-status-notifications">
+                    <span class="card-pf-aggregate-status-notification">
+                      <span class="pficon pficon-error-circle-o"></span>
+                    </span>
+                  </p>
                 </div>
-                <div
-                  v-show="view.isChartLoaded && !view.invalidChartsPingData"
-                  class="row"
-                >
-                  <div class="col-sm-11">
-                    <h4 class="col-sm-12">
-                      {{$t('troubleshooting.ping')}}
-                      <div id="chart-status" class="legend"></div>
-                    </h4>
-                    <div id="chart-ping" class="col-sm-12"></div>
+              </div>
+            </div>
+            <!-- END PROXY -->
+
+            <!-- PING CHART -->
+            <div class="col-xs-6 col-sm-4 col-md-4">
+              <div class="card-pf">
+                <div v-if="!view.graphLoaded && !view.isChartLoaded " class="spinner spinner-lg view-spinner"></div>
+                <div class="panel panel-default" id="network-graph"></div>
+
+                <div v-if="!view.graphLoaded && !view.isChartLoaded " class="spinner spinner-lg view-spinner"></div>
+                <div>
+                  <div
+                    v-if="view.invalidChartsPingData"
+                    class="alert alert-warning alert-dismissable col-sm-12"
+                  >
+                    <span class="pficon pficon-warning-triangle-o"></span>
+                    <strong>{{$t('warning')}}!</strong>
+                    {{$t('troubleshooting.ping_charts_not_updated')}}.
+                  </div>
+                  <div
+                    v-show="view.isChartLoaded && !view.invalidChartsPingData"
+                    class="row"
+                  >
+                    <div class="col-sm-11">
+                      <h4 class="col-sm-12">
+                        {{$t('troubleshooting.ping')}}
+                        <div id="chart-status" class="legend"></div>
+                      </h4>
+                      <div id="chart-ping" class="col-sm-12"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            <!-- END PING CHART -->
+
+            <!-- CHART -->
+            <div class="col-xs-3 col-sm-2 col-md-2">
+
+            </div>
+            <!-- END CHART -->
+
           </div>
 
-        </div>
 
         <h3>{{$t('Other')}}</h3>
 
@@ -342,7 +431,7 @@ export default {
       context.updatePingChart(900);
     }, 5000);
 
-    const services = ["internet", "shorewall", "multiwan", "systemd", "ipblacklist", "templates", "squid", "filter", "antivirus"]
+    const services = ["internet", "shorewall", "multiwan", "systemd", "ipblacklist", "ftl", "templates", "squid", "ufdbGuard", "antivirus", "fail2ban", "suricata", "ntopng"]
     services.forEach(function (item, index) {
       context.getServiceStatus(item);
     });
@@ -362,11 +451,15 @@ export default {
 
         squid: {status: 'disabled', isLoaded: false, details: {}},
         antivirus: {status: "disabled", isLoaded: false},
-        filter: {status: "disabled", isLoaded: false},
+        ufdbGuard: {status: "disabled", isLoaded: false},
 
         ipblacklist: {status: "disabled", isLoaded: false},
-        dnsblacklist: {status: "disabled", isLoaded: false},
+        ftl: {status: "disabled", isLoaded: false},
 
+        ntopng: {status: "disabled", isLoaded: false},
+
+        fail2ban: {status: "disabled", isLoaded: false},
+        suricata: {status: "disabled", isLoaded: false},
         templates: {status: "disabled", isLoaded: false, details: []},
 
       },
