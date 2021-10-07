@@ -37,11 +37,8 @@ require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_funct
 
 my $input = readInput();
 my $cmd = $input->{'action'};
-my $time = $input->{'time'} || 900;
 my $cdb = esmith::ConfigDB->open_ro();
 my $ndb = esmith::NetworksDB->open_ro();
-my $systemname = $cdb->get_value('SystemName');
-my $domainname = $cdb->get_value('DomainName');
 my @ret;
 
 sub slurp {
@@ -72,8 +69,18 @@ sub get_service_status {
     print encode_json({"status" => $status});
 }
 
-if ($cmd eq 'ping') {
-    open(FH, "rrdtool fetch /var/lib/collectd/rrd/$systemname.$domainname/ping/ping-*.rrd AVERAGE -s e-$time|");
+sub fetch_ping_rrd {
+    my $file = shift;
+    my $cdb = shift;
+    my $time = shift;
+    my @ret;
+    my $systemname = $cdb->get_value('SystemName');
+    my $domainname = $cdb->get_value('DomainName');
+    my $path = "/var/lib/collectd/rrd/$systemname.$domainname/ping/$file.rrd";
+    if (! -f $path) {
+        return @ret;
+    }
+    open(FH, "rrdtool fetch $path AVERAGE -s e-$time|");
     while (<FH>) {
     chomp;
     my @lines = split("\r\n");
@@ -84,12 +91,28 @@ if ($cmd eq 'ping') {
             $values[1] =~ s/ //g;
             # be sure to output a numeric value
             $values[1] = $values[1]*1000;
-            $values[0] = int($values[0]);
+            $values[0] = $values[0]*1000;
             push(@ret, \@values);
         }
     }
     close(FH);
-    print encode_json ({labels => [ 'time','latency' ], data => \@ret});
+    return @ret;   
+}
+
+if ($cmd eq 'ping') {
+    my $time = $input->{'time'} || 900;
+    #my @ret = fetch_rrd($cdb, $time);
+    my $ret;
+    # ping_droprate
+    # ping
+    foreach my $dns (split(",", $cdb->get_prop('dns', 'NameServers'))) {
+        my @data = fetch_ping_rrd("ping-".$dns, $cdb, $time);
+        if (@data) {
+            $ret->{$dns} = {labels => [ 'time','latency' ], data => \@data};
+        }
+    }
+
+    print encode_json ($ret);
 } elsif ($cmd eq 'service') {
 
     my $service = $input->{'service'};
@@ -165,10 +188,7 @@ if ($cmd eq 'ping') {
         }
         print encode_json({"status" => $status});
     } elsif ($service eq 'ipblacklist') {
-        my $status = "disabled";
-        if (-x '/usr/libexec/nethserver/api/api/ipsets/read') {
-            # TODO
-        }
+        my $status = $cdb->get_prop('blacklist', 'status') || "disabled";
         print encode_json({"status" => $status});
     } elsif ($service eq 'templates') {
         my $status = "disabled";

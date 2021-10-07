@@ -322,13 +322,10 @@
             <!-- END PROXY -->
 
             <!-- PING CHART -->
-            <div class="col-xs-6 col-sm-4 col-md-4">
-              <div class="card-pf">
+            <div class="col-xs-6 col-sm-4 col-md-4" >
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <div v-if="!view.graphLoaded && !view.isChartLoaded " class="spinner spinner-lg view-spinner"></div>
-                <div class="panel panel-default" id="network-graph"></div>
-
-                <div v-if="!view.graphLoaded && !view.isChartLoaded " class="spinner spinner-lg view-spinner"></div>
-                <div>
+                <div class="card-pf-body">
                   <div
                     v-if="view.invalidChartsPingData"
                     class="alert alert-warning alert-dismissable col-sm-12"
@@ -337,28 +334,15 @@
                     <strong>{{$t('warning')}}!</strong>
                     {{$t('troubleshooting.ping_charts_not_updated')}}.
                   </div>
-                  <div
-                    v-show="view.isChartLoaded && !view.invalidChartsPingData"
-                    class="row"
-                  >
-                    <div class="col-sm-11">
-                      <h4 class="col-sm-12">
-                        {{$t('troubleshooting.ping')}}
-                        <div id="chart-status" class="legend"></div>
-                      </h4>
-                      <div id="chart-ping" class="col-sm-12"></div>
-                    </div>
+                  <div v-if="view.isChartLoaded" v-for="(ip, index) in charts" :key="index">
+                    <h4>{{$t('troubleshooting.ping')}}: {{index}}</h4>
+                    <div :id="'chart-ping-' + index"></div>
                   </div>
                 </div>
               </div>
             </div>
             <!-- END PING CHART -->
 
-            <!-- CHART -->
-            <div class="col-xs-3 col-sm-2 col-md-2">
-
-            </div>
-            <!-- END CHART -->
 
           </div>
 
@@ -428,7 +412,7 @@ export default {
 
     context.updatePingChart();
     context.charts.ping_interval = setInterval(function() {
-      context.updatePingChart(900);
+      context.updatePingChart();
     }, 5000);
 
     const services = ["internet", "shorewall", "multiwan", "systemd", "ipblacklist", "ftl", "templates", "squid", "ufdbGuard", "antivirus", "fail2ban", "suricata", "ntopng"]
@@ -463,8 +447,7 @@ export default {
         templates: {status: "disabled", isLoaded: false, details: []},
 
       },
-      charts: {
-      },
+      charts: {},
       pollingIntervalIdChart: 0
     };
   },
@@ -506,39 +489,40 @@ export default {
         function(success) {
           try {
             success = JSON.parse(success);
+
           } catch (e) {
             console.error(e);
           }
-          if (success.data.length > 0) {
-            context.view.invalidChartsPingData = false;
-            for (var t in success.data) {
-              success.data[t][0] = new Date(success.data[t][0] * 1000);
-            }
-            context.charts["chart-ping"] = new Dygraph(
-              document.getElementById("chart-ping"),
-              success.data,
-              {
-                fillGraph: true,
-                stackedGraph: true,
-                labels: success.labels,
-                height: 150,
-                width: 400,
-                strokeWidth: 1,
-                strokeBorderWidth: 1,
-                ylabel: context.$i18n.t("troubleshooting.latency"),
-                axisLineColor: "white",
-                labelsDiv: document.getElementById("chart-status"),
-                labelsSeparateLines: true,
-                drawGrid: false,
-                legend: "always"
-              }
-            );
-            context.charts["chart-ping"].initialData = success.data;
-          } else {
-            context.view.invalidChartsPingData = true;
-            context.$forceUpdate();
-          }
+          context.charts = success;
+          context.view.invalidChartsPingData = false;
           context.view.isChartLoaded = true;
+          context.$nextTick(function () {
+            for (const ip in context.charts) {
+                var chart = context.charts[ip];
+                for (var t in chart.data) {
+                    chart.data[t][0] = new Date(chart.data[t][0]);
+                }
+                var g = new Dygraph(
+                  document.getElementById("chart-ping-"+ip),
+                  chart.data,
+                  {
+                    fillGraph: true,
+                    stackedGraph: true,
+                    labels: chart.labels,
+                    height: 150,
+                    width: 400,
+                    strokeWidth: 1,
+                    strokeBorderWidth: 1,
+                    ylabel: context.$i18n.t("troubleshooting.latency"),
+                    axisLineColor: "white",
+                    labelsSeparateLines: true,
+                    drawGrid: false,
+                  }
+                );
+                g.initialData = chart.data;
+
+            }
+          })
         },
         function(error) {
           console.error(error);
