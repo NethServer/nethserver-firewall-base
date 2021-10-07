@@ -56,6 +56,22 @@ sub slurp {
     return $content;
 }
 
+sub get_service_status {
+    my $service = shift;
+    my $cdb = shift;
+    my $status = $cdb->get_prop($service, 'status') || "disabled";
+
+    if ($status eq 'enabled') {
+        my $s = NethServer::Service->new($service, $cdb);
+	if ($s->is_running()) {
+            $status = 'running';
+        } else {
+	    $status = 'failed';
+	}
+    }
+    print encode_json({"status" => $status});
+}
+
 if ($cmd eq 'ping') {
     open(FH, "rrdtool fetch /var/lib/collectd/rrd/$systemname.$domainname/ping/ping-*.rrd AVERAGE -s e-$time|");
     while (<FH>) {
@@ -93,9 +109,7 @@ if ($cmd eq 'ping') {
             $status = "running";
         }
         print encode_json({"status" => $status});
-    }
-
-    if ($service eq 'squid') {
+    } elsif ($service eq 'squid') {
         my $status = $cdb->get_prop('squid', 'status') || "disabled";
         my $details = {
             "green" => $cdb->get_prop('squid', 'GreenMode') || 'disabled',
@@ -111,37 +125,7 @@ if ($cmd eq 'ping') {
             }
         }
         print encode_json({"status" => $status, "details" => $details});
-    }
-
-    if ($service eq 'filter') {
-        my $status = $cdb->get_prop('ufdbGuard', 'status') || "disabled";
-
-        if ($status eq 'enabled') {
-            my $s = NethServer::Service->new('ufdbGuard', $cdb);
-            if ($s->is_running()) {
-                $status = 'running';
-            } else {
-                $status = 'failed';
-            }
-        }
-        print encode_json({"status" => $status});
-    }
-
-    if ($service eq 'antivirus') {
-        my $status = $cdb->get_prop('c-icap', 'status') || "disabled";
-
-        if ($status eq 'enabled') {
-            my $s = NethServer::Service->new('c-icap', $cdb);
-            if ($s->is_running()) {
-                $status = 'running';
-            } else {
-                $status = 'failed';
-            }
-        }
-        print encode_json({"status" => $status});
-    }
-
-    if ($service eq 'internet') {
+    } elsif ($service eq 'internet') {
         my $dns = safe_decode_json(`/usr/libexec/nethserver/api/system-dns/hints`);
         my $ping = `/usr/bin/ping -c 1 www.nethserver.org`;
         my $ping_status = $?;
@@ -152,9 +136,7 @@ if ($cmd eq 'ping') {
             $status = "warning";
         }
         print encode_json({"status" => $status});
-    }
-
-    if ($service eq 'multiwan') {
+    } elsif ($service eq 'multiwan') {
         my $count = 0;
         my $failed = 0;
         my $status = 'disabled';
@@ -175,34 +157,30 @@ if ($cmd eq 'ping') {
             $status = 'failed';
         }
         print encode_json({"status" => $status});
-    }
-
-    if ($service eq 'systemd') {
+    } elsif ($service eq 'systemd') {
         my $status = "running";
         my $services = safe_decode_json(`/usr/libexec/nethserver/api/system-services/hints`);
         if ($services->{'count'} > 0) {
             $status = "warning";
         }
         print encode_json({"status" => $status});
-    }
-
-    if ($service eq 'ipblacklist') {
+    } elsif ($service eq 'ipblacklist') {
         my $status = "disabled";
         if (-x '/usr/libexec/nethserver/api/api/ipsets/read') {
             # TODO
         }
         print encode_json({"status" => $status});
-    }
-
-    if ($service eq 'templates') {
+    } elsif ($service eq 'templates') {
         my $status = "disabled";
         my @files = `/usr/bin/find /etc/e-smith/templates-custom/ -type f`;
         if (@files) {
             $status = "warning";
         }
         print encode_json({"status" => $status, "details" => \@files});
+    } elsif ($service eq 'antivirus') {
+        get_service_status('c-icap', $cdb);
+    } else {
+        get_service_status($service, $cdb);
     }
-
-
 }
 
