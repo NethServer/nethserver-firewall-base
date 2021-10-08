@@ -229,5 +229,9 @@ if ($cmd eq 'ping') {
     } else {
         get_service_status($service, $cdb);
     }
+} elsif ($cmd eq 'top-local-hosts') {
+    system('echo \'{"action": "top-local-hosts"}\' | /usr/libexec/nethserver/api/nethserver-ntopng/dashboard/read');
+} elsif ($cmd eq 'top-remote-hosts') {
+    system('echo \'{"action": "top-remote-hosts"}\' | /usr/libexec/nethserver/api/nethserver-ntopng/dashboard/read');
 }
 

@@ -200,7 +200,38 @@ var Filters = {
             return '-'
         }
         return value.length > 0 ? value.split(',').join('\n') : '-'
-    }
+    },
+    bpsFormat: function (size) {
+        var result;
+
+        switch (true) {
+            case size === null || size === "" || isNaN(size):
+                result = "-";
+                break;
+
+            case size >= 0 && size < 1000:
+                result = Math.round(size * 100) / 100 + " bps";
+                break;
+
+            case size >= 1000 && size < Math.pow(1000, 2):
+                result = Math.round(size / 1000 * 100) / 100 + " kbps";
+                break;
+
+            case size >= Math.pow(1000, 2) && size < Math.pow(1000, 3):
+                result = Math.round(size / Math.pow(1000, 2) * 100) / 100 + " Mbps";
+                break;
+
+            case size >= Math.pow(1000, 3) && size < Math.pow(1000, 4):
+                result = Math.round(size / Math.pow(1000, 3) * 100) / 100 + " Gbps";
+                break;
+
+            default:
+                result = Math.round(size / Math.pow(1000, 4) * 100) / 100 + " Tbps";
+        }
+
+        return result;
+    },
+ 
 };
 
 for (var f in Filters) {
