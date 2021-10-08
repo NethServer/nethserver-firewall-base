@@ -1,15 +1,16 @@
 <template>
   <div>
-    <h2>{{$t('troubleshooting.title')}}</h2>
+    <h2>{{ $t("troubleshooting.title") }}</h2>
 
     <ul class="nav nav-tabs nav-tabs-pf">
-     <li>
+      <li>
         <a
           class="nav-link"
           data-toggle="tab"
           href="#ts-services-tab"
           id="ts-services-tab-parent"
-        >{{$t('troubleshooting.services')}}</a>
+          >{{ $t("troubleshooting.services") }}</a
+        >
       </li>
       <li>
         <a
@@ -17,7 +18,8 @@
           data-toggle="tab"
           href="#ts-wans-tab"
           id="ts-wans-tab-parent"
-        >{{$t('troubleshooting.wans')}}</a>
+          >{{ $t("troubleshooting.wans") }}</a
+        >
       </li>
       <li>
         <a
@@ -25,34 +27,57 @@
           data-toggle="tab"
           href="#ts-hosts-tab"
           id="ts-hosts-tab-parent"
-        >{{$t('troubleshooting.hosts')}}</a>
+          >{{ $t("troubleshooting.hosts") }}</a
+        >
       </li>
     </ul>
 
     <div class="tab-content gray-bg" id="troubleshootingTabContent">
       <!-- SERVICES -->
-      <div class="tab-pane fade active" id="ts-services-tab" role="tabpanel" aria-labelledby="ts-services-tab">
-
+      <div
+        class="tab-pane fade active"
+        id="ts-services-tab"
+        role="tabpanel"
+        aria-labelledby="ts-services-tab"
+      >
         <div class="container-fluid container-cards-pf">
-          <h3>{{$t('Global')}}</h3>
+          <h3>{{ $t("Global") }}</h3>
 
           <div class="row row-cards-pf">
-
             <!-- INTERNET -->
             <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="fa fa-globe"></span>{{ $t('troubleshooting.internet') }}
+                  <span class="fa fa-globe"></span
+                  >{{ $t("troubleshooting.internet") }}
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.internet.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <p v-if="view.internet.isLoaded" class="card-pf-aggregate-status-notifications">
-                  <span class="card-pf-aggregate-status-notification">
-                    <span v-if="view.internet.status == 'disabled'" class="fa fa-ban gray"></span>
-                    <span v-if="view.internet.status == 'running'" class="pficon pficon-ok"></span>
-                    <span v-if="view.internet.status == 'warning'" class="pficon pficon-warning-triangle-o"></span>
-                    <span v-if="view.internet.status == 'failed'" class="pficon pficon-error-circle-o"></span>
-                  </span>
+                  <div
+                    v-if="!view.internet.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <p
+                    v-if="view.internet.isLoaded"
+                    class="card-pf-aggregate-status-notifications"
+                  >
+                    <span class="card-pf-aggregate-status-notification">
+                      <span
+                        v-if="view.internet.status == 'disabled'"
+                        class="fa fa-ban gray"
+                      ></span>
+                      <span
+                        v-if="view.internet.status == 'running'"
+                        class="pficon pficon-ok"
+                      ></span>
+                      <span
+                        v-if="view.internet.status == 'warning'"
+                        class="pficon pficon-warning-triangle-o"
+                      ></span>
+                      <span
+                        v-if="view.internet.status == 'failed'"
+                        class="pficon pficon-error-circle-o"
+                      ></span>
+                    </span>
                   </p>
                 </div>
               </div>
@@ -61,19 +86,38 @@
 
             <!-- MULTIWAN -->
             <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="pf-icon pficon-network"></span>{{ $t('troubleshooting.multiwan') }}
+                  <span class="pf-icon pficon-network"></span
+                  >{{ $t("troubleshooting.multiwan") }}
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.multiwan.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <p v-if="view.multiwan.isLoaded" class="card-pf-aggregate-status-notifications">
-                  <span class="card-pf-aggregate-status-notification">
-                    <span v-if="view.multiwan.status == 'disabled'" class="fa fa-ban gray"></span>
-                    <span v-if="view.multiwan.status == 'running'" class="pficon pficon-ok"></span>
-                    <span v-if="view.multiwan.status == 'warning'" class="pficon pficon-warning-triangle-o"></span>
-                    <span v-if="view.multiwan.status == 'failed'" class="pficon pficon-error-circle-o"></span>
-                  </span>
+                  <div
+                    v-if="!view.multiwan.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <p
+                    v-if="view.multiwan.isLoaded"
+                    class="card-pf-aggregate-status-notifications"
+                  >
+                    <span class="card-pf-aggregate-status-notification">
+                      <span
+                        v-if="view.multiwan.status == 'disabled'"
+                        class="fa fa-ban gray"
+                      ></span>
+                      <span
+                        v-if="view.multiwan.status == 'running'"
+                        class="pficon pficon-ok"
+                      ></span>
+                      <span
+                        v-if="view.multiwan.status == 'warning'"
+                        class="pficon pficon-warning-triangle-o"
+                      ></span>
+                      <span
+                        v-if="view.multiwan.status == 'failed'"
+                        class="pficon pficon-error-circle-o"
+                      ></span>
+                    </span>
                   </p>
                 </div>
               </div>
@@ -82,19 +126,38 @@
 
             <!-- SHOREWALL -->
             <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="fa fa-shield"></span>{{ $t('troubleshooting.shorewall') }}
+                  <span class="fa fa-shield"></span
+                  >{{ $t("troubleshooting.shorewall") }}
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.shorewall.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <p v-if="view.shorewall.isLoaded" class="card-pf-aggregate-status-notifications">
-                  <span class="card-pf-aggregate-status-notification">
-                    <span v-if="view.shorewall.status == 'disabled'" class="fa fa-ban gray"></span>
-                    <span v-if="view.shorewall.status == 'running'" class="pficon pficon-ok"></span>
-                    <span v-if="view.shorewall.status == 'warning'" class="pficon pficon-warning-triangle-o"></span>
-                    <span v-if="view.shorewall.status == 'failed'" class="pficon pficon-error-circle-o"></span>
-                  </span>
+                  <div
+                    v-if="!view.shorewall.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <p
+                    v-if="view.shorewall.isLoaded"
+                    class="card-pf-aggregate-status-notifications"
+                  >
+                    <span class="card-pf-aggregate-status-notification">
+                      <span
+                        v-if="view.shorewall.status == 'disabled'"
+                        class="fa fa-ban gray"
+                      ></span>
+                      <span
+                        v-if="view.shorewall.status == 'running'"
+                        class="pficon pficon-ok"
+                      ></span>
+                      <span
+                        v-if="view.shorewall.status == 'warning'"
+                        class="pficon pficon-warning-triangle-o"
+                      ></span>
+                      <span
+                        v-if="view.shorewall.status == 'failed'"
+                        class="pficon pficon-error-circle-o"
+                      ></span>
+                    </span>
                   </p>
                 </div>
               </div>
@@ -103,58 +166,90 @@
 
             <!-- SYSTEMD -->
             <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="pf-icon pficon-services"></span>{{ $t('troubleshooting.systemd') }}
-                <a href="#" class="card-pf-link-with-icon">
-                  <span class="fa fa-external-link pl-21"></span>
-                </a>
+                  <span class="pf-icon pficon-services"></span
+                  >{{ $t("troubleshooting.systemd") }}
+                  <a href="#" class="card-pf-link-with-icon">
+                    <span class="fa fa-external-link pl-21"></span>
+                  </a>
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.systemd.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <p v-if="view.systemd.isLoaded" class="card-pf-aggregate-status-notifications">
-                  <span class="card-pf-aggregate-status-notification">
-                    <span v-if="view.systemd.status == 'running'" class="pficon pficon-ok"></span>
-                    <span v-if="view.systemd.status == 'warning'" class="pficon pficon-warning-triangle-o"></span>
-                  </span>
+                  <div
+                    v-if="!view.systemd.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <p
+                    v-if="view.systemd.isLoaded"
+                    class="card-pf-aggregate-status-notifications"
+                  >
+                    <span class="card-pf-aggregate-status-notification">
+                      <span
+                        v-if="view.systemd.status == 'running'"
+                        class="pficon pficon-ok"
+                      ></span>
+                      <span
+                        v-if="view.systemd.status == 'warning'"
+                        class="pficon pficon-warning-triangle-o"
+                      ></span>
+                    </span>
                   </p>
                 </div>
               </div>
             </div>
             <!-- END SYSTEMD -->
-
           </div>
 
-          <h3>{{$t('Services')}}</h3>
+          <h3>{{ $t("Services") }}</h3>
 
           <div class="row row-cards-pf">
-
             <!-- PROXY -->
             <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="pf-icon pficon-filter"></span>{{ $t('troubleshooting.proxy') }}
-                <a href="#" class="card-pf-link-with-icon">
-                  <span class="fa fa-external-link pl-21"></span>
-                </a>
+                  <span class="pf-icon pficon-filter"></span
+                  >{{ $t("troubleshooting.proxy") }}
+                  <a href="#" class="card-pf-link-with-icon">
+                    <span class="fa fa-external-link pl-21"></span>
+                  </a>
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.squid.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <p v-if="view.squid.isLoaded && view.squid.status == 'running'" class="card-pf-aggregate-status-notifications">
+                  <div
+                    v-if="!view.squid.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <p
+                    v-if="view.squid.isLoaded && view.squid.status == 'running'"
+                    class="card-pf-aggregate-status-notifications"
+                  >
                     <span class="card-pf-aggregate-status-notification">
-                        <span class="pficon pficon-ok"></span>
+                      <span class="pficon pficon-ok"></span>
                     </span>
                   </p>
-                  <div v-if="view.squid.isLoaded && view.squid.status == 'running'">
-                    <p class="green small">{{ $t('troubleshooting.'+view.squid.details.green)}}</p>
-                    <p class="blue small">{{ $t('troubleshooting.'+view.squid.details.blue)}}</p>
+                  <div
+                    v-if="view.squid.isLoaded && view.squid.status == 'running'"
+                  >
+                    <p class="green small">
+                      {{ $t("troubleshooting." + view.squid.details.green) }}
+                    </p>
+                    <p class="blue small">
+                      {{ $t("troubleshooting." + view.squid.details.blue) }}
+                    </p>
                   </div>
-                  <p v-if="view.squid.isLoaded && view.squid.status == 'disabled' " class="card-pf-aggregate-status-notifications">
+                  <p
+                    v-if="
+                      view.squid.isLoaded && view.squid.status == 'disabled'
+                    "
+                    class="card-pf-aggregate-status-notifications"
+                  >
                     <span class="card-pf-aggregate-status-notification">
                       <span class="fa fa-ban gray"></span>
                     </span>
                   </p>
-                  <p v-if="view.squid.isLoaded && view.squid.status == 'failed' " class="card-pf-aggregate-status-notifications">
+                  <p
+                    v-if="view.squid.isLoaded && view.squid.status == 'failed'"
+                    class="card-pf-aggregate-status-notifications"
+                  >
                     <span class="card-pf-aggregate-status-notification">
                       <span class="pficon pficon-error-circle-o"></span>
                     </span>
@@ -166,18 +261,34 @@
 
             <!-- ufdbGuard FILTER -->
             <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="pf-icon pficon-filter"></span>{{ $t('troubleshooting.ufdbGuard') }}
+                  <span class="pf-icon pficon-filter"></span
+                  >{{ $t("troubleshooting.ufdbGuard") }}
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.ufdbGuard.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <p v-if="view.ufdbGuard.isLoaded" class="card-pf-aggregate-status-notifications">
-                  <span class="card-pf-aggregate-status-notification">
-                    <span v-if="view.ufdbGuard.status == 'disabled'" class="fa fa-ban gray"></span>
-                    <span v-if="view.ufdbGuard.status == 'running'" class="pficon pficon-ok"></span>
-                    <span v-if="view.ufdbGuard.status == 'failed'" class="pficon pficon-error-circle-o"></span>
-                  </span>
+                  <div
+                    v-if="!view.ufdbGuard.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <p
+                    v-if="view.ufdbGuard.isLoaded"
+                    class="card-pf-aggregate-status-notifications"
+                  >
+                    <span class="card-pf-aggregate-status-notification">
+                      <span
+                        v-if="view.ufdbGuard.status == 'disabled'"
+                        class="fa fa-ban gray"
+                      ></span>
+                      <span
+                        v-if="view.ufdbGuard.status == 'running'"
+                        class="pficon pficon-ok"
+                      ></span>
+                      <span
+                        v-if="view.ufdbGuard.status == 'failed'"
+                        class="pficon pficon-error-circle-o"
+                      ></span>
+                    </span>
                   </p>
                 </div>
               </div>
@@ -186,18 +297,34 @@
 
             <!-- ANTIVIRUS -->
             <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="pf-icon pficon-filter"></span>{{ $t('troubleshooting.antivirus') }}
+                  <span class="pf-icon pficon-filter"></span
+                  >{{ $t("troubleshooting.antivirus") }}
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.antivirus.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <p v-if="view.antivirus.isLoaded" class="card-pf-aggregate-status-notifications">
-                  <span class="card-pf-aggregate-status-notification">
-                    <span v-if="view.antivirus.status == 'disabled'" class="fa fa-ban gray"></span>
-                    <span v-if="view.antivirus.status == 'running'" class="pficon pficon-ok"></span>
-                    <span v-if="view.antivirus.status == 'failed'" class="pficon pficon-error-circle-o"></span>
-                  </span>
+                  <div
+                    v-if="!view.antivirus.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <p
+                    v-if="view.antivirus.isLoaded"
+                    class="card-pf-aggregate-status-notifications"
+                  >
+                    <span class="card-pf-aggregate-status-notification">
+                      <span
+                        v-if="view.antivirus.status == 'disabled'"
+                        class="fa fa-ban gray"
+                      ></span>
+                      <span
+                        v-if="view.antivirus.status == 'running'"
+                        class="pficon pficon-ok"
+                      ></span>
+                      <span
+                        v-if="view.antivirus.status == 'failed'"
+                        class="pficon pficon-error-circle-o"
+                      ></span>
+                    </span>
                   </p>
                 </div>
               </div>
@@ -206,66 +333,101 @@
 
             <!-- NTOPNG -->
             <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="pf-icon pficon-storage-domain"></span>{{ $t('troubleshooting.ntopng') }}
-                <a href="#" class="card-pf-link-with-icon">
-                  <span class="fa fa-external-link pl-21"></span>
-                </a>
+                  <span class="pf-icon pficon-storage-domain"></span
+                  >{{ $t("troubleshooting.ntopng") }}
+                  <a href="#" class="card-pf-link-with-icon">
+                    <span class="fa fa-external-link pl-21"></span>
+                  </a>
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.ntopng.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <div v-if="view.ntopng.isLoaded && view.ntopng.status == 'running'" class="card-pf-aggregate-status-notifications">
+                  <div
+                    v-if="!view.ntopng.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <div
+                    v-if="
+                      view.ntopng.isLoaded && view.ntopng.status == 'running'
+                    "
+                    class="card-pf-aggregate-status-notifications"
+                  >
                     <span class="pficon pficon-ok"></span>
                   </div>
-                  <p v-if="view.ntopng.isLoaded && view.ntopng.status == 'warning' " class="card-pf-aggregate-status-notifications">
-                      <span class="pficon pficon-warning-triangle-o"></span>
+                  <p
+                    v-if="
+                      view.ntopng.isLoaded && view.ntopng.status == 'warning'
+                    "
+                    class="card-pf-aggregate-status-notifications"
+                  >
+                    <span class="pficon pficon-warning-triangle-o"></span>
                   </p>
-                  <p v-if="view.ntopng.isLoaded && view.ntopng.status == 'failed' " class="card-pf-aggregate-status-notifications">
+                  <p
+                    v-if="
+                      view.ntopng.isLoaded && view.ntopng.status == 'failed'
+                    "
+                    class="card-pf-aggregate-status-notifications"
+                  >
                     <span class="card-pf-aggregate-status-notification">
                       <span class="pficon pficon-error-circle-o"></span>
                     </span>
                   </p>
                   <div class="h10">
-                   <div class="dropdown">
-                     <a href="#" data-toggle="dropdown" class="right">
-                       <span class="pficon pficon-info"></span>
+                    <div class="dropdown">
+                      <a href="#" data-toggle="dropdown" class="right">
+                        <span class="pficon pficon-info"></span>
                       </a>
-                     <div class="dropdown-menu infotip bottom-right">
-                       <div class="arrow"></div>
-                       <ul class="list-group">
-                         <li class="list-group-item" v-if="view.ntopng.details" v-for="(role, name) in view.ntopng.details" :key="name">
-                           <span class="pficon pficon-network pr-5"></span> <span :class="role">{{name}}</span>
-                         </li>
-
-                       </ul>
-                     </div>
-                   </div>
-                 </div>
+                      <div class="dropdown-menu infotip bottom-right">
+                        <div class="arrow"></div>
+                        <ul class="list-group">
+                          <li
+                            class="list-group-item"
+                            v-if="view.ntopng.details"
+                            v-for="(role, name) in view.ntopng.details"
+                            :key="name"
+                          >
+                            <span class="pficon pficon-network pr-5"></span>
+                            <span :class="role">{{ name }}</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             <!-- END NTOPNG -->
-
           </div>
 
-          <h3>{{$t('Security')}}</h3>
+          <h3>{{ $t("Security") }}</h3>
 
           <div class="row row-cards-pf">
-
             <!-- IP BLACKLIST -->
             <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="pf-icon pficon-cloud-security"></span>{{ $t('troubleshooting.ipblacklist') }}
+                  <span class="pf-icon pficon-cloud-security"></span
+                  >{{ $t("troubleshooting.ipblacklist") }}
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.ipblacklist.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <p v-if="view.ipblacklist.isLoaded" class="card-pf-aggregate-status-notifications">
-                  <span class="card-pf-aggregate-status-notification">
-                    <span v-if="view.ipblacklist.status == 'disabled'" class="fa fa-ban gray"></span>
-                    <span v-if="view.ipblacklist.status == 'enabled'" class="pficon pficon-ok"></span>
-                  </span>
+                  <div
+                    v-if="!view.ipblacklist.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <p
+                    v-if="view.ipblacklist.isLoaded"
+                    class="card-pf-aggregate-status-notifications"
+                  >
+                    <span class="card-pf-aggregate-status-notification">
+                      <span
+                        v-if="view.ipblacklist.status == 'disabled'"
+                        class="fa fa-ban gray"
+                      ></span>
+                      <span
+                        v-if="view.ipblacklist.status == 'enabled'"
+                        class="pficon pficon-ok"
+                      ></span>
+                    </span>
                   </p>
                 </div>
               </div>
@@ -274,17 +436,30 @@
 
             <!-- FTL DNS BLACKLIST -->
             <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="pf-icon pficon-cloud-security"></span>{{ $t('troubleshooting.ftl') }}
+                  <span class="pf-icon pficon-cloud-security"></span
+                  >{{ $t("troubleshooting.ftl") }}
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.ftl.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <p v-if="view.ftl.isLoaded" class="card-pf-aggregate-status-notifications">
-                  <span class="card-pf-aggregate-status-notification">
-                    <span v-if="view.ftl.status == 'disabled'" class="fa fa-ban gray"></span>
-                    <span v-if="view.ftl.status == 'enabled'" class="pficon pficon-ok"></span>
-                  </span>
+                  <div
+                    v-if="!view.ftl.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <p
+                    v-if="view.ftl.isLoaded"
+                    class="card-pf-aggregate-status-notifications"
+                  >
+                    <span class="card-pf-aggregate-status-notification">
+                      <span
+                        v-if="view.ftl.status == 'disabled'"
+                        class="fa fa-ban gray"
+                      ></span>
+                      <span
+                        v-if="view.ftl.status == 'enabled'"
+                        class="pficon pficon-ok"
+                      ></span>
+                    </span>
                   </p>
                 </div>
               </div>
@@ -293,17 +468,30 @@
 
             <!-- FAIL2BAN -->
             <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="pf-icon pficon-locked"></span>{{ $t('troubleshooting.fail2ban') }}
+                  <span class="pf-icon pficon-locked"></span
+                  >{{ $t("troubleshooting.fail2ban") }}
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.fail2ban.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <p v-if="view.fail2ban.isLoaded" class="card-pf-aggregate-status-notifications">
-                  <span class="card-pf-aggregate-status-notification">
-                    <span v-if="view.fail2ban.status == 'disabled'" class="fa fa-ban gray"></span>
-                    <span v-if="view.fail2ban.status == 'enabled'" class="pficon pficon-ok"></span>
-                  </span>
+                  <div
+                    v-if="!view.fail2ban.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <p
+                    v-if="view.fail2ban.isLoaded"
+                    class="card-pf-aggregate-status-notifications"
+                  >
+                    <span class="card-pf-aggregate-status-notification">
+                      <span
+                        v-if="view.fail2ban.status == 'disabled'"
+                        class="fa fa-ban gray"
+                      ></span>
+                      <span
+                        v-if="view.fail2ban.status == 'enabled'"
+                        class="pficon pficon-ok"
+                      ></span>
+                    </span>
                   </p>
                 </div>
               </div>
@@ -312,152 +500,196 @@
 
             <!-- SURICATA -->
             <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
-                <span class="pf-icon pficon-security"></span>{{ $t('troubleshooting.suricata') }}
+                  <span class="pf-icon pficon-security"></span
+                  >{{ $t("troubleshooting.suricata") }}
                 </h2>
                 <div class="card-pf-body">
-                  <div v-if="!view.suricata.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <p v-if="view.suricata.isLoaded" class="card-pf-aggregate-status-notifications">
-                  <span class="card-pf-aggregate-status-notification">
-                    <span v-if="view.suricata.status == 'disabled'" class="fa fa-ban gray"></span>
-                    <span v-if="view.suricata.status == 'enabled'" class="pficon pficon-ok"></span>
-                  </span>
+                  <div
+                    v-if="!view.suricata.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <p
+                    v-if="view.suricata.isLoaded"
+                    class="card-pf-aggregate-status-notifications"
+                  >
+                    <span class="card-pf-aggregate-status-notification">
+                      <span
+                        v-if="view.suricata.status == 'disabled'"
+                        class="fa fa-ban gray"
+                      ></span>
+                      <span
+                        v-if="view.suricata.status == 'enabled'"
+                        class="pficon pficon-ok"
+                      ></span>
+                    </span>
                   </p>
                 </div>
               </div>
             </div>
             <!-- END SURICATA -->
-
           </div>
 
-          <h3>{{$t('Network')}}</h3>
+          <h3>{{ $t("Network") }}</h3>
 
           <div class="row row-cards-pf">
-
-
-
             <!-- PING CHART -->
-            <div class="col-xs-6 col-sm-4 col-md-4" >
+            <div class="col-xs-6 col-sm-4 col-md-4">
               <div class="card-pf card-pf-accented card-pf-aggregate-status">
-                <div v-if="!view.graphLoaded && !view.isChartLoaded " class="spinner spinner-lg view-spinner"></div>
+                <div
+                  v-if="!view.graphLoaded && !view.isChartLoaded"
+                  class="spinner spinner-lg view-spinner"
+                ></div>
                 <div class="card-pf-body">
                   <div
                     v-if="view.invalidChartsPingData"
                     class="alert alert-warning alert-dismissable col-sm-12"
                   >
                     <span class="pficon pficon-warning-triangle-o"></span>
-                    <strong>{{$t('warning')}}!</strong>
-                    {{$t('troubleshooting.ping_charts_not_updated')}}.
+                    <strong>{{ $t("warning") }}!</strong>
+                    {{ $t("troubleshooting.ping_charts_not_updated") }}.
                   </div>
-                  <div v-if="view.isChartLoaded" v-for="(data, index) in charts" :key="index">
-                    <h4>{{$t('troubleshooting.ping')}}: {{index}}</h4>
+                  <div
+                    v-if="view.isChartLoaded"
+                    v-for="(data, index) in charts"
+                    :key="index"
+                  >
+                    <h4>{{ $t("troubleshooting.ping") }}: {{ index }}</h4>
                     <div :id="'chart-ping-' + index"></div>
                   </div>
                 </div>
               </div>
             </div>
             <!-- END PING CHART -->
-
-
           </div>
 
+          <h3>{{ $t("Other") }}</h3>
 
-        <h3>{{$t('Other')}}</h3>
-
-        <div class="row row-cards-pf">
-
-          <!-- TEMPLATES -->
-          <div class="col-xs-3 col-sm-2 col-md-2">
+          <div class="row row-cards-pf">
+            <!-- TEMPLATES -->
+            <div class="col-xs-3 col-sm-2 col-md-2">
               <div class="card-pf card-pf-accented card-pf-aggregate-status">
-              <h2 class="card-pf-title">
-              <span class="pf-icon pficon-settings"></span>{{ $t('troubleshooting.templates') }}
-              <a href="#" class="card-pf-link-with-icon">
-                <span class="pf-icon pficon-arrow fa-external-link"></span>
-              </a>
-              </h2>
-              <div class="card-pf-body">
-                <div v-if="!view.templates.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                <p v-if="view.templates.isLoaded" class="card-pf-aggregate-status-notifications">
-                <span class="card-pf-aggregate-status-notification">
-                  <span v-if="view.templates.status == 'disabled'" class="fa fa-ban gray"></span>
-                  <span v-if="view.templates.status == 'warning'" class="pficon pficon-warning-triangle-o"></span>
-                </span>
-                </p>
+                <h2 class="card-pf-title">
+                  <span class="pf-icon pficon-settings"></span
+                  >{{ $t("troubleshooting.templates") }}
+                  <a href="#" class="card-pf-link-with-icon">
+                    <span class="pf-icon pficon-arrow fa-external-link"></span>
+                  </a>
+                </h2>
+                <div class="card-pf-body">
+                  <div
+                    v-if="!view.templates.isLoaded"
+                    class="spinner spinner-lg view-spinner"
+                  ></div>
+                  <p
+                    v-if="view.templates.isLoaded"
+                    class="card-pf-aggregate-status-notifications"
+                  >
+                    <span class="card-pf-aggregate-status-notification">
+                      <span
+                        v-if="view.templates.status == 'disabled'"
+                        class="fa fa-ban gray"
+                      ></span>
+                      <span
+                        v-if="view.templates.status == 'warning'"
+                        class="pficon pficon-warning-triangle-o"
+                      ></span>
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
+            <!-- END TEMPLATES -->
           </div>
-          <!-- END TEMPLATES -->
         </div>
-
-        </div> <!-- END cards container -->
-
-
+        <!-- END cards container -->
       </div>
       <!-- END SERVICES -->
 
       <!-- WANS -->
-      <div class="tab-pane fade active" id="ts-wans-tab" role="tabpanel" aria-labelledby="ts-wans-tab">
-        <h3>{{$t('WANS')}}</h3>
+      <div
+        class="tab-pane fade active"
+        id="ts-wans-tab"
+        role="tabpanel"
+        aria-labelledby="ts-wans-tab"
+      >
+        <h3>{{ $t("WANS") }}</h3>
       </div>
       <!-- END WANS -->
 
       <!-- HOSTS -->
-      <div class="tab-pane fade active" id="ts-hosts-tab" role="tabpanel" aria-labelledby="ts-hosts-tab">
-        <h3>{{$t('Hosts')}}</h3>
+      <div
+        class="tab-pane fade active"
+        id="ts-hosts-tab"
+        role="tabpanel"
+        aria-labelledby="ts-hosts-tab"
+      >
+        <h3>{{ $t("Hosts") }}</h3>
 
         <div class="row">
-           <!-- top local hosts -->
-           <div class="col-md-6">
-             <h3>{{$t('troubleshooting.top_local_hosts')}}</h3>
-             <div v-show="!isLoaded.topLocalHosts">
-               <div class="blank-slate-pf">
-                 <div class="blank-slate-pf-icon">
-                   <span class="fa fa-table"></span>
-                 </div>
-                 <h4 class="chart-title gray">{{ $t('troubleshooting.no_data') }}</h4>
-               </div>
-             </div>
-             <vue-good-table
-               v-show="isLoaded.topLocalHosts"
-               :columns="columns"
-               :rows="topLocalHosts"
-               :lineNumbers="false"
-               :sort-options="{
-                   enabled: true,
-                   initialSortBy: {field: 'throughput', type: 'desc'},
-                 }"
-               :search-options="{
-                   enabled: false
-                 }"
-               :pagination-options="{
-                   enabled: false
-                 }"
-               styleClass="table responsive vgt2"
-             >
-               <template slot="table-row" slot-scope="props">
-                 <span v-if="props.column.field == 'name'" class="hostname-column">
-                   <span class="semi-bold" :title="props.row.name">{{ props.row.name }}</span>
-                 </span>
-                 <span v-else-if="props.column.field == 'ip'">
-                   <span>{{ props.row.ip }}</span>
-                 </span>
-                 <span v-else-if="props.column.field == 'throughput'">
-                   <span class="semi-bold">{{ props.row.throughput | bpsFormat}}</span>
-                 </span>
-               </template>
-             </vue-good-table>
-           </div>
+          <!-- top local hosts -->
+          <div class="col-md-6">
+            <h3>{{ $t("troubleshooting.top_local_hosts") }}</h3>
+            <div v-show="!isLoaded.topLocalHosts">
+              <div class="blank-slate-pf">
+                <div class="blank-slate-pf-icon">
+                  <span class="fa fa-table"></span>
+                </div>
+                <h4 class="chart-title gray">
+                  {{ $t("troubleshooting.no_data") }}
+                </h4>
+              </div>
+            </div>
+            <vue-good-table
+              v-show="isLoaded.topLocalHosts"
+              :columns="columns"
+              :rows="topLocalHosts"
+              :lineNumbers="false"
+              :sort-options="{
+                enabled: true,
+                initialSortBy: { field: 'throughput', type: 'desc' },
+              }"
+              :search-options="{
+                enabled: false,
+              }"
+              :pagination-options="{
+                enabled: false,
+              }"
+              styleClass="table responsive vgt2"
+            >
+              <template slot="table-row" slot-scope="props">
+                <span
+                  v-if="props.column.field == 'name'"
+                  class="hostname-column"
+                >
+                  <span class="semi-bold" :title="props.row.name">{{
+                    props.row.name
+                  }}</span>
+                </span>
+                <span v-else-if="props.column.field == 'ip'">
+                  <span>{{ props.row.ip }}</span>
+                </span>
+                <span v-else-if="props.column.field == 'throughput'">
+                  <span class="semi-bold">{{
+                    props.row.throughput | bpsFormat
+                  }}</span>
+                </span>
+              </template>
+            </vue-good-table>
+          </div>
 
           <!-- top remote hosts -->
           <div class="col-md-6">
-            <h3>{{$t('troubleshooting.top_remote_hosts')}}</h3>
+            <h3>{{ $t("troubleshooting.top_remote_hosts") }}</h3>
             <div v-show="!isLoaded.topRemoteHosts">
               <div class="blank-slate-pf">
                 <div class="blank-slate-pf-icon">
                   <span class="fa fa-table"></span>
                 </div>
-                <h4 class="chart-title gray">{{ $t('troubleshooting.no_data') }}</h4>
+                <h4 class="chart-title gray">
+                  {{ $t("troubleshooting.no_data") }}
+                </h4>
               </div>
             </div>
             <vue-good-table
@@ -466,37 +698,41 @@
               :rows="topRemoteHosts"
               :lineNumbers="false"
               :sort-options="{
-                  enabled: true,
-                  initialSortBy: {field: 'throughput', type: 'desc'},
-                }"
+                enabled: true,
+                initialSortBy: { field: 'throughput', type: 'desc' },
+              }"
               :search-options="{
-                  enabled: false
-                }"
+                enabled: false,
+              }"
               :pagination-options="{
-                  enabled: false
-                }"
+                enabled: false,
+              }"
               styleClass="table responsive vgt2"
             >
               <template slot="table-row" slot-scope="props">
-                <span v-if="props.column.field == 'name'" class="hostname-column">
-                  <span class="semi-bold" :title="props.row.name">{{ props.row.name }}</span>
+                <span
+                  v-if="props.column.field == 'name'"
+                  class="hostname-column"
+                >
+                  <span class="semi-bold" :title="props.row.name">{{
+                    props.row.name
+                  }}</span>
                 </span>
                 <span v-else-if="props.column.field == 'ip'">
                   <span>{{ props.row.ip }}</span>
                 </span>
                 <span v-else-if="props.column.field == 'throughput'">
-                  <span class="semi-bold">{{ props.row.throughput | bpsFormat}}</span>
+                  <span class="semi-bold">{{
+                    props.row.throughput | bpsFormat
+                  }}</span>
                 </span>
               </template>
             </vue-good-table>
           </div>
-
         </div>
-
       </div>
       <!-- END HOSTS -->
     </div>
-
   </div>
 </template>
 
@@ -519,8 +755,22 @@ export default {
       context.updatePingChart();
     }, 5000);
 
-    const services = ["internet", "shorewall", "multiwan", "systemd", "ipblacklist", "ftl", "templates", "squid", "ufdbGuard", "antivirus", "fail2ban", "suricata", "ntopng"]
-    services.forEach(function (item, index) {
+    const services = [
+      "internet",
+      "shorewall",
+      "multiwan",
+      "systemd",
+      "ipblacklist",
+      "ftl",
+      "templates",
+      "squid",
+      "ufdbGuard",
+      "antivirus",
+      "fail2ban",
+      "suricata",
+      "ntopng",
+    ];
+    services.forEach(function(item, index) {
       context.getServiceStatus(item);
     });
 
@@ -528,7 +778,6 @@ export default {
     this.getTopRemoteHosts();
 
     $("#ts-services-tab-parent").click();
-
   },
   data() {
     return {
@@ -536,24 +785,23 @@ export default {
         isChartLoaded: false,
         invalidChartsPingData: false,
 
-        internet: {status: "disabled", isLoaded: false},
-        shorewall: {status: "disabled", isLoaded: false},
-        multiwan: {status: "disabled", isLoaded: false},
-        systemd: {status: "disabled", isLoaded: false},
+        internet: { status: "disabled", isLoaded: false },
+        shorewall: { status: "disabled", isLoaded: false },
+        multiwan: { status: "disabled", isLoaded: false },
+        systemd: { status: "disabled", isLoaded: false },
 
-        squid: {status: 'disabled', isLoaded: false, details: {}},
-        antivirus: {status: "disabled", isLoaded: false},
-        ufdbGuard: {status: "disabled", isLoaded: false},
+        squid: { status: "disabled", isLoaded: false, details: {} },
+        antivirus: { status: "disabled", isLoaded: false },
+        ufdbGuard: { status: "disabled", isLoaded: false },
 
-        ipblacklist: {status: "disabled", isLoaded: false},
-        ftl: {status: "disabled", isLoaded: false},
+        ipblacklist: { status: "disabled", isLoaded: false },
+        ftl: { status: "disabled", isLoaded: false },
 
-        ntopng: {status: "disabled", isLoaded: false},
+        ntopng: { status: "disabled", isLoaded: false },
 
-        fail2ban: {status: "disabled", isLoaded: false},
-        suricata: {status: "disabled", isLoaded: false},
-        templates: {status: "disabled", isLoaded: false, details: []},
-
+        fail2ban: { status: "disabled", isLoaded: false },
+        suricata: { status: "disabled", isLoaded: false },
+        templates: { status: "disabled", isLoaded: false, details: [] },
       },
       charts: {},
       pollingIntervalIdChart: 0,
@@ -567,21 +815,20 @@ export default {
         {
           label: this.$i18n.t("troublehsooting.name"),
           field: "name",
-          sortable: true
+          sortable: true,
         },
         {
           label: this.$i18n.t("troublehsooting.ip_address"),
           field: "ip",
-          sortable: true
+          sortable: true,
         },
         {
           label: this.$i18n.t("troublehsooting.throughput"),
           field: "throughput",
           type: "number",
-          sortable: true
-        }
+          sortable: true,
+        },
       ],
-
     };
   },
   methods: {
@@ -589,9 +836,7 @@ export default {
       var context = this;
       nethserver.exec(
         ["nethserver-firewall-base/troubleshooting/read"],
-        { action: "service",
-          service: service
-        },
+        { action: "service", service: service },
         null,
         function(success) {
           try {
@@ -601,7 +846,7 @@ export default {
           }
           context["view"][service]["isLoaded"] = true;
           context["view"][service]["status"] = success.status;
-          if ('details' in success) {
+          if ("details" in success) {
             context["view"][service]["details"] = success.details;
           }
         },
@@ -615,47 +860,43 @@ export default {
       var context = this;
       nethserver.exec(
         ["nethserver-firewall-base/troubleshooting/read"],
-        { action: "ping",
-          time: 900
-        },
+        { action: "ping", time: 900 },
         null,
         function(success) {
           try {
             success = JSON.parse(success);
-
           } catch (e) {
             console.error(e);
           }
           context.charts = success;
           context.view.invalidChartsPingData = false;
           context.view.isChartLoaded = true;
-          context.$nextTick(function () {
+          context.$nextTick(function() {
             for (const ip in context.charts) {
-                var chart = context.charts[ip];
-                for (var t in chart.data) {
-                    chart.data[t][0] = new Date(chart.data[t][0]);
+              var chart = context.charts[ip];
+              for (var t in chart.data) {
+                chart.data[t][0] = new Date(chart.data[t][0]);
+              }
+              var g = new Dygraph(
+                document.getElementById("chart-ping-" + ip),
+                chart.data,
+                {
+                  fillGraph: true,
+                  stackedGraph: true,
+                  labels: chart.labels,
+                  height: 150,
+                  width: 400,
+                  strokeWidth: 1,
+                  strokeBorderWidth: 1,
+                  ylabel: context.$i18n.t("troubleshooting.latency"),
+                  axisLineColor: "white",
+                  labelsSeparateLines: true,
+                  drawGrid: false,
                 }
-                var g = new Dygraph(
-                  document.getElementById("chart-ping-"+ip),
-                  chart.data,
-                  {
-                    fillGraph: true,
-                    stackedGraph: true,
-                    labels: chart.labels,
-                    height: 150,
-                    width: 400,
-                    strokeWidth: 1,
-                    strokeBorderWidth: 1,
-                    ylabel: context.$i18n.t("troubleshooting.latency"),
-                    axisLineColor: "white",
-                    labelsSeparateLines: true,
-                    drawGrid: false,
-                  }
-                );
-                g.initialData = chart.data;
-
+              );
+              g.initialData = chart.data;
             }
-          })
+          });
         },
         function(error) {
           console.error(error);
@@ -668,7 +909,7 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/troubleshooting/read"],
         {
-          action: "top-local-hosts"
+          action: "top-local-hosts",
         },
         null,
         function(success) {
@@ -691,7 +932,7 @@ export default {
       nethserver.exec(
         ["nethserver-firewall-base/troubleshooting/read"],
         {
-          action: "top-remote-hosts"
+          action: "top-remote-hosts",
         },
         null,
         function(success) {
@@ -709,8 +950,7 @@ export default {
         }
       );
     },
-
-  }
+  },
 };
 </script>
 
@@ -720,26 +960,26 @@ export default {
 }
 
 .green {
-  color: green
+  color: green;
 }
 
 .blue {
-  color: blue
+  color: blue;
 }
 
 .card-pf-title > .pf-icon {
-  margin-right: 7px
+  margin-right: 7px;
 }
 
 .pl-21 {
-  padding-left: 21px
+  padding-left: 21px;
 }
 
 .pr-5 {
-  padding-right: 21px
+  padding-right: 21px;
 }
 .h10 {
   height: 10px;
-  padding: 2px
+  padding: 2px;
 }
 </style>
