@@ -101,14 +101,23 @@ sub fetch_ping_rrd {
 
 if ($cmd eq 'ping') {
     my $time = $input->{'time'} || 900;
-    #my @ret = fetch_rrd($cdb, $time);
     my $ret;
     # ping_droprate
     # ping
-    foreach my $dns (split(",", $cdb->get_prop('dns', 'NameServers'))) {
-        my @data = fetch_ping_rrd("ping-".$dns, $cdb, $time);
+    # collectd keeps track of the first DNS
+    my @dns = split(',',$cdb->get_prop('dns', 'NameServers'));
+    if (defined($dns[0])) {
+        my @data = fetch_ping_rrd("ping-".$dns[0], $cdb, $time);
         if (@data) {
-            $ret->{$dns} = {labels => [ 'time','latency' ], data => \@data};
+            $ret->{$dns[0]} = {labels => [ 'time','latency' ], data => \@data};
+        }
+    }
+
+    # load extra configured hosts
+    foreach my $h (split(",", $cdb->get_prop('collectd', 'PingHosts'))) {
+        my @data = fetch_ping_rrd("ping-".$h, $cdb, $time);
+        if (@data) {
+            $ret->{$h} = {labels => [ 'time','latency' ], data => \@data};
         }
     }
 
