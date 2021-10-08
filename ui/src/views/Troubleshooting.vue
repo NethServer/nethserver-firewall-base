@@ -130,7 +130,7 @@
           <div class="row row-cards-pf">
 
             <!-- PROXY -->
-            <div class="col-xs-6 col-sm-4 col-md-4">
+            <div class="col-xs-3 col-sm-2 col-md-2">
                 <div class="card-pf card-pf-accented card-pf-aggregate-status">
                 <h2 class="card-pf-title">
                 <span class="pf-icon pficon-filter"></span>{{ $t('troubleshooting.proxy') }}
@@ -203,6 +203,49 @@
               </div>
             </div>
             <!-- END ANTIVIRUS -->
+
+            <!-- NTOPNG -->
+            <div class="col-xs-3 col-sm-2 col-md-2">
+                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+                <h2 class="card-pf-title">
+                <span class="pf-icon pficon-storage-domain"></span>{{ $t('troubleshooting.ntopng') }}
+                <a href="#" class="card-pf-link-with-icon">
+                  <span class="fa fa-external-link pl-21"></span>
+                </a>
+                </h2>
+                <div class="card-pf-body">
+                  <div v-if="!view.ntopng.isLoaded" class="spinner spinner-lg view-spinner"></div>
+                  <div v-if="view.ntopng.isLoaded && view.ntopng.status == 'running'" class="card-pf-aggregate-status-notifications">
+                    <span class="pficon pficon-ok"></span>
+                  </div>
+                  <p v-if="view.ntopng.isLoaded && view.ntopng.status == 'warning' " class="card-pf-aggregate-status-notifications">
+                      <span class="pficon pficon-warning-triangle-o"></span>
+                  </p>
+                  <p v-if="view.ntopng.isLoaded && view.ntopng.status == 'failed' " class="card-pf-aggregate-status-notifications">
+                    <span class="card-pf-aggregate-status-notification">
+                      <span class="pficon pficon-error-circle-o"></span>
+                    </span>
+                  </p>
+                  <div class="h10">
+                   <div class="dropdown">
+                     <a href="#" data-toggle="dropdown" class="right">
+                       <span class="pficon pficon-info"></span>
+                      </a>
+                     <div class="dropdown-menu infotip bottom-right">
+                       <div class="arrow"></div>
+                       <ul class="list-group">
+                         <li class="list-group-item" v-if="view.ntopng.details" v-for="(role, name) in view.ntopng.details" :key="name">
+                           <span class="pficon pficon-network pr-5"></span> <span :class="role">{{name}}</span>
+                         </li>
+
+                       </ul>
+                     </div>
+                   </div>
+                 </div>
+                </div>
+              </div>
+            </div>
+            <!-- END NTOPNG -->
 
           </div>
 
@@ -292,34 +335,7 @@
 
           <div class="row row-cards-pf">
 
-            <!-- NTOPNG -->
-            <div class="col-xs-3 col-sm-2 col-md-2">
-                <div class="card-pf card-pf-accented card-pf-aggregate-status">
-                <h2 class="card-pf-title">
-                <span class="pf-icon pficon-storage-domain"></span>{{ $t('troubleshooting.ntopng') }}
-                <a href="#" class="card-pf-link-with-icon">
-                  <span class="fa fa-external-link pl-21"></span>
-                </a>
-                </h2>
-                <div class="card-pf-body">
-                  <div v-if="!view.ntopng.isLoaded" class="spinner spinner-lg view-spinner"></div>
-                  <div v-if="view.ntopng.isLoaded && view.ntopng.status == 'running'">
-                    <p class="green small">{{ $t('troubleshooting.'+view.ntopng.green)}}</p>
-                  </div>
-                  <p v-if="view.ntopng.isLoaded && view.ntopng.status == 'disabled' " class="card-pf-aggregate-status-notifications">
-                    <span class="card-pf-aggregate-status-notification">
-                      <span class="fa fa-ban gray"></span>
-                    </span>
-                  </p>
-                  <p v-if="view.ntopng.isLoaded && view.ntopng.status == 'failed' " class="card-pf-aggregate-status-notifications">
-                    <span class="card-pf-aggregate-status-notification">
-                      <span class="pficon pficon-error-circle-o"></span>
-                    </span>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <!-- END PROXY -->
+
 
             <!-- PING CHART -->
             <div class="col-xs-6 col-sm-4 col-md-4" >
@@ -334,7 +350,7 @@
                     <strong>{{$t('warning')}}!</strong>
                     {{$t('troubleshooting.ping_charts_not_updated')}}.
                   </div>
-                  <div v-if="view.isChartLoaded" v-for="(ip, index) in charts" :key="index">
+                  <div v-if="view.isChartLoaded" v-for="(data, index) in charts" :key="index">
                     <h4>{{$t('troubleshooting.ping')}}: {{index}}</h4>
                     <div :id="'chart-ping-' + index"></div>
                   </div>
@@ -553,5 +569,13 @@ export default {
 
 .pl-21 {
   padding-left: 21px
+}
+
+.pr-5 {
+  padding-right: 21px
+}
+.h10 {
+  height: 10px;
+  padding: 2px
 }
 </style>

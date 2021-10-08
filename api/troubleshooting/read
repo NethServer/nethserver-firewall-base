@@ -208,6 +208,24 @@ if ($cmd eq 'ping') {
         print encode_json({"status" => $status, "details" => \@files});
     } elsif ($service eq 'antivirus') {
         get_service_status('c-icap', $cdb);
+    } elsif ($service eq 'ntopng') {
+        my $status = $cdb->get_prop($service, 'status') || "warning";
+        my $details;
+
+        if ($status eq 'enabled') {
+            my $s = NethServer::Service->new($service, $cdb);
+	    if ($s->is_running()) {
+                $status = 'running';
+            } else {
+	        $status = 'failed';
+	    }
+        }
+        foreach my $i (split(',',$cdb->get_prop('ntopng', 'Interfaces'))) {
+            my $role = $ndb->get_prop($i, 'role') || next;
+            $details->{$i} = $role;
+        }
+        print encode_json({"status" => $status, "details" => $details});
+
     } else {
         get_service_status($service, $cdb);
     }
