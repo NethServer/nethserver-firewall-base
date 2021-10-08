@@ -210,7 +210,7 @@ if ($cmd eq 'ping') {
     } elsif ($service eq 'antivirus') {
         get_service_status('c-icap', $cdb);
     } elsif ($service eq 'ntopng') {
-        my $status = $cdb->get_prop($service, 'status') || "warning";
+        my $status = $cdb->get_prop($service, 'status') || "disabled";
         my $details;
 
         if ($status eq 'enabled') {

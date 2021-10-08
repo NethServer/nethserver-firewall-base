@@ -525,9 +525,9 @@
         "suricata": "Intrusion Prevention System",
         "fail2ban": "Fail2ban",
         "ntopng": "Bandwidth monitor",
-        "manual": "Manual",
         "latency": "Latency (ms)",
-        "ping_charts_not_updated":"Charts cannot be updated. Maybe collectd is not running"
+        "ping_charts_not_updated":"Charts cannot be updated. Maybe collectd is not running",
+        "bandwidth_monitor_disabled": "Bandwidth monitor disabled or not installed"
     },
     "about": {
         "title": "About",
