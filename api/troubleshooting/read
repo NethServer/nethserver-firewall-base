@@ -29,6 +29,7 @@
 use strict;
 use warnings;
 use JSON;
+use String::ShellQuote;
 use esmith::ConfigDB;
 use NethServer::Service;
 use NethServer::ApiTools qw(readInput safe_decode_json);
@@ -100,7 +101,7 @@ sub fetch_ping_rrd {
 }
 
 if ($cmd eq 'ping') {
-    my $time = $input->{'time'} || 900;
+    my $time = 3600;
     my $ret;
     # ping_droprate
     # ping
@@ -233,5 +234,25 @@ if ($cmd eq 'ping') {
     system('echo \'{"action": "top-local-hosts"}\' | /usr/libexec/nethserver/api/nethserver-ntopng/dashboard/read');
 } elsif ($cmd eq 'top-remote-hosts') {
     system('echo \'{"action": "top-remote-hosts"}\' | /usr/libexec/nethserver/api/nethserver-ntopng/dashboard/read');
+} elsif ($cmd eq 'host-chart') {
+    my $host = shell_quote_best_effort($input->{'host'});
+    my $interfaces = $cdb->get_prop('ntopng', 'Interfaces') || '';
+    my $ifid = $interfaces =~ tr/,//;
+    $ifid += 1;
+    my $now = time();
+    my $yday = $now - (24 * 60 * 60);
+    my $url = 'http://127.0.0.1:3000/lua/rest/get/timeseries/ts.lua?ts_schema=host:traffic&ts_query=ifid:'.$ifid.',host:'.$host.'&epoch_begin='.$yday.'&epoch_end='.$now.'&extended=0&format=json';
+    my $response = safe_decode_json(`/usr/bin/curl -s '$url'`);
+    my @data;
+    my @labels = ('time', 'sent_bytes', 'received_bytes');
+    my $sent = $response->{'series'}[0]->{'data'};
+    my $rcvd = $response->{'series'}[1]->{'data'};
+    foreach (keys $sent) {
+        push(@data, [$_, $sent->{$_}, $rcvd->{$_}]);
+    }
+    my $tsent = $response->{'statistics'}{'by_serie'}[0]->{'total'};
+    my $trcvd = $response->{'statistics'}{'by_serie'}[1]->{'total'};
+    print(encode_json({"labels" => \@labels, "data" => \@data, "totals" => { "sent" => $tsent, "rcvd" => $trcvd, "both"=> $tsent + $trcvd}}));
+    
 }
 
