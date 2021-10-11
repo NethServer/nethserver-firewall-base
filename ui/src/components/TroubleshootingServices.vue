@@ -1,11 +1,10 @@
 <template>
   <div class="container-fluid container-cards-pf">
-    <!-- //// fix i18n keys -->
-    <h3>{{ $t("Global") }}</h3>
+    <h3>{{ $t("troubleshooting.global") }}</h3>
 
     <div class="row row-cards-pf">
       <!-- INTERNET -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
+      <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
             <span class="fa fa-globe"></span
@@ -45,7 +44,7 @@
       <!-- END INTERNET -->
 
       <!-- MULTIWAN -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
+      <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-network"></span
@@ -85,7 +84,7 @@
       <!-- END MULTIWAN -->
 
       <!-- SHOREWALL -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
+      <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
             <span class="fa fa-shield"></span
@@ -125,14 +124,18 @@
       <!-- END SHOREWALL -->
 
       <!-- SYSTEMD -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
+      <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
+            <a
+              target="_blank"
+              href="/nethserver#/services"
+              class="card-pf-link-with-icon card-action"
+            >
+              <span class="fa fa-external-link"></span>
+            </a>
             <span class="pf-icon pficon-services"></span
             >{{ $t("troubleshooting.systemd") }}
-            <a href="#" class="card-pf-link-with-icon">
-              <span class="fa fa-external-link pl-21"></span>
-            </a>
           </h2>
           <div class="card-pf-body">
             <div
@@ -160,18 +163,24 @@
       <!-- END SYSTEMD -->
     </div>
 
-    <h3>{{ $t("Services") }}</h3>
+    <h3>{{ $t("troubleshooting.services") }}</h3>
 
     <div class="row row-cards-pf">
       <!-- PROXY -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+      <div class="col-sm-4 col-md-3">
+        <div
+          class="card-pf card-pf-accented card-pf-aggregate-status card-with-footer"
+        >
           <h2 class="card-pf-title">
+            <a
+              target="_blank"
+              href="/nethserver#/applications/nethserver-squid"
+              class="card-pf-link-with-icon card-action"
+            >
+              <span class="fa fa-external-link"></span>
+            </a>
             <span class="pf-icon pficon-filter"></span
             >{{ $t("troubleshooting.proxy") }}
-            <a href="#" class="card-pf-link-with-icon">
-              <span class="fa fa-external-link pl-21"></span>
-            </a>
           </h2>
           <div class="card-pf-body">
             <div
@@ -186,14 +195,6 @@
                 <span class="pficon pficon-ok"></span>
               </span>
             </p>
-            <div v-if="view.squid.isLoaded && view.squid.status == 'running'">
-              <p class="green small">
-                {{ $t("troubleshooting." + view.squid.details.green) }}
-              </p>
-              <p class="blue small">
-                {{ $t("troubleshooting." + view.squid.details.blue) }}
-              </p>
-            </div>
             <p
               v-if="view.squid.isLoaded && view.squid.status == 'disabled'"
               class="card-pf-aggregate-status-notifications"
@@ -211,12 +212,18 @@
               </span>
             </p>
           </div>
+          <div v-if="view.squid.status !== 'disabled'" class="footer">
+            <span class="action" @click="showProxyModal">
+              <span class="fa fa-search icon"></span
+              >{{ $t("troubleshooting.details") }}
+            </span>
+          </div>
         </div>
       </div>
       <!-- END PROXY -->
 
       <!-- ufdbGuard FILTER -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
+      <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-filter"></span
@@ -252,11 +259,10 @@
       <!-- END FILTER -->
 
       <!-- ANTIVIRUS -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
+      <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
-            <span class="pf-icon pficon-filter"></span
-            >{{ $t("troubleshooting.antivirus") }}
+            <span class="fa fa-bug"></span>{{ $t("troubleshooting.antivirus") }}
           </h2>
           <div class="card-pf-body">
             <div
@@ -288,14 +294,20 @@
       <!-- END ANTIVIRUS -->
 
       <!-- NTOPNG -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+      <div class="col-sm-4 col-md-3">
+        <div
+          class="card-pf card-pf-accented card-pf-aggregate-status card-with-footer"
+        >
           <h2 class="card-pf-title">
-            <span class="pf-icon pficon-storage-domain"></span
-            >{{ $t("troubleshooting.ntopng") }}
-            <a href="#" class="card-pf-link-with-icon">
-              <span class="fa fa-external-link pl-21"></span>
+            <a
+              target="_blank"
+              href="/nethserver#/applications/nethserver-ntopng"
+              class="card-pf-link-with-icon card-action"
+            >
+              <span class="fa fa-external-link"></span>
             </a>
+            <span class="fa fa-tachometer"></span
+            >{{ $t("troubleshooting.ntopng") }}
           </h2>
           <div class="card-pf-body">
             <div
@@ -322,38 +334,23 @@
                 <span class="pficon pficon-error-circle-o"></span>
               </span>
             </p>
-            <div class="h10">
-              <div class="dropdown">
-                <a href="#" data-toggle="dropdown" class="right">
-                  <span class="pficon pficon-info"></span>
-                </a>
-                <div class="dropdown-menu infotip bottom-right">
-                  <div class="arrow"></div>
-                  <ul class="list-group">
-                    <li
-                      class="list-group-item"
-                      v-if="view.ntopng.details"
-                      v-for="(role, name) in view.ntopng.details"
-                      :key="name"
-                    >
-                      <span class="pficon pficon-network pr-5"></span>
-                      <span :class="role">{{ name }}</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+          </div>
+          <div v-if="view.ntopng.status !== 'disabled'" class="footer">
+            <span class="action" @click="showNtopngModal">
+              <span class="fa fa-search icon"></span
+              >{{ $t("troubleshooting.details") }}
+            </span>
           </div>
         </div>
       </div>
       <!-- END NTOPNG -->
     </div>
 
-    <h3>{{ $t("Security") }}</h3>
+    <h3>{{ $t("troubleshooting.security") }}</h3>
 
     <div class="row row-cards-pf">
       <!-- IP BLACKLIST -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
+      <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-cloud-security"></span
@@ -385,7 +382,7 @@
       <!-- END IP BLACKLIST -->
 
       <!-- FTL DNS BLACKLIST -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
+      <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-cloud-security"></span
@@ -406,7 +403,7 @@
                   class="fa fa-ban gray"
                 ></span>
                 <span
-                  v-if="view.ftl.status == 'enabled'"
+                  v-if="view.ftl.status == 'running'"
                   class="pficon pficon-ok"
                 ></span>
               </span>
@@ -417,7 +414,7 @@
       <!-- END FTL -->
 
       <!-- FAIL2BAN -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
+      <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-locked"></span
@@ -449,7 +446,7 @@
       <!-- END FAIL2BAN -->
 
       <!-- SURICATA -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
+      <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-security"></span
@@ -470,7 +467,7 @@
                   class="fa fa-ban gray"
                 ></span>
                 <span
-                  v-if="view.suricata.status == 'enabled'"
+                  v-if="view.suricata.status == 'running'"
                   class="pficon pficon-ok"
                 ></span>
               </span>
@@ -481,11 +478,11 @@
       <!-- END SURICATA -->
     </div>
 
-    <h3>{{ $t("Network") }}</h3>
+    <h3>{{ $t("troubleshooting.network") }}</h3>
 
     <div class="row row-cards-pf">
       <!-- PING CHART -->
-      <div class="col-xs-6 col-sm-4 col-md-4">
+      <div class="col-md-6">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <div
             v-if="!view.graphLoaded && !view.isChartLoaded"
@@ -500,13 +497,11 @@
               <strong>{{ $t("warning") }}!</strong>
               {{ $t("troubleshooting.ping_charts_not_updated") }}.
             </div>
-            <div
-              v-if="view.isChartLoaded"
-              v-for="(data, index) in charts"
-              :key="index"
-            >
-              <h4>{{ $t("troubleshooting.ping") }}: {{ index }}</h4>
-              <div :id="'chart-ping-' + index"></div>
+            <div v-if="view.isChartLoaded">
+              <div v-for="(data, index) in charts" :key="index">
+                <h4>{{ $t("troubleshooting.ping") }}: {{ index }}</h4>
+                <div :id="'chart-ping-' + index" class="chart-ping"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -514,18 +509,17 @@
       <!-- END PING CHART -->
     </div>
 
-    <h3>{{ $t("Other") }}</h3>
+    <h3>{{ $t("troubleshooting.other") }}</h3>
 
     <div class="row row-cards-pf">
       <!-- TEMPLATES -->
-      <div class="col-xs-3 col-sm-2 col-md-2">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+      <div class="col-sm-4 col-md-3">
+        <div
+          class="card-pf card-pf-accented card-pf-aggregate-status card-with-footer"
+        >
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-settings"></span
             >{{ $t("troubleshooting.templates") }}
-            <a href="#" class="card-pf-link-with-icon">
-              <span class="pf-icon pficon-arrow fa-external-link"></span>
-            </a>
           </h2>
           <div class="card-pf-body">
             <div
@@ -548,9 +542,143 @@
               </span>
             </p>
           </div>
+          <div v-if="view.templates.status !== 'disabled'" class="footer">
+            <span class="action" @click="showCustomTemplatesModal">
+              <span class="fa fa-search icon"></span
+              >{{ $t("troubleshooting.details") }}
+            </span>
+          </div>
         </div>
       </div>
       <!-- END TEMPLATES -->
+    </div>
+    <!-- ntopng modal -->
+    <div
+      class="modal"
+      id="ntopngModal"
+      tabindex="-1"
+      role="dialog"
+      data-backdrop="static"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              {{ $t("troubleshooting.ntopng") }}
+            </h4>
+          </div>
+          <div class="modal-body">
+            <div>
+              {{ $t("troubleshooting.bandwidth_monitor_modal_description") }}
+            </div>
+            <ul v-if="view.ntopng.details" class="list-group mg-top-10">
+              <li
+                class="list-group-item"
+                v-for="(role, name) in view.ntopng.details"
+                :key="name"
+              >
+                <span class="pficon pficon-network icon"></span>
+                <span :class="role">{{ name }}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-default"
+              type="button"
+              @click="hideNtopngModal"
+            >
+              {{ $t("close") }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- custom templates modal -->
+    <div
+      class="modal"
+      id="customTemplatesModal"
+      tabindex="-1"
+      role="dialog"
+      data-backdrop="static"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              {{ $t("troubleshooting.templates") }}
+            </h4>
+          </div>
+          <div class="modal-body">
+            <div>
+              {{ $t("troubleshooting.custom_templates_modal_description") }}
+            </div>
+            <ul v-if="view.templates.details" class="list-group mg-top-10">
+              <li
+                class="list-group-item"
+                v-for="(template, index) in view.templates.details"
+                :key="index"
+              >
+                <span class="fa fa-cogs icon"></span>
+                <code>{{ template }}</code>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-default"
+              type="button"
+              @click="hideCustomTemplatesModal"
+            >
+              {{ $t("close") }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- proxy modal -->
+    <div
+      class="modal"
+      id="proxyModal"
+      tabindex="-1"
+      role="dialog"
+      data-backdrop="static"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              {{ $t("troubleshooting.proxy") }}
+            </h4>
+          </div>
+          <div class="modal-body">
+            <div>
+              {{ $t("troubleshooting.proxy_modal_description") }}
+            </div>
+            <ul v-if="view.squid.details" class="list-group mg-top-10">
+              <li
+                class="list-group-item"
+                v-for="(mode, role) in view.squid.details"
+                :key="role"
+              >
+                <span class="pficon pficon-network icon"></span>
+                <strong :class="role">{{ role.toUpperCase() }}</strong
+                >:
+                <code>{{ $t("troubleshooting." + mode) }}</code>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-default"
+              type="button"
+              @click="hideProxyModal"
+            >
+              {{ $t("close") }}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -620,7 +748,7 @@ export default {
       context.getServiceStatus(item);
     });
 
-    $("#ts-services-tab-parent").click(); //// needed?
+    $("#ts-services-tab-parent").click();
   },
   beforeDestroy() {
     console.log("services beforeDestroy"); ////
@@ -648,6 +776,8 @@ export default {
           context["view"][service]["status"] = success.status;
           if ("details" in success) {
             context["view"][service]["details"] = success.details;
+
+            console.log(service, "details", success.details); ////
           }
         },
         function(error) {
@@ -685,7 +815,6 @@ export default {
                   stackedGraph: true,
                   labels: chart.labels,
                   height: 150,
-                  width: 400,
                   strokeWidth: 1,
                   strokeBorderWidth: 1,
                   ylabel: context.$i18n.t("troubleshooting.latency"),
@@ -704,19 +833,29 @@ export default {
         }
       );
     },
+    showNtopngModal() {
+      $("#ntopngModal").modal("show");
+    },
+    hideNtopngModal() {
+      $("#ntopngModal").modal("hide");
+    },
+    showCustomTemplatesModal() {
+      $("#customTemplatesModal").modal("show");
+    },
+    hideCustomTemplatesModal() {
+      $("#customTemplatesModal").modal("hide");
+    },
+    showProxyModal() {
+      $("#proxyModal").modal("show");
+    },
+    hideProxyModal() {
+      $("#proxyModal").modal("hide");
+    },
   },
 };
 </script>
 
 <style scoped>
-.green {
-  color: green;
-}
-
-.blue {
-  color: blue;
-}
-
 .card-pf-title > .pf-icon {
   margin-right: 7px;
 }
@@ -725,12 +864,67 @@ export default {
   padding-left: 21px;
 }
 
-.pr-5 {
-  padding-right: 21px;
+.icon {
+  margin-right: 7px;
 }
 
-.h10 {
-  height: 10px;
-  padding: 2px;
+.card-pf-aggregate-status .card-pf-title .fa:hover {
+  color: #0088ce;
+}
+
+.card-pf-aggregate-status .card-pf-title .card-action {
+  float: right;
+}
+
+.card-pf-aggregate-status .card-pf-title .card-action span {
+  margin-right: 0;
+}
+
+.container-fluid.container-cards-pf {
+  margin-left: auto !important;
+}
+
+.chart-ping {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.card-with-footer {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.card-with-footer .card-pf-title {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.card-with-footer .card-pf-body {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.card-with-footer .footer {
+  border-top: 1px solid lightgray;
+  background-color: #fafafa;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.card-with-footer .footer .icon {
+  margin-right: 7px;
+}
+
+.card-with-footer .footer .action {
+  color: #0088ce;
+  cursor: pointer;
+}
+
+.card-pf-aggregate-status .card-pf-title .fa {
+  font-size: 14px;
+}
+
+.card-pf-aggregate-status .card-pf-title .fa:hover {
+  color: currentColor !important;
 }
 </style>

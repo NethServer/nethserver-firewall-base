@@ -507,6 +507,10 @@
         "hosts": "Hosts",
         "ping": "Ping",
         "proxy": "Web proxy",
+        "global": "Global",
+        "security": "Security",
+        "network": "Network",
+        "other": "Other",
         "details": "Details",
         "charts": "Charts",
         "ipblacklist": "Threat shield IP",
@@ -526,8 +530,11 @@
         "fail2ban": "Fail2ban",
         "ntopng": "Bandwidth monitor",
         "latency": "Latency (ms)",
-        "ping_charts_not_updated":"Charts cannot be updated. Maybe collectd is not running",
-        "bandwidth_monitor_disabled": "Bandwidth monitor disabled or not installed"
+        "ping_charts_not_updated": "Charts cannot be updated. Maybe collectd is not running",
+        "bandwidth_monitor_disabled": "Bandwidth monitor disabled or not installed",
+        "bandwidth_monitor_modal_description": "Bandwidth monitor is enabled on following interfaces:",
+        "custom_templates_modal_description": "Custom templates installed on the system:",
+        "proxy_modal_description": "Web proxy is configured as follows:"
     },
     "about": {
         "title": "About",
