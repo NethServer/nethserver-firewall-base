@@ -584,4 +584,12 @@ export default {
 .icon-disabled {
   color: #72767b !important;
 }
+
+.troubleshooting-chart-legend {
+  padding: 5px;
+  position: absolute;
+  right: 3rem;
+  text-align: left;
+  z-index: 5;
+}
 </style>

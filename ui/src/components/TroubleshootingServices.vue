@@ -126,14 +126,14 @@
       <!-- SYSTEMD -->
       <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <a
+            target="_blank"
+            href="/nethserver#/services"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
           <h2 class="card-pf-title">
-            <a
-              target="_blank"
-              href="/nethserver#/services"
-              class="card-pf-link-with-icon card-action"
-            >
-              <span class="fa fa-external-link"></span>
-            </a>
             <span class="pf-icon pficon-services"></span
             >{{ $t("troubleshooting.systemd") }}
           </h2>
@@ -171,14 +171,14 @@
         <div
           class="card-pf card-pf-accented card-pf-aggregate-status card-with-footer"
         >
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-squid"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
           <h2 class="card-pf-title">
-            <a
-              target="_blank"
-              href="/nethserver#/applications/nethserver-squid"
-              class="card-pf-link-with-icon card-action"
-            >
-              <span class="fa fa-external-link"></span>
-            </a>
             <span class="pf-icon pficon-filter"></span
             >{{ $t("troubleshooting.proxy") }}
           </h2>
@@ -225,6 +225,13 @@
       <!-- ufdbGuard FILTER -->
       <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-squid"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-filter"></span
             >{{ $t("troubleshooting.ufdbGuard") }}
@@ -261,6 +268,13 @@
       <!-- ANTIVIRUS -->
       <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-squid"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
           <h2 class="card-pf-title">
             <span class="fa fa-bug"></span>{{ $t("troubleshooting.antivirus") }}
           </h2>
@@ -298,14 +312,14 @@
         <div
           class="card-pf card-pf-accented card-pf-aggregate-status card-with-footer"
         >
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-ntopng"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
           <h2 class="card-pf-title">
-            <a
-              target="_blank"
-              href="/nethserver#/applications/nethserver-ntopng"
-              class="card-pf-link-with-icon card-action"
-            >
-              <span class="fa fa-external-link"></span>
-            </a>
             <span class="fa fa-tachometer"></span
             >{{ $t("troubleshooting.ntopng") }}
           </h2>
@@ -352,6 +366,13 @@
       <!-- IP BLACKLIST -->
       <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-blacklist"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-cloud-security"></span
             >{{ $t("troubleshooting.ipblacklist") }}
@@ -384,6 +405,13 @@
       <!-- FTL DNS BLACKLIST -->
       <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-blacklist"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-cloud-security"></span
             >{{ $t("troubleshooting.ftl") }}
@@ -416,6 +444,13 @@
       <!-- FAIL2BAN -->
       <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-fail2ban"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-locked"></span
             >{{ $t("troubleshooting.fail2ban") }}
@@ -448,6 +483,13 @@
       <!-- SURICATA -->
       <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-suricata"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-security"></span
             >{{ $t("troubleshooting.suricata") }}
@@ -476,37 +518,6 @@
         </div>
       </div>
       <!-- END SURICATA -->
-    </div>
-
-    <h3>{{ $t("troubleshooting.network") }}</h3>
-
-    <div class="row row-cards-pf">
-      <!-- PING CHART -->
-      <div class="col-md-6">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
-          <div
-            v-if="!view.graphLoaded && !view.isChartLoaded"
-            class="spinner spinner-lg view-spinner"
-          ></div>
-          <div class="card-pf-body">
-            <div
-              v-if="view.invalidChartsPingData"
-              class="alert alert-warning alert-dismissable col-sm-12"
-            >
-              <span class="pficon pficon-warning-triangle-o"></span>
-              <strong>{{ $t("warning") }}!</strong>
-              {{ $t("troubleshooting.ping_charts_not_updated") }}.
-            </div>
-            <div v-if="view.isChartLoaded">
-              <div v-for="(data, index) in charts" :key="index">
-                <h4>{{ $t("troubleshooting.ping") }}: {{ index }}</h4>
-                <div :id="'chart-ping-' + index" class="chart-ping"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- END PING CHART -->
     </div>
 
     <h3>{{ $t("troubleshooting.other") }}</h3>
@@ -552,6 +563,44 @@
       </div>
       <!-- END TEMPLATES -->
     </div>
+
+    <h3>{{ $t("troubleshooting.network") }}</h3>
+
+    <div class="row row-cards-pf">
+      <!-- PING CHART -->
+      <div class="col-md-6">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <div
+            v-if="!view.isChartLoaded"
+            class="spinner spinner-lg view-spinner  mg-top-20"
+          ></div>
+          <div class="card-pf-body">
+            <div
+              v-if="view.invalidChartsPingData"
+              class="alert alert-warning alert-dismissable col-sm-12"
+            >
+              <span class="pficon pficon-warning-triangle-o"></span>
+              <strong>{{ $t("warning") }}!</strong>
+              {{ $t("troubleshooting.ping_charts_not_updated") }}.
+            </div>
+            <div v-if="view.isChartLoaded">
+              <div v-for="(data, index) in charts" :key="index">
+                <h4 class="mg-top">
+                  {{ $t("troubleshooting.ping") }}: {{ index }}
+                </h4>
+                <div
+                  :id="'ping-legend-' + index"
+                  class="troubleshooting-chart-legend"
+                ></div>
+                <div :id="'chart-ping-' + index" class="chart-ping"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PING CHART -->
+    </div>
+
     <!-- ntopng modal -->
     <div
       class="modal"
@@ -713,7 +762,7 @@ export default {
         templates: { status: "disabled", isLoaded: false, details: [] },
       },
       charts: {},
-      pollingIntervalIdChart: 0,
+      pingChartInterval: null,
     };
   },
   created() {
@@ -725,7 +774,7 @@ export default {
     var context = this;
 
     context.updatePingChart();
-    context.charts.ping_interval = setInterval(function() {
+    context.pingChartInterval = setInterval(function() {
       context.updatePingChart();
     }, 5000);
 
@@ -753,11 +802,8 @@ export default {
   beforeDestroy() {
     console.log("services beforeDestroy"); ////
 
-    //// todo needed?
     $(".modal").modal("hide");
-    clearInterval(this.pollingIntervalIdChart);
-
-    clearInterval(this.charts.ping_interval);
+    clearInterval(this.pingChartInterval);
   },
   methods: {
     getServiceStatus(service) {
@@ -804,21 +850,28 @@ export default {
           context.$nextTick(function() {
             for (const ip in context.charts) {
               var chart = context.charts[ip];
+
               for (var t in chart.data) {
                 chart.data[t][0] = new Date(chart.data[t][0]);
               }
+
+              const i18nLabels = chart.labels.map((label) =>
+                context.$i18n.t("troubleshooting." + label)
+              );
+
               var g = new Dygraph(
                 document.getElementById("chart-ping-" + ip),
                 chart.data,
                 {
                   fillGraph: true,
                   stackedGraph: true,
-                  labels: chart.labels,
+                  labels: i18nLabels,
                   height: 150,
                   strokeWidth: 1,
                   strokeBorderWidth: 1,
-                  ylabel: context.$i18n.t("troubleshooting.latency"),
+                  ylabel: context.$i18n.t("troubleshooting.latency_ms"),
                   axisLineColor: "white",
+                  labelsDiv: document.getElementById("ping-legend-" + ip),
                   labelsSeparateLines: true,
                   drawGrid: false,
                 }
@@ -856,6 +909,11 @@ export default {
 </script>
 
 <style scoped>
+.card-pf-aggregate-status .card-pf-title {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
 .card-pf-title > .pf-icon {
   margin-right: 7px;
 }
@@ -868,16 +926,22 @@ export default {
   margin-right: 7px;
 }
 
-.card-pf-aggregate-status .card-pf-title .fa:hover {
-  color: #0088ce;
-}
-
-.card-pf-aggregate-status .card-pf-title .card-action {
+.card-pf-aggregate-status .card-action {
   float: right;
+  margin-top: 10px;
 }
 
-.card-pf-aggregate-status .card-pf-title .card-action span {
+.card-pf-aggregate-status .card-action span {
   margin-right: 0;
+}
+
+.card-pf-aggregate-status .card-action .fa {
+  font-size: 14px;
+  color: #0088ce !important;
+}
+
+.card-pf-aggregate-status .card-action .fa:hover {
+  color: #0088ce !important;
 }
 
 .container-fluid.container-cards-pf {
@@ -887,6 +951,7 @@ export default {
 .chart-ping {
   padding-left: 5px;
   padding-right: 5px;
+  margin-bottom: 20px;
 }
 
 .card-with-footer {
@@ -918,13 +983,5 @@ export default {
 .card-with-footer .footer .action {
   color: #0088ce;
   cursor: pointer;
-}
-
-.card-pf-aggregate-status .card-pf-title .fa {
-  font-size: 14px;
-}
-
-.card-pf-aggregate-status .card-pf-title .fa:hover {
-  color: currentColor !important;
 }
 </style>

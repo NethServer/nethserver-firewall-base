@@ -91,7 +91,7 @@ sub fetch_ping_rrd {
             next unless $values[1] =~ m/\d/;
             $values[1] =~ s/ //g;
             # be sure to output a numeric value
-            $values[1] = $values[1]*1000;
+            $values[1] = $values[1]*1;
             $values[0] = $values[0]*1000;
             push(@ret, \@values);
         }
@@ -241,18 +241,19 @@ if ($cmd eq 'ping') {
     $ifid += 1;
     my $now = time();
     my $yday = $now - (24 * 60 * 60);
-    my $url = 'http://127.0.0.1:3000/lua/rest/get/timeseries/ts.lua?ts_schema=host:traffic&ts_query=ifid:'.$ifid.',host:'.$host.'&epoch_begin='.$yday.'&epoch_end='.$now.'&extended=0&format=json';
+    my $port = $cdb->get_prop('ntopng', 'TCPPort') || "3000";
+    my $url = 'http://127.0.0.1:'.$port.'/lua/rest/get/timeseries/ts.lua?ts_schema=host:traffic&ts_query=ifid:'.$ifid.',host:'.$host.'&epoch_begin='.$yday.'&epoch_end='.$now.'&extended=0&format=json';
     my $response = safe_decode_json(`/usr/bin/curl -s '$url'`);
     my @data;
     my @labels = ('time', 'sent_bytes', 'received_bytes');
     my $sent = $response->{'series'}[0]->{'data'};
     my $rcvd = $response->{'series'}[1]->{'data'};
     foreach (keys $sent) {
-        push(@data, [$_, $sent->{$_}, $rcvd->{$_}]);
+        # express time in milliseconds and traffic in mbit/s
+        push(@data, [$_*1000, $sent->{$_}/1000, $rcvd->{$_}/1000]);
     }
     my $tsent = $response->{'statistics'}{'by_serie'}[0]->{'total'};
     my $trcvd = $response->{'statistics'}{'by_serie'}[1]->{'total'};
     print(encode_json({"labels" => \@labels, "data" => \@data, "totals" => { "sent" => $tsent, "rcvd" => $trcvd, "both"=> $tsent + $trcvd}}));
-    
 }
 
