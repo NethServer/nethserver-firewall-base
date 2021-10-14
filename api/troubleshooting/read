@@ -240,6 +240,20 @@ if ($cmd eq 'ping') {
             @details = split(',', $cdb->get_prop('flashstart', 'Roles') || '');
         }
         print encode_json({"status" => $status, "details" => \@details});
+   } elsif ($service eq 'ftl') {
+        my $status = $cdb->get_prop($service, 'status') || "disabled";
+        my @details;
+
+        if ($status eq 'enabled') {
+            my $s = NethServer::Service->new('ftl', $cdb);
+	    if ($s->is_running()) {
+                $status = 'running';
+            } else {
+	        $status = 'failed';
+	    }
+            @details = split(',', $cdb->get_prop('ftl', 'Roles') || '');
+        }
+        print encode_json({"status" => $status, "details" => \@details});
     } else {
         get_service_status($service, $cdb);
     }
