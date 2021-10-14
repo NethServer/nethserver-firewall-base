@@ -562,6 +562,133 @@
         </div>
       </div>
       <!-- END TEMPLATES -->
+
+      <!-- YUM LAST UPDATE -->
+      <div class="col-sm-4 col-md-3">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <h2 class="card-pf-title">
+            <span class="pficon pficon-restart"></span
+            >{{ $t("troubleshooting.yum_last_update") }}
+          </h2>
+          <div class="card-pf-body">
+            <div
+              v-if="!view.yum.isLoaded"
+              class="spinner spinner-lg view-spinner"
+            ></div>
+            <p
+              v-if="view.yum.isLoaded"
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="card-pf-aggregate-status-notification">
+                <span
+                  v-if="view.yum.date"
+                  class=""
+                >{{view.yum.date | dateFormat}}</span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- END YUM LAST UPDATE -->
+
+      <!-- UPS -->
+      <div class="col-sm-4 col-md-3">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-nut"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
+          <h2 class="card-pf-title">
+            <span class="fa fa-battery"></span
+            >{{ $t("troubleshooting.ups") }}
+          </h2>
+          <div class="card-pf-body">
+            <div
+              v-if="!view.ups.isLoaded"
+              class="spinner spinner-lg view-spinner"
+            ></div>
+            <p
+              v-if="view.ups.isLoaded"
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="card-pf-aggregate-status-notification">
+                <span
+                  v-if="view.ups.status == 'disabled'"
+                  class="fa fa-ban gray"
+                ></span>
+                <span
+                  v-if="view.ups.status == 'running'"
+                  class="pficon pficon-ok"
+                ></span>
+                <span
+                  v-if="view.ups.status == 'warning'"
+                  class="pficon pficon-warning-triangle-o"
+                ></span>
+                <span
+                  v-if="view.ups.status == 'failed'"
+                  class="pficon pficon-error-circle-o"
+                ></span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- END UPS -->
+
+      <!-- FLASHSTART -->
+      <div class="col-sm-4 col-md-3">
+        <div
+          class="card-pf card-pf-accented card-pf-aggregate-status card-with-footer"
+        >
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-flashstart"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
+          <h2 class="card-pf-title">
+            <span class="fa fa-bolt"></span
+            >{{ $t("troubleshooting.flashstart") }}
+          </h2>
+          <div class="card-pf-body">
+            <div
+              v-if="!view.flashstart.isLoaded"
+              class="spinner spinner-lg view-spinner"
+            ></div>
+            <div
+              v-if="view.flashstart.isLoaded && view.flashstart.status == 'running'"
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="pficon pficon-ok"></span>
+            </div>
+            <p
+              v-if="view.flashstart.isLoaded && view.flashstart.status == 'disabled'"
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="fa fa-ban gray"></span>
+            </p>
+            <p
+              v-if="view.flashstart.isLoaded && view.flashstart.status == 'failed'"
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="card-pf-aggregate-status-notification">
+                <span class="pficon pficon-error-circle-o"></span>
+              </span>
+            </p>
+          </div>
+          <div v-if="view.flashstart.status !== 'disabled'" class="footer">
+            <span class="action" @click="showFlashstartModal">
+              <span class="fa fa-search icon"></span
+              >{{ $t("troubleshooting.details") }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- END FLASHSTART -->
     </div>
 
     <h3>{{ $t("troubleshooting.network") }}</h3>
@@ -729,6 +856,48 @@
         </div>
       </div>
     </div>
+    <!-- flashstart modal -->
+    <div
+      class="modal"
+      id="flashStart"
+      tabindex="-1"
+      role="dialog"
+      data-backdrop="static"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              {{ $t("troubleshooting.flashstart") }}
+            </h4>
+          </div>
+          <div class="modal-body">
+            <div>
+              {{ $t("troubleshooting.flashstart_modal_description") }}
+            </div>
+            <ul v-if="view.flashstart.details" class="list-group mg-top-10">
+              <li
+                class="list-group-item"
+                v-for="role in view.flashstart.details"
+                :key="role"
+              >
+                <span class="pficon pficon-network icon"></span>
+                <strong :class="role">{{ role.toUpperCase() }}</strong>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-default"
+              type="button"
+              @click="hideFlashstartModal"
+            >
+              {{ $t("close") }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -760,6 +929,10 @@ export default {
         fail2ban: { status: "disabled", isLoaded: false },
         suricata: { status: "disabled", isLoaded: false },
         templates: { status: "disabled", isLoaded: false, details: [] },
+
+        yum: { status: "disabled", isLoaded: false },
+        ups: { status: "disabled", isLoaded: false },
+        flashstart: { status: "disabled", isLoaded: false },
       },
       charts: {},
       pingChartInterval: null,
@@ -792,6 +965,9 @@ export default {
       "fail2ban",
       "suricata",
       "ntopng",
+      "yum",
+      "ups",
+      "flashstart"
     ];
     services.forEach(function(item, index) {
       context.getServiceStatus(item);
@@ -824,6 +1000,11 @@ export default {
             context["view"][service]["details"] = success.details;
 
             console.log(service, "details", success.details); ////
+          }
+          if ("date" in success) {
+            context["view"][service]["date"] = parseInt(success.date) || null;
+
+            console.log(service, "date", success.date); ////
           }
         },
         function(error) {
@@ -903,6 +1084,12 @@ export default {
     },
     hideProxyModal() {
       $("#proxyModal").modal("hide");
+    },
+    showFlashstartModal() {
+      $("#flashStart").modal("show");
+    },
+    hideFlashstartModal() {
+      $("#flashStart").modal("hide");
     },
   },
 };
