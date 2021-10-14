@@ -254,9 +254,18 @@ if ($cmd eq 'ping') {
             @details = split(',', $cdb->get_prop('ftl', 'Roles') || '');
         }
         print encode_json({"status" => $status, "details" => \@details});
-    } else {
+   } elsif ($service eq 'yum') {
+        my $ret = undef;
+        my $updated = `grep Updated: /var/log/yum.log 2>/dev/null | tail -f -n1 | cut -d' ' -f1,2,3`;
+        chomp $updated;
+        if ($updated) {
+            $ret = `date +%s -d "$updated"`;
+            chomp $ret;
+        }
+        print encode_json({"date" => $ret});
+   } else {
         get_service_status($service, $cdb);
-    }
+   }
 } elsif ($cmd eq 'top-local-hosts') {
     system('echo \'{"action": "top-local-hosts"}\' | /usr/libexec/nethserver/api/nethserver-ntopng/dashboard/read');
 } elsif ($cmd eq 'top-remote-hosts') {
@@ -282,14 +291,5 @@ if ($cmd eq 'ping') {
     my $tsent = $response->{'statistics'}{'by_serie'}[0]->{'total'};
     my $trcvd = $response->{'statistics'}{'by_serie'}[1]->{'total'};
     print(encode_json({"labels" => \@labels, "data" => \@data, "totals" => { "sent" => $tsent, "rcvd" => $trcvd, "both"=> $tsent + $trcvd}}));
-} elsif ($cmd eq 'last-update') {
-    my $ret = undef;
-    my $updated = `grep Updated: /var/log/yum.log 2>/dev/null | tail -f -n1 | cut -d' ' -f1,2,3`;
-    chomp $updated;
-    if ($updated) {
-         $ret = `date +%s -d "$updated"`;
-         chomp $ret;
-    }
-    print encode_json({"date" => $ret});
 }
 
