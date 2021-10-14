@@ -255,5 +255,14 @@ if ($cmd eq 'ping') {
     my $tsent = $response->{'statistics'}{'by_serie'}[0]->{'total'};
     my $trcvd = $response->{'statistics'}{'by_serie'}[1]->{'total'};
     print(encode_json({"labels" => \@labels, "data" => \@data, "totals" => { "sent" => $tsent, "rcvd" => $trcvd, "both"=> $tsent + $trcvd}}));
+} elsif ($cmd eq 'last-update') {
+    my $ret = undef;
+    my $updated = `grep Updated: /var/log/yum.log 2>/dev/null | tail -f -n1 | cut -d' ' -f1,2,3`;
+    chomp $updated;
+    if ($updated) {
+         $ret = `date +%s -d "$updated"`;
+         chomp $ret;
+    }
+    print encode_json({"date" => $ret});
 }
 
