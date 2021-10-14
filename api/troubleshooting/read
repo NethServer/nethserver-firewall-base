@@ -90,9 +90,9 @@ sub fetch_ping_rrd {
             next unless $values[0] =~ m/\d/;
             next unless $values[1] =~ m/\d/;
             $values[1] =~ s/ //g;
-            # be sure to output a numeric value
-            $values[1] = $values[1]*1;
-            $values[0] = $values[0]*1000;
+            # make sure to output a numeric value
+            $values[1] = $values[1]+0;
+            $values[0] = $values[0]+0;
             push(@ret, \@values);
         }
     }
@@ -100,29 +100,35 @@ sub fetch_ping_rrd {
     return @ret;   
 }
 
-if ($cmd eq 'ping') {
+sub ping_chart {
+    my $file_prefix = shift;
+    my $ylabel = shift;
     my $time = 3600;
     my $ret;
-    # ping_droprate
-    # ping
     # collectd keeps track of the first DNS
     my @dns = split(',',$cdb->get_prop('dns', 'NameServers'));
     if (defined($dns[0])) {
-        my @data = fetch_ping_rrd("ping-".$dns[0], $cdb, $time);
+        my @data = fetch_ping_rrd($file_prefix."-".$dns[0], $cdb, $time);
         if (@data) {
-            $ret->{$dns[0]} = {labels => [ 'time','latency' ], data => \@data};
+            $ret->{$dns[0]} = {labels => [ 'time', $ylabel ], data => \@data};
         }
     }
 
     # load extra configured hosts
     foreach my $h (split(",", $cdb->get_prop('collectd', 'PingHosts'))) {
-        my @data = fetch_ping_rrd("ping-".$h, $cdb, $time);
+        my @data = fetch_ping_rrd($file_prefix."-".$h, $cdb, $time);
         if (@data) {
-            $ret->{$h} = {labels => [ 'time','latency' ], data => \@data};
+            $ret->{$h} = {labels => [ 'time', $ylabel ], data => \@data};
         }
     }
 
     print encode_json ($ret);
+}
+
+if ($cmd eq 'ping') {
+    ping_chart('ping', 'latency');
+} elsif ($cmd eq 'ping-droprate') {
+    ping_chart('ping_droprate', 'droprate');
 } elsif ($cmd eq 'service') {
 
     my $service = $input->{'service'};
