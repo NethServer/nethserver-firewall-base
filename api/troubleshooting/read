@@ -100,6 +100,37 @@ sub fetch_ping_rrd {
     return @ret;   
 }
 
+sub fetch_interface_rrd {
+    my $interface = shift;
+    my $cdb = shift;
+    my $time = shift;
+    my @ret;
+    my $systemname = $cdb->get_value('SystemName');
+    my $domainname = $cdb->get_value('DomainName');
+    my $path = "/var/lib/collectd/rrd/$systemname.$domainname/interface-$interface/if_octets.rrd";
+    if (! -f $path) {
+        return @ret;
+    }
+    open(FH, "rrdtool fetch $path AVERAGE -s e-$time|");
+    while (<FH>) {
+    chomp;
+    my @lines = split("\r\n");
+        foreach my $line (@lines) {
+            my ($time, $octets) = split(":", $line);
+            my ($rcvd, $sent) = split(" ", $octets);
+            next unless ($time =~ m/\d/ && $rcvd =~ m/\d/ && $sent =~ m/\d/);
+            # make sure to output a numeric value
+            $time = $time*1000;
+            $rcvd = $rcvd*1;
+            $sent = $sent*1;
+            push(@ret, [$time, $rcvd, $sent]);
+        }
+    }
+    close(FH);
+    return @ret;
+}
+
+
 sub ping_chart {
     my $file_prefix = shift;
     my $ylabel = shift;
@@ -129,6 +160,10 @@ if ($cmd eq 'ping') {
     ping_chart('ping', 'latency');
 } elsif ($cmd eq 'ping-droprate') {
     ping_chart('ping_droprate', 'droprate');
+} elsif ($cmd eq 'interface') {
+    my $interface = $input->{'interface'};
+    my @data = fetch_interface_rrd($interface, $cdb, 3600);
+    print encode_json({labels => [ 'time', 'rcvd_bytes', 'sent_bytes' ], data => \@data});
 } elsif ($cmd eq 'service') {
 
     my $service = $input->{'service'};
