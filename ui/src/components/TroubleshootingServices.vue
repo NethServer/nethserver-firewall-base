@@ -404,7 +404,7 @@
 
       <!-- FTL DNS BLACKLIST -->
       <div class="col-sm-4 col-md-3">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status  card-with-footer">
           <a
             target="_blank"
             href="/nethserver#/applications/nethserver-blacklist"
@@ -436,6 +436,12 @@
                 ></span>
               </span>
             </p>
+          </div>
+          <div v-if="view.ftl.status !== 'disabled'" class="footer">
+            <span class="action" @click="showFtlModal">
+              <span class="fa fa-search icon"></span
+              >{{ $t("troubleshooting.details") }}
+            </span>
           </div>
         </div>
       </div>
@@ -859,7 +865,7 @@
     <!-- flashstart modal -->
     <div
       class="modal"
-      id="flashStart"
+      id="flashStartModal"
       tabindex="-1"
       role="dialog"
       data-backdrop="static"
@@ -891,6 +897,48 @@
               class="btn btn-default"
               type="button"
               @click="hideFlashstartModal"
+            >
+              {{ $t("close") }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ftl modal -->
+    <div
+      class="modal"
+      id="ftlModal"
+      tabindex="-1"
+      role="dialog"
+      data-backdrop="static"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              {{ $t("troubleshooting.ftl") }}
+            </h4>
+          </div>
+          <div class="modal-body">
+            <div>
+              {{ $t("troubleshooting.ftl_modal_description") }}
+            </div>
+            <ul v-if="view.ftl.details" class="list-group mg-top-10">
+              <li
+                class="list-group-item"
+                v-for="role in view.ftl.details"
+                :key="role"
+              >
+                <span class="pficon pficon-network icon"></span>
+                <strong :class="role">{{ role.toUpperCase() }}</strong>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-default"
+              type="button"
+              @click="hideFtlModal"
             >
               {{ $t("close") }}
             </button>
@@ -1086,10 +1134,16 @@ export default {
       $("#proxyModal").modal("hide");
     },
     showFlashstartModal() {
-      $("#flashStart").modal("show");
+      $("#flashStartModal").modal("show");
     },
     hideFlashstartModal() {
-      $("#flashStart").modal("hide");
+      $("#flashStartModal").modal("hide");
+    },
+    showFtlModal() {
+      $("#ftlModal").modal("show");
+    },
+    hideFtlModal() {
+      $("#ftlModal").modal("hide");
     },
   },
 };

@@ -540,6 +540,7 @@
         "custom_templates_modal_description": "Custom templates installed on the system:",
         "proxy_modal_description": "Web proxy is configured as follows:",
         "flashstart_modal_description": "Flashstart is configured on following interfaces:",
+        "ftl_modal_description": "Threat shield DNS is configured on following interfaces:",
         "top_local_hosts": "Top local hosts",
         "top_remote_hosts": "Top remote hosts",
         "no_data": "No data",
