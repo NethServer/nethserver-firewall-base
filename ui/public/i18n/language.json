@@ -557,7 +557,15 @@
         "traffic_for_host": "Last 24 hours traffic for host",
         "traffic_mbps": "Traffic (mbit/s)",
         "sent_bytes": "Sent",
-        "received_bytes": "Received"
+        "received_bytes": "Received",
+        "up": "Up",
+        "down": "Down",
+        "label": "Label",
+        "cidr": "CIDR",
+        "gateway": "Gateway",
+        "weight": "Weight",
+        "download_bandwidth": "Download bandwidth",
+        "upload_bandwidth": "Upload bandwidth"
     },
     "about": {
         "title": "About",

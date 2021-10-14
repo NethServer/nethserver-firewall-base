@@ -130,7 +130,6 @@ sub fetch_interface_rrd {
     return @ret;
 }
 
-
 sub ping_chart {
     my $file_prefix = shift;
     my $ylabel = shift;
@@ -333,5 +332,7 @@ if ($cmd eq 'ping') {
     my $trcvd = $response->{'statistics'}{'by_serie'}[1]->{'total'};
     print(encode_json({"labels" => \@labels, "data" => \@data, "totals" => { "sent" => $tsent, "rcvd" => $trcvd, "both"=> $tsent + $trcvd}}));
 } elsif ($cmd eq 'traffic-by-interface') {
-  system('echo \'{"action":"traffic-by-interface"}\' | /usr/libexec/nethserver/api/nethserver-ntopng/dashboard/read')
+    system('echo \'{"action":"traffic-by-interface"}\' | /usr/libexec/nethserver/api/nethserver-ntopng/dashboard/read')
+} elsif ($cmd eq 'wan-providers') {
+    system('echo \'{"action": "providers"}\' | /usr/libexec/nethserver/api/nethserver-firewall-base/wan/read');
 }
