@@ -297,5 +297,6 @@ if ($cmd eq 'ping') {
     my $tsent = $response->{'statistics'}{'by_serie'}[0]->{'total'};
     my $trcvd = $response->{'statistics'}{'by_serie'}[1]->{'total'};
     print(encode_json({"labels" => \@labels, "data" => \@data, "totals" => { "sent" => $tsent, "rcvd" => $trcvd, "both"=> $tsent + $trcvd}}));
+} elsif ($cmd eq 'traffic-by-interface') {
+  system('echo \'{"action":"traffic-by-interface"}\' | /usr/libexec/nethserver/api/nethserver-ntopng/dashboard/read')
 }
-

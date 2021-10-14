@@ -700,11 +700,41 @@
     <h3>{{ $t("troubleshooting.network") }}</h3>
 
     <div class="row row-cards-pf">
+      <!-- TRAFFIC BY INTERFACE CHART -->
+      <div class="col-md-12">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <div
+            v-if="!view.isTrafficChartLoaded"
+            class="spinner spinner-lg view-spinner  mg-top-20"
+          ></div>
+          <div class="card-pf-body">
+            <div
+              v-if="view.invalidChartsTrafficByInterfaceData"
+              class="alert alert-warning alert-dismissable col-sm-12"
+            >
+              <span class="pficon pficon-warning-triangle-o"></span>
+              <strong>{{ $t("warning") }}!</strong>
+              {{ $t("troubleshooting.traffic_by_interface_charts_not_updated") }}.
+            </div>
+            <div v-if="view.isTrafficChartLoaded">
+              <h4 class="mg-top">
+                {{ $t("troubleshooting.traffic_by_interface") }}
+              </h4>
+              <div
+                :id="'traffic-by-interface-legend'"
+                class="troubleshooting-chart-legend"
+              ></div>
+              <div :id="'chart-traffic-by-interface'" class="chart-ping"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END TRAFFIC BY INTERFACE CHART -->
       <!-- PING CHART -->
       <div class="col-md-6">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <div
-            v-if="!view.isChartLoaded"
+            v-if="!view.isPingChartLoaded"
             class="spinner spinner-lg view-spinner  mg-top-20"
           ></div>
           <div class="card-pf-body">
@@ -716,8 +746,8 @@
               <strong>{{ $t("warning") }}!</strong>
               {{ $t("troubleshooting.ping_charts_not_updated") }}.
             </div>
-            <div v-if="view.isChartLoaded">
-              <div v-for="(data, index) in charts" :key="index">
+            <div v-if="view.isPingChartLoaded">
+              <div v-for="(data, index) in charts.ping" :key="index">
                 <h4 class="mg-top">
                   {{ $t("troubleshooting.ping") }}: {{ index }}
                 </h4>
@@ -736,7 +766,7 @@
       <div class="col-md-6">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <div
-            v-if="!view.isChartLoaded"
+            v-if="!view.isDroprateChartLoaded"
             class="spinner spinner-lg view-spinner  mg-top-20"
           ></div>
           <div class="card-pf-body">
@@ -748,8 +778,8 @@
               <strong>{{ $t("warning") }}!</strong>
               {{ $t("troubleshooting.ping_droprate_charts_not_updated") }}.
             </div>
-            <div v-if="view.isChartLoaded">
-              <div v-for="(data, index) in charts" :key="index">
+            <div v-if="view.isDroprateChartLoaded">
+              <div v-for="(data, index) in charts.droprate" :key="index">
                 <h4 class="mg-top">
                   {{ $t("troubleshooting.ping_droprate") }}: {{ index }}
                 </h4>
@@ -989,9 +1019,12 @@ export default {
   data() {
     return {
       view: {
-        isChartLoaded: false,
+        isPingChartLoaded: false,
+        isDroprateChartLoaded: false,
+        isTrafficChartLoaded: false,
         invalidChartsPingData: false,
         invalidChartsPingDroprateData: false,
+        invalidChartsTrafficByInterfaceData: false,
 
         internet: { status: "disabled", isLoaded: false },
         shorewall: { status: "disabled", isLoaded: false },
@@ -1015,9 +1048,14 @@ export default {
         ups: { status: "disabled", isLoaded: false },
         flashstart: { status: "disabled", isLoaded: false },
       },
-      charts: {},
+      charts: {
+        ping: {},
+        droprate: {},
+        traffic: {}
+      },
       pingChartInterval: null,
       pingDroprateChartInterval: null,
+      trafficByInterfaceChartInterval: null,
     };
   },
   created() {
@@ -1036,6 +1074,11 @@ export default {
     context.updatePingDroprateChart();
     context.pingDroprateChartInterval = setInterval(function() {
       context.updatePingDroprateChart();
+    }, 5000);
+
+    context.updateTrafficByInterfaceChart();
+    context.trafficByInterfaceChartInterval = setInterval(function() {
+      context.updateTrafficByInterfaceChart();
     }, 5000);
 
     const services = [
@@ -1068,6 +1111,7 @@ export default {
     $(".modal").modal("hide");
     clearInterval(this.pingChartInterval);
     clearInterval(this.pingDroprateChartInterval);
+    clearInterval(this.trafficByInterfaceChartInterval);
   },
   methods: {
     getServiceStatus(service) {
@@ -1113,12 +1157,12 @@ export default {
           } catch (e) {
             console.error(e);
           }
-          context.charts = success;
+          context.charts.ping = success;
           context.view.invalidChartsPingData = false;
-          context.view.isChartLoaded = true;
+          context.view.isPingChartLoaded = true;
           context.$nextTick(function() {
-            for (const ip in context.charts) {
-              var chart = context.charts[ip];
+            for (const ip in context.charts.ping) {
+              var chart = context.charts.ping[ip];
 
               for (var t in chart.data) {
                 chart.data[t][0] = new Date(chart.data[t][0]);
@@ -1151,7 +1195,7 @@ export default {
         },
         function(error) {
           console.error(error);
-          context.view.isChartLoaded = true;
+          context.view.isPingChartLoaded = true;
         }
       );
     },
@@ -1167,12 +1211,12 @@ export default {
           } catch (e) {
             console.error(e);
           }
-          context.charts = success;
+          context.charts.droprate = success;
           context.view.invalidChartsPingDroprateData = false;
-          context.view.isChartLoaded = true;
+          context.view.isDroprateChartLoaded = true;
           context.$nextTick(function() {
-            for (const ip in context.charts) {
-              var chart = context.charts[ip];
+            for (const ip in context.charts.droprate) {
+              var chart = context.charts.droprate[ip];
 
               for (var t in chart.data) {
                 chart.data[t][0] = new Date(chart.data[t][0]);
@@ -1211,9 +1255,106 @@ export default {
         },
         function(error) {
           console.error(error);
-          context.view.isChartLoaded = true;
+          context.view.isDroprateChartLoaded = true;
         }
       );
+    },
+    updateTrafficByInterfaceChart() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/troubleshooting/read"],
+        { action: "traffic-by-interface", time: 900 },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          //context.charts.traffic = success;
+          context.view.invalidChartsPingDroprateData = false;
+          context.view.isTrafficChartLoaded = true;
+          context.$nextTick(function() {
+            var chart = success["trafficByInterface"];
+            const startTime = chart.data[0][0];
+
+            for (var t in chart.data) {
+              chart.data[t][0] = new Date(chart.data[t][0] * 1000);
+
+              for (
+                let i = 1;
+                i < chart.data[t].length;
+                i++
+              ) {
+                // show througput in kbit/s
+                chart.data[t][i] =
+                  chart.data[t][i] / 1000;
+              }
+            }
+
+            // set initial data
+            if (!context.charts.traffic.graph) {
+              context.charts.traffic.initialData = chart;
+            }
+
+            // zero-fill previous chart data
+            context.zeroFillTrafficByInterfaceChart(startTime);
+
+            if (!context.charts.traffic.graph) {
+              context.charts.traffic.graph = new Dygraph(
+                document.getElementById("chart-traffic-by-interface"),
+                context.charts.traffic.initialData.data,
+                {
+                  fillGraph: true,
+                  stackedGraph: true,
+                  labels: context.charts.traffic.initialData.labels,
+                  height: 150,
+                  strokeWidth: 1,
+                  strokeBorderWidth: 1,
+                  ylabel: context.$i18n.t("troubleshooting.traffic_kbps"),
+                  axisLineColor: "white",
+                  labelsDiv: document.getElementById("traffic-by-interface-legend"),
+                  labelsSeparateLines: true,
+                  drawGrid: false,
+                  axes: {
+                    y: {
+                      axisLabelFormatter: function(y) {
+                        return Math.ceil(y);
+                      }
+                    }
+                  }
+                }
+              );
+            } else {
+              // append to previous data and retain only visible samples (to avoid memory overload)
+              context.charts.traffic.initialData.data = context.charts.traffic.initialData.data
+                .concat(chart.data)
+                .slice(-1 * 60);
+
+              context.charts.traffic.graph.updateOptions({
+                file: context.charts.traffic.initialData.data
+              });
+            }
+          });
+        },
+        function(error) {
+          console.error(error);
+          context.view.isTrafficChartLoaded = true;
+        }
+      );
+    },
+    zeroFillTrafficByInterfaceChart(startTime) {
+      let time = startTime;
+
+      for (let i = 0; i < 60; i++) {
+        time -= 5000 / 1000;
+        let zeroSample = [new Date(time * 1000)];
+
+        for (let j = 1; j < this.charts.traffic.initialData.labels.length; j++) {
+          zeroSample.push(0);
+        }
+        this.charts.traffic.initialData.data.unshift(zeroSample);
+      }
     },
     showNtopngModal() {
       $("#ntopngModal").modal("show");
