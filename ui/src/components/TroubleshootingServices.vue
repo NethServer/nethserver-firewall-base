@@ -732,6 +732,38 @@
         </div>
       </div>
       <!-- END PING CHART -->
+      <!-- PING DROPRATE -->
+      <div class="col-md-6">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <div
+            v-if="!view.isChartLoaded"
+            class="spinner spinner-lg view-spinner  mg-top-20"
+          ></div>
+          <div class="card-pf-body">
+            <div
+              v-if="view.invalidChartsPingDroprateData"
+              class="alert alert-warning alert-dismissable col-sm-12"
+            >
+              <span class="pficon pficon-warning-triangle-o"></span>
+              <strong>{{ $t("warning") }}!</strong>
+              {{ $t("troubleshooting.ping_droprate_charts_not_updated") }}.
+            </div>
+            <div v-if="view.isChartLoaded">
+              <div v-for="(data, index) in charts" :key="index">
+                <h4 class="mg-top">
+                  {{ $t("troubleshooting.ping_droprate") }}: {{ index }}
+                </h4>
+                <div
+                  :id="'ping-droprate-legend-' + index"
+                  class="troubleshooting-chart-legend"
+                ></div>
+                <div :id="'chart-ping-droprate-' + index" class="chart-ping"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PING DROPRATE -->
     </div>
 
     <!-- ntopng modal -->
@@ -959,6 +991,7 @@ export default {
       view: {
         isChartLoaded: false,
         invalidChartsPingData: false,
+        invalidChartsPingDroprateData: false,
 
         internet: { status: "disabled", isLoaded: false },
         shorewall: { status: "disabled", isLoaded: false },
@@ -984,6 +1017,7 @@ export default {
       },
       charts: {},
       pingChartInterval: null,
+      pingDroprateChartInterval: null,
     };
   },
   created() {
@@ -997,6 +1031,11 @@ export default {
     context.updatePingChart();
     context.pingChartInterval = setInterval(function() {
       context.updatePingChart();
+    }, 5000);
+
+    context.updatePingDroprateChart();
+    context.pingDroprateChartInterval = setInterval(function() {
+      context.updatePingDroprateChart();
     }, 5000);
 
     const services = [
@@ -1028,6 +1067,7 @@ export default {
 
     $(".modal").modal("hide");
     clearInterval(this.pingChartInterval);
+    clearInterval(this.pingDroprateChartInterval);
   },
   methods: {
     getServiceStatus(service) {
@@ -1103,6 +1143,66 @@ export default {
                   labelsDiv: document.getElementById("ping-legend-" + ip),
                   labelsSeparateLines: true,
                   drawGrid: false,
+                }
+              );
+              g.initialData = chart.data;
+            }
+          });
+        },
+        function(error) {
+          console.error(error);
+          context.view.isChartLoaded = true;
+        }
+      );
+    },
+    updatePingDroprateChart() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/troubleshooting/read"],
+        { action: "ping-droprate", time: 900 },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.charts = success;
+          context.view.invalidChartsPingDroprateData = false;
+          context.view.isChartLoaded = true;
+          context.$nextTick(function() {
+            for (const ip in context.charts) {
+              var chart = context.charts[ip];
+
+              for (var t in chart.data) {
+                chart.data[t][0] = new Date(chart.data[t][0]);
+              }
+
+              const i18nLabels = chart.labels.map((label) =>
+                context.$i18n.t("troubleshooting." + label)
+              );
+
+              var g = new Dygraph(
+                document.getElementById("chart-ping-droprate-" + ip),
+                chart.data,
+                {
+                  fillGraph: true,
+                  stackedGraph: true,
+                  labels: i18nLabels,
+                  height: 150,
+                  strokeWidth: 1,
+                  strokeBorderWidth: 1,
+                  ylabel: context.$i18n.t("troubleshooting.droprate_perc"),
+                  axisLineColor: "white",
+                  labelsDiv: document.getElementById("ping-droprate-legend-" + ip),
+                  labelsSeparateLines: true,
+                  drawGrid: false,
+                  axes : {
+                    y : {
+                      axisLabelFormatter: function(y) { return (y * 100).toFixed(0) + '%' },
+                      valueFormatter: function(y) { return (y * 100).toFixed(0) + '%' },
+                    }
+                  }
                 }
               );
               g.initialData = chart.data;
