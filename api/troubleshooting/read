@@ -335,4 +335,15 @@ if ($cmd eq 'ping') {
     system('echo \'{"action":"traffic-by-interface"}\' | /usr/libexec/nethserver/api/nethserver-ntopng/dashboard/read')
 } elsif ($cmd eq 'wan-providers') {
     system('echo \'{"action": "providers"}\' | /usr/libexec/nethserver/api/nethserver-firewall-base/wan/read');
+} elsif ($cmd eq 'host-list') {
+    my @hosts;
+    open(my $fh, '-|', 'LANG=C /usr/sbin/arp -a');
+    while (my $line = <$fh>) {
+        #next if $line =~ m/^Address/;
+        my @fields = split(/\s+/, $line);
+        my $host = ($fields[0] eq '?') ? substr($fields[1], 1, -1) : $fields[0];
+        push(@hosts, {'host' => $host , 'ip' => substr($fields[1], 1, -1), 'mac' => $fields[3], 'interface' => $fields[6]});
+    }
+    close($fh);
+    print(encode_json(\@hosts));
 }
