@@ -807,6 +807,22 @@ sub getRules
     return sort _sort_by_position @list; # ascending sort
 }
 
+=head2 getSeparator
+
+Return the separator list ordered by Position property (ascending order).
+Each record has all database properties.
+
+=cut
+sub getSeparator
+{
+    my $self = shift;
+    my @list;
+    foreach ($self->{'fdb'}->get_all_by_prop('type' => 'separator')) {
+        push(@list,$_);
+    }
+    return sort _sort_by_position @list; # ascending sort
+}
+
 =head2 getTcRules
 
 Return the tc rule list ordered by Position property (ascending order).

@@ -303,6 +303,7 @@ sub list_fw_rules
     my $skip_local = shift;
     my $fw = new NethServer::Firewall();
     my @rules;
+    my @separators;
     my $i = 1;
     my $max_pos = 0;
     my $nextID = 0;
@@ -329,8 +330,26 @@ sub list_fw_rules
         push(@rules, \%props);
         $i++;
     }
+    foreach ($fw->getSeparator()) {
+        my %props = $_->props;
+        if ($skip_local) {
+            # skip rule to/from the firewall
+            next if ($props{'Dst'} eq 'fw');
+        } else {
+            # skip rule not for the firewall itself
+            next if ($props{'Dst'} ne 'fw');
+        }
+        $props{'id'} = $_->key;
+        $props{'Position'} = int($props{'Position'});
+        $nextID =`/usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-next-id`;
+        push(@separators, \%props);
+        $i++;
+    }
 
-    return {"status" => {"count" => scalar(@rules), "next" => $max_pos+1, "nextID" => $nextID }, "rules" => \@rules};
+    push (@rules, @separators);
+    my @sorted = sort { $a->{'Position'} <=> $b->{'Position'} } @rules;
+
+    return {"status" => {"count" => scalar(@rules), "next" => $max_pos+1, "nextID" => $nextID }, "rules" => \@sorted};
 }
 
 sub list_policies
