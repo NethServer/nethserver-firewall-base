@@ -1,6 +1,7 @@
 <template>
   <div class="container-fluid container-cards-pf">
-    <div class="row row-cards-pf mg-top-20">
+    <h3>{{ $t("troubleshooting.status") }}</h3>
+    <div class="row row-cards-pf">
       <!-- MULTIWAN -->
       <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
@@ -70,9 +71,7 @@
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-network"></span>
-            <span class="red"
-              >{{ iface.name }} ({{ iface.provider.name }})</span
-            >
+            <span>{{ iface.name }} ({{ iface.provider.name }})</span>
           </h2>
           <div class="card-pf-body mg-top-20">
             <div class="table-wrapper card-pf-aggregate-status-notifications">
@@ -93,7 +92,7 @@
                     <span v-if="wanProviders.status[iface.provider.name] == 1">
                       {{ $t("troubleshooting.up") }}
                     </span>
-                    <span v-else>{{ $t("troubleshooting.Down") }}</span>
+                    <span v-else>{{ $t("troubleshooting.down") }}</span>
                   </div>
                 </div>
                 <!-- nslabel -->
@@ -189,10 +188,57 @@
       </div>
       <!-- END RED INTERFACES -->
     </div>
+    <h3>{{ $t("troubleshooting.traffic") }}</h3>
+    <div class="row row-cards-pf">
+      <!-- TRAFFIC CHARTS -->
+      <div v-if="!isLoaded.wanProviders" class="col-sm-4 col-md-3">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <h2 class="card-pf-title mg-top-20"></h2>
+          <div class="card-pf-body">
+            <div class="spinner spinner-lg view-spinner"></div>
+          </div>
+        </div>
+      </div>
+      <div
+        v-else
+        v-for="(iface, index) in wanProviders.configuration.interfaces"
+        :key="index"
+        class="col-md-6"
+      >
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <h2 class="card-pf-title">
+            <span>{{ iface.name }} ({{ iface.provider.name }})</span>
+          </h2>
+          <div class="card-pf-body">
+            <div v-if="!trafficCharts[iface.name]">
+              <div class="spinner spinner-lg view-spinner"></div>
+            </div>
+            <div v-else>
+              <div
+                v-for="(data, index) in trafficCharts[iface.name]"
+                :key="index"
+              >
+                <div
+                  :id="'traffic-legend-' + iface.name"
+                  class="troubleshooting-chart-legend"
+                ></div>
+                <div
+                  :id="'traffic-chart-' + iface.name"
+                  class="traffic-chart"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END TRAFFIC CHARTS -->
+    </div>
   </div>
 </template>
 
 <script>
+import Dygraph from "dygraphs";
+
 export default {
   name: "WANs",
   data() {
@@ -201,22 +247,19 @@ export default {
         multiwan: { status: "disabled", isLoaded: false },
       },
       wanProviders: null,
+      redInterfaces: [],
+      trafficCharts: {},
       isLoaded: {
         wanProviders: false,
       },
     };
   },
   created() {
-    console.log("wans created"); ////
-
     this.getServiceStatus("multiwan");
     this.getWanProviders();
   },
-  mounted() {
-    console.log("wans mounted"); ////
-  },
   beforeDestroy() {
-    console.log("wans beforeDestroy"); ////
+    clearInterval(this.trafficChartsInterval);
   },
   methods: {
     getServiceStatus(service) {
@@ -235,8 +278,6 @@ export default {
           context["view"][service]["status"] = success.status;
           if ("details" in success) {
             context["view"][service]["details"] = success.details;
-
-            console.log(service, "details", success.details); ////
           }
         },
         function(error) {
@@ -259,8 +300,11 @@ export default {
           }
           context.isLoaded.wanProviders = true;
           context.wanProviders = success;
+          context.updateTrafficCharts();
 
-          console.log("wan providers", context.wanProviders); ////
+          context.trafficChartsInterval = setInterval(function() {
+            context.updateTrafficCharts();
+          }, 5000);
 
           setTimeout(function() {
             $('[data-toggle="tooltip"]').tooltip();
@@ -271,12 +315,66 @@ export default {
         }
       );
     },
+    updateTrafficCharts() {
+      var context = this;
+      for (const iface of context.wanProviders.configuration.interfaces) {
+        nethserver.exec(
+          ["nethserver-firewall-base/troubleshooting/read"],
+          { action: "interface", interface: iface.name },
+          null,
+          function(success) {
+            try {
+              success = JSON.parse(success);
+            } catch (e) {
+              console.error(e);
+            }
+            const chart = success;
+
+            // needed for reactivity (see https://vuejs.org/v2/guide/reactivity.html#For-Objects)
+            context.$set(context.trafficCharts, iface.name, chart);
+
+            context.$nextTick(function() {
+              for (var t in chart.data) {
+                chart.data[t][0] = new Date(chart.data[t][0]);
+              }
+
+              const i18nLabels = chart.labels.map((label) =>
+                context.$i18n.t("troubleshooting." + label)
+              );
+
+              var g = new Dygraph(
+                document.getElementById("traffic-chart-" + iface.name),
+                chart.data,
+                {
+                  fillGraph: true,
+                  stackedGraph: true,
+                  labels: i18nLabels,
+                  height: 150,
+                  strokeWidth: 1,
+                  strokeBorderWidth: 1,
+                  ylabel: context.$i18n.t("troubleshooting.traffic_mbps"),
+                  axisLineColor: "white",
+                  labelsDiv: document.getElementById(
+                    "traffic-legend-" + iface.name
+                  ),
+                  labelsSeparateLines: true,
+                  drawGrid: false,
+                }
+              );
+              g.initialData = chart.data;
+            });
+          },
+          function(error) {
+            console.error(error);
+          }
+        );
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
-/* //// copy services and wans common styles to App.vue */
 .card-pf-aggregate-status .card-pf-title {
   padding-left: 20px;
   padding-right: 20px;
@@ -289,7 +387,6 @@ export default {
 .container-fluid.container-cards-pf {
   margin-left: auto !important;
 }
-/* //// END COMMON STYLES  */
 
 .red {
   color: #cc0000;
@@ -335,5 +432,11 @@ export default {
   margin-bottom: 10px;
   position: relative;
   top: 2px;
+}
+
+.traffic-chart {
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-bottom: 20px;
 }
 </style>

@@ -1069,7 +1069,7 @@ export default {
     context.updatePingChart();
     context.pingChartInterval = setInterval(function() {
       context.updatePingChart();
-    }, 10000);
+    }, 5000);
 
     context.updatePingDroprateChart();
     context.pingDroprateChartInterval = setInterval(function() {

@@ -121,8 +121,8 @@ sub fetch_interface_rrd {
             next unless ($time =~ m/\d/ && $rcvd =~ m/\d/ && $sent =~ m/\d/);
             # make sure to output a numeric value
             $time = $time*1000;
-            $rcvd = $rcvd*1;
-            $sent = $sent*1;
+            $rcvd = $rcvd/1000;
+            $sent = $sent/1000;
             push(@ret, [$time, $rcvd, $sent]);
         }
     }

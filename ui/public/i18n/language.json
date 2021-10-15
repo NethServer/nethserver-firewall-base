@@ -565,7 +565,10 @@
         "gateway": "Gateway",
         "weight": "Weight",
         "download_bandwidth": "Download bandwidth",
-        "upload_bandwidth": "Upload bandwidth"
+        "upload_bandwidth": "Upload bandwidth",
+        "status": "Status",
+        "traffic": "Traffic",
+        "rcvd_bytes": "Received"
     },
     "about": {
         "title": "About",
