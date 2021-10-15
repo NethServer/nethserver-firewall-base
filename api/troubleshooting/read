@@ -130,6 +130,36 @@ sub fetch_interface_rrd {
     return @ret;
 }
 
+sub fetch_wan_rrd {
+    my $provider = shift;
+    my $ip = shift;
+    my $cdb = shift;
+    my $time = shift;
+    my @ret;
+    my $systemname = $cdb->get_value('SystemName');
+    my $domainname = $cdb->get_value('DomainName');
+    my $path = "/var/lib/collectd/rrd/$systemname.$domainname/table-wan/ping-_".$provider."_".$ip."_rtt.value.rrd";
+    if (! -f $path) {
+        return @ret;
+    }
+    open(FH, "rrdtool fetch $path AVERAGE -s e-$time|");
+    while (<FH>) {
+    chomp;
+    my @lines = split("\r\n");
+        foreach my $line (@lines) {
+            my ($time, $value) = split(":", $line);
+            next unless ($time =~ m/\d/ && $value =~ m/\d/);
+            # make sure to output a numeric value
+            $time = $time*1000;
+            $value = $value*1;
+            push(@ret, [$time, $value]);
+        }
+    }
+    close(FH);
+    return @ret;
+}
+
+
 sub ping_chart {
     my $file_prefix = shift;
     my $ylabel = shift;
@@ -163,6 +193,19 @@ if ($cmd eq 'ping') {
     my $interface = $input->{'interface'};
     my @data = fetch_interface_rrd($interface, $cdb, 3600);
     print encode_json({labels => [ 'time', 'rcvd_bytes', 'sent_bytes' ], data => \@data});
+} elsif ($cmd eq 'wan-ping') {
+    my $ret = {};
+    my @ips = split(',', $cdb->get_prop('firewall', 'CheckIP'));
+    foreach my $p ($ndb->get_all_by_prop('type' => 'provider')) {
+        foreach my $ip (@ips) {
+            my @data = fetch_wan_rrd($p->key, $ip, $cdb, 3600);
+            if (@data) {
+                $ret->{$p->key}->{$ip}->{'labels'} = ["time", "latency"];
+                $ret->{$p->key}->{$ip}->{'data'} = \@data;
+            }
+        }
+   }
+   print encode_json($ret);
 } elsif ($cmd eq 'service') {
 
     my $service = $input->{'service'};
