@@ -1069,17 +1069,17 @@ export default {
     context.updatePingChart();
     context.pingChartInterval = setInterval(function() {
       context.updatePingChart();
-    }, 5000);
+    }, 30000);
 
     context.updatePingDroprateChart();
     context.pingDroprateChartInterval = setInterval(function() {
       context.updatePingDroprateChart();
-    }, 5000);
+    }, 30000);
 
     context.updateTrafficByInterfaceChart();
     context.trafficByInterfaceChartInterval = setInterval(function() {
       context.updateTrafficByInterfaceChart();
-    }, 5000);
+    }, 30000);
 
     const services = [
       "internet",
@@ -1186,7 +1186,12 @@ export default {
                   axisLineColor: "white",
                   labelsDiv: document.getElementById("ping-legend-" + ip),
                   labelsSeparateLines: true,
-                  drawGrid: false,
+                  drawGrid: true,
+                  axes : {
+                    y : {
+                      valueFormatter: function(y) { return (y * 100).toFixed(0) + ' ms' },
+                    }
+                  }
                 }
               );
               g.initialData = chart.data;
@@ -1240,7 +1245,7 @@ export default {
                   axisLineColor: "white",
                   labelsDiv: document.getElementById("ping-droprate-legend-" + ip),
                   labelsSeparateLines: true,
-                  drawGrid: false,
+                  drawGrid: true,
                   axes : {
                     y : {
                       axisLabelFormatter: function(y) { return (y * 100).toFixed(0) + '%' },
@@ -1311,16 +1316,14 @@ export default {
                   height: 150,
                   strokeWidth: 1,
                   strokeBorderWidth: 1,
-                  ylabel: context.$i18n.t("troubleshooting.traffic_kbps"),
+                  ylabel: context.$i18n.t("troubleshooting.traffic_mbps"),
                   axisLineColor: "white",
                   labelsDiv: document.getElementById("traffic-by-interface-legend"),
                   labelsSeparateLines: true,
-                  drawGrid: false,
+                  drawGrid: true,
                   axes: {
                     y: {
-                      axisLabelFormatter: function(y) {
-                        return Math.ceil(y);
-                      }
+                      valueFormatter: function(y) { return (y / 1000).toFixed(2) + " mbit/s" },
                     }
                   }
                 }
@@ -1346,8 +1349,8 @@ export default {
     zeroFillTrafficByInterfaceChart(startTime) {
       let time = startTime;
 
-      for (let i = 0; i < 60; i++) {
-        time -= 5000 / 1000;
+      for (let i = 0; i < 2880; i++) {
+        time -= 30000 / 1000;
         let zeroSample = [new Date(time * 1000)];
 
         for (let j = 1; j < this.charts.traffic.initialData.labels.length; j++) {

@@ -163,7 +163,7 @@ sub fetch_wan_rrd {
 sub ping_chart {
     my $file_prefix = shift;
     my $ylabel = shift;
-    my $time = 3600;
+    my $time = 86400;
     my $ret;
     # collectd keeps track of the first DNS
     my @dns = split(',',$cdb->get_prop('dns', 'NameServers'));

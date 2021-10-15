@@ -259,7 +259,7 @@ export default {
             context.chartsInterval = setInterval(function() {
               context.getTopLocalHosts();
               context.getTopRemoteHosts();
-            }, 10000);
+            }, 30000);
           }
         },
         function(error) {
@@ -361,7 +361,12 @@ export default {
                 labelsDiv: document.getElementById("host-traffic-legend"),
                 axisLineColor: "white",
                 labelsSeparateLines: true,
-                drawGrid: false,
+                drawGrid: true,
+                axes: {
+                  y: {
+                    valueFormatter: function(y) { return y.toFixed(2) + " mbit/s" },
+                  }
+                }
               }
             );
             g.initialData = chart.data;
