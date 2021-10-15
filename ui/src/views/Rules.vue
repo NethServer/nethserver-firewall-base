@@ -55,18 +55,18 @@
         v-sortable="{onEnd: reorder, handle: '.drag-here'}"
         class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10"
       >
-        <li
+        <li 
           :class="[r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
           v-for="(r,k) in filteredRules"
           v-bind:key="k"
         >
-          <div class="drag-size">
+          <div v-if="r.type === 'rule'" class="drag-size">
             <span class="gray mg-right-5">{{r.id}}</span>
           </div>
-          <div v-show="searchString.length == 0" class="list-view-pf-checkbox drag-here">
+          <div v-if="r.type === 'rule'" v-show="searchString.length == 0" class="list-view-pf-checkbox drag-here">
             <span class="fa fa-bars"></span>
           </div>
-          <div class="list-view-pf-actions">
+          <div v-if="r.type === 'rule'" class="list-view-pf-actions">
             <button
               @click="r.status == 'disabled' ? toggleEnableRule(r) : openEditRule(r, false)"
               :class="['btn btn-default', r.status == 'disabled' ? 'btn-primary' : '']"
@@ -112,7 +112,7 @@
               </ul>
             </div>
           </div>
-          <div class="list-view-pf-main-info small-list">
+          <div v-if="r.type === 'rule'" class="list-view-pf-main-info small-list">
             <div class="list-view-pf-left">
               <span
                 data-toggle="tooltip"
@@ -215,6 +215,165 @@
                   <span class="fa fa-clock-o"></span>
                   <strong>{{r.Time && r.Time.name}}</strong>
                 </div>
+                <div class="list-view-pf-additional-info-item">{{r.Description}}</div>
+              </div>
+            </div>
+          </div>
+          <div v-if="r.type === 'separator'" class="drag-size">
+            <span class="gray mg-right-5">{{r.id}}</span>
+          </div>
+          <div v-if="r.type === 'separator'" v-show="searchString.length == 0" class="list-view-pf-checkbox drag-here">
+            <span class="fa fa-bars"></span>
+          </div>
+          <div v-if="r.type === 'separator'" class="list-view-pf-actions">
+            <!-- <button
+              @click="r.status == 'disabled' ? toggleEnableRule(r) : openEditRule(r, false)"
+              :class="['btn btn-default', r.status == 'disabled' ? 'btn-primary' : '']"
+            >
+              <span
+                :class="['fa', r.status == 'disabled' ? 'fa-check' : 'fa-edit', 'span-right-margin']"
+              ></span>
+              {{r.status == 'disabled' ? $t('enable') : $t('edit')}}
+            </button> -->
+            <div class="dropup pull-right dropdown-kebab-pf">
+              <button
+                class="btn btn-link dropdown-toggle"
+                type="button"
+                id="dropdownKebabRight9"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="true"
+              >
+                <span class="fa fa-ellipsis-v"></span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownKebabRight9">
+                <!-- <li>
+                  <a @click="r.status == 'enabled' ? toggleEnableRule(r) : openEditRule(r, false)">
+                    <span
+                      :class="['fa', r.status == 'enabled' ? 'fa-lock' : 'fa-edit', 'span-right-margin']"
+                    ></span>
+                    {{r.status == 'enabled' ? $t('disable') : $t('edit')}}
+                  </a>
+                </li> -->
+                <!-- <li @click="openEditRule(r, true)">
+                  <a>
+                    <span class="fa fa-clone span-right-margin"></span>
+                    {{$t('rules.duplicate')}}
+                  </a>
+                </li>
+                <li role="separator" class="divider"></li> -->
+                <li @click="openDeleteRule(r)">
+                  <a>
+                    <span class="fa fa-times span-right-margin"></span>
+                    {{$t('delete')}}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div v-if="r.type === 'separator'" class="list-view-pf-main-info small-list">
+            <div class="list-view-pf-left">
+              <!-- <span
+                data-toggle="tooltip"
+                data-placement="top"
+                data-html="true"
+                :title="mapTitleAction(r)"
+                :class="[mapIcon(r.Action, r.status), 'list-view-pf-icon-sm']"
+              ></span>
+              <span
+                data-toggle="tooltip"
+                data-placement="top"
+                data-html="true"
+                :title="$t('rules.log_enabled')"
+                v-show="r.Log"
+                class="fa fa-bookmark-o log-icon"
+              ></span>
+              <span
+                data-toggle="tooltip"
+                data-placement="top"
+                data-html="true"
+                :title="$t('rules.state_enabled')"
+                v-show="r.State"
+                class="pficon pficon-security pf-orange state-icon"
+              ></span> -->
+            </div>
+            <div class="list-view-pf-body">
+              <div class="list-view-pf-description rules-src-dst">
+                <div class="list-group-item-heading">
+                  <!-- <span
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    data-html="true"
+                    :title="mapTitleSrc(r)"
+                    class="handle-overflow"
+                  >
+                    <span :class="mapObjectIcon(r.Src, r.status)"></span>
+                    <span
+                      :class="[r.status == 'disabled' ? 'gray' : r.Src.name.toLowerCase(),'mg-left-5']"
+                    >
+                      <span
+                        v-show="r.Src.type == 'raw'"
+                        class="pficon pficon-warning-triangle-o mg-right-5"
+                      ></span>
+                      {{r.Src.type == 'fw' || r.Src.type == 'role' || r.Src.type == 'any' ? (r.Src.name.toUpperCase()): r.Src.name}}
+                      <a
+                        v-show="r.Src.type == 'raw'"
+                        @click="openCreateObject(r.Src)"
+                      >{{$t('create')}} {{$t('objects.'+r.Src.object)}}</a>
+                    </span>
+                  </span>
+                </div> -->
+                <div class="list-group-item-text">
+                  <!-- <span :class="[mapArrow(r.Action), 'mg-right-10 big-icon']"></span>
+                  <span
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    data-html="true"
+                    :title="mapTitleDst(r)"
+                    class="handle-overflow"
+                  >
+                    <span :class="mapObjectIcon(r.Dst, r.status)"></span>
+                    <span
+                      :class="[r.status == 'disabled' ? 'gray' : r.Dst.name.toLowerCase(),'mg-left-5']"
+                    >
+                      <span
+                        v-show="r.Dst.type == 'raw'"
+                        class="pficon pficon-warning-triangle-o mg-right-5"
+                      ></span>
+                      {{r.Dst.type == 'fw' || r.Dst.type == 'role' || r.Dst.type == 'any' ? (r.Dst.name.toUpperCase()): r.Dst.name}}
+                      <a
+                        v-show="r.Dst.type == 'raw'"
+                        @click="openCreateObject(r.Dst)"
+                      >{{$t('create')}} {{$t('objects.'+r.Dst.object)}}</a>
+                    </span>
+                  </span> -->
+                </div>
+              </div>
+              <div class="list-view-pf-additional-info rules-info">
+                <!-- <div
+                  v-show="r.Service"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  data-html="true"
+                  :title="mapTitleService(r)"
+                  class="list-view-pf-additional-info-item"
+                >
+                  <span
+                    :class="['fa', r.Service && r.Service.type == 'application' ? r.Service.icon : 'fa-cogs']"
+                  ></span>
+                  <strong>{{r.Service && r.Service.name}}</strong>
+                </div>
+                <div
+                  v-show="r.Time"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  data-html="true"
+                  :title="mapTitleTime(r)"
+                  class="list-view-pf-additional-info-item"
+                >
+                  <span class="fa fa-clock-o"></span>
+                  <strong>{{r.Time && r.Time.name}}</strong>
+                </div> -->
                 <div class="list-view-pf-additional-info-item">{{r.Description}}</div>
               </div>
             </div>
