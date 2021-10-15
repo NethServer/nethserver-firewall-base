@@ -358,7 +358,7 @@ export default {
                     "traffic-legend-" + iface.name
                   ),
                   labelsSeparateLines: true,
-                  drawGrid: false,
+                  drawGrid: true,
                 }
               );
               g.initialData = chart.data;
