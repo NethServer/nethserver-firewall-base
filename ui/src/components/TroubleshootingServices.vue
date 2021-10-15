@@ -476,7 +476,7 @@
                   class="fa fa-ban gray"
                 ></span>
                 <span
-                  v-if="view.fail2ban.status == 'enabled'"
+                  v-if="view.fail2ban.status == 'running'"
                   class="pficon pficon-ok"
                 ></span>
               </span>
