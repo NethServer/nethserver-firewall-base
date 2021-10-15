@@ -385,7 +385,7 @@ if ($cmd eq 'ping') {
         #next if $line =~ m/^Address/;
         my @fields = split(/\s+/, $line);
         my $host = ($fields[0] eq '?') ? substr($fields[1], 1, -1) : $fields[0];
-        push(@hosts, {'host' => $host , 'ip' => substr($fields[1], 1, -1), 'mac' => $fields[3], 'interface' => $fields[6]});
+        push(@hosts, {'name' => $host , 'ip' => substr($fields[1], 1, -1), 'mac' => $fields[3], 'interface' => $fields[6]});
     }
     close($fh);
     print(encode_json(\@hosts));

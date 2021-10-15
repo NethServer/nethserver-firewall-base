@@ -11,123 +11,190 @@
         </h4>
       </div>
     </div>
-    <div v-else class="row">
-      <!-- top local hosts -->
-      <div class="col-md-6">
-        <h3>{{ $t("troubleshooting.top_local_hosts") }}</h3>
-        <div class="host-table">
-          <div
-            v-if="!isLoaded.topLocalHosts"
-            class="spinner spinner-lg mg-top-20"
-          ></div>
-          <div v-else-if="!topLocalHosts.length">
-            <div class="blank-slate-pf">
-              <div class="blank-slate-pf-icon">
-                <span class="fa fa-table"></span>
+    <div v-else>
+      <div class="row">
+        <!-- top local hosts -->
+        <div class="col-md-6">
+          <h3 class="no-mg-top">{{ $t("troubleshooting.top_local_hosts") }}</h3>
+          <div class="host-table">
+            <div
+              v-if="!isLoaded.topLocalHosts"
+              class="spinner spinner-lg mg-top-20"
+            ></div>
+            <div v-else-if="!topLocalHosts.length">
+              <div class="blank-slate-pf">
+                <div class="blank-slate-pf-icon">
+                  <span class="fa fa-table"></span>
+                </div>
+                <h4 class="chart-title gray">
+                  {{ $t("troubleshooting.no_data") }}
+                </h4>
               </div>
-              <h4 class="chart-title gray">
-                {{ $t("troubleshooting.no_data") }}
-              </h4>
+            </div>
+            <div v-else>
+              <vue-good-table
+                v-show="isLoaded.topLocalHosts"
+                :columns="topHostsColumns"
+                :rows="topLocalHosts"
+                :lineNumbers="false"
+                :sort-options="{
+                  enabled: true,
+                  initialSortBy: { field: 'throughput', type: 'desc' },
+                }"
+                :search-options="{
+                  enabled: false,
+                }"
+                :pagination-options="{
+                  enabled: false,
+                }"
+                styleClass="table responsive vgt2"
+              >
+                <template slot="table-row" slot-scope="props">
+                  <span
+                    v-if="props.column.field == 'name'"
+                    class="hostname-column"
+                  >
+                    <span class="semi-bold" :title="props.row.name">
+                      <a @click="showHostModal(props.row)">{{
+                        props.row.name
+                      }}</a></span
+                    >
+                  </span>
+                  <span v-else-if="props.column.field == 'ip'">
+                    <span>{{ props.row.ip }}</span>
+                  </span>
+                  <span v-else-if="props.column.field == 'throughput'">
+                    <span class="semi-bold">{{
+                      props.row.throughput | bpsFormat
+                    }}</span>
+                  </span>
+                </template>
+              </vue-good-table>
             </div>
           </div>
-          <div v-else>
-            <vue-good-table
-              v-show="isLoaded.topLocalHosts"
-              :columns="columns"
-              :rows="topLocalHosts"
-              :lineNumbers="false"
-              :sort-options="{
-                enabled: true,
-                initialSortBy: { field: 'throughput', type: 'desc' },
-              }"
-              :search-options="{
-                enabled: false,
-              }"
-              :pagination-options="{
-                enabled: false,
-              }"
-              styleClass="table responsive vgt2"
-            >
-              <template slot="table-row" slot-scope="props">
-                <span
-                  v-if="props.column.field == 'name'"
-                  class="hostname-column"
-                >
-                  <span class="semi-bold" :title="props.row.name">
-                    <a @click="showHostModal(props.row)">{{
-                      props.row.name
-                    }}</a></span
+        </div>
+
+        <!-- top remote hosts -->
+        <div class="col-md-6">
+          <h3 class="no-mg-top">
+            {{ $t("troubleshooting.top_remote_hosts") }}
+          </h3>
+          <div class="host-table">
+            <div
+              v-if="!isLoaded.topRemoteHosts"
+              class="spinner spinner-lg mg-top-20"
+            ></div>
+            <div v-else-if="!topRemoteHosts.length">
+              <div class="blank-slate-pf">
+                <div class="blank-slate-pf-icon">
+                  <span class="fa fa-table"></span>
+                </div>
+                <h4 class="chart-title gray">
+                  {{ $t("troubleshooting.no_data") }}
+                </h4>
+              </div>
+            </div>
+            <div v-else>
+              <vue-good-table
+                v-show="isLoaded.topRemoteHosts"
+                :columns="topHostsColumns"
+                :rows="topRemoteHosts"
+                :lineNumbers="false"
+                :sort-options="{
+                  enabled: true,
+                  initialSortBy: { field: 'throughput', type: 'desc' },
+                }"
+                :search-options="{
+                  enabled: false,
+                }"
+                :pagination-options="{
+                  enabled: false,
+                }"
+                styleClass="table responsive vgt2"
+              >
+                <template slot="table-row" slot-scope="props">
+                  <span
+                    v-if="props.column.field == 'name'"
+                    class="hostname-column"
                   >
-                </span>
-                <span v-else-if="props.column.field == 'ip'">
-                  <span>{{ props.row.ip }}</span>
-                </span>
-                <span v-else-if="props.column.field == 'throughput'">
-                  <span class="semi-bold">{{
-                    props.row.throughput | bpsFormat
-                  }}</span>
-                </span>
-              </template>
-            </vue-good-table>
+                    <span class="semi-bold" :title="props.row.name">{{
+                      props.row.name
+                    }}</span>
+                  </span>
+                  <span v-else-if="props.column.field == 'ip'">
+                    <span>{{ props.row.ip }}</span>
+                  </span>
+                  <span v-else-if="props.column.field == 'throughput'">
+                    <span class="semi-bold">{{
+                      props.row.throughput | bpsFormat
+                    }}</span>
+                  </span>
+                </template>
+              </vue-good-table>
+            </div>
           </div>
         </div>
       </div>
-
-      <!-- top remote hosts -->
-      <div class="col-md-6">
-        <h3>{{ $t("troubleshooting.top_remote_hosts") }}</h3>
-        <div class="host-table">
-          <div
-            v-if="!isLoaded.topRemoteHosts"
-            class="spinner spinner-lg mg-top-20"
-          ></div>
-          <div v-else-if="!topRemoteHosts.length">
-            <div class="blank-slate-pf">
-              <div class="blank-slate-pf-icon">
-                <span class="fa fa-table"></span>
+      <div class="row">
+        <!-- known hosts -->
+        <div class="col-md-12">
+          <h3>{{ $t("troubleshooting.known_hosts") }}</h3>
+          <div class="host-table">
+            <div
+              v-if="!isLoaded.knownHosts"
+              class="spinner spinner-lg mg-top-20"
+            ></div>
+            <div v-else-if="!knownHosts.length">
+              <div class="blank-slate-pf">
+                <div class="blank-slate-pf-icon">
+                  <span class="fa fa-table"></span>
+                </div>
+                <h4 class="chart-title gray">
+                  {{ $t("troubleshooting.no_data") }}
+                </h4>
               </div>
-              <h4 class="chart-title gray">
-                {{ $t("troubleshooting.no_data") }}
-              </h4>
             </div>
-          </div>
-          <div v-else>
-            <vue-good-table
-              v-show="isLoaded.topRemoteHosts"
-              :columns="columns"
-              :rows="topRemoteHosts"
-              :lineNumbers="false"
-              :sort-options="{
-                enabled: true,
-                initialSortBy: { field: 'throughput', type: 'desc' },
-              }"
-              :search-options="{
-                enabled: false,
-              }"
-              :pagination-options="{
-                enabled: false,
-              }"
-              styleClass="table responsive vgt2"
-            >
-              <template slot="table-row" slot-scope="props">
-                <span
-                  v-if="props.column.field == 'name'"
-                  class="hostname-column"
-                >
-                  <span class="semi-bold" :title="props.row.name">{{
-                    props.row.name
-                  }}</span>
-                </span>
-                <span v-else-if="props.column.field == 'ip'">
-                  <span>{{ props.row.ip }}</span>
-                </span>
-                <span v-else-if="props.column.field == 'throughput'">
-                  <span class="semi-bold">{{
-                    props.row.throughput | bpsFormat
-                  }}</span>
-                </span>
-              </template>
-            </vue-good-table>
+            <div v-else>
+              <vue-good-table
+                v-show="isLoaded.knownHosts"
+                :columns="knownHostsColumns"
+                :rows="knownHosts"
+                :lineNumbers="false"
+                :sort-options="{
+                  enabled: true,
+                  initialSortBy: { field: 'name', type: 'asc' },
+                }"
+                :search-options="{
+                  enabled: false,
+                }"
+                :pagination-options="{
+                  enabled: false,
+                }"
+                styleClass="table responsive vgt2"
+              >
+                <template slot="table-row" slot-scope="props">
+                  <span
+                    v-if="props.column.field == 'name'"
+                    class="hostname-column"
+                  >
+                    <span class="semi-bold" :title="props.row.name">
+                      <a @click="showHostModal(props.row)">{{
+                        props.row.name
+                      }}</a></span
+                    >
+                  </span>
+                  <span v-else-if="props.column.field == 'ip'">
+                    <span>{{ props.row.ip }}</span>
+                  </span>
+                  <span v-else-if="props.column.field == 'mac'">
+                    <span class="semi-bold">{{ props.row.mac }}</span>
+                  </span>
+                  <span v-else-if="props.column.field == 'interface'">
+                    <span class="semi-bold">{{ props.row.interface }}</span>
+                  </span>
+                </template>
+              </vue-good-table>
+            </div>
           </div>
         </div>
       </div>
@@ -197,7 +264,8 @@ export default {
       chartsInterval: null,
       currentHost: null,
       hostTraffic: null,
-      columns: [
+      knownHosts: [],
+      topHostsColumns: [
         {
           label: this.$i18n.t("troubleshooting.name"),
           field: "name",
@@ -215,24 +283,41 @@ export default {
           sortable: true,
         },
       ],
+      knownHostsColumns: [
+        {
+          label: this.$i18n.t("troubleshooting.name"),
+          field: "name",
+          sortable: true,
+        },
+        {
+          label: this.$i18n.t("troubleshooting.ip_address"),
+          field: "ip",
+          sortable: true,
+        },
+        {
+          label: this.$i18n.t("troubleshooting.mac_address"),
+          field: "mac",
+          sortable: true,
+        },
+        {
+          label: this.$i18n.t("troubleshooting.interface"),
+          field: "interface",
+          sortable: true,
+        },
+      ],
       isLoaded: {
         ntopngStatus: false,
         topLocalHosts: false,
         topRemoteHosts: false,
         hostTraffic: false,
+        knownHosts: false,
       },
     };
   },
   created() {
-    console.log("hosts created"); ////
     this.getNtopngStatus();
   },
-  mounted() {
-    console.log("hosts mounted"); ////
-  },
   beforeDestroy() {
-    console.log("hosts beforeDestroy"); ////
-
     $(".modal").modal("hide");
     clearInterval(this.chartsInterval);
   },
@@ -255,10 +340,12 @@ export default {
           if (context.ntopngStatus == "running") {
             context.getTopLocalHosts();
             context.getTopRemoteHosts();
+            context.getKnownHosts();
 
             context.chartsInterval = setInterval(function() {
               context.getTopLocalHosts();
               context.getTopRemoteHosts();
+              context.getKnownHosts();
             }, 30000);
           }
         },
@@ -364,9 +451,11 @@ export default {
                 drawGrid: true,
                 axes: {
                   y: {
-                    valueFormatter: function(y) { return y.toFixed(2) + " mbit/s" },
-                  }
-                }
+                    valueFormatter: function(y) {
+                      return y.toFixed(2) + " mbit/s";
+                    },
+                  },
+                },
               }
             );
             g.initialData = chart.data;
@@ -398,6 +487,29 @@ export default {
         return 0;
       };
     },
+    getKnownHosts() {
+      const context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/troubleshooting/read"],
+        {
+          action: "host-list",
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.knownHosts = success;
+          context.isLoaded.knownHosts = true;
+        },
+        function(error) {
+          console.error(error);
+          context.isLoaded.knownHosts = true;
+        }
+      );
+    },
   },
 };
 </script>
@@ -405,10 +517,6 @@ export default {
 <style scoped>
 .container {
   padding: 20px;
-}
-
-h3 {
-  margin-top: 0;
 }
 
 .host-table {

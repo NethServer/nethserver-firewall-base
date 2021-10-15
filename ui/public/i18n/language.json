@@ -568,7 +568,11 @@
         "upload_bandwidth": "Upload bandwidth",
         "status": "Status",
         "traffic": "Traffic",
-        "rcvd_bytes": "Received"
+        "rcvd_bytes": "Received",
+        "known_hosts": "Known hosts",
+        "host": "Host",
+        "interface": "Interface",
+        "mac_address":"MAC address"
     },
     "about": {
         "title": "About",
