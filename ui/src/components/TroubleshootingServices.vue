@@ -358,6 +358,58 @@
         </div>
       </div>
       <!-- END NTOPNG -->
+
+      <!-- HOTSPOT -->
+      <div class="col-sm-4 col-md-3">
+        <div
+          class="card-pf card-pf-accented card-pf-aggregate-status card-with-footer"
+        >
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-dedalo"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
+          <h2 class="card-pf-title">
+            <span class="fa fa-cube"></span
+            >{{ $t("troubleshooting.hotspot") }}
+          </h2>
+          <div class="card-pf-body">
+            <div
+              v-if="!view.hotspot.isLoaded"
+              class="spinner spinner-lg view-spinner"
+            ></div>
+            <div
+              v-if="view.hotspot.isLoaded && view.hotspot.status == 'running'"
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="pficon pficon-ok"></span>
+            </div>
+            <p
+              v-if="view.hotspot.isLoaded && view.hotspot.status == 'disabled'"
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="fa fa-ban gray"></span>
+            </p>
+            <p
+              v-if="view.hotspot.isLoaded && view.hotspot.status == 'failed'"
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="card-pf-aggregate-status-notification">
+                <span class="pficon pficon-error-circle-o"></span>
+              </span>
+            </p>
+          </div>
+          <div v-if="view.hotspot.status !== 'disabled'" class="footer">
+            <span class="action" @click="showHotspotModal">
+              <span class="fa fa-search icon"></span
+              >{{ $t("troubleshooting.details") }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- END HOTSPOT -->
     </div>
 
     <h3>{{ $t("troubleshooting.security") }}</h3>
@@ -849,6 +901,47 @@
         </div>
       </div>
     </div>
+    <!-- dedalo modal -->
+    <div
+      class="modal"
+      id="hotspotModal"
+      tabindex="-1"
+      role="dialog"
+      data-backdrop="static"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              {{ $t("troubleshooting.hotspot") }}
+            </h4>
+          </div>
+          <div class="modal-body">
+            <div>
+              {{ $t("troubleshooting.hotspot_unit_modal_description") }}
+            </div>
+            <ul v-if="view.hotspot.details" class="list-group mg-top-10">
+              <li
+                class="list-group-item"
+              >
+                <span class="fa fa-cube icon"></span>
+                <span><b>{{ view.hotspot.details.name }}</b> {{ $t("troubleshooting.hotspot_unit_modal_on_interface") + ' ' }}</span>
+                <code>{{ view.hotspot.details.interface }}</code>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-default"
+              type="button"
+              @click="hideHotspotModal"
+            >
+              {{ $t("close") }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- custom templates modal -->
     <div
       class="modal"
@@ -1041,6 +1134,7 @@ export default {
         squid: { status: "disabled", isLoaded: false, details: {} },
         antivirus: { status: "disabled", isLoaded: false },
         ufdbGuard: { status: "disabled", isLoaded: false },
+        hotspot: { status: "disabled", isLoaded: false },
 
         ipblacklist: { status: "disabled", isLoaded: false },
         ftl: { status: "disabled", isLoaded: false },
@@ -1105,6 +1199,7 @@ export default {
       "yum",
       "ups",
       "flashstart",
+      "hotspot"
     ];
     services.forEach(function(item, index) {
       context.getServiceStatus(item);
@@ -1382,6 +1477,12 @@ export default {
     },
     hideNtopngModal() {
       $("#ntopngModal").modal("hide");
+    },
+    showHotspotModal() {
+      $("#hotspotModal").modal("show");
+    },
+    hideHotspotModal() {
+      $("#hotspotModal").modal("hide");
     },
     showCustomTemplatesModal() {
       $("#customTemplatesModal").modal("show");
