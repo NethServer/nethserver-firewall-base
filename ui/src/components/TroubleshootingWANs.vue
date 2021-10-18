@@ -229,36 +229,33 @@
           </div>
         </div>
         <!-- PING CHARTS -->
-        <div v-if="!isLoaded.pingCharts" class="col-md-4">
-          <div class="card-pf card-pf-accented card-pf-aggregate-status">
-            <h2 class="card-pf-title mg-top-20"></h2>
-            <div class="card-pf-body">
-              <div class="spinner spinner-lg view-spinner"></div>
-            </div>
-          </div>
-        </div>
-        <div v-else v-for="(ips, redName, index) in pingCharts" :key="index">
-          <div v-if="redName == iface.provider.name">
-            <div
-              v-for="(chart, ip, index) in ips"
-              :key="index"
-              class="col-md-4"
-            >
-              <div class="card-pf card-pf-accented card-pf-aggregate-status">
-                <h2 class="card-pf-title">
-                  <span>{{ $t("troubleshooting.ping") }} {{ ip }}</span>
-                </h2>
-                <div class="card-pf-body">
-                  <div
-                    :id="`ping-legend-${redName}-${ip}`"
-                    class="troubleshooting-chart-legend"
-                  ></div>
-                  <div :id="`ping-chart-${redName}-${ip}`" class="chart"></div>
+        <template v-if="isLoaded.pingCharts">
+          <div v-for="(ips, redName, index) in pingCharts" :key="index">
+            <div v-if="redName == iface.provider.name">
+              <div
+                v-for="(chart, ip, index) in ips"
+                :key="index"
+                class="col-md-4"
+              >
+                <div class="card-pf card-pf-accented card-pf-aggregate-status">
+                  <h2 class="card-pf-title">
+                    <span>{{ $t("troubleshooting.ping") }} {{ ip }}</span>
+                  </h2>
+                  <div class="card-pf-body">
+                    <div
+                      :id="`ping-legend-${redName}-${ip}`"
+                      class="troubleshooting-chart-legend"
+                    ></div>
+                    <div
+                      :id="`ping-chart-${redName}-${ip}`"
+                      class="chart"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </template>
       </div>
       <!-- END PING CHARTS -->
     </div>
