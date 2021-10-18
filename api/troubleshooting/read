@@ -337,6 +337,22 @@ if ($cmd eq 'ping') {
             @details = split(',', $cdb->get_prop('ftl', 'Roles') || '');
         }
         print encode_json({"status" => $status, "details" => \@details});
+   } elsif ($service eq 'hotspot') {
+        my $status = $cdb->get_prop('dedalo', 'status') || "disabled";
+        my $details;
+
+        if ($status eq 'enabled') {
+            my $s = NethServer::Service->new('dedalo', $cdb);
+	        if ($s->is_running()) {
+                $status = 'running';
+            } else {
+	            $status = 'failed';
+	        }
+            my @interfaces = $ndb->get_all_by_prop('role' => 'hotspot');
+            $details->{'name'} = $cdb->get_prop('dedalo', 'Name') || '';
+            $details->{'interface'} = $interfaces[0] ? $interfaces[0]->key : undef;
+        }
+        print encode_json({"status" => $status, "details" => $details});
    } elsif ($service eq 'yum') {
         my $ret = undef;
         my $updated = `grep Updated: /var/log/yum.log 2>/dev/null | tail -f -n1 | cut -d' ' -f1,2,3`;
