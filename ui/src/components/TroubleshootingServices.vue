@@ -404,7 +404,9 @@
 
       <!-- FTL DNS BLACKLIST -->
       <div class="col-sm-4 col-md-3">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status  card-with-footer">
+        <div
+          class="card-pf card-pf-accented card-pf-aggregate-status  card-with-footer"
+        >
           <a
             target="_blank"
             href="/nethserver#/applications/nethserver-blacklist"
@@ -586,10 +588,9 @@
               class="card-pf-aggregate-status-notifications"
             >
               <span class="card-pf-aggregate-status-notification">
-                <span
-                  v-if="view.yum.date"
-                  class=""
-                >{{view.yum.date | dateFormat}}</span>
+                <span v-if="view.yum.date" class="">{{
+                  view.yum.date | dateFormat
+                }}</span>
               </span>
             </p>
           </div>
@@ -608,8 +609,7 @@
             <span class="fa fa-external-link"></span>
           </a>
           <h2 class="card-pf-title">
-            <span class="fa fa-battery"></span
-            >{{ $t("troubleshooting.ups") }}
+            <span class="fa fa-battery"></span>{{ $t("troubleshooting.ups") }}
           </h2>
           <div class="card-pf-body">
             <div
@@ -666,19 +666,25 @@
               class="spinner spinner-lg view-spinner"
             ></div>
             <div
-              v-if="view.flashstart.isLoaded && view.flashstart.status == 'running'"
+              v-if="
+                view.flashstart.isLoaded && view.flashstart.status == 'running'
+              "
               class="card-pf-aggregate-status-notifications"
             >
               <span class="pficon pficon-ok"></span>
             </div>
             <p
-              v-if="view.flashstart.isLoaded && view.flashstart.status == 'disabled'"
+              v-if="
+                view.flashstart.isLoaded && view.flashstart.status == 'disabled'
+              "
               class="card-pf-aggregate-status-notifications"
             >
               <span class="fa fa-ban gray"></span>
             </p>
             <p
-              v-if="view.flashstart.isLoaded && view.flashstart.status == 'failed'"
+              v-if="
+                view.flashstart.isLoaded && view.flashstart.status == 'failed'
+              "
               class="card-pf-aggregate-status-notifications"
             >
               <span class="card-pf-aggregate-status-notification">
@@ -714,7 +720,9 @@
             >
               <span class="pficon pficon-warning-triangle-o"></span>
               <strong>{{ $t("warning") }}!</strong>
-              {{ $t("troubleshooting.traffic_by_interface_charts_not_updated") }}.
+              {{
+                $t("troubleshooting.traffic_by_interface_charts_not_updated")
+              }}.
             </div>
             <div v-if="view.isTrafficChartLoaded">
               <h4 class="mg-top">
@@ -787,7 +795,10 @@
                   :id="'ping-droprate-legend-' + index"
                   class="troubleshooting-chart-legend"
                 ></div>
-                <div :id="'chart-ping-droprate-' + index" class="chart-ping"></div>
+                <div
+                  :id="'chart-ping-droprate-' + index"
+                  class="chart-ping"
+                ></div>
               </div>
             </div>
           </div>
@@ -997,11 +1008,7 @@
             </ul>
           </div>
           <div class="modal-footer">
-            <button
-              class="btn btn-default"
-              type="button"
-              @click="hideFtlModal"
-            >
+            <button class="btn btn-default" type="button" @click="hideFtlModal">
               {{ $t("close") }}
             </button>
           </div>
@@ -1051,7 +1058,7 @@ export default {
       charts: {
         ping: {},
         droprate: {},
-        traffic: {}
+        traffic: {},
       },
       pingChartInterval: null,
       pingDroprateChartInterval: null,
@@ -1097,7 +1104,7 @@ export default {
       "ntopng",
       "yum",
       "ups",
-      "flashstart"
+      "flashstart",
     ];
     services.forEach(function(item, index) {
       context.getServiceStatus(item);
@@ -1187,11 +1194,13 @@ export default {
                   labelsDiv: document.getElementById("ping-legend-" + ip),
                   labelsSeparateLines: true,
                   drawGrid: true,
-                  axes : {
-                    y : {
-                      valueFormatter: function(y) { return (y * 100).toFixed(0) + ' ms' },
-                    }
-                  }
+                  axes: {
+                    y: {
+                      valueFormatter: function(y) {
+                        return y.toFixed() + " ms";
+                      },
+                    },
+                  },
                 }
               );
               g.initialData = chart.data;
@@ -1243,15 +1252,21 @@ export default {
                   strokeBorderWidth: 1,
                   ylabel: context.$i18n.t("troubleshooting.droprate_perc"),
                   axisLineColor: "white",
-                  labelsDiv: document.getElementById("ping-droprate-legend-" + ip),
+                  labelsDiv: document.getElementById(
+                    "ping-droprate-legend-" + ip
+                  ),
                   labelsSeparateLines: true,
                   drawGrid: true,
-                  axes : {
-                    y : {
-                      axisLabelFormatter: function(y) { return (y * 100).toFixed(0) + '%' },
-                      valueFormatter: function(y) { return (y * 100).toFixed(0) + '%' },
-                    }
-                  }
+                  axes: {
+                    y: {
+                      axisLabelFormatter: function(y) {
+                        return (y * 100).toFixed(0) + "%";
+                      },
+                      valueFormatter: function(y) {
+                        return (y * 100).toFixed(0) + "%";
+                      },
+                    },
+                  },
                 }
               );
               g.initialData = chart.data;
@@ -1286,14 +1301,9 @@ export default {
             for (var t in chart.data) {
               chart.data[t][0] = new Date(chart.data[t][0] * 1000);
 
-              for (
-                let i = 1;
-                i < chart.data[t].length;
-                i++
-              ) {
+              for (let i = 1; i < chart.data[t].length; i++) {
                 // show througput in kbit/s
-                chart.data[t][i] =
-                  chart.data[t][i] / 1000;
+                chart.data[t][i] = chart.data[t][i] / 1000;
               }
             }
 
@@ -1318,14 +1328,18 @@ export default {
                   strokeBorderWidth: 1,
                   ylabel: context.$i18n.t("troubleshooting.traffic_mbps"),
                   axisLineColor: "white",
-                  labelsDiv: document.getElementById("traffic-by-interface-legend"),
+                  labelsDiv: document.getElementById(
+                    "traffic-by-interface-legend"
+                  ),
                   labelsSeparateLines: true,
                   drawGrid: true,
                   axes: {
                     y: {
-                      valueFormatter: function(y) { return (y / 1000).toFixed(2) + " mbit/s" },
-                    }
-                  }
+                      valueFormatter: function(y) {
+                        return (y / 1000).toFixed(2) + " mbit/s";
+                      },
+                    },
+                  },
                 }
               );
             } else {
@@ -1335,7 +1349,7 @@ export default {
                 .slice(-1 * 60);
 
               context.charts.traffic.graph.updateOptions({
-                file: context.charts.traffic.initialData.data
+                file: context.charts.traffic.initialData.data,
               });
             }
           });
@@ -1353,7 +1367,11 @@ export default {
         time -= 30000 / 1000;
         let zeroSample = [new Date(time * 1000)];
 
-        for (let j = 1; j < this.charts.traffic.initialData.labels.length; j++) {
+        for (
+          let j = 1;
+          j < this.charts.traffic.initialData.labels.length;
+          j++
+        ) {
           zeroSample.push(0);
         }
         this.charts.traffic.initialData.data.unshift(zeroSample);
