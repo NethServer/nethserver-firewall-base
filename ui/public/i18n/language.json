@@ -538,7 +538,6 @@
         "latency": "Latency",
         "droprate_perc": "Drop rate (%)",
         "droprate": "Drop rate",
-        "traffic_mbps": "Traffic in mbit/s",
         "ping_charts_not_updated": "Charts cannot be updated. Maybe collectd is not running",
         "ping_droprate_charts_not_updated": "Charts cannot be updated. Maybe collectd is not running",
         "bandwidth_monitor_disabled": "Bandwidth monitor disabled or not installed",

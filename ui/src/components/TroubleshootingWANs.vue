@@ -188,51 +188,81 @@
       </div>
       <!-- END RED INTERFACES -->
     </div>
-    <h3>{{ $t("troubleshooting.traffic") }}</h3>
-    <div class="row row-cards-pf">
-      <!-- TRAFFIC CHARTS -->
-      <div v-if="!isLoaded.wanProviders" class="col-sm-4 col-md-3">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
-          <h2 class="card-pf-title mg-top-20"></h2>
-          <div class="card-pf-body">
-            <div class="spinner spinner-lg view-spinner"></div>
-          </div>
+    <!-- CHARTS -->
+    <div v-show="!isLoaded.wanProviders" class="col-md-4">
+      <div class="card-pf card-pf-accented card-pf-aggregate-status">
+        <h2 class="card-pf-title mg-top-20"></h2>
+        <div class="card-pf-body">
+          <div class="spinner spinner-lg view-spinner"></div>
         </div>
       </div>
-      <div
-        v-else
-        v-for="(iface, index) in wanProviders.configuration.interfaces"
-        :key="index"
-        class="col-md-6"
-      >
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
-          <h2 class="card-pf-title">
-            <span>{{ iface.name }} ({{ iface.provider.name }})</span>
-          </h2>
-          <div class="card-pf-body">
-            <div v-if="!trafficCharts[iface.name]">
+    </div>
+    <div
+      v-show="isLoaded.wanProviders"
+      v-for="(iface, index) in wanProviders.configuration.interfaces"
+      :key="index"
+    >
+      <h3>{{ iface.name }} ({{ iface.provider.name }})</h3>
+      <div class="row row-cards-pf">
+        <div class="col-md-4">
+          <div class="card-pf card-pf-accented card-pf-aggregate-status">
+            <h2 class="card-pf-title">
+              <span>{{ $t("troubleshooting.traffic") }}</span>
+            </h2>
+            <div class="card-pf-body">
+              <div v-if="!trafficCharts[iface.name]">
+                <div class="spinner spinner-lg view-spinner"></div>
+              </div>
+              <div v-else>
+                <div
+                  v-for="(data, index) in trafficCharts[iface.name]"
+                  :key="index"
+                >
+                  <div
+                    :id="'traffic-legend-' + iface.name"
+                    class="troubleshooting-chart-legend"
+                  ></div>
+                  <div :id="'traffic-chart-' + iface.name" class="chart"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- PING CHARTS -->
+        <div v-if="!isLoaded.pingCharts" class="col-md-4">
+          <div class="card-pf card-pf-accented card-pf-aggregate-status">
+            <h2 class="card-pf-title mg-top-20"></h2>
+            <div class="card-pf-body">
               <div class="spinner spinner-lg view-spinner"></div>
             </div>
-            <div v-else>
-              <div
-                v-for="(data, index) in trafficCharts[iface.name]"
-                :key="index"
-              >
-                <div
-                  :id="'traffic-legend-' + iface.name"
-                  class="troubleshooting-chart-legend"
-                ></div>
-                <div
-                  :id="'traffic-chart-' + iface.name"
-                  class="traffic-chart"
-                ></div>
+          </div>
+        </div>
+        <div v-else v-for="(ips, redName, index) in pingCharts" :key="index">
+          <div v-if="redName == iface.provider.name">
+            <div
+              v-for="(chart, ip, index) in ips"
+              :key="index"
+              class="col-md-4"
+            >
+              <div class="card-pf card-pf-accented card-pf-aggregate-status">
+                <h2 class="card-pf-title">
+                  <span>{{ $t("troubleshooting.ping") }} {{ ip }}</span>
+                </h2>
+                <div class="card-pf-body">
+                  <div
+                    :id="`ping-legend-${redName}-${ip}`"
+                    class="troubleshooting-chart-legend"
+                  ></div>
+                  <div :id="`ping-chart-${redName}-${ip}`" class="chart"></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- END TRAFFIC CHARTS -->
+      <!-- END PING CHARTS -->
     </div>
+    <!-- END CHARTS -->
   </div>
 </template>
 
@@ -246,20 +276,31 @@ export default {
       view: {
         multiwan: { status: "disabled", isLoaded: false },
       },
-      wanProviders: null,
+      wanProviders: { configuration: {}, status: {} },
       redInterfaces: [],
       trafficCharts: {},
+      pingCharts: {},
+      trafficChartsInterval: null,
+      pingChartsInterval: null,
       isLoaded: {
         wanProviders: false,
+        pingCharts: false,
       },
     };
   },
-  created() {
+  mounted() {
     this.getServiceStatus("multiwan");
     this.getWanProviders();
+    this.updatePingCharts();
+
+    let context = this;
+    this.pingChartsInterval = setInterval(function() {
+      context.updatePingCharts();
+    }, 30000);
   },
   beforeDestroy() {
     clearInterval(this.trafficChartsInterval);
+    clearInterval(this.pingChartsInterval);
   },
   methods: {
     getServiceStatus(service) {
@@ -304,11 +345,74 @@ export default {
 
           context.trafficChartsInterval = setInterval(function() {
             context.updateTrafficCharts();
-          }, 5000);
+          }, 30000);
 
           setTimeout(function() {
             $('[data-toggle="tooltip"]').tooltip();
           }, 500);
+        },
+        function(error) {
+          console.error(error);
+        }
+      );
+    },
+    updatePingCharts() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/troubleshooting/read"],
+        { action: "wan-ping" },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+
+          for (const [redName, ips] of Object.entries(success)) {
+            // needed for reactivity (see https://vuejs.org/v2/guide/reactivity.html#For-Objects)
+            context.$set(context.pingCharts, redName, ips);
+
+            for (const [ip, chart] of Object.entries(ips)) {
+              for (var t in chart.data) {
+                chart.data[t][0] = new Date(chart.data[t][0]);
+              }
+              const i18nLabels = chart.labels.map((label) =>
+                context.$i18n.t("troubleshooting." + label)
+              );
+              context.isLoaded.pingCharts = true;
+
+              setTimeout(() => {
+                var g = new Dygraph(
+                  document.getElementById(`ping-chart-${redName}-${ip}`),
+                  chart.data,
+                  {
+                    fillGraph: true,
+                    stackedGraph: true,
+                    labels: i18nLabels,
+                    height: 150,
+                    strokeWidth: 1,
+                    strokeBorderWidth: 1,
+                    ylabel: context.$i18n.t("troubleshooting.latency_ms"),
+                    axisLineColor: "white",
+                    labelsDiv: document.getElementById(
+                      `ping-legend-${redName}-${ip}`
+                    ),
+                    labelsSeparateLines: true,
+                    drawGrid: true,
+                    axes: {
+                      y: {
+                        valueFormatter: function(y) {
+                          return y.toFixed() + " ms";
+                        },
+                      },
+                    },
+                  }
+                );
+                g.initialData = chart.data;
+              }, 1000);
+            }
+          }
         },
         function(error) {
           console.error(error);
@@ -359,6 +463,13 @@ export default {
                   ),
                   labelsSeparateLines: true,
                   drawGrid: true,
+                  axes: {
+                    y: {
+                      valueFormatter: function(y) {
+                        return y.toFixed(2) + " mbit/s";
+                      },
+                    },
+                  },
                 }
               );
               g.initialData = chart.data;
@@ -418,6 +529,7 @@ export default {
 .table {
   display: table;
   width: auto;
+  margin-bottom: 0;
 }
 
 .tr {
@@ -434,7 +546,7 @@ export default {
   top: 2px;
 }
 
-.traffic-chart {
+.chart {
   padding-left: 5px;
   padding-right: 5px;
   margin-bottom: 20px;

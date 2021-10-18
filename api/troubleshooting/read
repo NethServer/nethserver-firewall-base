@@ -191,14 +191,14 @@ if ($cmd eq 'ping') {
     ping_chart('ping_droprate', 'droprate');
 } elsif ($cmd eq 'interface') {
     my $interface = $input->{'interface'};
-    my @data = fetch_interface_rrd($interface, $cdb, 3600);
+    my @data = fetch_interface_rrd($interface, $cdb, 86400);
     print encode_json({labels => [ 'time', 'rcvd_bytes', 'sent_bytes' ], data => \@data});
 } elsif ($cmd eq 'wan-ping') {
     my $ret = {};
     my @ips = split(',', $cdb->get_prop('firewall', 'CheckIP'));
     foreach my $p ($ndb->get_all_by_prop('type' => 'provider')) {
         foreach my $ip (@ips) {
-            my @data = fetch_wan_rrd($p->key, $ip, $cdb, 3600);
+            my @data = fetch_wan_rrd($p->key, $ip, $cdb, 86400);
             if (@data) {
                 $ret->{$p->key}->{$ip}->{'labels'} = ["time", "latency"];
                 $ret->{$p->key}->{$ip}->{'data'} = \@data;
