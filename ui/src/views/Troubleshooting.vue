@@ -12,13 +12,13 @@
           >{{ $t("troubleshooting.services") }}</a
         >
       </li>
-      <li @click="selectWans()">
+      <li @click="selectNetwork()">
         <a
           class="nav-link"
           data-toggle="tab"
-          href="#ts-wans-tab"
-          id="ts-wans-tab-parent"
-          >{{ $t("troubleshooting.wans") }}</a
+          href="#ts-network-tab"
+          id="ts-network-tab-parent"
+          >{{ $t("troubleshooting.network") }}</a
         >
       </li>
       <li @click="selectHosts()">
@@ -44,16 +44,16 @@
       </div>
       <!-- END SERVICES -->
 
-      <!-- WANS -->
+      <!-- NETWORK -->
       <div
         class="tab-pane fade active"
-        id="ts-wans-tab"
+        id="ts-network-tab"
         role="tabpanel"
-        aria-labelledby="ts-wans-tab"
+        aria-labelledby="ts-network-tab"
       >
-        <TroubleshootingWANs v-if="view.isWansSelected" />
+        <TroubleshootingNetwork v-if="view.isNetworkSelected" />
       </div>
-      <!-- END WANS -->
+      <!-- END NETWORK -->
 
       <!-- HOSTS -->
       <div
@@ -71,21 +71,21 @@
 
 <script>
 import TroubleshootingServices from "@/components/TroubleshootingServices";
-import TroubleshootingWANs from "@/components/TroubleshootingWANs";
+import TroubleshootingNetwork from "@/components/TroubleshootingNetwork";
 import TroubleshootingHosts from "@/components/TroubleshootingHosts";
 
 export default {
   name: "Troubleshooting",
   components: {
     TroubleshootingServices,
-    TroubleshootingWANs,
+    TroubleshootingNetwork,
     TroubleshootingHosts,
   },
   data() {
     return {
       view: {
         isServicesSelected: true,
-        isWansSelected: false,
+        isNetworkSelected: false,
         isHostsSelected: false,
       },
     };
@@ -93,17 +93,17 @@ export default {
   methods: {
     selectServices() {
       this.view.isServicesSelected = true;
-      this.view.isWansSelected = false;
+      this.view.isNetworkSelected = false;
       this.view.isHostsSelected = false;
     },
-    selectWans() {
+    selectNetwork() {
       this.view.isServicesSelected = false;
-      this.view.isWansSelected = true;
+      this.view.isNetworkSelected = true;
       this.view.isHostsSelected = false;
     },
     selectHosts() {
       this.view.isServicesSelected = false;
-      this.view.isWansSelected = false;
+      this.view.isNetworkSelected = false;
       this.view.isHostsSelected = true;
     },
   },

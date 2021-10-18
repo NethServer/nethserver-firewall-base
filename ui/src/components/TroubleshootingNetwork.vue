@@ -1,6 +1,100 @@
 <template>
   <div class="container-fluid container-cards-pf">
     <h3>{{ $t("troubleshooting.status") }}</h3>
+
+    <div class="row row-cards-pf">
+      <!-- TRAFFIC BY INTERFACE CHART -->
+      <div class="col-md-12">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <div
+            v-if="!view.isTrafficChartLoaded"
+            class="spinner spinner-lg view-spinner  mg-top-20"
+          ></div>
+          <div class="card-pf-body">
+            <div v-if="view.isTrafficChartLoaded">
+              <h4 class="mg-top">
+                {{ $t("troubleshooting.traffic_by_interface_last_hour") }}
+              </h4>
+              <div
+                :id="'traffic-by-interface-legend'"
+                class="troubleshooting-chart-legend"
+              ></div>
+              <div :id="'chart-traffic-by-interface'" class="chart-ping"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END TRAFFIC BY INTERFACE CHART -->
+      <!-- PING CHART -->
+      <div class="col-md-6">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <div
+            v-if="!view.isPingChartLoaded"
+            class="spinner spinner-lg view-spinner  mg-top-20"
+          ></div>
+          <div class="card-pf-body">
+            <div
+              v-if="view.invalidChartsPingData"
+              class="alert alert-warning alert-dismissable col-sm-12"
+            >
+              <span class="pficon pficon-warning-triangle-o"></span>
+              <strong>{{ $t("warning") }}!</strong>
+              {{ $t("troubleshooting.ping_charts_not_updated") }}.
+            </div>
+            <div v-if="view.isPingChartLoaded">
+              <div v-for="(data, index) in charts.ping" :key="index">
+                <h4 class="mg-top">
+                  {{ $t("troubleshooting.ping") }}: {{ index }}
+                </h4>
+                <div
+                  :id="'ping-legend-' + index"
+                  class="troubleshooting-chart-legend"
+                ></div>
+                <div :id="'chart-ping-' + index" class="chart-ping"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PING CHART -->
+      <!-- PING DROPRATE -->
+      <div class="col-md-6">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <div
+            v-if="!view.isDroprateChartLoaded"
+            class="spinner spinner-lg view-spinner  mg-top-20"
+          ></div>
+          <div class="card-pf-body">
+            <div
+              v-if="view.invalidChartsPingDroprateData"
+              class="alert alert-warning alert-dismissable col-sm-12"
+            >
+              <span class="pficon pficon-warning-triangle-o"></span>
+              <strong>{{ $t("warning") }}!</strong>
+              {{ $t("troubleshooting.ping_droprate_charts_not_updated") }}.
+            </div>
+            <div v-if="view.isDroprateChartLoaded">
+              <div v-for="(data, index) in charts.droprate" :key="index">
+                <h4 class="mg-top">
+                  {{ $t("troubleshooting.ping_droprate") }}: {{ index }}
+                </h4>
+                <div
+                  :id="'ping-droprate-legend-' + index"
+                  class="troubleshooting-chart-legend"
+                ></div>
+                <div
+                  :id="'chart-ping-droprate-' + index"
+                  class="chart-ping"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PING DROPRATE -->
+    </div>
+
+    <h3>{{ $t("troubleshooting.wans") }}</h3>
     <div class="row row-cards-pf">
       <!-- MULTIWAN -->
       <div class="col-sm-4 col-md-3">
@@ -204,7 +298,7 @@
     >
       <h3>{{ iface.name }} ({{ iface.provider.name }})</h3>
       <div class="row row-cards-pf">
-        <div class="col-md-4">
+        <div class="col-md-12">
           <div class="card-pf card-pf-accented card-pf-aggregate-status">
             <h2 class="card-pf-title">
               <span>{{ $t("troubleshooting.traffic") }}</span>
@@ -229,13 +323,13 @@
           </div>
         </div>
         <!-- PING CHARTS -->
-        <template v-if="isLoaded.pingCharts">
-          <div v-for="(ips, redName, index) in pingCharts" :key="index">
+        <template v-if="isLoaded.ifacePingCharts">
+          <div v-for="(ips, redName, index) in ifacePingCharts" :key="index">
             <div v-if="redName == iface.provider.name">
               <div
                 v-for="(chart, ip, index) in ips"
                 :key="index"
-                class="col-md-4"
+                class="col-md-6"
               >
                 <div class="card-pf card-pf-accented card-pf-aggregate-status">
                   <h2 class="card-pf-title">
@@ -267,37 +361,68 @@
 import Dygraph from "dygraphs";
 
 export default {
-  name: "WANs",
+  name: "TroubleshootingNetwork",
   data() {
     return {
+      TRAFFIC_BY_INTERFACE_SAMPLES: 240,
+      UPDATE_TRAFFIC_BY_INTERFACE_INTERVAL: 15000, // 15 seconds
       view: {
         multiwan: { status: "disabled", isLoaded: false },
+        isTrafficChartLoaded: false,
+        isPingChartLoaded: false,
+        isDroprateChartLoaded: false,
       },
       wanProviders: { configuration: {}, status: {} },
       redInterfaces: [],
       trafficCharts: {},
-      pingCharts: {},
+      ifacePingCharts: {},
       trafficChartsInterval: null,
-      pingChartsInterval: null,
+      ifacePingChartsInterval: null,
+      pingChartInterval: null,
+      pingDroprateChartInterval: null,
+      trafficByInterfaceChartInterval: null,
+      charts: {
+        ping: {},
+        droprate: {},
+        traffic: {},
+      },
       isLoaded: {
         wanProviders: false,
-        pingCharts: false,
+        ifacePingCharts: false,
       },
     };
   },
   mounted() {
     this.getServiceStatus("multiwan");
     this.getWanProviders();
-    this.updatePingCharts();
-
     let context = this;
-    this.pingChartsInterval = setInterval(function() {
-      context.updatePingCharts();
-    }, 30000);
+
+    this.updateTrafficByInterfaceChart();
+    this.trafficByInterfaceChartInterval = setInterval(function() {
+      context.updateTrafficByInterfaceChart();
+    }, this.UPDATE_TRAFFIC_BY_INTERFACE_INTERVAL);
+
+    this.updatePingChart();
+    this.pingChartInterval = setInterval(function() {
+      context.updatePingChart();
+    }, 60000);
+
+    this.updatePingDroprateChart();
+    this.pingDroprateChartInterval = setInterval(function() {
+      context.updatePingDroprateChart();
+    }, 60000);
+
+    this.updateIfacePingCharts();
+    this.ifacePingChartsInterval = setInterval(function() {
+      context.updateIfacePingCharts();
+    }, 60000);
   },
   beforeDestroy() {
     clearInterval(this.trafficChartsInterval);
-    clearInterval(this.pingChartsInterval);
+    clearInterval(this.ifacePingChartsInterval);
+    clearInterval(this.pingChartInterval);
+    clearInterval(this.pingDroprateChartInterval);
+    clearInterval(this.trafficByInterfaceChartInterval);
   },
   methods: {
     getServiceStatus(service) {
@@ -353,7 +478,7 @@ export default {
         }
       );
     },
-    updatePingCharts() {
+    updateIfacePingCharts() {
       var context = this;
       nethserver.exec(
         ["nethserver-firewall-base/troubleshooting/read"],
@@ -368,7 +493,7 @@ export default {
 
           for (const [redName, ips] of Object.entries(success)) {
             // needed for reactivity (see https://vuejs.org/v2/guide/reactivity.html#For-Objects)
-            context.$set(context.pingCharts, redName, ips);
+            context.$set(context.ifacePingCharts, redName, ips);
 
             for (const [ip, chart] of Object.entries(ips)) {
               for (var t in chart.data) {
@@ -377,7 +502,7 @@ export default {
               const i18nLabels = chart.labels.map((label) =>
                 context.$i18n.t("troubleshooting." + label)
               );
-              context.isLoaded.pingCharts = true;
+              context.isLoaded.ifacePingCharts = true;
 
               setTimeout(() => {
                 var g = new Dygraph(
@@ -387,7 +512,7 @@ export default {
                     fillGraph: true,
                     stackedGraph: true,
                     labels: i18nLabels,
-                    height: 150,
+                    height: 200,
                     strokeWidth: 1,
                     strokeBorderWidth: 1,
                     ylabel: context.$i18n.t("troubleshooting.latency_ms"),
@@ -450,7 +575,7 @@ export default {
                   fillGraph: true,
                   stackedGraph: true,
                   labels: i18nLabels,
-                  height: 150,
+                  height: 200,
                   strokeWidth: 1,
                   strokeBorderWidth: 1,
                   ylabel: context.$i18n.t("troubleshooting.traffic_mbps"),
@@ -477,6 +602,227 @@ export default {
           }
         );
       }
+    },
+    updateTrafficByInterfaceChart() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/troubleshooting/read"],
+        { action: "traffic-by-interface" },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.view.isTrafficChartLoaded = true;
+          context.$nextTick(function() {
+            var chart = success["trafficByInterface"];
+            const startTime = chart.data[0][0];
+
+            for (var t in chart.data) {
+              chart.data[t][0] = new Date(chart.data[t][0] * 1000);
+
+              for (let i = 1; i < chart.data[t].length; i++) {
+                // show througput in mbit/s
+                chart.data[t][i] = chart.data[t][i] / (1024 * 1024);
+              }
+            }
+
+            // set initial data
+            if (!context.charts.traffic.graph) {
+              context.charts.traffic.initialData = chart;
+            }
+
+            // zero-fill previous chart data
+            context.zeroFillTrafficByInterfaceChart(startTime);
+
+            if (!context.charts.traffic.graph) {
+              context.charts.traffic.graph = new Dygraph(
+                document.getElementById("chart-traffic-by-interface"),
+                context.charts.traffic.initialData.data,
+                {
+                  fillGraph: true,
+                  stackedGraph: true,
+                  labels: context.charts.traffic.initialData.labels,
+                  height: 200,
+                  strokeWidth: 1,
+                  strokeBorderWidth: 1,
+                  ylabel: context.$i18n.t("troubleshooting.traffic_mbps"),
+                  axisLineColor: "white",
+                  labelsDiv: document.getElementById(
+                    "traffic-by-interface-legend"
+                  ),
+                  labelsSeparateLines: true,
+                  drawGrid: true,
+                  axes: {
+                    y: {
+                      valueFormatter: function(y) {
+                        return y.toFixed(2) + " mbit/s";
+                      },
+                    },
+                  },
+                }
+              );
+            } else {
+              // append to previous data and retain only visible samples (to avoid memory overload)
+              context.charts.traffic.initialData.data = context.charts.traffic.initialData.data
+                .concat(chart.data)
+                .slice(-1 * context.TRAFFIC_BY_INTERFACE_SAMPLES);
+
+              context.charts.traffic.graph.updateOptions({
+                file: context.charts.traffic.initialData.data,
+              });
+            }
+          });
+        },
+        function(error) {
+          console.error(error);
+          context.view.isTrafficChartLoaded = true;
+        }
+      );
+    },
+    zeroFillTrafficByInterfaceChart(startTime) {
+      let time = startTime;
+
+      for (let i = 0; i < this.TRAFFIC_BY_INTERFACE_SAMPLES; i++) {
+        time -= this.UPDATE_TRAFFIC_BY_INTERFACE_INTERVAL / 1000;
+        let zeroSample = [new Date(time * 1000)];
+
+        for (
+          let j = 1;
+          j < this.charts.traffic.initialData.labels.length;
+          j++
+        ) {
+          zeroSample.push(0);
+        }
+        this.charts.traffic.initialData.data.unshift(zeroSample);
+      }
+    },
+    updatePingChart() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/troubleshooting/read"],
+        { action: "ping" },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.charts.ping = success;
+          context.view.isPingChartLoaded = true;
+          context.$nextTick(function() {
+            for (const ip in context.charts.ping) {
+              var chart = context.charts.ping[ip];
+
+              for (var t in chart.data) {
+                chart.data[t][0] = new Date(chart.data[t][0]);
+              }
+
+              const i18nLabels = chart.labels.map((label) =>
+                context.$i18n.t("troubleshooting." + label)
+              );
+
+              var g = new Dygraph(
+                document.getElementById("chart-ping-" + ip),
+                chart.data,
+                {
+                  fillGraph: true,
+                  stackedGraph: true,
+                  labels: i18nLabels,
+                  height: 200,
+                  strokeWidth: 1,
+                  strokeBorderWidth: 1,
+                  ylabel: context.$i18n.t("troubleshooting.latency_ms"),
+                  axisLineColor: "white",
+                  labelsDiv: document.getElementById("ping-legend-" + ip),
+                  labelsSeparateLines: true,
+                  drawGrid: true,
+                  axes: {
+                    y: {
+                      valueFormatter: function(y) {
+                        return y.toFixed() + " ms";
+                      },
+                    },
+                  },
+                }
+              );
+              g.initialData = chart.data;
+            }
+          });
+        },
+        function(error) {
+          console.error(error);
+          context.view.isPingChartLoaded = true;
+        }
+      );
+    },
+    updatePingDroprateChart() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/troubleshooting/read"],
+        { action: "ping-droprate" },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.charts.droprate = success;
+          context.view.isDroprateChartLoaded = true;
+          context.$nextTick(function() {
+            for (const ip in context.charts.droprate) {
+              var chart = context.charts.droprate[ip];
+
+              for (var t in chart.data) {
+                chart.data[t][0] = new Date(chart.data[t][0]);
+              }
+
+              const i18nLabels = chart.labels.map((label) =>
+                context.$i18n.t("troubleshooting." + label)
+              );
+
+              var g = new Dygraph(
+                document.getElementById("chart-ping-droprate-" + ip),
+                chart.data,
+                {
+                  fillGraph: true,
+                  stackedGraph: true,
+                  labels: i18nLabels,
+                  height: 200,
+                  strokeWidth: 1,
+                  strokeBorderWidth: 1,
+                  ylabel: context.$i18n.t("troubleshooting.droprate_perc"),
+                  axisLineColor: "white",
+                  labelsDiv: document.getElementById(
+                    "ping-droprate-legend-" + ip
+                  ),
+                  labelsSeparateLines: true,
+                  drawGrid: true,
+                  axes: {
+                    y: {
+                      axisLabelFormatter: function(y) {
+                        return (y * 100).toFixed(0) + "%";
+                      },
+                      valueFormatter: function(y) {
+                        return (y * 100).toFixed(0) + "%";
+                      },
+                    },
+                  },
+                }
+              );
+              g.initialData = chart.data;
+            }
+          });
+        },
+        function(error) {
+          console.error(error);
+          context.view.isDroprateChartLoaded = true;
+        }
+      );
     },
   },
 };

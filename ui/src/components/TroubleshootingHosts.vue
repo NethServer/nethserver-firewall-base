@@ -138,7 +138,10 @@
       <div class="row">
         <!-- known hosts -->
         <div class="col-md-12">
-          <h3>{{ $t("troubleshooting.known_hosts") }}</h3>
+          <h3>
+            {{ $t("troubleshooting.known_hosts") }}
+            <span v-if="isLoaded.knownHosts"> ({{ knownHosts.length }})</span>
+          </h3>
           <div class="host-table">
             <div
               v-if="!isLoaded.knownHosts"
@@ -441,7 +444,7 @@ export default {
                 fillGraph: true,
                 stackedGraph: true,
                 labels: i18nLabels,
-                height: 150,
+                height: 200,
                 strokeWidth: 1,
                 strokeBorderWidth: 1,
                 ylabel: context.$i18n.t("troubleshooting.traffic_mbps"),

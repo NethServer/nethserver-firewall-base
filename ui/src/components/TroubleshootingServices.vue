@@ -372,8 +372,7 @@
             <span class="fa fa-external-link"></span>
           </a>
           <h2 class="card-pf-title">
-            <span class="fa fa-cube"></span
-            >{{ $t("troubleshooting.hotspot") }}
+            <span class="fa fa-cube"></span>{{ $t("troubleshooting.hotspot") }}
           </h2>
           <div class="card-pf-body">
             <div
@@ -410,6 +409,64 @@
         </div>
       </div>
       <!-- END HOTSPOT -->
+
+      <!-- FLASHSTART -->
+      <div class="col-sm-4 col-md-3">
+        <div
+          class="card-pf card-pf-accented card-pf-aggregate-status card-with-footer"
+        >
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-flashstart"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
+          <h2 class="card-pf-title">
+            <span class="fa fa-bolt"></span
+            >{{ $t("troubleshooting.flashstart") }}
+          </h2>
+          <div class="card-pf-body">
+            <div
+              v-if="!view.flashstart.isLoaded"
+              class="spinner spinner-lg view-spinner"
+            ></div>
+            <div
+              v-if="
+                view.flashstart.isLoaded && view.flashstart.status == 'running'
+              "
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="pficon pficon-ok"></span>
+            </div>
+            <p
+              v-if="
+                view.flashstart.isLoaded && view.flashstart.status == 'disabled'
+              "
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="fa fa-ban gray"></span>
+            </p>
+            <p
+              v-if="
+                view.flashstart.isLoaded && view.flashstart.status == 'failed'
+              "
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="card-pf-aggregate-status-notification">
+                <span class="pficon pficon-error-circle-o"></span>
+              </span>
+            </p>
+          </div>
+          <div v-if="view.flashstart.status !== 'disabled'" class="footer">
+            <span class="action" @click="showFlashstartModal">
+              <span class="fa fa-search icon"></span
+              >{{ $t("troubleshooting.details") }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- END FLASHSTART -->
     </div>
 
     <h3>{{ $t("troubleshooting.security") }}</h3>
@@ -696,167 +753,30 @@
       </div>
       <!-- END UPS -->
 
-      <!-- FLASHSTART -->
+      <!-- KNOWN HOSTS -->
       <div class="col-sm-4 col-md-3">
-        <div
-          class="card-pf card-pf-accented card-pf-aggregate-status card-with-footer"
-        >
-          <a
-            target="_blank"
-            href="/nethserver#/applications/nethserver-flashstart"
-            class="card-pf-link-with-icon card-action"
-          >
-            <span class="fa fa-external-link"></span>
-          </a>
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
-            <span class="fa fa-bolt"></span
-            >{{ $t("troubleshooting.flashstart") }}
+            <span class="pficon pficon-screen"></span
+            >{{ $t("troubleshooting.known_hosts") }}
           </h2>
           <div class="card-pf-body">
             <div
-              v-if="!view.flashstart.isLoaded"
+              v-if="!view.knownHosts.isLoaded"
               class="spinner spinner-lg view-spinner"
             ></div>
-            <div
-              v-if="
-                view.flashstart.isLoaded && view.flashstart.status == 'running'
-              "
-              class="card-pf-aggregate-status-notifications"
-            >
-              <span class="pficon pficon-ok"></span>
-            </div>
             <p
-              v-if="
-                view.flashstart.isLoaded && view.flashstart.status == 'disabled'
-              "
-              class="card-pf-aggregate-status-notifications"
-            >
-              <span class="fa fa-ban gray"></span>
-            </p>
-            <p
-              v-if="
-                view.flashstart.isLoaded && view.flashstart.status == 'failed'
-              "
+              v-if="view.knownHosts.isLoaded"
               class="card-pf-aggregate-status-notifications"
             >
               <span class="card-pf-aggregate-status-notification">
-                <span class="pficon pficon-error-circle-o"></span>
+                <span>{{ view.knownHosts.total }}</span>
               </span>
             </p>
           </div>
-          <div v-if="view.flashstart.status !== 'disabled'" class="footer">
-            <span class="action" @click="showFlashstartModal">
-              <span class="fa fa-search icon"></span
-              >{{ $t("troubleshooting.details") }}
-            </span>
-          </div>
         </div>
       </div>
-      <!-- END FLASHSTART -->
-    </div>
-
-    <h3>{{ $t("troubleshooting.network") }}</h3>
-
-    <div class="row row-cards-pf">
-      <!-- TRAFFIC BY INTERFACE CHART -->
-      <div class="col-md-12">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
-          <div
-            v-if="!view.isTrafficChartLoaded"
-            class="spinner spinner-lg view-spinner  mg-top-20"
-          ></div>
-          <div class="card-pf-body">
-            <div
-              v-if="view.invalidChartsTrafficByInterfaceData"
-              class="alert alert-warning alert-dismissable col-sm-12"
-            >
-              <span class="pficon pficon-warning-triangle-o"></span>
-              <strong>{{ $t("warning") }}!</strong>
-              {{
-                $t("troubleshooting.traffic_by_interface_charts_not_updated")
-              }}.
-            </div>
-            <div v-if="view.isTrafficChartLoaded">
-              <h4 class="mg-top">
-                {{ $t("troubleshooting.traffic_by_interface") }}
-              </h4>
-              <div
-                :id="'traffic-by-interface-legend'"
-                class="troubleshooting-chart-legend"
-              ></div>
-              <div :id="'chart-traffic-by-interface'" class="chart-ping"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- END TRAFFIC BY INTERFACE CHART -->
-      <!-- PING CHART -->
-      <div class="col-md-6">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
-          <div
-            v-if="!view.isPingChartLoaded"
-            class="spinner spinner-lg view-spinner  mg-top-20"
-          ></div>
-          <div class="card-pf-body">
-            <div
-              v-if="view.invalidChartsPingData"
-              class="alert alert-warning alert-dismissable col-sm-12"
-            >
-              <span class="pficon pficon-warning-triangle-o"></span>
-              <strong>{{ $t("warning") }}!</strong>
-              {{ $t("troubleshooting.ping_charts_not_updated") }}.
-            </div>
-            <div v-if="view.isPingChartLoaded">
-              <div v-for="(data, index) in charts.ping" :key="index">
-                <h4 class="mg-top">
-                  {{ $t("troubleshooting.ping") }}: {{ index }}
-                </h4>
-                <div
-                  :id="'ping-legend-' + index"
-                  class="troubleshooting-chart-legend"
-                ></div>
-                <div :id="'chart-ping-' + index" class="chart-ping"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- END PING CHART -->
-      <!-- PING DROPRATE -->
-      <div class="col-md-6">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
-          <div
-            v-if="!view.isDroprateChartLoaded"
-            class="spinner spinner-lg view-spinner  mg-top-20"
-          ></div>
-          <div class="card-pf-body">
-            <div
-              v-if="view.invalidChartsPingDroprateData"
-              class="alert alert-warning alert-dismissable col-sm-12"
-            >
-              <span class="pficon pficon-warning-triangle-o"></span>
-              <strong>{{ $t("warning") }}!</strong>
-              {{ $t("troubleshooting.ping_droprate_charts_not_updated") }}.
-            </div>
-            <div v-if="view.isDroprateChartLoaded">
-              <div v-for="(data, index) in charts.droprate" :key="index">
-                <h4 class="mg-top">
-                  {{ $t("troubleshooting.ping_droprate") }}: {{ index }}
-                </h4>
-                <div
-                  :id="'ping-droprate-legend-' + index"
-                  class="troubleshooting-chart-legend"
-                ></div>
-                <div
-                  :id="'chart-ping-droprate-' + index"
-                  class="chart-ping"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- END PING DROPRATE -->
+      <!-- END KNOWN HOSTS -->
     </div>
 
     <!-- ntopng modal -->
@@ -921,11 +841,14 @@
               {{ $t("troubleshooting.hotspot_unit_modal_description") }}
             </div>
             <ul v-if="view.hotspot.details" class="list-group mg-top-10">
-              <li
-                class="list-group-item"
-              >
+              <li class="list-group-item">
                 <span class="fa fa-cube icon"></span>
-                <span><b>{{ view.hotspot.details.name }}</b> {{ $t("troubleshooting.hotspot_unit_modal_on_interface") + ' ' }}</span>
+                <span
+                  ><b>{{ view.hotspot.details.name }}</b>
+                  {{
+                    $t("troubleshooting.hotspot_unit_modal_on_interface") + " "
+                  }}</span
+                >
                 <code>{{ view.hotspot.details.interface }}</code>
               </li>
             </ul>
@@ -1119,13 +1042,6 @@ export default {
   data() {
     return {
       view: {
-        isPingChartLoaded: false,
-        isDroprateChartLoaded: false,
-        isTrafficChartLoaded: false,
-        invalidChartsPingData: false,
-        invalidChartsPingDroprateData: false,
-        invalidChartsTrafficByInterfaceData: false,
-
         internet: { status: "disabled", isLoaded: false },
         shorewall: { status: "disabled", isLoaded: false },
         multiwan: { status: "disabled", isLoaded: false },
@@ -1148,34 +1064,12 @@ export default {
         yum: { status: "disabled", isLoaded: false },
         ups: { status: "disabled", isLoaded: false },
         flashstart: { status: "disabled", isLoaded: false },
+        knownHosts: { total: 0, isLoaded: false },
       },
-      charts: {
-        ping: {},
-        droprate: {},
-        traffic: {},
-      },
-      pingChartInterval: null,
-      pingDroprateChartInterval: null,
-      trafficByInterfaceChartInterval: null,
     };
   },
   mounted() {
     var context = this;
-
-    context.updatePingChart();
-    context.pingChartInterval = setInterval(function() {
-      context.updatePingChart();
-    }, 30000);
-
-    context.updatePingDroprateChart();
-    context.pingDroprateChartInterval = setInterval(function() {
-      context.updatePingDroprateChart();
-    }, 30000);
-
-    context.updateTrafficByInterfaceChart();
-    context.trafficByInterfaceChartInterval = setInterval(function() {
-      context.updateTrafficByInterfaceChart();
-    }, 30000);
 
     const services = [
       "internet",
@@ -1194,19 +1088,18 @@ export default {
       "yum",
       "ups",
       "flashstart",
-      "hotspot"
+      "hotspot",
     ];
     services.forEach(function(item, index) {
       context.getServiceStatus(item);
     });
 
+    this.getKnownHosts();
+
     $("#ts-services-tab-parent").click();
   },
   beforeDestroy() {
     $(".modal").modal("hide");
-    clearInterval(this.pingChartInterval);
-    clearInterval(this.pingDroprateChartInterval);
-    clearInterval(this.trafficByInterfaceChartInterval);
   },
   methods: {
     getServiceStatus(service) {
@@ -1235,231 +1128,6 @@ export default {
           context["view"][service]["isLoaded"] = false;
         }
       );
-    },
-    updatePingChart() {
-      var context = this;
-      nethserver.exec(
-        ["nethserver-firewall-base/troubleshooting/read"],
-        { action: "ping", time: 900 },
-        null,
-        function(success) {
-          try {
-            success = JSON.parse(success);
-          } catch (e) {
-            console.error(e);
-          }
-          context.charts.ping = success;
-          context.view.invalidChartsPingData = false;
-          context.view.isPingChartLoaded = true;
-          context.$nextTick(function() {
-            for (const ip in context.charts.ping) {
-              var chart = context.charts.ping[ip];
-
-              for (var t in chart.data) {
-                chart.data[t][0] = new Date(chart.data[t][0]);
-              }
-
-              const i18nLabels = chart.labels.map((label) =>
-                context.$i18n.t("troubleshooting." + label)
-              );
-
-              var g = new Dygraph(
-                document.getElementById("chart-ping-" + ip),
-                chart.data,
-                {
-                  fillGraph: true,
-                  stackedGraph: true,
-                  labels: i18nLabels,
-                  height: 150,
-                  strokeWidth: 1,
-                  strokeBorderWidth: 1,
-                  ylabel: context.$i18n.t("troubleshooting.latency_ms"),
-                  axisLineColor: "white",
-                  labelsDiv: document.getElementById("ping-legend-" + ip),
-                  labelsSeparateLines: true,
-                  drawGrid: true,
-                  axes: {
-                    y: {
-                      valueFormatter: function(y) {
-                        return y.toFixed() + " ms";
-                      },
-                    },
-                  },
-                }
-              );
-              g.initialData = chart.data;
-            }
-          });
-        },
-        function(error) {
-          console.error(error);
-          context.view.isPingChartLoaded = true;
-        }
-      );
-    },
-    updatePingDroprateChart() {
-      var context = this;
-      nethserver.exec(
-        ["nethserver-firewall-base/troubleshooting/read"],
-        { action: "ping-droprate", time: 900 },
-        null,
-        function(success) {
-          try {
-            success = JSON.parse(success);
-          } catch (e) {
-            console.error(e);
-          }
-          context.charts.droprate = success;
-          context.view.invalidChartsPingDroprateData = false;
-          context.view.isDroprateChartLoaded = true;
-          context.$nextTick(function() {
-            for (const ip in context.charts.droprate) {
-              var chart = context.charts.droprate[ip];
-
-              for (var t in chart.data) {
-                chart.data[t][0] = new Date(chart.data[t][0]);
-              }
-
-              const i18nLabels = chart.labels.map((label) =>
-                context.$i18n.t("troubleshooting." + label)
-              );
-
-              var g = new Dygraph(
-                document.getElementById("chart-ping-droprate-" + ip),
-                chart.data,
-                {
-                  fillGraph: true,
-                  stackedGraph: true,
-                  labels: i18nLabels,
-                  height: 150,
-                  strokeWidth: 1,
-                  strokeBorderWidth: 1,
-                  ylabel: context.$i18n.t("troubleshooting.droprate_perc"),
-                  axisLineColor: "white",
-                  labelsDiv: document.getElementById(
-                    "ping-droprate-legend-" + ip
-                  ),
-                  labelsSeparateLines: true,
-                  drawGrid: true,
-                  axes: {
-                    y: {
-                      axisLabelFormatter: function(y) {
-                        return (y * 100).toFixed(0) + "%";
-                      },
-                      valueFormatter: function(y) {
-                        return (y * 100).toFixed(0) + "%";
-                      },
-                    },
-                  },
-                }
-              );
-              g.initialData = chart.data;
-            }
-          });
-        },
-        function(error) {
-          console.error(error);
-          context.view.isDroprateChartLoaded = true;
-        }
-      );
-    },
-    updateTrafficByInterfaceChart() {
-      var context = this;
-      nethserver.exec(
-        ["nethserver-firewall-base/troubleshooting/read"],
-        { action: "traffic-by-interface", time: 900 },
-        null,
-        function(success) {
-          try {
-            success = JSON.parse(success);
-          } catch (e) {
-            console.error(e);
-          }
-          //context.charts.traffic = success;
-          context.view.invalidChartsPingDroprateData = false;
-          context.view.isTrafficChartLoaded = true;
-          context.$nextTick(function() {
-            var chart = success["trafficByInterface"];
-            const startTime = chart.data[0][0];
-
-            for (var t in chart.data) {
-              chart.data[t][0] = new Date(chart.data[t][0] * 1000);
-
-              for (let i = 1; i < chart.data[t].length; i++) {
-                // show througput in kbit/s
-                chart.data[t][i] = chart.data[t][i] / 1000;
-              }
-            }
-
-            // set initial data
-            if (!context.charts.traffic.graph) {
-              context.charts.traffic.initialData = chart;
-            }
-
-            // zero-fill previous chart data
-            context.zeroFillTrafficByInterfaceChart(startTime);
-
-            if (!context.charts.traffic.graph) {
-              context.charts.traffic.graph = new Dygraph(
-                document.getElementById("chart-traffic-by-interface"),
-                context.charts.traffic.initialData.data,
-                {
-                  fillGraph: true,
-                  stackedGraph: true,
-                  labels: context.charts.traffic.initialData.labels,
-                  height: 150,
-                  strokeWidth: 1,
-                  strokeBorderWidth: 1,
-                  ylabel: context.$i18n.t("troubleshooting.traffic_mbps"),
-                  axisLineColor: "white",
-                  labelsDiv: document.getElementById(
-                    "traffic-by-interface-legend"
-                  ),
-                  labelsSeparateLines: true,
-                  drawGrid: true,
-                  axes: {
-                    y: {
-                      valueFormatter: function(y) {
-                        return (y / 1000).toFixed(2) + " mbit/s";
-                      },
-                    },
-                  },
-                }
-              );
-            } else {
-              // append to previous data and retain only visible samples (to avoid memory overload)
-              context.charts.traffic.initialData.data = context.charts.traffic.initialData.data
-                .concat(chart.data)
-                .slice(-1 * 60);
-
-              context.charts.traffic.graph.updateOptions({
-                file: context.charts.traffic.initialData.data,
-              });
-            }
-          });
-        },
-        function(error) {
-          console.error(error);
-          context.view.isTrafficChartLoaded = true;
-        }
-      );
-    },
-    zeroFillTrafficByInterfaceChart(startTime) {
-      let time = startTime;
-
-      for (let i = 0; i < 2880; i++) {
-        time -= 30000 / 1000;
-        let zeroSample = [new Date(time * 1000)];
-
-        for (
-          let j = 1;
-          j < this.charts.traffic.initialData.labels.length;
-          j++
-        ) {
-          zeroSample.push(0);
-        }
-        this.charts.traffic.initialData.data.unshift(zeroSample);
-      }
     },
     showNtopngModal() {
       $("#ntopngModal").modal("show");
@@ -1496,6 +1164,29 @@ export default {
     },
     hideFtlModal() {
       $("#ftlModal").modal("hide");
+    },
+    getKnownHosts() {
+      const context = this;
+      nethserver.exec(
+        ["nethserver-firewall-base/troubleshooting/read"],
+        {
+          action: "host-list",
+        },
+        null,
+        function(success) {
+          try {
+            success = JSON.parse(success);
+          } catch (e) {
+            console.error(e);
+          }
+          context.view.knownHosts.total = success.length;
+          context.view.knownHosts.isLoaded = true;
+        },
+        function(error) {
+          console.error(error);
+          context.view.knownHosts.isLoaded = true;
+        }
+      );
     },
   },
 };
