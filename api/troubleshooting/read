@@ -385,7 +385,8 @@ if ($cmd eq 'ping') {
     my $rcvd = $response->{'series'}[1]->{'data'};
     foreach (keys $sent) {
         # express time in milliseconds and traffic in mbit/s
-        push(@data, [$_*1000, $sent->{$_}/1024/1024, $rcvd->{$_}/1024/1024]);
+        # HACK: multiply values for 10 just to match ntopng graph
+        push(@data, [$_*1000, $sent->{$_}/1024/1024*10, $rcvd->{$_}/1024/1024*10]);
     }
     my $tsent = $response->{'statistics'}{'by_serie'}[0]->{'total'};
     my $trcvd = $response->{'statistics'}{'by_serie'}[1]->{'total'};
