@@ -1159,12 +1159,7 @@ export default {
       trafficByInterfaceChartInterval: null,
     };
   },
-  created() {
-    console.log("services created"); ////
-  },
   mounted() {
-    console.log("services mounted"); ////
-
     var context = this;
 
     context.updatePingChart();
@@ -1208,8 +1203,6 @@ export default {
     $("#ts-services-tab-parent").click();
   },
   beforeDestroy() {
-    console.log("services beforeDestroy"); ////
-
     $(".modal").modal("hide");
     clearInterval(this.pingChartInterval);
     clearInterval(this.pingDroprateChartInterval);
@@ -1232,13 +1225,9 @@ export default {
           context["view"][service]["status"] = success.status;
           if ("details" in success) {
             context["view"][service]["details"] = success.details;
-
-            console.log(service, "details", success.details); ////
           }
           if ("date" in success) {
             context["view"][service]["date"] = parseInt(success.date) || null;
-
-            console.log(service, "date", success.date); ////
           }
         },
         function(error) {
