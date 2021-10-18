@@ -298,11 +298,11 @@ if ($cmd eq 'ping') {
 
         if ($status eq 'enabled') {
             my $s = NethServer::Service->new($service, $cdb);
-	    if ($s->is_running()) {
+	        if ($s->is_running()) {
                 $status = 'running';
             } else {
-	        $status = 'failed';
-	    }
+	            $status = 'failed';
+	        }
         }
         foreach my $i (split(',',$cdb->get_prop('ntopng', 'Interfaces'))) {
             my $role = $ndb->get_prop($i, 'role') || next;
@@ -315,11 +315,11 @@ if ($cmd eq 'ping') {
 
         if ($status eq 'enabled') {
             my $s = NethServer::Service->new('unbound', $cdb);
-	    if ($s->is_running()) {
+	        if ($s->is_running()) {
                 $status = 'running';
             } else {
-	        $status = 'failed';
-	    }
+	            $status = 'failed';
+	        }
             @details = split(',', $cdb->get_prop('flashstart', 'Roles') || '');
         }
         print encode_json({"status" => $status, "details" => \@details});
