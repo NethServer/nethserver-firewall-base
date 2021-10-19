@@ -249,7 +249,7 @@
       role="dialog"
       data-backdrop="static"
     >
-      <div class="modal-dialog">
+      <div class="modal-dialog host-traffic">
         <div class="modal-content">
           <div class="modal-header">
             <h4 class="modal-title">
@@ -483,9 +483,9 @@ export default {
               chart.data,
               {
                 fillGraph: true,
-                stackedGraph: true,
+                stackedGraph: false,
                 labels: i18nLabels,
-                height: 200,
+                height: 300,
                 strokeWidth: 1,
                 strokeBorderWidth: 1,
                 ylabel: context.$i18n.t("troubleshooting.traffic_mbps"),
@@ -581,5 +581,11 @@ export default {
 
 .pad-20 {
   padding: 25px !important;
+}
+
+@media (min-width: 1056px) {
+  .modal-dialog.host-traffic {
+    width: 800px !important;
+  }
 }
 </style>

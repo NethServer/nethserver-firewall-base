@@ -510,7 +510,7 @@ export default {
                   chart.data,
                   {
                     fillGraph: true,
-                    stackedGraph: true,
+                    stackedGraph: false,
                     labels: i18nLabels,
                     height: 200,
                     strokeWidth: 1,
@@ -573,7 +573,7 @@ export default {
                 chart.data,
                 {
                   fillGraph: true,
-                  stackedGraph: true,
+                  stackedGraph: false,
                   labels: i18nLabels,
                   height: 200,
                   strokeWidth: 1,
@@ -643,7 +643,7 @@ export default {
                 context.charts.traffic.initialData.data,
                 {
                   fillGraph: true,
-                  stackedGraph: true,
+                  stackedGraph: false,
                   labels: context.charts.traffic.initialData.labels,
                   height: 200,
                   strokeWidth: 1,
@@ -730,7 +730,7 @@ export default {
                 chart.data,
                 {
                   fillGraph: true,
-                  stackedGraph: true,
+                  stackedGraph: false,
                   labels: i18nLabels,
                   height: 200,
                   strokeWidth: 1,
@@ -790,7 +790,7 @@ export default {
                 chart.data,
                 {
                   fillGraph: true,
-                  stackedGraph: true,
+                  stackedGraph: false,
                   labels: i18nLabels,
                   height: 200,
                   strokeWidth: 1,
