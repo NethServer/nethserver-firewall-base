@@ -574,7 +574,8 @@
         "known_hosts": "Known hosts",
         "host": "Host",
         "interface": "Interface",
-        "mac_address":"MAC address"
+        "mac_address":"MAC address",
+        "search_ip": "Search host by IP address"
     },
     "about": {
         "title": "About",

@@ -136,6 +136,38 @@
         </div>
       </div>
       <div class="row">
+        <!-- search -->
+        <div class="col-md-12">
+          <h3>
+            {{ $t("troubleshooting.search_ip") }}
+          </h3>
+        </div>
+        <form role="form" class="form-horizontal" v-on:submit.prevent="">
+          <div class="col-sm-3">
+            <div class="form-group no-mg-left">
+              <input
+                required
+                type="text"
+                :placeholder="$t('troubleshooting.ip_address')"
+                v-model.trim="ipAddress"
+                class="form-control ip-address"
+              />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <button
+                class="btn btn-primary"
+                type="submit"
+                @click="showHostModalForIpAddress(ipAddress)"
+              >
+                <span class="fa fa-search"></span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="row">
         <!-- known hosts -->
         <div class="col-md-12">
           <h3>
@@ -172,7 +204,13 @@
                   placeholder: tableLangsTexts.globalSearchPlaceholder,
                 }"
                 :pagination-options="{
-                  enabled: false,
+                  enabled: true,
+                  perPageDropdown: [25, 50, 100],
+                  perPage: 25,
+                  nextLabel: tableLangsTexts.nextText,
+                  prevLabel: tableLangsTexts.prevText,
+                  ofLabel: tableLangsTexts.ofText,
+                  rowsPerPageLabel: tableLangsTexts.rowsPerPageText,
                 }"
                 styleClass="table responsive vgt2"
               >
@@ -310,6 +348,7 @@ export default {
         },
       ],
       tableLangsTexts: this.tableLangs(),
+      ipAddress: "",
       isLoaded: {
         ntopngStatus: false,
         topLocalHosts: false,
@@ -475,6 +514,14 @@ export default {
     },
     showHostModal(host) {
       this.currentHost = host;
+      this.getHostTraffic();
+      $("#hostModal").modal("show");
+    },
+    showHostModalForIpAddress(ipAddress) {
+      if (!ipAddress) {
+        return;
+      }
+      this.currentHost = { ip: ipAddress, name: ipAddress };
       this.getHostTraffic();
       $("#hostModal").modal("show");
     },
