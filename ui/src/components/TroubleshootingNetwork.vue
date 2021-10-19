@@ -769,4 +769,22 @@ export default {
 .card-pf-aggregate-status .card-pf-title {
   font-size: 16px;
 }
+
+.card-pf-aggregate-status .card-action {
+  float: right;
+  margin-top: 10px;
+}
+
+.card-pf-aggregate-status .card-action span {
+  margin-right: 0;
+}
+
+.card-pf-aggregate-status .card-action .fa {
+  font-size: 14px;
+  color: #0088ce !important;
+}
+
+.card-pf-aggregate-status .card-action .fa:hover {
+  color: #0088ce !important;
+}
 </style>
