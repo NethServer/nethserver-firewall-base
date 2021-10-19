@@ -472,6 +472,84 @@
     <h3>{{ $t("troubleshooting.security") }}</h3>
 
     <div class="row row-cards-pf">
+      <!-- SURICATA -->
+      <div class="col-sm-4 col-md-3">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-suricata"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
+          <h2 class="card-pf-title">
+            <span class="pf-icon pficon-security"></span
+            >{{ $t("troubleshooting.suricata") }}
+          </h2>
+          <div class="card-pf-body">
+            <div
+              v-if="!view.suricata.isLoaded"
+              class="spinner spinner-lg view-spinner"
+            ></div>
+            <p
+              v-if="view.suricata.isLoaded"
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="card-pf-aggregate-status-notification">
+                <span
+                  v-if="view.suricata.status == 'disabled'"
+                  class="fa fa-ban gray"
+                ></span>
+                <span
+                  v-if="view.suricata.status == 'running'"
+                  class="pficon pficon-ok"
+                ></span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- END SURICATA -->
+
+      <!-- FAIL2BAN -->
+      <div class="col-sm-4 col-md-3">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <a
+            target="_blank"
+            href="/nethserver#/applications/nethserver-fail2ban"
+            class="card-pf-link-with-icon card-action"
+          >
+            <span class="fa fa-external-link"></span>
+          </a>
+          <h2 class="card-pf-title">
+            <span class="pf-icon pficon-locked"></span
+            >{{ $t("troubleshooting.fail2ban") }}
+          </h2>
+          <div class="card-pf-body">
+            <div
+              v-if="!view.fail2ban.isLoaded"
+              class="spinner spinner-lg view-spinner"
+            ></div>
+            <p
+              v-if="view.fail2ban.isLoaded"
+              class="card-pf-aggregate-status-notifications"
+            >
+              <span class="card-pf-aggregate-status-notification">
+                <span
+                  v-if="view.fail2ban.status == 'disabled'"
+                  class="fa fa-ban gray"
+                ></span>
+                <span
+                  v-if="view.fail2ban.status == 'running'"
+                  class="pficon pficon-ok"
+                ></span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- END FAIL2BAN -->
+
       <!-- IP BLACKLIST -->
       <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
@@ -557,84 +635,6 @@
         </div>
       </div>
       <!-- END FTL -->
-
-      <!-- FAIL2BAN -->
-      <div class="col-sm-4 col-md-3">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
-          <a
-            target="_blank"
-            href="/nethserver#/applications/nethserver-fail2ban"
-            class="card-pf-link-with-icon card-action"
-          >
-            <span class="fa fa-external-link"></span>
-          </a>
-          <h2 class="card-pf-title">
-            <span class="pf-icon pficon-locked"></span
-            >{{ $t("troubleshooting.fail2ban") }}
-          </h2>
-          <div class="card-pf-body">
-            <div
-              v-if="!view.fail2ban.isLoaded"
-              class="spinner spinner-lg view-spinner"
-            ></div>
-            <p
-              v-if="view.fail2ban.isLoaded"
-              class="card-pf-aggregate-status-notifications"
-            >
-              <span class="card-pf-aggregate-status-notification">
-                <span
-                  v-if="view.fail2ban.status == 'disabled'"
-                  class="fa fa-ban gray"
-                ></span>
-                <span
-                  v-if="view.fail2ban.status == 'running'"
-                  class="pficon pficon-ok"
-                ></span>
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-      <!-- END FAIL2BAN -->
-
-      <!-- SURICATA -->
-      <div class="col-sm-4 col-md-3">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
-          <a
-            target="_blank"
-            href="/nethserver#/applications/nethserver-suricata"
-            class="card-pf-link-with-icon card-action"
-          >
-            <span class="fa fa-external-link"></span>
-          </a>
-          <h2 class="card-pf-title">
-            <span class="pf-icon pficon-security"></span
-            >{{ $t("troubleshooting.suricata") }}
-          </h2>
-          <div class="card-pf-body">
-            <div
-              v-if="!view.suricata.isLoaded"
-              class="spinner spinner-lg view-spinner"
-            ></div>
-            <p
-              v-if="view.suricata.isLoaded"
-              class="card-pf-aggregate-status-notifications"
-            >
-              <span class="card-pf-aggregate-status-notification">
-                <span
-                  v-if="view.suricata.status == 'disabled'"
-                  class="fa fa-ban gray"
-                ></span>
-                <span
-                  v-if="view.suricata.status == 'running'"
-                  class="pficon pficon-ok"
-                ></span>
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-      <!-- END SURICATA -->
     </div>
 
     <h3>{{ $t("troubleshooting.other") }}</h3>
@@ -1232,12 +1232,6 @@ export default {
   margin-left: auto !important;
 }
 
-.chart-ping {
-  padding-left: 5px;
-  padding-right: 5px;
-  margin-bottom: 20px;
-}
-
 .card-with-footer {
   padding-left: 0 !important;
   padding-right: 0 !important;
@@ -1267,5 +1261,14 @@ export default {
 .card-with-footer .footer .action {
   color: #0088ce;
   cursor: pointer;
+}
+
+.card-pf-body .pficon,
+.card-pf-body .fa {
+  font-size: 22px;
+}
+
+.card-pf-aggregate-status .card-pf-title {
+  font-size: 16px;
 }
 </style>

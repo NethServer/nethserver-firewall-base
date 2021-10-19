@@ -501,7 +501,7 @@
         "filter_label": "Regexp filter"
     },
     "troubleshooting": {
-        "title": "Troubleshooting",
+        "title": "Analysis",
         "services": "Services",
         "wans": "WANs",
         "hosts": "Hosts",
@@ -517,7 +517,7 @@
         "charts": "Charts",
         "ipblacklist": "Threat shield IP",
         "ftl": "Threat shield DNS",
-        "systemd": "System services",
+        "systemd": "System services health",
         "templates": "Custom templates",
         "multiwan": "MultiWAN",
         "shorewall": "Firewall",
@@ -532,7 +532,7 @@
         "fail2ban": "Fail2ban",
         "ntopng": "Bandwidth monitor",
         "hotspot": "Hotspot",
-        "yum_last_update": "Yum last update",
+        "yum_last_update": "Last system update",
         "ups": "UPS",
         "flashstart": "Flashstart",
         "latency_ms": "Latency (ms)",
@@ -575,7 +575,10 @@
         "host": "Host",
         "interface": "Interface",
         "mac_address":"MAC address",
-        "search_ip": "Search host by IP address"
+        "search_ip": "Search host by IP address",
+        "subscription_needed": "Subscription required",
+        "subscription_needed_description": "You need a valid subscription to access this section",
+        "go_to_subscription": "Go to subscription"
     },
     "about": {
         "title": "About",

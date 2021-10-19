@@ -1,99 +1,5 @@
 <template>
   <div class="container-fluid container-cards-pf">
-    <h3>{{ $t("troubleshooting.status") }}</h3>
-
-    <div class="row row-cards-pf">
-      <!-- TRAFFIC BY INTERFACE CHART -->
-      <div class="col-md-12">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
-          <div
-            v-if="!view.isTrafficChartLoaded"
-            class="spinner spinner-lg view-spinner  mg-top-20"
-          ></div>
-          <div class="card-pf-body">
-            <div v-if="view.isTrafficChartLoaded">
-              <h4 class="mg-top">
-                {{ $t("troubleshooting.traffic_by_interface_last_hour") }}
-              </h4>
-              <div
-                :id="'traffic-by-interface-legend'"
-                class="troubleshooting-chart-legend"
-              ></div>
-              <div :id="'chart-traffic-by-interface'" class="chart-ping"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- END TRAFFIC BY INTERFACE CHART -->
-      <!-- PING CHART -->
-      <div class="col-md-6">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
-          <div
-            v-if="!view.isPingChartLoaded"
-            class="spinner spinner-lg view-spinner  mg-top-20"
-          ></div>
-          <div class="card-pf-body">
-            <div
-              v-if="view.invalidChartsPingData"
-              class="alert alert-warning alert-dismissable col-sm-12"
-            >
-              <span class="pficon pficon-warning-triangle-o"></span>
-              <strong>{{ $t("warning") }}!</strong>
-              {{ $t("troubleshooting.ping_charts_not_updated") }}.
-            </div>
-            <div v-if="view.isPingChartLoaded">
-              <div v-for="(data, index) in charts.ping" :key="index">
-                <h4 class="mg-top">
-                  {{ $t("troubleshooting.ping") }}: {{ index }}
-                </h4>
-                <div
-                  :id="'ping-legend-' + index"
-                  class="troubleshooting-chart-legend"
-                ></div>
-                <div :id="'chart-ping-' + index" class="chart-ping"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- END PING CHART -->
-      <!-- PING DROPRATE -->
-      <div class="col-md-6">
-        <div class="card-pf card-pf-accented card-pf-aggregate-status">
-          <div
-            v-if="!view.isDroprateChartLoaded"
-            class="spinner spinner-lg view-spinner  mg-top-20"
-          ></div>
-          <div class="card-pf-body">
-            <div
-              v-if="view.invalidChartsPingDroprateData"
-              class="alert alert-warning alert-dismissable col-sm-12"
-            >
-              <span class="pficon pficon-warning-triangle-o"></span>
-              <strong>{{ $t("warning") }}!</strong>
-              {{ $t("troubleshooting.ping_droprate_charts_not_updated") }}.
-            </div>
-            <div v-if="view.isDroprateChartLoaded">
-              <div v-for="(data, index) in charts.droprate" :key="index">
-                <h4 class="mg-top">
-                  {{ $t("troubleshooting.ping_droprate") }}: {{ index }}
-                </h4>
-                <div
-                  :id="'ping-droprate-legend-' + index"
-                  class="troubleshooting-chart-legend"
-                ></div>
-                <div
-                  :id="'chart-ping-droprate-' + index"
-                  class="chart-ping"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- END PING DROPRATE -->
-    </div>
-
     <h3>{{ $t("troubleshooting.wans") }}</h3>
     <div class="row row-cards-pf">
       <!-- MULTIWAN -->
@@ -165,7 +71,11 @@
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-network"></span>
-            <span>{{ iface.name }} ({{ iface.provider.name }})</span>
+            <span v-if="iface.nslabel"
+              >{{ iface.nslabel }} ({{ iface.name }} -
+              {{ iface.provider.name }})</span
+            >
+            <span v-else>{{ iface.name }} ({{ iface.provider.name }})</span>
           </h2>
           <div class="card-pf-body mg-top-20">
             <div class="table-wrapper card-pf-aggregate-status-notifications">
@@ -187,21 +97,6 @@
                       {{ $t("troubleshooting.up") }}
                     </span>
                     <span v-else>{{ $t("troubleshooting.down") }}</span>
-                  </div>
-                </div>
-                <!-- nslabel -->
-                <div class="tr" v-if="iface.nslabel">
-                  <div class="td">
-                    <div
-                      data-toggle="tooltip"
-                      data-placement="bottom"
-                      :title="$t('troubleshooting.label')"
-                    >
-                      <span class="pficon pficon-info row-icon"></span>
-                    </div>
-                  </div>
-                  <div class="td">
-                    {{ iface.nslabel }}
                   </div>
                 </div>
                 <!-- cidr -->
@@ -282,7 +177,7 @@
       </div>
       <!-- END RED INTERFACES -->
     </div>
-    <!-- CHARTS -->
+    <!-- INTERFACE CHARTS -->
     <div v-show="!isLoaded.wanProviders" class="col-md-4">
       <div class="card-pf card-pf-accented card-pf-aggregate-status">
         <h2 class="card-pf-title mg-top-20"></h2>
@@ -296,7 +191,13 @@
       v-for="(iface, index) in wanProviders.configuration.interfaces"
       :key="index"
     >
-      <h3>{{ iface.name }} ({{ iface.provider.name }})</h3>
+      <h3>
+        <span v-if="iface.nslabel"
+          >{{ iface.nslabel }} ({{ iface.name }} -
+          {{ iface.provider.name }})</span
+        >
+        <span v-else>{{ iface.name }} ({{ iface.provider.name }})</span>
+      </h3>
       <div class="row row-cards-pf">
         <div class="col-md-12">
           <div class="card-pf card-pf-accented card-pf-aggregate-status">
@@ -353,7 +254,75 @@
       </div>
       <!-- END PING CHARTS -->
     </div>
-    <!-- END CHARTS -->
+    <!-- END INTERFACE CHARTS -->
+
+    <h3>{{ $t("troubleshooting.status") }}</h3>
+    <div class="row row-cards-pf">
+      <!-- PING CHART -->
+      <div class="col-md-6">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <div
+            v-if="!view.isPingChartLoaded"
+            class="spinner spinner-lg view-spinner  mg-top-20"
+          ></div>
+          <div class="card-pf-body">
+            <div
+              v-if="view.invalidChartsPingData"
+              class="alert alert-warning alert-dismissable col-sm-12"
+            >
+              <span class="pficon pficon-warning-triangle-o"></span>
+              <strong>{{ $t("warning") }}!</strong>
+              {{ $t("troubleshooting.ping_charts_not_updated") }}.
+            </div>
+            <div v-if="view.isPingChartLoaded">
+              <div v-for="(data, index) in charts.ping" :key="index">
+                <h4 class="mg-top">
+                  {{ $t("troubleshooting.ping") }}: {{ index }}
+                </h4>
+                <div
+                  :id="'ping-legend-' + index"
+                  class="troubleshooting-chart-legend"
+                ></div>
+                <div :id="'chart-ping-' + index" class="chart"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PING CHART -->
+      <!-- PING DROPRATE -->
+      <div class="col-md-6">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <div
+            v-if="!view.isDroprateChartLoaded"
+            class="spinner spinner-lg view-spinner  mg-top-20"
+          ></div>
+          <div class="card-pf-body">
+            <div
+              v-if="view.invalidChartsPingDroprateData"
+              class="alert alert-warning alert-dismissable col-sm-12"
+            >
+              <span class="pficon pficon-warning-triangle-o"></span>
+              <strong>{{ $t("warning") }}!</strong>
+              {{ $t("troubleshooting.ping_droprate_charts_not_updated") }}.
+            </div>
+            <div v-if="view.isDroprateChartLoaded">
+              <div v-for="(data, index) in charts.droprate" :key="index">
+                <h4 class="mg-top">
+                  {{ $t("troubleshooting.ping_droprate") }}: {{ index }}
+                </h4>
+                <div
+                  :id="'ping-droprate-legend-' + index"
+                  class="troubleshooting-chart-legend"
+                ></div>
+                <div :id="'chart-ping-droprate-' + index" class="chart"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PING DROPRATE -->
+    </div>
   </div>
 </template>
 
@@ -365,10 +334,8 @@ export default {
   data() {
     return {
       TRAFFIC_BY_INTERFACE_SAMPLES: 240,
-      UPDATE_TRAFFIC_BY_INTERFACE_INTERVAL: 15000, // 15 seconds
       view: {
         multiwan: { status: "disabled", isLoaded: false },
-        isTrafficChartLoaded: false,
         isPingChartLoaded: false,
         isDroprateChartLoaded: false,
       },
@@ -380,11 +347,9 @@ export default {
       ifacePingChartsInterval: null,
       pingChartInterval: null,
       pingDroprateChartInterval: null,
-      trafficByInterfaceChartInterval: null,
       charts: {
         ping: {},
         droprate: {},
-        traffic: {},
       },
       isLoaded: {
         wanProviders: false,
@@ -396,11 +361,6 @@ export default {
     this.getServiceStatus("multiwan");
     this.getWanProviders();
     let context = this;
-
-    this.updateTrafficByInterfaceChart();
-    this.trafficByInterfaceChartInterval = setInterval(function() {
-      context.updateTrafficByInterfaceChart();
-    }, this.UPDATE_TRAFFIC_BY_INTERFACE_INTERVAL);
 
     this.updatePingChart();
     this.pingChartInterval = setInterval(function() {
@@ -422,7 +382,6 @@ export default {
     clearInterval(this.ifacePingChartsInterval);
     clearInterval(this.pingChartInterval);
     clearInterval(this.pingDroprateChartInterval);
-    clearInterval(this.trafficByInterfaceChartInterval);
   },
   methods: {
     getServiceStatus(service) {
@@ -601,102 +560,6 @@ export default {
             console.error(error);
           }
         );
-      }
-    },
-    updateTrafficByInterfaceChart() {
-      var context = this;
-      nethserver.exec(
-        ["nethserver-firewall-base/troubleshooting/read"],
-        { action: "traffic-by-interface" },
-        null,
-        function(success) {
-          try {
-            success = JSON.parse(success);
-          } catch (e) {
-            console.error(e);
-          }
-          context.view.isTrafficChartLoaded = true;
-          context.$nextTick(function() {
-            var chart = success["trafficByInterface"];
-            const startTime = chart.data[0][0];
-
-            for (var t in chart.data) {
-              chart.data[t][0] = new Date(chart.data[t][0] * 1000);
-
-              for (let i = 1; i < chart.data[t].length; i++) {
-                // show througput in mbit/s
-                chart.data[t][i] = chart.data[t][i] / (1024 * 1024);
-              }
-            }
-
-            // set initial data
-            if (!context.charts.traffic.graph) {
-              context.charts.traffic.initialData = chart;
-            }
-
-            // zero-fill previous chart data
-            context.zeroFillTrafficByInterfaceChart(startTime);
-
-            if (!context.charts.traffic.graph) {
-              context.charts.traffic.graph = new Dygraph(
-                document.getElementById("chart-traffic-by-interface"),
-                context.charts.traffic.initialData.data,
-                {
-                  fillGraph: true,
-                  stackedGraph: false,
-                  labels: context.charts.traffic.initialData.labels,
-                  height: 200,
-                  strokeWidth: 1,
-                  strokeBorderWidth: 1,
-                  ylabel: context.$i18n.t("troubleshooting.traffic_mbps"),
-                  axisLineColor: "white",
-                  labelsDiv: document.getElementById(
-                    "traffic-by-interface-legend"
-                  ),
-                  labelsSeparateLines: true,
-                  drawGrid: true,
-                  axes: {
-                    y: {
-                      valueFormatter: function(y) {
-                        return y.toFixed(2) + " mbit/s";
-                      },
-                    },
-                  },
-                }
-              );
-            } else {
-              // append to previous data and retain only visible samples (to avoid memory overload)
-              context.charts.traffic.initialData.data = context.charts.traffic.initialData.data
-                .concat(chart.data)
-                .slice(-1 * context.TRAFFIC_BY_INTERFACE_SAMPLES);
-
-              context.charts.traffic.graph.updateOptions({
-                file: context.charts.traffic.initialData.data,
-              });
-            }
-          });
-        },
-        function(error) {
-          console.error(error);
-          context.view.isTrafficChartLoaded = true;
-        }
-      );
-    },
-    zeroFillTrafficByInterfaceChart(startTime) {
-      let time = startTime;
-
-      for (let i = 0; i < this.TRAFFIC_BY_INTERFACE_SAMPLES; i++) {
-        time -= this.UPDATE_TRAFFIC_BY_INTERFACE_INTERVAL / 1000;
-        let zeroSample = [new Date(time * 1000)];
-
-        for (
-          let j = 1;
-          j < this.charts.traffic.initialData.labels.length;
-          j++
-        ) {
-          zeroSample.push(0);
-        }
-        this.charts.traffic.initialData.data.unshift(zeroSample);
       }
     },
     updatePingChart() {
@@ -893,5 +756,14 @@ export default {
   padding-left: 5px;
   padding-right: 5px;
   margin-bottom: 20px;
+}
+
+.card-pf-body .pficon,
+.card-pf-body .fa {
+  font-size: 22px;
+}
+
+.card-pf-aggregate-status .card-pf-title {
+  font-size: 16px;
 }
 </style>

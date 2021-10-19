@@ -102,7 +102,7 @@
 
         <li id="troubleshooting-item" :class="[getCurrentPath('troubleshooting') ? 'active' : '', 'list-group-item']">
           <a href="#/troubleshooting">
-            <span class="fa fa-bug"></span>
+            <span class="fa fa-search"></span>
             <span class="list-group-item-value">{{$t('troubleshooting.title')}}</span>
           </a>
         </li>
