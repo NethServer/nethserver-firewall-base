@@ -408,4 +408,12 @@ if ($cmd eq 'ping') {
     }
     close($fh);
     print(encode_json(\@hosts));
+} elsif ($cmd eq 'valid-subscription') {
+    my $secret = $cdb->get_prop('subscription', 'Secret') || '';
+    my $systemid = $cdb->get_prop('subscription', 'SystemId') || '';
+    if ($secret ne '' && $systemid ne '') {
+        print(encode_json(JSON::true));
+    } else {
+        print(encode_json(JSON::false));
+    }
 }
