@@ -292,6 +292,8 @@ if ($cmd eq 'ping') {
         print encode_json({"status" => $status, "details" => \@files});
     } elsif ($service eq 'antivirus') {
         get_service_status('c-icap', $cdb);
+    } elsif ($service eq 'ups') {
+        get_service_status('nut-monitor', $cdb);
     } elsif ($service eq 'ntopng') {
         my $status = $cdb->get_prop($service, 'status') || "disabled";
         my $details;
