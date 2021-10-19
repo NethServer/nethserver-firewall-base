@@ -46,6 +46,9 @@
       <!-- MULTIWAN -->
       <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <a href="#/wan" class="card-pf-link-with-icon card-action">
+            <span class="fa fa-external-link"></span>
+          </a>
           <h2 class="card-pf-title">
             <span class="pf-icon pficon-network"></span
             >{{ $t("troubleshooting.multiwan") }}
@@ -756,6 +759,9 @@
       <!-- KNOWN HOSTS -->
       <div class="col-sm-4 col-md-3">
         <div class="card-pf card-pf-accented card-pf-aggregate-status">
+          <a href="#/objects" class="card-pf-link-with-icon card-action">
+            <span class="fa fa-external-link"></span>
+          </a>
           <h2 class="card-pf-title">
             <span class="pficon pficon-screen"></span
             >{{ $t("troubleshooting.known_hosts") }}
