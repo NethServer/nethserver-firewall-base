@@ -168,7 +168,8 @@
                   initialSortBy: { field: 'name', type: 'asc' },
                 }"
                 :search-options="{
-                  enabled: false,
+                  enabled: true,
+                  placeholder: tableLangsTexts.globalSearchPlaceholder,
                 }"
                 :pagination-options="{
                   enabled: false,
@@ -308,6 +309,7 @@ export default {
           sortable: true,
         },
       ],
+      tableLangsTexts: this.tableLangs(),
       isLoaded: {
         ntopngStatus: false,
         topLocalHosts: false,
