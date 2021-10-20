@@ -1280,4 +1280,8 @@ export default {
 .card-pf-aggregate-status .card-pf-title {
   font-size: 16px;
 }
+
+.card-pf {
+  min-height: 135px;
+}
 </style>

@@ -787,4 +787,8 @@ export default {
 .card-pf-aggregate-status .card-action .fa:hover {
   color: #0088ce !important;
 }
+
+.card-pf {
+  min-height: 135px;
+}
 </style>
