@@ -462,7 +462,9 @@ export default {
                 chart.data[t][0] = new Date(chart.data[t][0]);
               }
               const i18nLabels = chart.labels.map((label) =>
-                context.$i18n.t("troubleshooting." + label)
+                context.$i18n
+                  ? context.$i18n.t("troubleshooting." + label)
+                  : label
               );
               context.isLoaded.ifacePingCharts = true;
 
@@ -477,7 +479,9 @@ export default {
                     height: 200,
                     strokeWidth: 1,
                     strokeBorderWidth: 1,
-                    ylabel: context.$i18n.t("troubleshooting.latency_ms"),
+                    ylabel: context.$i18n
+                      ? context.$i18n.t("troubleshooting.latency_ms")
+                      : "",
                     axisLineColor: "white",
                     labelsDiv: document.getElementById(
                       `ping-legend-${redName}-${ip}`
@@ -527,7 +531,9 @@ export default {
               }
 
               const i18nLabels = chart.labels.map((label) =>
-                context.$i18n.t("troubleshooting." + label)
+                context.$i18n
+                  ? context.$i18n.t("troubleshooting." + label)
+                  : label
               );
 
               var g = new Dygraph(
@@ -540,7 +546,9 @@ export default {
                   height: 200,
                   strokeWidth: 1,
                   strokeBorderWidth: 1,
-                  ylabel: context.$i18n.t("troubleshooting.traffic_mbps"),
+                  ylabel: context.$i18n
+                    ? context.$i18n.t("troubleshooting.traffic_mbps")
+                    : "",
                   axisLineColor: "white",
                   labelsDiv: document.getElementById(
                     "traffic-legend-" + iface.name
@@ -588,7 +596,9 @@ export default {
               }
 
               const i18nLabels = chart.labels.map((label) =>
-                context.$i18n.t("troubleshooting." + label)
+                context.$i18n
+                  ? context.$i18n.t("troubleshooting." + label)
+                  : label
               );
 
               var g = new Dygraph(
@@ -601,7 +611,9 @@ export default {
                   height: 200,
                   strokeWidth: 1,
                   strokeBorderWidth: 1,
-                  ylabel: context.$i18n.t("troubleshooting.latency_ms"),
+                  ylabel: context.$i18n
+                    ? context.$i18n.t("troubleshooting.latency_ms")
+                    : "",
                   axisLineColor: "white",
                   labelsDiv: document.getElementById("ping-legend-" + ip),
                   labelsSeparateLines: true,
@@ -648,7 +660,9 @@ export default {
               }
 
               const i18nLabels = chart.labels.map((label) =>
-                context.$i18n.t("troubleshooting." + label)
+                context.$i18n
+                  ? context.$i18n.t("troubleshooting." + label)
+                  : label
               );
 
               var g = new Dygraph(
@@ -661,7 +675,9 @@ export default {
                   height: 200,
                   strokeWidth: 1,
                   strokeBorderWidth: 1,
-                  ylabel: context.$i18n.t("troubleshooting.droprate_perc"),
+                  ylabel: context.$i18n
+                    ? context.$i18n.t("troubleshooting.droprate_perc")
+                    : "",
                   axisLineColor: "white",
                   labelsDiv: document.getElementById(
                     "ping-droprate-legend-" + ip
