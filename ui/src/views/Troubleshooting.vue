@@ -60,7 +60,10 @@
           role="tabpanel"
           aria-labelledby="ts-services-tab"
         >
-          <TroubleshootingServices v-if="view.isServicesSelected" />
+          <TroubleshootingServices
+            v-if="view.isServicesSelected"
+            @changeTab="onChangeTab"
+          />
         </div>
         <!-- END SERVICES -->
 
@@ -155,6 +158,18 @@ export default {
           console.error(error);
         }
       );
+    },
+    onChangeTab(tab) {
+      if (tab == "services") {
+        this.selectServices();
+        $("#ts-services-tab-parent").click();
+      } else if (tab == "network") {
+        this.selectNetwork();
+        $("#ts-network-tab-parent").click();
+      } else if (tab == "hosts") {
+        this.selectHosts();
+        $("#ts-hosts-tab-parent").click();
+      }
     },
   },
 };
