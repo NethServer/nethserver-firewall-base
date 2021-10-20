@@ -1,0 +1,419 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2021 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+##
+## Parse the output of rrd file in a json content
+##
+
+
+
+use strict;
+use warnings;
+use JSON;
+use String::ShellQuote;
+use esmith::ConfigDB;
+use NethServer::Service;
+use NethServer::ApiTools qw(readInput safe_decode_json);
+
+require '/usr/libexec/nethserver/api/nethserver-firewall-base/lib/firewall_functions.pl';
+
+my $input = readInput();
+my $cmd = $input->{'action'};
+my $cdb = esmith::ConfigDB->open_ro();
+my $ndb = esmith::NetworksDB->open_ro();
+my @ret;
+
+sub slurp {
+    my $file = shift;
+    my $content;
+    open(my $fh, '<', $file) or return '';
+    {
+        local $/;
+        $content = <$fh>;
+    }
+    close($fh);
+    return $content;
+}
+
+sub get_service_status {
+    my $service = shift;
+    my $cdb = shift;
+    my $status = $cdb->get_prop($service, 'status') || "disabled";
+
+    if ($status eq 'enabled') {
+        my $s = NethServer::Service->new($service, $cdb);
+	if ($s->is_running()) {
+            $status = 'running';
+        } else {
+	    $status = 'failed';
+	}
+    }
+    print encode_json({"status" => $status});
+}
+
+sub fetch_ping_rrd {
+    my $file = shift;
+    my $cdb = shift;
+    my $time = shift;
+    my @ret;
+    my $systemname = $cdb->get_value('SystemName');
+    my $domainname = $cdb->get_value('DomainName');
+    my $path = "/var/lib/collectd/rrd/$systemname.$domainname/ping/$file.rrd";
+    if (! -f $path) {
+        return @ret;
+    }
+    open(FH, "rrdtool fetch $path AVERAGE -s e-$time|");
+    while (<FH>) {
+    chomp;
+    my @lines = split("\r\n");
+        foreach my $line (@lines) {
+            my @values = split(":",$line);
+            next unless $values[0] =~ m/\d/;
+            next unless $values[1] =~ m/\d/;
+            $values[1] =~ s/ //g;
+            # make sure to output a numeric value
+            $values[1] = $values[1]*1;
+            $values[0] = $values[0]*1000; # time
+            push(@ret, \@values);
+        }
+    }
+    close(FH);
+    return @ret;   
+}
+
+sub fetch_interface_rrd {
+    my $interface = shift;
+    my $cdb = shift;
+    my $time = shift;
+    my @ret;
+    my $systemname = $cdb->get_value('SystemName');
+    my $domainname = $cdb->get_value('DomainName');
+    my $path = "/var/lib/collectd/rrd/$systemname.$domainname/interface-$interface/if_octets.rrd";
+    if (! -f $path) {
+        return @ret;
+    }
+    open(FH, "rrdtool fetch $path AVERAGE -s e-$time|");
+    while (<FH>) {
+    chomp;
+    my @lines = split("\r\n");
+        foreach my $line (@lines) {
+            my ($time, $octets) = split(":", $line);
+            my ($rcvd, $sent) = split(" ", $octets);
+            next unless ($time =~ m/\d/ && $rcvd =~ m/\d/ && $sent =~ m/\d/);
+            # make sure to output a numeric value
+            $time = $time*1000;
+            $rcvd = $rcvd/1024/1024; # transform to Mbits
+            $sent = $sent/1024/1024; # transform to Mbits
+            push(@ret, [$time, $rcvd, $sent]);
+        }
+    }
+    close(FH);
+    return @ret;
+}
+
+sub fetch_wan_rrd {
+    my $provider = shift;
+    my $ip = shift;
+    my $cdb = shift;
+    my $time = shift;
+    my @ret;
+    my $systemname = $cdb->get_value('SystemName');
+    my $domainname = $cdb->get_value('DomainName');
+    my $path = "/var/lib/collectd/rrd/$systemname.$domainname/table-wan/ping-_".$provider."_".$ip."_rtt.value.rrd";
+    if (! -f $path) {
+        return @ret;
+    }
+    open(FH, "rrdtool fetch $path AVERAGE -s e-$time|");
+    while (<FH>) {
+    chomp;
+    my @lines = split("\r\n");
+        foreach my $line (@lines) {
+            my ($time, $value) = split(":", $line);
+            next unless ($time =~ m/\d/ && $value =~ m/\d/);
+            # make sure to output a numeric value
+            $time = $time*1000;
+            $value = $value*1;
+            push(@ret, [$time, $value]);
+        }
+    }
+    close(FH);
+    return @ret;
+}
+
+
+sub ping_chart {
+    my $file_prefix = shift;
+    my $ylabel = shift;
+    my $time = 86400;
+    my $ret;
+    # collectd keeps track of the first DNS
+    my @dns = split(',',$cdb->get_prop('dns', 'NameServers'));
+    if (defined($dns[0])) {
+        my @data = fetch_ping_rrd($file_prefix."-".$dns[0], $cdb, $time);
+        if (@data) {
+            $ret->{$dns[0]} = {labels => [ 'time', $ylabel ], data => \@data};
+        }
+    }
+
+    # load extra configured hosts
+    foreach my $h (split(",", $cdb->get_prop('collectd', 'PingHosts'))) {
+        my @data = fetch_ping_rrd($file_prefix."-".$h, $cdb, $time);
+        if (@data) {
+            $ret->{$h} = {labels => [ 'time', $ylabel ], data => \@data};
+        }
+    }
+
+    print encode_json ($ret);
+}
+
+if ($cmd eq 'ping') {
+    ping_chart('ping', 'latency');
+} elsif ($cmd eq 'ping-droprate') {
+    ping_chart('ping_droprate', 'droprate');
+} elsif ($cmd eq 'interface') {
+    my $interface = $input->{'interface'};
+    my @data = fetch_interface_rrd($interface, $cdb, 86400);
+    print encode_json({labels => [ 'time', 'rcvd_bytes', 'sent_bytes' ], data => \@data});
+} elsif ($cmd eq 'wan-ping') {
+    my $ret = {};
+    my @ips = split(',', $cdb->get_prop('firewall', 'CheckIP'));
+    foreach my $p ($ndb->get_all_by_prop('type' => 'provider')) {
+        foreach my $ip (@ips) {
+            my @data = fetch_wan_rrd($p->key, $ip, $cdb, 86400);
+            if (@data) {
+                $ret->{$p->key}->{$ip}->{'labels'} = ["time", "latency"];
+                $ret->{$p->key}->{$ip}->{'data'} = \@data;
+            }
+        }
+   }
+   print encode_json($ret);
+} elsif ($cmd eq 'service') {
+
+    my $service = $input->{'service'};
+
+    # Each response must return a JSON object with the 'status' field.
+    # Valid values for status are:
+    #   - running
+    #   - failed
+    #   - disabled
+    #   - warning
+    # The response can also contain a 'details' field which can have any type.
+
+    if ($service eq 'shorewall') {
+        my $out = `/usr/sbin/shorewall status`;
+        my $status = "failed";
+        if ($? == 0) {
+            $status = "running";
+        }
+        print encode_json({"status" => $status});
+    } elsif ($service eq 'squid') {
+        my $status = $cdb->get_prop('squid', 'status') || "disabled";
+        my $details = {
+            "green" => $cdb->get_prop('squid', 'GreenMode') || 'disabled',
+            "blue" => $cdb->get_prop('squid', 'BlueMode') || 'disabled',
+        };
+
+        if ($status eq 'enabled') {
+            my $s = NethServer::Service->new('squid', $cdb);
+            if ($s->is_running()) {
+                $status = 'running';
+            } else {
+                $status = 'failed';
+            }
+        }
+        print encode_json({"status" => $status, "details" => $details});
+    } elsif ($service eq 'internet') {
+        my $dns = safe_decode_json(`/usr/libexec/nethserver/api/system-dns/hints`);
+        my $ping = `/usr/bin/ping -c 1 www.nethserver.org`;
+        my $ping_status = $?;
+        my $status = "failed";
+        if ($dns->{'count'} == 0 && $ping_status == 0) {
+            $status = "running";
+        } elsif ($dns->{'count'} > 0 && $ping_status == 0) {
+            $status = "warning";
+        }
+        print encode_json({"status" => $status});
+    } elsif ($service eq 'multiwan') {
+        my $count = 0;
+        my $failed = 0;
+        my $status = 'disabled';
+        foreach  ($ndb->red()) {
+            $count++;
+            my $file = '/var/lib/shorewall/'.$_->key.'.status';
+            if (-f $file) {
+                if (slurp($file) eq '1') {
+                    $failed++;
+                }
+            }
+        }
+        if ($count > 1 && $failed == 0) {
+            $status = 'running';
+        } elsif ($count > 1 && $failed > 0 && $failed < $count) {
+            $status = 'warning';
+        } elsif ($count > 1 && $failed == $count) {
+            $status = 'failed';
+        }
+        print encode_json({"status" => $status});
+    } elsif ($service eq 'systemd') {
+        my $status = "running";
+        my $services = safe_decode_json(`/usr/libexec/nethserver/api/system-services/hints`);
+        if ($services->{'count'} > 0) {
+            $status = "warning";
+        }
+        print encode_json({"status" => $status});
+    } elsif ($service eq 'ipblacklist') {
+        my $status = $cdb->get_prop('blacklist', 'status') || "disabled";
+        print encode_json({"status" => $status});
+    } elsif ($service eq 'templates') {
+        my $status = "disabled";
+        my @files = `/usr/bin/find /etc/e-smith/templates-custom/ -type f`;
+        if (@files) {
+            $status = "warning";
+        }
+        print encode_json({"status" => $status, "details" => \@files});
+    } elsif ($service eq 'antivirus') {
+        get_service_status('c-icap', $cdb);
+    } elsif ($service eq 'ups') {
+        get_service_status('nut-monitor', $cdb);
+    } elsif ($service eq 'ntopng') {
+        my $status = $cdb->get_prop($service, 'status') || "disabled";
+        my $details;
+
+        if ($status eq 'enabled') {
+            my $s = NethServer::Service->new($service, $cdb);
+	        if ($s->is_running()) {
+                $status = 'running';
+            } else {
+	            $status = 'failed';
+	        }
+        }
+        foreach my $i (split(',',$cdb->get_prop('ntopng', 'Interfaces'))) {
+            my $role = $ndb->get_prop($i, 'role') || next;
+            $details->{$i} = $role;
+        }
+        print encode_json({"status" => $status, "details" => $details});
+   } elsif ($service eq 'flashstart') {
+        my $status = $cdb->get_prop($service, 'status') || "disabled";
+        my @details;
+
+        if ($status eq 'enabled') {
+            my $s = NethServer::Service->new('unbound', $cdb);
+	        if ($s->is_running()) {
+                $status = 'running';
+            } else {
+	            $status = 'failed';
+	        }
+            @details = split(',', $cdb->get_prop('flashstart', 'Roles') || '');
+        }
+        print encode_json({"status" => $status, "details" => \@details});
+   } elsif ($service eq 'ftl') {
+        my $status = $cdb->get_prop($service, 'status') || "disabled";
+        my @details;
+
+        if ($status eq 'enabled') {
+            my $s = NethServer::Service->new('ftl', $cdb);
+	    if ($s->is_running()) {
+                $status = 'running';
+            } else {
+	        $status = 'failed';
+	    }
+            @details = split(',', $cdb->get_prop('ftl', 'Roles') || '');
+        }
+        print encode_json({"status" => $status, "details" => \@details});
+   } elsif ($service eq 'hotspot') {
+        my $status = $cdb->get_prop('dedalo', 'status') || "disabled";
+        my $details;
+
+        if ($status eq 'enabled') {
+            my $s = NethServer::Service->new('dedalo', $cdb);
+	        if ($s->is_running()) {
+                $status = 'running';
+            } else {
+	            $status = 'failed';
+	        }
+            my @interfaces = $ndb->get_all_by_prop('role' => 'hotspot');
+            $details->{'name'} = $cdb->get_prop('dedalo', 'Name') || '';
+            $details->{'interface'} = $interfaces[0] ? $interfaces[0]->key : undef;
+        }
+        print encode_json({"status" => $status, "details" => $details});
+   } elsif ($service eq 'yum') {
+        my $ret = undef;
+        my $updated = `grep Updated: /var/log/yum.log 2>/dev/null | tail -f -n1 | cut -d' ' -f1,2,3`;
+        chomp $updated;
+        if ($updated) {
+            $ret = `date +%s -d "$updated"`;
+            chomp $ret;
+        }
+        print encode_json({"date" => $ret});
+   } else {
+        get_service_status($service, $cdb);
+   }
+} elsif ($cmd eq 'top-local-hosts') {
+    system('echo \'{"action": "top-local-hosts"}\' | /usr/libexec/nethserver/api/nethserver-ntopng/dashboard/read');
+} elsif ($cmd eq 'top-remote-hosts') {
+    system('echo \'{"action": "top-remote-hosts"}\' | /usr/libexec/nethserver/api/nethserver-ntopng/dashboard/read');
+} elsif ($cmd eq 'host-chart') {
+    my $host = shell_quote_best_effort($input->{'host'});
+    my $interfaces = $cdb->get_prop('ntopng', 'Interfaces') || '';
+    my $ifid = $interfaces =~ tr/,//;
+    $ifid += 1;
+    my $now = time();
+    my $yday = $now - (24 * 60 * 60);
+    my $port = $cdb->get_prop('ntopng', 'TCPPort') || "3000";
+    my $url = 'http://127.0.0.1:'.$port.'/lua/rest/get/timeseries/ts.lua?ts_schema=host:traffic&ts_query=ifid:'.$ifid.',host:'.$host.'&epoch_begin='.$yday.'&epoch_end='.$now.'&extended=0&format=json';
+    my $response = safe_decode_json(`/usr/bin/curl -s '$url'`);
+    my @data;
+    my @labels = ('time', 'sent_bytes', 'received_bytes');
+    my $sent = $response->{'series'}[0]->{'data'};
+    my $rcvd = $response->{'series'}[1]->{'data'};
+    foreach (keys $sent) {
+        # express time in milliseconds and traffic in mbit/s
+        # HACK: multiply values for 10 just to match ntopng graph
+        push(@data, [$_*1000, $sent->{$_}/1024/1024*10, $rcvd->{$_}/1024/1024*10]);
+    }
+    my $tsent = $response->{'statistics'}{'by_serie'}[0]->{'total'};
+    my $trcvd = $response->{'statistics'}{'by_serie'}[1]->{'total'};
+    print(encode_json({"labels" => \@labels, "data" => \@data, "totals" => { "sent" => $tsent, "rcvd" => $trcvd, "both"=> $tsent + $trcvd}}));
+} elsif ($cmd eq 'traffic-by-interface') {
+    system('echo \'{"action":"traffic-by-interface"}\' | /usr/libexec/nethserver/api/nethserver-ntopng/dashboard/read')
+} elsif ($cmd eq 'wan-providers') {
+    system('echo \'{"action": "providers"}\' | /usr/libexec/nethserver/api/nethserver-firewall-base/wan/read');
+} elsif ($cmd eq 'host-list') {
+    my @hosts;
+    open(my $fh, '-|', 'LANG=C /usr/sbin/arp -a');
+    while (my $line = <$fh>) {
+        #next if $line =~ m/^Address/;
+        my @fields = split(/\s+/, $line);
+        my $host = ($fields[0] eq '?') ? substr($fields[1], 1, -1) : $fields[0];
+        push(@hosts, {'name' => $host , 'ip' => substr($fields[1], 1, -1), 'mac' => $fields[3], 'interface' => $fields[6]});
+    }
+    close($fh);
+    print(encode_json(\@hosts));
+} elsif ($cmd eq 'valid-subscription') {
+    my $secret = $cdb->get_prop('subscription', 'Secret') || '';
+    my $systemid = $cdb->get_prop('subscription', 'SystemId') || '';
+    if ($secret ne '' && $systemid ne '') {
+        print(encode_json(JSON::true));
+    } else {
+        print(encode_json(JSON::false));
+    }
+}

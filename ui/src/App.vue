@@ -14,7 +14,7 @@
 
         <li class="li-empty"></li>
 
-        <li id="wan-item" :class="[getCurrentPath('wan') ? 'active' : '', 'list-group-item']">
+       <li id="wan-item" :class="[getCurrentPath('wan') ? 'active' : '', 'list-group-item']">
           <a href="#/wan">
             <span class="fa fa-globe"></span>
             <span class="list-group-item-value">{{$t('wan.title')}}</span>
@@ -98,6 +98,15 @@
           </a>
         </li>
 
+        <li class="li-empty"></li>
+
+        <li id="troubleshooting-item" :class="[getCurrentPath('troubleshooting') ? 'active' : '', 'list-group-item']">
+          <a href="#/troubleshooting">
+            <span class="fa fa-search"></span>
+            <span class="list-group-item-value">{{$t('troubleshooting.title')}}</span>
+          </a>
+        </li>
+   
         <li class="li-empty"></li>
 
         <li id="about-item" :class="[getCurrentPath('about') ? 'active' : '', 'list-group-item']">
@@ -574,5 +583,13 @@ export default {
 
 .icon-disabled {
   color: #72767b !important;
+}
+
+.troubleshooting-chart-legend {
+  padding: 5px;
+  position: absolute;
+  right: 3rem;
+  text-align: left;
+  z-index: 5;
 }
 </style>
