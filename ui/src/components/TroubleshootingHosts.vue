@@ -474,8 +474,11 @@ export default {
               chart.data[t][0] = new Date(chart.data[t][0]);
             }
 
-            const i18nLabels = chart.labels.map((label) =>
-              context.$i18n.t("troubleshooting." + label)
+            const i18nLabels = chart.labels.map(
+              (label) =>
+                context.$i18n
+                  ? context.$i18n.t("troubleshooting." + label)
+                  : label
             );
 
             var g = new Dygraph(
@@ -488,7 +491,9 @@ export default {
                 height: 300,
                 strokeWidth: 1,
                 strokeBorderWidth: 1,
-                ylabel: context.$i18n.t("troubleshooting.traffic_mbps"),
+                ylabel: context.$i18n
+                  ? context.$i18n.t("troubleshooting.traffic_mbps")
+                  : "",
                 labelsDiv: document.getElementById("host-traffic-legend"),
                 axisLineColor: "white",
                 labelsSeparateLines: true,

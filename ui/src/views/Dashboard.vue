@@ -569,14 +569,17 @@ export default {
     },
     initGraph() {
       var container = document.getElementById("network-graph");
-      var network = new vis.Network(
-        container,
-        {
-          nodes: this.nodes,
-          edges: this.edges
-        },
-        this.options
-      );
+
+      if(container) {
+        var network = new vis.Network(
+          container,
+          {
+            nodes: this.nodes,
+            edges: this.edges
+          },
+          this.options
+        );
+      }
     },
     getInterfaces(callback) {
       var context = this;
@@ -599,7 +602,7 @@ export default {
             if (success.configuration[role].length > 0)
               context.nodes.push({
                 id: role,
-                label: context.$i18n.t("dashboard." + role),
+                label: context && context.$i18n && context.$i18n.t("dashboard." + role) || '',
                 group: role,
                 level: context.levelMap(role, true)
               });

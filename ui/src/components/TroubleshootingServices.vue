@@ -1131,7 +1131,6 @@ export default {
         },
         function(error) {
           console.error(error);
-          context["view"][service]["isLoaded"] = false;
         }
       );
     },
