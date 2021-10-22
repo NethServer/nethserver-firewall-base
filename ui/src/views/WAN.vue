@@ -110,20 +110,6 @@
               <div class="list-group-item-header">
                 <div class="list-view-pf-actions">
                   <div v-if="i.isUpdating" class="spinner spinner-sm form-spinner-loader"></div>
-                  <a
-                    tabindex="0"
-                    @click="speedTest(i)"
-                    :id="'popover-'+i.name | sanitize"
-                    data-placement="left"
-                    data-toggle="popover"
-                    data-html="true"
-                    :title="$t('wan.speed_info')"
-                    class="btn btn-default"
-                    v-if="interfacesStatus[i.provider.name]"
-                  >
-                    <span class="fa fa-bolt span-right-margin"></span>
-                    {{$t('wan.speedtest')}}
-                  </a>
                   <div
                     v-if="interfacesStatus[i.provider.name] && interfaces.length > 1"
                     class="dropup pull-right dropdown-kebab-pf"
@@ -2107,9 +2093,6 @@ export default {
             var iface = success.configuration.interfaces[i];
             iface.isLoading = false;
             iface.isUpdating = false;
-            iface.speedtest = {
-              isLoaded: false
-            };
             iface.errors = context.initErrors();
             iface.opened = false;
             $(
@@ -2158,126 +2141,6 @@ export default {
           context.view.isLoadedInterface = true;
         }
       );
-    },
-    speedTest(iface) {
-      iface.opened = true;
-
-      $("#" + this.$options.filters.sanitize("popover-" + iface.name)).popover('hide');
-
-      var popover = $(
-        "#" + this.$options.filters.sanitize("popover-" + iface.name)
-      ).data("bs.popover");
-
-      if (popover) {
-        popover.options.content =
-          '<div class="spinner spinner-sm"></div><small>' +
-          this.$i18n.t("wan.fireqos_temporary_disabled") +
-          "</small>";
-        popover.show();
-
-        var context = this;
-        nethserver.exec(
-          ["nethserver-firewall-base/wan/read"],
-          {
-            action: "speedtest",
-            interface: iface.name
-          },
-          null,
-          function(success) {
-            try {
-              success = JSON.parse(success);
-            } catch (e) {
-              console.error(e);
-            }
-
-            if (success.speedtestRunning) {
-              popover.options.content =
-              '<div class="spinner spinner-sm"></div><small>' +
-              context.$i18n.t("wan.fireqos_temporary_disabled") +
-              "</small>";
-            }
-            else {
-              popover.options.content =
-                '<b class="col-sm-6">' +
-                context.$i18n.t("download") +
-                '</b><span class="col-sm-6">' +
-                ((success.download &&
-                  context.$options.filters.bitFormat(success.download)+'/s') ||
-                  "-") +
-                "</span>";
-
-              popover.options.content +=
-                '<b class="col-sm-6">' +
-                context.$i18n.t("upload") +
-                '</b><span class="col-sm-6">' +
-                ((success.upload &&
-                  context.$options.filters.bitFormat(success.upload)+'/s') ||
-                  "-") +
-                "</span>";
-
-              popover.options.content +=
-                '<b class="col-sm-6">' +
-                context.$i18n.t("wan.ping") +
-                '</b><span class="col-sm-6">' +
-                (success.ping ? success.ping + " ms" : "-") +
-                "</span>";
-
-              popover.options.content +=
-                '<span class="col-sm-12">' +
-                '<span id="use_settings" class="btn btn-primary btn-sm no-mg-left mg-top-5">' +
-                context.$i18n.t("wan.use_this_set") +
-                "</span>" +
-                '<span id="close_popover" class="btn btn-default btn-sm mg-left-5 mg-top-5">' +
-                context.$i18n.t("close") +
-                "</span>" +
-                "</span>";
-
-              window.setSpeedValues = function(iface, down, up) {
-                $("#" + iface + "-FwInBandwidth").val(down);
-                $("#" + iface + "-FwOutBandwidth").val(up);
-              };
-            }
-
-            popover.show();
-
-            setTimeout(function() {
-              $("#use_settings").click(function() {
-                setSpeedValues(
-                  context.$options.filters.sanitize(iface.name),
-                  Math.round(success.download / 1024),
-                  Math.round(success.upload / 1024)
-                );
-              });
-              
-              $("#close_popover").click(function() {
-                popover.hide();
-              });
-            }, 1500);
-          },
-          function(error) {
-            popover.options.content =
-              '<div class="alert alert-warning alert-dismissable"><span class="pficon pficon-warning-triangle-o"></span><strong>' +
-              context.$i18n.t("warning") +
-              ".</strong> " +
-              context.$i18n.t("wan.speedtest_error") +
-              "</div>" +
-              '<span id="close_popover" class="btn btn-default btn-sm no-mg-left no-mg-top">' +
-              context.$i18n.t("close") +
-              '</span>';
-              
-            popover.show();
-            
-            setTimeout(function() {
-              $("#close_popover").click(function() {
-                popover.hide();
-              });
-            }, 1500);
-            
-            iface.speedtest.isLoaded = true;
-            console.error(error);
-          }
-        );
-      }
     },
     toggleProvider(i) {
       var context = this;
