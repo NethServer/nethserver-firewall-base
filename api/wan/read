@@ -128,6 +128,10 @@ if($cmd eq 'providers') {
     foreach ($ndb->red()) {
         $ret->{$_->key} = undef;
         my $txt = read_netdata("/api/v1/data?chart=net.".$_->key."&format=csv&before=-1&after=1&options=abs");
+        if ($txt =~ m/Chart is not found/) {
+            delete($ret->{$_->key});
+            next;
+        }
         if ($txt) {
             my @lines = split("\r\n",$txt);
             my @values = split(",",$lines[1]);
