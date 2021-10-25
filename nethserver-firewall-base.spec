@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.16.0
+Version: 3.17.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,10 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Mon Oct 25 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.17.0-1
+- Firewall: Remove the button of speedtest-cli - NethServer/dev#6588
+- Firewall troubleshooting dashboard - NethServer/dev#6582
+
 * Tue Oct 05 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.16.0-1
 - sNAT doesn't work in some cases - Bug NethServer/dev#6575
 
