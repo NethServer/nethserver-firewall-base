@@ -94,8 +94,9 @@ if($cmd eq 'providers') {
 
     my $ndb = esmith::NetworksDB->open_ro();
     foreach ($ndb->red()) {
-        $ret->{$_->key} = undef;
         my $txt = read_netdata("/api/v1/data?chart=net.".$_->key."&format=csv&before=-1&after=1&options=abs");
+        next if ($txt =~ m/Chart is not found/);
+        $ret->{$_->key} = undef;
         if ($txt) {
             my @lines = split("\r\n",$txt);
             my @values = split(",",$lines[1]);
