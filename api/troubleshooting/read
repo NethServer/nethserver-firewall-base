@@ -118,6 +118,8 @@ sub fetch_interface_rrd {
     my @lines = split("\r\n");
         foreach my $line (@lines) {
             my ($time, $octets) = split(":", $line);
+            # skip invalid data
+            next unless length $octets > 0;
             my ($rcvd, $sent) = split(" ", $octets);
             next unless ($time =~ m/\d/ && $rcvd =~ m/\d/ && $sent =~ m/\d/);
             # make sure to output a numeric value
