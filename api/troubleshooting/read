@@ -81,7 +81,7 @@ sub fetch_ping_rrd {
     if (! -f $path) {
         return @ret;
     }
-    open(FH, "rrdtool fetch $path AVERAGE -s e-$time|");
+    open(FH, "LANG=C rrdtool fetch $path AVERAGE -s e-$time|");
     while (<FH>) {
     chomp;
     my @lines = split("\r\n");
@@ -145,7 +145,7 @@ sub fetch_wan_rrd {
     if (! -f $path) {
         return @ret;
     }
-    open(FH, "rrdtool fetch $path AVERAGE -s e-$time|");
+    open(FH, "LANG=C rrdtool fetch $path AVERAGE -s e-$time|");
     while (<FH>) {
     chomp;
     my @lines = split("\r\n");
