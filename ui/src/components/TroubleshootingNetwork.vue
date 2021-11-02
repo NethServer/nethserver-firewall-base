@@ -555,6 +555,7 @@ export default {
                   ),
                   labelsSeparateLines: true,
                   drawGrid: true,
+                  colors: ["blue", "green"],
                   axes: {
                     y: {
                       valueFormatter: function(y) {
