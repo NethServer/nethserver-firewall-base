@@ -811,7 +811,7 @@
                 :key="name"
               >
                 <span class="pficon pficon-network icon"></span>
-                <span :class="role">{{ name }}</span>
+                <span :class="role" class="bold">{{ name }}</span>
               </li>
             </ul>
           </div>
@@ -1282,5 +1282,17 @@ export default {
 
 .card-pf {
   min-height: 135px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.modal-title {
+  font-size: 16px;
+}
+
+.modal-body {
+  font-size: 16px;
 }
 </style>
