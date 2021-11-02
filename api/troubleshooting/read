@@ -111,7 +111,8 @@ sub fetch_interface_rrd {
     if (! -f $path) {
         return @ret;
     }
-    open(FH, "rrdtool fetch $path AVERAGE -s e-$time|");
+    # LANG=C command prefix is needed to always load rrd values with dot as decimal separator
+    open(FH, "LANG=C rrdtool fetch $path AVERAGE -s e-$time|");
     while (<FH>) {
     chomp;
     my @lines = split("\r\n");
