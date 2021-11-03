@@ -263,7 +263,9 @@ if ($cmd eq 'ping') {
             $count++;
             my $file = '/var/lib/shorewall/'.$_->key.'.status';
             if (-f $file) {
-                if (slurp($file) eq '1') {
+                my $status = slurp($file);
+                chomp($status);
+                if ($status eq '1') {
                     $failed++;
                 }
             }
