@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.17.0
+Version: 3.17.1
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Wed Nov 03 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.17.1-1
+- Firewall: wrong chart data with some locales - Bug NethServer/dev#6590 
+
 * Mon Oct 25 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.17.0-1
 - Firewall: Remove the button of speedtest-cli - NethServer/dev#6588
 - Firewall troubleshooting dashboard - NethServer/dev#6582
