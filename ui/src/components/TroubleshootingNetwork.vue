@@ -92,7 +92,7 @@
                     ></span>
                     <span
                       v-else
-                      class="pficon pficon-warning-triangle-o"
+                      class="pficon pficon-error-circle-o"
                     ></span>
                   </div>
                   <div class="td">
