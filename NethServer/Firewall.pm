@@ -137,6 +137,7 @@ sub new
     my $pfdb_path = shift || 'portforward';
     my $ftdb_path = shift || 'fwtimes';
     my $mdb_path = shift || 'macs';
+    my $sepdb_path = shift || 'separators';
 
     my $self = {
         sdb_path => $sdb_path,
@@ -146,7 +147,8 @@ sub new
         pfdb_path => $pfdb_path,
         ftdb_path => $ftdb_path,
         cdb_path => $cdb_path,
-        mdb_path => $mdb_path
+        mdb_path => $mdb_path,
+        sepdb_path => $sepdb_path
     };
     bless $self, $class;
     $self->_initialize();
@@ -166,6 +168,7 @@ sub _initialize()
     $self->{'pfdb'} = esmith::ConfigDB->open_ro($self->{'pfdb_path'});
     $self->{'ftdb'} = esmith::ConfigDB->open_ro($self->{'ftdb_path'});
     $self->{'mdb'} = esmith::ConfigDB->open_ro($self->{'mdb_path'});
+    $self->{'sepdb'} = esmith::ConfigDB->open_ro($self->{'sepdb_path'});
 }
 
 =head2 getAddress(id, expand_zone = 0)
@@ -817,7 +820,7 @@ sub getSeparator
 {
     my $self = shift;
     my @list;
-    foreach ($self->{'fdb'}->get_all_by_prop('type' => 'separator')) {
+    foreach ($self->{'sepdb'}->get_all_by_prop('type' => 'separator')) {
         push(@list,$_);
     }
     return sort _sort_by_position @list; # ascending sort
