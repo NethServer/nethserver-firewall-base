@@ -22,7 +22,9 @@
 
 require_once("/usr/libexec/nethserver/api/lib/Helpers.php");
 
-
+    if ($data['type'] === 'separator' ) {
+                success();
+    }
 /*
  * Validate a firewall rules. Takes 2 arguments:
  *
