@@ -30,11 +30,23 @@ use esmith::ConfigDB;
 use List::Util qw[max];
 
 my $db = esmith::ConfigDB->open('fwrules');
+my $sdb = esmith::ConfigDB->open('separators');
 
-my $max_id = 0;
+my $max_id1 = 0;
 foreach ($db->get_all_by_prop('type' => 'rule')) {
-    $max_id = max($max_id, $_->key);
+    $max_id1 = max($max_id1, $_->key);
 }
-$max_id++;
+$max_id1++;
 
-print $max_id;
+# verifiy in the separator db if an index is not superior or equal
+my $max_id2 = 0;
+foreach ($sdb->get_all_by_prop('type' => 'separator')) {
+    $max_id2 = max($max_id2, $_->key);
+}
+$max_id2++;
+
+if ($max_id2 >= $max_id1) {
+    print $max_id2;
+} else {
+    print $max_id1;
+}
