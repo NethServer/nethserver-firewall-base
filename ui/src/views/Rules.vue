@@ -29,6 +29,7 @@
         </div>
       </div>
       <button v-if="rules.length > 0" @click="openCreateRule()" class="btn btn-primary btn-lg">{{$t('rules.create_rule')}}</button>
+      <button v-if="rules.length > 0" @click="openCreateSeparator()" class="btn btn-primary btn-lg">{{$t('rules.create_separator')}}</button>
     </div>
 
     <div class="pf-container" v-if="rules.length > 0 && view.isLoaded">
@@ -56,7 +57,7 @@
         class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10"
       >
         <li 
-          :class="[r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
+          :class="[r.type === 'separator' ? mapColor(r.color) : r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
           v-for="(r,k) in filteredRules"
           v-bind:key="k"
         >
@@ -226,15 +227,6 @@
             <span class="fa fa-bars"></span>
           </div>
           <div v-if="r.type === 'separator'" class="list-view-pf-actions">
-            <!-- <button
-              @click="r.status == 'disabled' ? toggleEnableRule(r) : openEditRule(r, false)"
-              :class="['btn btn-default', r.status == 'disabled' ? 'btn-primary' : '']"
-            >
-              <span
-                :class="['fa', r.status == 'disabled' ? 'fa-check' : 'fa-edit', 'span-right-margin']"
-              ></span>
-              {{r.status == 'disabled' ? $t('enable') : $t('edit')}}
-            </button> -->
             <div class="dropup pull-right dropdown-kebab-pf">
               <button
                 class="btn btn-link dropdown-toggle"
@@ -247,22 +239,7 @@
                 <span class="fa fa-ellipsis-v"></span>
               </button>
               <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownKebabRight9">
-                <!-- <li>
-                  <a @click="r.status == 'enabled' ? toggleEnableRule(r) : openEditRule(r, false)">
-                    <span
-                      :class="['fa', r.status == 'enabled' ? 'fa-lock' : 'fa-edit', 'span-right-margin']"
-                    ></span>
-                    {{r.status == 'enabled' ? $t('disable') : $t('edit')}}
-                  </a>
-                </li> -->
-                <!-- <li @click="openEditRule(r, true)">
-                  <a>
-                    <span class="fa fa-clone span-right-margin"></span>
-                    {{$t('rules.duplicate')}}
-                  </a>
-                </li>
-                <li role="separator" class="divider"></li> -->
-                <li @click="openDeleteRule(r)">
+                <li @click="openDeleteSeparator(r)">
                   <a>
                     <span class="fa fa-times span-right-margin"></span>
                     {{$t('delete')}}
@@ -273,107 +250,15 @@
           </div>
           <div v-if="r.type === 'separator'" class="list-view-pf-main-info small-list">
             <div class="list-view-pf-left">
-              <!-- <span
-                data-toggle="tooltip"
-                data-placement="top"
-                data-html="true"
-                :title="mapTitleAction(r)"
-                :class="[mapIcon(r.Action, r.status), 'list-view-pf-icon-sm']"
-              ></span>
-              <span
-                data-toggle="tooltip"
-                data-placement="top"
-                data-html="true"
-                :title="$t('rules.log_enabled')"
-                v-show="r.Log"
-                class="fa fa-bookmark-o log-icon"
-              ></span>
-              <span
-                data-toggle="tooltip"
-                data-placement="top"
-                data-html="true"
-                :title="$t('rules.state_enabled')"
-                v-show="r.State"
-                class="pficon pficon-security pf-orange state-icon"
-              ></span> -->
             </div>
             <div class="list-view-pf-body">
               <div class="list-view-pf-description rules-src-dst">
                 <div class="list-group-item-heading">
-                  <!-- <span
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    data-html="true"
-                    :title="mapTitleSrc(r)"
-                    class="handle-overflow"
-                  >
-                    <span :class="mapObjectIcon(r.Src, r.status)"></span>
-                    <span
-                      :class="[r.status == 'disabled' ? 'gray' : r.Src.name.toLowerCase(),'mg-left-5']"
-                    >
-                      <span
-                        v-show="r.Src.type == 'raw'"
-                        class="pficon pficon-warning-triangle-o mg-right-5"
-                      ></span>
-                      {{r.Src.type == 'fw' || r.Src.type == 'role' || r.Src.type == 'any' ? (r.Src.name.toUpperCase()): r.Src.name}}
-                      <a
-                        v-show="r.Src.type == 'raw'"
-                        @click="openCreateObject(r.Src)"
-                      >{{$t('create')}} {{$t('objects.'+r.Src.object)}}</a>
-                    </span>
-                  </span>
-                </div> -->
+                </div>
                 <div class="list-group-item-text">
-                  <!-- <span :class="[mapArrow(r.Action), 'mg-right-10 big-icon']"></span>
-                  <span
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    data-html="true"
-                    :title="mapTitleDst(r)"
-                    class="handle-overflow"
-                  >
-                    <span :class="mapObjectIcon(r.Dst, r.status)"></span>
-                    <span
-                      :class="[r.status == 'disabled' ? 'gray' : r.Dst.name.toLowerCase(),'mg-left-5']"
-                    >
-                      <span
-                        v-show="r.Dst.type == 'raw'"
-                        class="pficon pficon-warning-triangle-o mg-right-5"
-                      ></span>
-                      {{r.Dst.type == 'fw' || r.Dst.type == 'role' || r.Dst.type == 'any' ? (r.Dst.name.toUpperCase()): r.Dst.name}}
-                      <a
-                        v-show="r.Dst.type == 'raw'"
-                        @click="openCreateObject(r.Dst)"
-                      >{{$t('create')}} {{$t('objects.'+r.Dst.object)}}</a>
-                    </span>
-                  </span> -->
                 </div>
               </div>
               <div class="list-view-pf-additional-info rules-info">
-                <!-- <div
-                  v-show="r.Service"
-                  data-toggle="tooltip"
-                  data-placement="top"
-                  data-html="true"
-                  :title="mapTitleService(r)"
-                  class="list-view-pf-additional-info-item"
-                >
-                  <span
-                    :class="['fa', r.Service && r.Service.type == 'application' ? r.Service.icon : 'fa-cogs']"
-                  ></span>
-                  <strong>{{r.Service && r.Service.name}}</strong>
-                </div>
-                <div
-                  v-show="r.Time"
-                  data-toggle="tooltip"
-                  data-placement="top"
-                  data-html="true"
-                  :title="mapTitleTime(r)"
-                  class="list-view-pf-additional-info-item"
-                >
-                  <span class="fa fa-clock-o"></span>
-                  <strong>{{r.Time && r.Time.name}}</strong>
-                </div> -->
                 <div class="list-view-pf-additional-info-item">{{r.Description}}</div>
               </div>
             </div>
@@ -756,6 +641,56 @@
       </div>
     </div>
 
+    <div class="modal" id="createSeparatorModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4
+              class="modal-title"
+            >{{newSeparator.isEdit ? $t('rules.edit_separator') : $t('rules.create_separator')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="saveSeparator()">
+            <div class="modal-body">
+              <div
+                :class="['form-group', newSeparator.errors.Description.hasError ? 'has-error' : '']"
+              >
+                <label class="col-sm-3 control-label">{{$t('rules.description')}}</label>
+                <div class="col-sm-9">
+                  <input class="form-control" type="text" v-model="newSeparator.Description">
+                  <span v-if="newSeparator.errors.Description.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newSeparator.errors.Description.message)}}
+                  </span>
+                </div>
+              </div>
+              <div :class="['form-group', newSeparator.errors.color.hasError ? 'has-error' : '']">
+                <label class="col-sm-3 control-label">{{$t('rules.color')}}</label>
+                <div class="col-sm-9">
+                  <select v-model="newSeparator.color" class="form-control">
+                    <option value="green">{{$t('rules.green')}}</option>
+                    <option value="blue">{{$t('rules.blue')}}</option>
+                    <option value="red">{{$t('rules.red')}}</option>
+                  </select>
+                  <span v-if="newSeparator.errors.color.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newSeparator.errors.color.message)}}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer no-mg-top">
+              <div v-if="newSeparator.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button
+                class="btn btn-primary"
+                type="submit"
+              >{{newSeparator.isEdit ? $t('edit') : $t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <div class="modal" id="deleteRuleModal" tabindex="-1" role="dialog" data-backdrop="static">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -763,6 +698,30 @@
             <h4 class="modal-title">{{$t('rules.delete_rule')}} {{currentRule.id}}</h4>
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteRule(currentRule)">
+            <div class="modal-body">
+              <div class="form-group">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('are_you_sure')}}?</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-danger" type="submit">{{$t('delete')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  
+    <div class="modal" id="deleteSeparatorModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{$t('rules.delete_Separator')}} {{currentRule.id}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="deleteSeparator(currentRule)">
             <div class="modal-body">
               <div class="form-group">
                 <label
@@ -923,6 +882,7 @@ export default {
         inputClass: "form-control"
       },
       newRule: this.initRule(),
+      newSeparator: this.initSeparator(),
       currentRule: {},
       searchString: "",
       highlightInstance: null,
@@ -1350,6 +1310,19 @@ export default {
           break;
       }
     },
+    mapColor(action) {
+      switch (action) {
+        case "blue":
+          return "blue-background";
+          break;
+        case "green":
+          return "green-background";
+          break;
+        case "red":
+          return "red-background";
+          break;
+      }
+    },
     mapIcon(action, status) {
       switch (action) {
         case "accept":
@@ -1429,6 +1402,39 @@ export default {
         advanced: false,
         order: "bottom",
         errors: this.initRuleErrors()
+      };
+    },
+    initSeparator() {
+      return {
+        Dst: "",
+        Description: "",
+        order: "top",
+        color: "blue",
+        errors: this.initSeparatorErrors()
+      };
+    },
+    initSeparatorErrors() {
+      return {
+        Dst: {
+          hasError: false,
+          message: ""
+        },
+        Description: {
+          hasError: false,
+          message: ""
+        },
+        Position: {
+          hasError: false,
+          message: ""
+        },
+        order: {
+          hasError: false,
+          message: ""
+        },
+        color: {
+          hasError: false,
+          message: ""
+        }
       };
     },
     initRuleErrors() {
@@ -1953,6 +1959,10 @@ export default {
       this.newRule = this.initRule();
       $("#createRuleModal").modal("show");
     },
+    openCreateSeparator() {
+      this.newSeparator = this.initSeparator();
+      $("#createSeparatorModal").modal("show");
+    },
     openEditRule(r, duplicate) {
       this.newRule = Object.assign({}, r);
       this.newRule.errors = this.initRuleErrors();
@@ -2053,6 +2063,10 @@ export default {
       this.currentRule = Object.assign({}, r);
       $("#deleteRuleModal").modal("show");
     },
+    openDeleteSeparator(r) {
+      this.currentRule = Object.assign({}, r);
+      $("#deleteSeparatorModal").modal("show");
+    },
     saveRule() {
       var context = this;
 
@@ -2150,6 +2164,79 @@ export default {
         }
       );
     },
+    saveSeparator() {
+      var context = this;
+
+      var ruleObj = {
+        action: context.newSeparator.isEdit ? "update-separator" : "create-separator",
+        Position: context.newSeparator.isEdit
+          ? context.newSeparator.Position
+          : context.status.next,
+        Dst: "",
+        id: context.newSeparator.isEdit ? context.newSeparator.id : null,
+        color: context.newSeparator.color,
+        type: "separator",
+        Description: context.newSeparator.Description
+      };
+      context.newRule.isLoading = true;
+      context.$forceUpdate();
+      nethserver.exec(
+        ["nethserver-firewall-base/rules/validate"],
+        ruleObj,
+        null,
+        function(success) {
+          context.newRule.isLoading = false;
+          $("#createSeparatorModal").modal("hide");
+
+          // notification
+          nethserver.notifications.success = context.$i18n.t(
+            "rules.separator_" +
+              (context.newSeparator.isEdit ? "updated" : "created") +
+              "_ok"
+          );
+          nethserver.notifications.error = context.$i18n.t(
+            "rules.separator_" +
+              (context.newSeparator.isEdit ? "updated" : "created") +
+              "_error"
+          );
+
+          // update values
+          nethserver.exec(
+            [
+              "nethserver-firewall-base/rules/update"
+            ],
+            ruleObj,
+            function(stream) {
+              console.info("firewall-base-update", stream);
+            },
+            function(success) {
+                var nextID = context.status.nextID;
+                context.moveRuleTop(nextID);
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
+        },
+        function(error, data) {
+          var errorData = {};
+          context.newRule.isLoading = false;
+          context.newSeparator.errors = context.initSeparatorErrors();
+
+          try {
+            errorData = JSON.parse(data);
+            for (var e in errorData.attributes) {
+              var attr = errorData.attributes[e];
+              context.newSeparator.errors[attr.parameter].hasError = true;
+              context.newSeparator.errors[attr.parameter].message = attr.error;
+            }
+          } catch (e) {
+            console.error(e);
+          }
+          context.$forceUpdate();
+        }
+      );
+    },
     deleteRule(r) {
       var context = this;
 
@@ -2166,6 +2253,36 @@ export default {
         ["nethserver-firewall-base/rules/delete"],
         {
           name: r.id
+        },
+        function(stream) {
+          console.info("nethserver-firewall-base", stream);
+        },
+        function(success) {
+          // get rules
+          context.getRules();
+        },
+        function(error, data) {
+          console.error(error, data);
+        }
+      );
+    },
+    deleteSeparator(r) {
+      var context = this;
+
+      // notification
+      nethserver.notifications.success = context.$i18n.t(
+        "rules.separator_deleted_ok"
+      );
+      nethserver.notifications.error = context.$i18n.t(
+        "rules.separator_deleted_error"
+      );
+
+      $("#deleteSeparatorModal").modal("hide");
+      nethserver.exec(
+        ["nethserver-firewall-base/rules/update"],
+        {
+          id: r.id,
+          action: "delete-separator"
         },
         function(stream) {
           console.info("nethserver-firewall-base", stream);
@@ -2299,6 +2416,15 @@ export default {
 </script>
 
 <style>
+.blue-background {
+  background-color: lightblue;
+}
+.green-background {
+  background-color: lightgreen;
+}
+.red-background {
+  background-color: pink;
+}
 .info-desc-local {
   min-width: 75px;
 }
