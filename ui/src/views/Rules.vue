@@ -29,7 +29,7 @@
         </div>
       </div>
       <button v-if="rules.length > 0" @click="openCreateRule()" class="btn btn-primary btn-lg">{{$t('rules.create_rule')}}</button>
-      <button v-if="rules.length > 0" @click="openCreateSeparator()" class="btn btn-primary btn-lg">{{$t('rules.create_separator')}}</button>
+      <button v-if="rules.length > 0" @click="openCreateSeparator()" class="btn btn-primary btn-lg mg-left-5">{{$t('rules.create_separator')}}</button>
     </div>
 
     <div class="pf-container" v-if="rules.length > 0 && view.isLoaded">
@@ -239,6 +239,12 @@
                 <span class="fa fa-ellipsis-v"></span>
               </button>
               <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownKebabRight9">
+                <li @click="openEditSeparator(r)">
+                  <a>
+                    <span class="fa fa-edit span-right-margin"></span>
+                    {{$t('edit')}}
+                  </a>
+                </li>
                 <li @click="openDeleteSeparator(r)">
                   <a>
                     <span class="fa fa-times span-right-margin"></span>
@@ -2012,6 +2018,14 @@ export default {
       this.newRule.order = 'bottom';
 
       $("#createRuleModal").modal("show");
+    },
+    openEditSeparator(r) {
+      this.newSeparator = Object.assign({}, r);
+      this.newSeparator.errors = this.initSeparatorErrors();
+      this.newSeparator.isLoading = false;
+      this.newSeparator.isEdit = true;
+
+      $("#createSeparatorModal").modal("show");
     },
     toggleEnableRule(r) {
       var context = this;
