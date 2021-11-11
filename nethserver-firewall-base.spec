@@ -42,7 +42,7 @@ sed -i 's/_RELEASE_/%{version}/' %{name}.json
 mkdir -p root%{perl_vendorlib}
 mv -v NethServer root%{perl_vendorlib}
 
-for _nsdb in fwservices portforward ; do
+for _nsdb in fwservices portforward separators; do
    mkdir -p root/%{_nsdbconfdir}/${_nsdb}/{migrate,force,defaults}
 done
 
@@ -69,6 +69,7 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 %dir %{_nseventsdir}/%{name}-update
 %dir %{_nsdbconfdir}/fwservices
 %dir %{_nsdbconfdir}/portforward
+%dir %{_nsdbconfdir}/separators
 
 
 %changelog
