@@ -306,6 +306,8 @@ sub list_fw_rules
     my @separators;
     my $i = 1;
     my $max_pos = 0;
+    my $max_posRule = 0;
+    my $max_posSeparator = 0;
     my $nextID = 0;
     foreach ($fw->getRules()) {
         my %props = $_->props;
@@ -325,7 +327,7 @@ sub list_fw_rules
         $props{'Time'} = get_time_info($props{'Time'}, $fw->{'ftdb'}, $expand);
         $props{'Service'} = get_service_info($props{'Service'}, $fw, $expand);
         $props{'Position'} = int($props{'Position'});
-        $max_pos = max($max_pos, $props{'Position'});
+        $max_posRule = max($max_posRule, $props{'Position'});
         $nextID =`/usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-next-id`;
         push(@rules, \%props);
         $i++;
@@ -342,8 +344,15 @@ sub list_fw_rules
         $props{'id'} = $_->key;
         $props{'Position'} = int($props{'Position'});
         $nextID =`/usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-next-id`;
+        $max_posSeparator = max($max_posSeparator, $props{'Position'});
         push(@separators, \%props);
         $i++;
+    }
+    # find the the higher position in the fwrule or separator db 
+    if ($max_posSeparator >= $max_posRule ) {
+        $max_pos = $max_posSeparator;
+    } else {
+        $max_pos = $max_posRule;
     }
 
     push (@rules, @separators);
