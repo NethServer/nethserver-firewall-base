@@ -220,9 +220,6 @@
               </div>
             </div>
           </div>
-          <div v-if="r.type === 'separator'" class="drag-size">
-            <span class="gray mg-right-5">{{r.id}}</span>
-          </div>
           <div v-if="r.type === 'separator'" v-show="searchString.length == 0" class="list-view-pf-checkbox drag-here">
             <span class="fa fa-bars"></span>
           </div>
@@ -260,12 +257,12 @@
             <div class="list-view-pf-body">
               <div class="list-view-pf-description rules-src-dst">
                 <div class="list-group-item-heading">
+                <span>{{r.Description.toUpperCase()}}</span>
                 </div>
                 <div class="list-group-item-text">
                 </div>
               </div>
               <div class="list-view-pf-additional-info rules-info">
-                <div class="list-view-pf-additional-info-item">{{r.Description}}</div>
               </div>
             </div>
           </div>
@@ -946,7 +943,8 @@ export default {
         ["nethserver-firewall-base/rules/update"],
         {
           action: "reorder",
-          rules: ids
+          rules: ids,
+          type: movedItem.type
         },
         function(stream) {
           console.info("firewall-base-update", stream);
@@ -959,7 +957,7 @@ export default {
         }
       );
     },
-    moveRuleTop(index) {
+    moveRuleTop(index, type) {
       // retrieve the array order of indexes.
       var ids = this.rules.map(function(i) {
         return i.id;
@@ -975,7 +973,8 @@ export default {
         ["nethserver-firewall-base/rules/update"],
         {
           action: "reorder",
-          rules: ids
+          rules: ids,
+          type: type
         },
         function(stream) {
           console.info("firewall-base-update", stream);
@@ -2149,7 +2148,7 @@ export default {
                 //We retrieve order of ruleS by status.order 
                 //and we unshift with status.nextID
                 var nextID = context.status.nextID;
-                context.moveRuleTop(nextID);
+                context.moveRuleTop(nextID, 'rule');
               } else {
                 context.getRules();
               }
@@ -2225,7 +2224,7 @@ export default {
             },
             function(success) {
                 var nextID = context.status.nextID;
-                context.moveRuleTop(nextID);
+                context.moveRuleTop(nextID, 'separator');
             },
             function(error, data) {
               console.error(error, data);

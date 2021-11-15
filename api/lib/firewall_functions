@@ -300,7 +300,6 @@ function fw_separator
     
     Dst=$(_get Dst)
 
-    save_db separators
     /sbin/e-smith/db separators set "$id" separator \
         Position "$(_get Position)"  \
         color "$(_get color)"  \
@@ -328,7 +327,6 @@ function delete_separator
         error
     fi
 
-    save_db separators
     /sbin/e-smith/db separators delete "$id"
 
     if [ $? -gt 0 ]; then

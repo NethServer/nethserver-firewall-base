@@ -30,7 +30,9 @@ case $action in
         ;;
 
     "reorder")
-        save_db fwrules
+        if [[ $(_get type) == 'rule' ]]; then 
+            save_db fwrules
+        fi
         echo $data | /usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-reorder
         ;;
     "update-separator")
