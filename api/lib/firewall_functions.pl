@@ -334,13 +334,6 @@ sub list_fw_rules
     }
     foreach ($fw->getSeparator()) {
         my %props = $_->props;
-        if ($skip_local) {
-            # skip rule to/from the firewall
-            next if ($props{'Dst'} eq 'fw');
-        } else {
-            # skip rule not for the firewall itself
-            next if ($props{'Dst'} ne 'fw');
-        }
         $props{'id'} = $_->key;
         $props{'Position'} = int($props{'Position'});
         $nextID =`/usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-next-id`;

@@ -298,12 +298,9 @@ function fw_separator
         error
     fi
     
-    Dst=$(_get Dst)
-
     /sbin/e-smith/db separators set "$id" separator \
         Position "$(_get Position)"  \
         color "$(_get color)"  \
-        Dst "$Dst" \
         Description "$(_get Description)"
     
     if [ $? -gt 0 ]; then
