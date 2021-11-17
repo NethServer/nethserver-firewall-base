@@ -57,7 +57,7 @@
         class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10"
       >
         <li 
-          :class="[r.type === 'separator' ? mapColor(r.color) : r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
+          :class="[r.type === 'separator' ? r.color+'-background' : r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
           v-for="(r,k) in filteredRules"
           v-bind:key="k"
         >
@@ -1312,19 +1312,6 @@ export default {
           break;
         case "drop":
           return "red-list";
-          break;
-      }
-    },
-    mapColor(action) {
-      switch (action) {
-        case "blue":
-          return "blue-background";
-          break;
-        case "green":
-          return "green-background";
-          break;
-        case "red":
-          return "red-background";
           break;
       }
     },
