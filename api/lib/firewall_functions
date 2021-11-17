@@ -281,11 +281,11 @@ function fw_rule
 }
 
 #
-# Create or update a firewall rule
-# The rule is passed by $data global variable
+# Create or update a separator
+# The separator is passed by $data global variable
 # Takes one argument: action to perform (create/update)
 #
-# Usage example: fw_rule create
+# Usage example: fw_separator create
 #
 
 function fw_separator
