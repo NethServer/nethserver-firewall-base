@@ -45,8 +45,4 @@ foreach ($sdb->get_all_by_prop('type' => 'separator')) {
 }
 $max_sep_id++;
 
-if ($max_sep_id >= $max_rule_id) {
-    print $max_sep_id;
-} else {
-    print $max_rule_id;
-}
+print max($max_sep_id, $max_rule_id);
