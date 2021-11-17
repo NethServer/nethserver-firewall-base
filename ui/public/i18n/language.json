@@ -429,6 +429,8 @@
         "rule_updated_error": "Rule not updated.",
         "rule_deleted_ok": "Rule deleted successfully!",
         "rule_deleted_error": "Rule not deleted.",
+        "separator_deleted_ok": "Separator deleted successfully!",
+        "separator_deleted_error": "Separator not deleted.",
         "tc_add_rules_info": "Order is important: evaluation of rules will continue after a match. Priority is assigned by last match.",
         "wan_add_rules_info": "Order is important: evaluation of rules will continue after a match. Route is assigned by last match.",
         "type_to_search": "Type to search objects, roles...",
