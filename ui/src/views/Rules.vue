@@ -29,7 +29,7 @@
         </div>
       </div>
       <button v-if="rules.length > 0" @click="openCreateRule()" class="btn btn-primary btn-lg">{{$t('rules.create_rule')}}</button>
-      <button v-if="rules.length > 0" @click="openCreateSeparator()" class="btn btn-primary btn-lg mg-left-5">{{$t('rules.create_separator')}}</button>
+      <button v-if="rules.length > 0" @click="openCreateSeparator()" class="btn btn-default btn-lg mg-left-5">{{$t('rules.create_separator')}}</button>
     </div>
 
     <div class="pf-container" v-if="rules.length > 0 && view.isLoaded">
