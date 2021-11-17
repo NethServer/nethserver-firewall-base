@@ -810,13 +810,13 @@ sub getRules
     return sort _sort_by_position @list; # ascending sort
 }
 
-=head2 getSeparator
+=head2 getSeparators
 
 Return the separator list ordered by Position property (ascending order).
 Each record has all database properties.
 
 =cut
-sub getSeparator
+sub getSeparators
 {
     my $self = shift;
     my @list;

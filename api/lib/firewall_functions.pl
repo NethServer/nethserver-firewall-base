@@ -332,7 +332,7 @@ sub list_fw_rules
         push(@rules, \%props);
         $i++;
     }
-    foreach ($fw->getSeparator()) {
+    foreach ($fw->getSeparators()) {
         my %props = $_->props;
         $props{'id'} = $_->key;
         $props{'Position'} = int($props{'Position'});
