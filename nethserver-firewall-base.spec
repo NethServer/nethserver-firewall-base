@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.17.2
+Version: 3.17.3
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -72,6 +72,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Thu Nov 18 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.17.3-1
+- Firewall analysis page: network traffic chart reports wrong data - Bug NethServer/dev#6599
+
 * Thu Nov 04 2021 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.17.2-1
 - Firewall: wrong multiwan status in Analysis page - Bug NethServer/dev#6593
 
