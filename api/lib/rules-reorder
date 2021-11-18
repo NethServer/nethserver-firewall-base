@@ -35,10 +35,11 @@ my $input = readInput();
 my $order = $input->{'rules'};
 
 my $db = esmith::ConfigDB->open('fwrules');
+my $sdb = esmith::ConfigDB->open('separators');
 
 my $i = 1;
 foreach my $id (@$order) {
-    my $rule = $db->get($id) || next;
+    my $rule = $db->get($id) || $sdb->get($id) || next;
     $rule->set_prop('Position',$i);
     $i++;
 }

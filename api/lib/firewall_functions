@@ -279,3 +279,57 @@ function fw_rule
         success
     fi
 }
+
+#
+# Create or update a separator
+# The separator is passed by $data global variable
+# Takes one argument: action to perform (create/update)
+#
+# Usage example: fw_separator create
+#
+
+function fw_separator
+{
+    if [ "$1" = "create" ]; then
+        id=$(/usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-next-id)
+    elif [ "$1" = "update" ]; then
+        id=$(_get id)
+    else
+        error
+    fi
+    
+    /sbin/e-smith/db separators set "$id" separator \
+        Position "$(_get Position)"  \
+        color "$(_get color)"  \
+        Description "$(_get Description)"
+    
+    if [ $? -gt 0 ]; then
+        error "SaveFailed" "check_logs"
+    else
+        success
+    fi
+}
+
+#
+# Delete given firewall separator
+# Takes one argument: the rule id
+#
+# Usage example: delete_rule "$(_get name)"
+#
+function delete_separator
+{
+    id=$(_get id)
+
+    if [ -z $id ]; then
+        error
+    fi
+
+    /sbin/e-smith/db separators delete "$id"
+
+    if [ $? -gt 0 ]; then
+        error "DeleteFailed" "check_logs"
+    else
+        success
+    fi
+
+}
