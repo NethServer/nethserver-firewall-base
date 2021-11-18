@@ -29,6 +29,7 @@
         </div>
       </div>
       <button v-if="rules.length > 0" @click="openCreateRule()" class="btn btn-primary btn-lg">{{$t('rules.create_rule')}}</button>
+      <button v-if="rules.length > 0" @click="openCreateSeparator()" class="btn btn-default btn-lg mg-left-5">{{$t('rules.create_separator')}}</button>
     </div>
 
     <div class="pf-container" v-if="rules.length > 0 && view.isLoaded">
@@ -55,18 +56,18 @@
         v-sortable="{onEnd: reorder, handle: '.drag-here'}"
         class="list-group list-view-pf list-view-pf-view no-mg-top mg-top-10"
       >
-        <li
-          :class="[r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
+        <li 
+          :class="[r.type === 'separator' ? r.color+'-background' : r.status == 'disabled' ? 'gray-list' : mapList(r.Action), 'list-group-item', r.status == 'disabled' ? 'gray' : '']"
           v-for="(r,k) in filteredRules"
           v-bind:key="k"
         >
-          <div class="drag-size">
+          <div v-if="r.type === 'rule'" class="drag-size">
             <span class="gray mg-right-5">{{r.id}}</span>
           </div>
-          <div v-show="searchString.length == 0" class="list-view-pf-checkbox drag-here">
+          <div v-if="r.type === 'rule'" v-show="searchString.length == 0" class="list-view-pf-checkbox drag-here">
             <span class="fa fa-bars"></span>
           </div>
-          <div class="list-view-pf-actions">
+          <div v-if="r.type === 'rule'" class="list-view-pf-actions">
             <button
               @click="r.status == 'disabled' ? toggleEnableRule(r) : openEditRule(r, false)"
               :class="['btn btn-default', r.status == 'disabled' ? 'btn-primary' : '']"
@@ -112,7 +113,7 @@
               </ul>
             </div>
           </div>
-          <div class="list-view-pf-main-info small-list">
+          <div v-if="r.type === 'rule'" class="list-view-pf-main-info small-list">
             <div class="list-view-pf-left">
               <span
                 data-toggle="tooltip"
@@ -216,6 +217,52 @@
                   <strong>{{r.Time && r.Time.name}}</strong>
                 </div>
                 <div class="list-view-pf-additional-info-item">{{r.Description}}</div>
+              </div>
+            </div>
+          </div>
+          <div v-if="r.type === 'separator'" v-show="searchString.length == 0" class="list-view-pf-checkbox drag-here">
+            <span class="fa fa-bars"></span>
+          </div>
+          <div v-if="r.type === 'separator'" class="list-view-pf-actions">
+            <div class="dropup pull-right dropdown-kebab-pf">
+              <button
+                class="btn btn-link dropdown-toggle"
+                type="button"
+                id="dropdownKebabRight9"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="true"
+              >
+                <span class="fa fa-ellipsis-v"></span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownKebabRight9">
+                <li @click="openEditSeparator(r)">
+                  <a>
+                    <span class="fa fa-edit span-right-margin"></span>
+                    {{$t('edit')}}
+                  </a>
+                </li>
+                <li @click="openDeleteSeparator(r)">
+                  <a>
+                    <span class="fa fa-times span-right-margin"></span>
+                    {{$t('delete')}}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div v-if="r.type === 'separator'" class="list-view-pf-main-info small-list">
+            <div class="list-view-pf-left">
+            </div>
+            <div class="list-view-pf-body">
+              <div class="list-view-pf-description rules-src-dst">
+                <div class="list-group-item-heading">
+                <span>{{r.Description.toUpperCase()}}</span>
+                </div>
+                <div class="list-group-item-text">
+                </div>
+              </div>
+              <div class="list-view-pf-additional-info rules-info">
               </div>
             </div>
           </div>
@@ -597,6 +644,56 @@
       </div>
     </div>
 
+    <div class="modal" id="createSeparatorModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4
+              class="modal-title"
+            >{{newSeparator.isEdit ? $t('rules.edit_separator') : $t('rules.create_separator')}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="saveSeparator()">
+            <div class="modal-body">
+              <div
+                :class="['form-group', newSeparator.errors.Description.hasError ? 'has-error' : '']"
+              >
+                <label class="col-sm-3 control-label">{{$t('rules.description')}}</label>
+                <div class="col-sm-9">
+                  <input class="form-control" type="text" v-model="newSeparator.Description">
+                  <span v-if="newSeparator.errors.Description.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newSeparator.errors.Description.message)}}
+                  </span>
+                </div>
+              </div>
+              <div :class="['form-group', newSeparator.errors.color.hasError ? 'has-error' : '']">
+                <label class="col-sm-3 control-label">{{$t('rules.color')}}</label>
+                <div class="col-sm-9">
+                  <select v-model="newSeparator.color" class="form-control">
+                    <option value="green">{{$t('rules.green')}}</option>
+                    <option value="blue">{{$t('rules.blue')}}</option>
+                    <option value="red">{{$t('rules.red')}}</option>
+                  </select>
+                  <span v-if="newSeparator.errors.color.hasError" class="help-block">
+                    {{$t('validation.validation_failed')}}:
+                    {{$t('validation.'+newSeparator.errors.color.message)}}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer no-mg-top">
+              <div v-if="newSeparator.isLoading" class="spinner spinner-sm form-spinner-loader"></div>
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button
+                class="btn btn-primary"
+                type="submit"
+              >{{newSeparator.isEdit ? $t('edit') : $t('save')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <div class="modal" id="deleteRuleModal" tabindex="-1" role="dialog" data-backdrop="static">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -604,6 +701,30 @@
             <h4 class="modal-title">{{$t('rules.delete_rule')}} {{currentRule.id}}</h4>
           </div>
           <form class="form-horizontal" v-on:submit.prevent="deleteRule(currentRule)">
+            <div class="modal-body">
+              <div class="form-group">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('are_you_sure')}}?</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-danger" type="submit">{{$t('delete')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  
+    <div class="modal" id="deleteSeparatorModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{$t('rules.delete_Separator')}} {{currentRule.id}}</h4>
+          </div>
+          <form class="form-horizontal" v-on:submit.prevent="deleteSeparator(currentRule)">
             <div class="modal-body">
               <div class="form-group">
                 <label
@@ -764,6 +885,7 @@ export default {
         inputClass: "form-control"
       },
       newRule: this.initRule(),
+      newSeparator: this.initSeparator(),
       currentRule: {},
       searchString: "",
       highlightInstance: null,
@@ -821,7 +943,8 @@ export default {
         ["nethserver-firewall-base/rules/update"],
         {
           action: "reorder",
-          rules: ids
+          rules: ids,
+          type: movedItem.type
         },
         function(stream) {
           console.info("firewall-base-update", stream);
@@ -834,7 +957,7 @@ export default {
         }
       );
     },
-    moveRuleTop(index) {
+    moveRuleTop(index, type) {
       // retrieve the array order of indexes.
       var ids = this.rules.map(function(i) {
         return i.id;
@@ -850,7 +973,8 @@ export default {
         ["nethserver-firewall-base/rules/update"],
         {
           action: "reorder",
-          rules: ids
+          rules: ids,
+          type: type
         },
         function(stream) {
           console.info("firewall-base-update", stream);
@@ -1270,6 +1394,39 @@ export default {
         advanced: false,
         order: "bottom",
         errors: this.initRuleErrors()
+      };
+    },
+    initSeparator() {
+      return {
+        Dst: "",
+        Description: "",
+        order: "top",
+        color: "blue",
+        errors: this.initSeparatorErrors()
+      };
+    },
+    initSeparatorErrors() {
+      return {
+        Dst: {
+          hasError: false,
+          message: ""
+        },
+        Description: {
+          hasError: false,
+          message: ""
+        },
+        Position: {
+          hasError: false,
+          message: ""
+        },
+        order: {
+          hasError: false,
+          message: ""
+        },
+        color: {
+          hasError: false,
+          message: ""
+        }
       };
     },
     initRuleErrors() {
@@ -1794,6 +1951,10 @@ export default {
       this.newRule = this.initRule();
       $("#createRuleModal").modal("show");
     },
+    openCreateSeparator() {
+      this.newSeparator = this.initSeparator();
+      $("#createSeparatorModal").modal("show");
+    },
     openEditRule(r, duplicate) {
       this.newRule = Object.assign({}, r);
       this.newRule.errors = this.initRuleErrors();
@@ -1844,6 +2005,14 @@ export default {
 
       $("#createRuleModal").modal("show");
     },
+    openEditSeparator(r) {
+      this.newSeparator = Object.assign({}, r);
+      this.newSeparator.errors = this.initSeparatorErrors();
+      this.newSeparator.isLoading = false;
+      this.newSeparator.isEdit = true;
+
+      $("#createSeparatorModal").modal("show");
+    },
     toggleEnableRule(r) {
       var context = this;
 
@@ -1893,6 +2062,10 @@ export default {
     openDeleteRule(r) {
       this.currentRule = Object.assign({}, r);
       $("#deleteRuleModal").modal("show");
+    },
+    openDeleteSeparator(r) {
+      this.currentRule = Object.assign({}, r);
+      $("#deleteSeparatorModal").modal("show");
     },
     saveRule() {
       var context = this;
@@ -1962,7 +2135,7 @@ export default {
                 //We retrieve order of ruleS by status.order 
                 //and we unshift with status.nextID
                 var nextID = context.status.nextID;
-                context.moveRuleTop(nextID);
+                context.moveRuleTop(nextID, 'rule');
               } else {
                 context.getRules();
               }
@@ -1991,6 +2164,79 @@ export default {
         }
       );
     },
+    saveSeparator() {
+      var context = this;
+
+      var ruleObj = {
+        action: context.newSeparator.isEdit ? "update-separator" : "create-separator",
+        Position: context.newSeparator.isEdit
+          ? context.newSeparator.Position
+          : context.status.next,
+        Dst: "",
+        id: context.newSeparator.isEdit ? context.newSeparator.id : null,
+        color: context.newSeparator.color,
+        type: "separator",
+        Description: context.newSeparator.Description
+      };
+      context.newRule.isLoading = true;
+      context.$forceUpdate();
+      nethserver.exec(
+        ["nethserver-firewall-base/rules/validate"],
+        ruleObj,
+        null,
+        function(success) {
+          context.newRule.isLoading = false;
+          $("#createSeparatorModal").modal("hide");
+
+          // notification
+          nethserver.notifications.success = context.$i18n.t(
+            "rules.separator_" +
+              (context.newSeparator.isEdit ? "updated" : "created") +
+              "_ok"
+          );
+          nethserver.notifications.error = context.$i18n.t(
+            "rules.separator_" +
+              (context.newSeparator.isEdit ? "updated" : "created") +
+              "_error"
+          );
+
+          // update values
+          nethserver.exec(
+            [
+              "nethserver-firewall-base/rules/update"
+            ],
+            ruleObj,
+            function(stream) {
+              console.info("firewall-base-update", stream);
+            },
+            function(success) {
+                var nextID = context.status.nextID;
+                context.moveRuleTop(nextID, 'separator');
+            },
+            function(error, data) {
+              console.error(error, data);
+            }
+          );
+        },
+        function(error, data) {
+          var errorData = {};
+          context.newRule.isLoading = false;
+          context.newSeparator.errors = context.initSeparatorErrors();
+
+          try {
+            errorData = JSON.parse(data);
+            for (var e in errorData.attributes) {
+              var attr = errorData.attributes[e];
+              context.newSeparator.errors[attr.parameter].hasError = true;
+              context.newSeparator.errors[attr.parameter].message = attr.error;
+            }
+          } catch (e) {
+            console.error(e);
+          }
+          context.$forceUpdate();
+        }
+      );
+    },
     deleteRule(r) {
       var context = this;
 
@@ -2007,6 +2253,36 @@ export default {
         ["nethserver-firewall-base/rules/delete"],
         {
           name: r.id
+        },
+        function(stream) {
+          console.info("nethserver-firewall-base", stream);
+        },
+        function(success) {
+          // get rules
+          context.getRules();
+        },
+        function(error, data) {
+          console.error(error, data);
+        }
+      );
+    },
+    deleteSeparator(r) {
+      var context = this;
+
+      // notification
+      nethserver.notifications.success = context.$i18n.t(
+        "rules.separator_deleted_ok"
+      );
+      nethserver.notifications.error = context.$i18n.t(
+        "rules.separator_deleted_error"
+      );
+
+      $("#deleteSeparatorModal").modal("hide");
+      nethserver.exec(
+        ["nethserver-firewall-base/rules/update"],
+        {
+          id: r.id,
+          action: "delete-separator"
         },
         function(stream) {
           console.info("nethserver-firewall-base", stream);
@@ -2140,6 +2416,15 @@ export default {
 </script>
 
 <style>
+.blue-background {
+  background-color: lightblue;
+}
+.green-background {
+  background-color: lightgreen;
+}
+.red-background {
+  background-color: pink;
+}
 .info-desc-local {
   min-width: 75px;
 }
