@@ -124,8 +124,8 @@ sub fetch_interface_rrd {
             next unless ($time =~ m/\d/ && $rcvd =~ m/\d/ && $sent =~ m/\d/);
             # make sure to output a numeric value
             $time = $time*1000;
-            $rcvd = $rcvd/1024/1024; # transform to Mbits
-            $sent = $sent/1024/1024; # transform to Mbits
+            $rcvd = $rcvd/1024/1024*8; # transform to Mbits
+            $sent = $sent/1024/1024*8; # transform to Mbits
             push(@ret, [$time, $rcvd, $sent]);
         }
     }
