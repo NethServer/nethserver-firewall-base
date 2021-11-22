@@ -14,12 +14,4 @@
    $OUT .= "INLINE():F - - ; -m ndpi --all\n";
    $OUT .= "INLINE \$FW - ; -m ndpi --all\n";
    $OUT .= "IPTABLES(NDPI --ndpi-id-p --set-mark):T\n";
-
-   $OUT .= "# Restore the connection mark into the current packet.\n";
-   $OUT .= "RESTORE:F       -               -               -\n";
-   $OUT .= "# Restore the connection mark for packets from/to firewall (Squid).\n";
-   $OUT .= "# This is useful only for QoS\n";
-   $OUT .= "RESTORE        \$FW             -               - - - - 0x00\n";
-   $OUT .= "RESTORE        -                \$FW            - - - - 0x00\n";
-
 }

@@ -1,0 +1,12 @@
+#
+# 22restore_connmark
+#
+{
+   $OUT .= "# Restore the connection mark into the current packet.\n";
+   $OUT .= "RESTORE:F       -               -               -\n";
+   $OUT .= "# Restore the connection mark for packets from/to firewall.\n";
+   $OUT .= "# Used QoS, IPS and Squid\n";
+   $OUT .= "RESTORE        \$FW             -               - - - - 0x00\n";
+   $OUT .= "RESTORE        -                \$FW            - - - - 0x00\n";
+
+}
