@@ -2417,13 +2417,13 @@ export default {
 
 <style>
 .blue-background {
-  background-color: lightblue;
+  background-color: #00b9e4;
 }
 .green-background {
-  background-color: lightgreen;
+  background-color: #92d400;
 }
 .red-background {
-  background-color: pink;
+  background-color: #8b0000;
 }
 .info-desc-local {
   min-width: 75px;
