@@ -44,6 +44,7 @@ Cmnd_Alias NSAPI_NETHSERVER_FIREWALL_BASE = \
     /usr/libexec/nethserver/api/nethserver-firewall-base/wan/delete, \
     /usr/libexec/nethserver/api/nethserver-firewall-base/wan/read, \
     /usr/libexec/nethserver/api/nethserver-firewall-base/wan/update, \
-    /usr/libexec/nethserver/api/nethserver-firewall-base/wan/validate
+    /usr/libexec/nethserver/api/nethserver-firewall-base/wan/validate, \
+    /usr/libexec/nethserver/api/nethserver-firewall-base/troubleshooting/read
 
 Defaults!NSAPI_NETHSERVER_FIREWALL_BASE !requiretty
