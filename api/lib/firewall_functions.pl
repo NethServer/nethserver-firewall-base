@@ -303,9 +303,10 @@ sub list_fw_rules
     my $skip_local = shift;
     my $fw = new NethServer::Firewall();
     my @rules;
-    my $i = 1;
-    my $max_pos = 0;
+    my $max_posRule = 0;
+    my $max_posSeparator = 0;
     my $nextID = 0;
+    my $next = 0;
     foreach ($fw->getRules()) {
         my %props = $_->props;
 
@@ -324,13 +325,21 @@ sub list_fw_rules
         $props{'Time'} = get_time_info($props{'Time'}, $fw->{'ftdb'}, $expand);
         $props{'Service'} = get_service_info($props{'Service'}, $fw, $expand);
         $props{'Position'} = int($props{'Position'});
-        $max_pos = max($max_pos, $props{'Position'});
-        $nextID =`/usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-next-id`;
+        $max_posRule = max($max_posRule, $props{'Position'});
         push(@rules, \%props);
-        $i++;
     }
+    foreach ($fw->getSeparators()) {
+        my %props = $_->props;
+        $props{'id'} = $_->key;
+        $props{'Position'} = int($props{'Position'});
+        $max_posSeparator = max($max_posSeparator, $props{'Position'});
+        push(@rules, \%props);
+    }
+    $next = int(`/usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-next-id`);
 
-    return {"status" => {"count" => scalar(@rules), "next" => $max_pos+1, "nextID" => $nextID }, "rules" => \@rules};
+    my @sorted = sort { $a->{'Position'} <=> $b->{'Position'} } @rules;
+
+    return {"status" => {"count" => scalar(@rules), "next" => max($max_posRule, $max_posSeparator)+1, "nextID" => $next }, "rules" => \@sorted};
 }
 
 sub list_policies

@@ -38,6 +38,7 @@ function validate_rule($data, $type) {
     $ndb = new EsmithDatabase('networks');
     $tdb = new EsmithDatabase('tc');
     $timesdb = new EsmithDatabase('fwtimes');
+    $sdb = new EsmithDatabase('separators');
 
     # set validActions for each type of rule
     if (($type == 'rules' && $data['Service']['type'] != 'application') || $type == 'local-rules') {
@@ -125,6 +126,17 @@ function validate_rule($data, $type) {
     } else if ($data['action'] == 'update-rule') {
         if (! $rulesdb->getKey($data['id'])) {
             $v->addValidationError('id', 'rule_not_exists', $data['id']);
+        }
+    }
+
+    # check for id on creation/update for separator
+    if ($data['action'] == 'create-separator') {
+        if ($sdb->getKey($data['id'])) {
+            $v->addValidationError('id', 'separator_exists', $data['id']);
+        }
+    } else if ($data['action'] == 'update-separator') {
+        if (! $sdb->getKey($data['id'])) {
+            $v->addValidationError('id', 'separator_not_exists', $data['id']);
         }
     }
 
