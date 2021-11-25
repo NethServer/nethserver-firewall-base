@@ -328,12 +328,15 @@ sub list_fw_rules
         $max_posRule = max($max_posRule, $props{'Position'});
         push(@rules, \%props);
     }
-    foreach ($fw->getSeparators()) {
-        my %props = $_->props;
-        $props{'id'} = $_->key;
-        $props{'Position'} = int($props{'Position'});
-        $max_posSeparator = max($max_posSeparator, $props{'Position'});
-        push(@rules, \%props);
+    # separator are only for rules
+    if ($skip_local && @rules) {
+        foreach ($fw->getSeparators()) {
+            my %props = $_->props;
+            $props{'id'} = $_->key;
+            $props{'Position'} = int($props{'Position'});
+            $max_posSeparator = max($max_posSeparator, $props{'Position'});
+            push(@rules, \%props);
+        }
     }
     $next = int(`/usr/libexec/nethserver/api/nethserver-firewall-base/lib/rules-next-id`);
 
