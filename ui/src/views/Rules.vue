@@ -61,13 +61,14 @@
           v-for="(r,k) in filteredRules"
           v-bind:key="k"
         >
-          <div v-if="r.type === 'rule'" class="drag-size">
+          <template v-if="r.type === 'rule'">
+          <div class="drag-size">
             <span class="gray mg-right-5">{{r.id}}</span>
           </div>
-          <div v-if="r.type === 'rule'" v-show="searchString.length == 0" class="list-view-pf-checkbox drag-here">
+          <div v-show="searchString.length == 0" class="list-view-pf-checkbox drag-here">
             <span class="fa fa-bars"></span>
           </div>
-          <div v-if="r.type === 'rule'" class="list-view-pf-actions">
+          <div class="list-view-pf-actions">
             <button
               @click="r.status == 'disabled' ? toggleEnableRule(r) : openEditRule(r, false)"
               :class="['btn btn-default', r.status == 'disabled' ? 'btn-primary' : '']"
@@ -113,7 +114,7 @@
               </ul>
             </div>
           </div>
-          <div v-if="r.type === 'rule'" class="list-view-pf-main-info small-list">
+          <div class="list-view-pf-main-info small-list">
             <div class="list-view-pf-left">
               <span
                 data-toggle="tooltip"
@@ -220,10 +221,12 @@
               </div>
             </div>
           </div>
-          <div v-if="r.type === 'separator'" v-show="searchString.length == 0" class="list-view-pf-checkbox drag-here">
+          </template>
+          <template v-if="r.type === 'separator'">
+          <div v-show="searchString.length == 0" class="list-view-pf-checkbox drag-here">
             <span class="fa fa-bars"></span>
           </div>
-          <div v-if="r.type === 'separator'" class="list-view-pf-actions">
+          <div class="list-view-pf-actions">
             <div class="dropup pull-right dropdown-kebab-pf">
               <button
                 class="btn btn-link dropdown-toggle"
@@ -251,7 +254,7 @@
               </ul>
             </div>
           </div>
-          <div v-if="r.type === 'separator'" class="list-view-pf-main-info small-list">
+          <div class="list-view-pf-main-info small-list">
             <div class="list-view-pf-left">
             </div>
             <div class="list-view-pf-body">
@@ -266,6 +269,7 @@
               </div>
             </div>
           </div>
+          </template>
         </li>
       </ul>
     </div>
