@@ -65,6 +65,7 @@
           v-for="(r,k) in filteredRules"
           v-bind:key="k"
         >
+          <template v-if="r.type === 'rule'">
           <div class="drag-size">
             <span class="gray mg-right-5">{{r.id}}</span>
           </div>
@@ -214,6 +215,7 @@
               </div>
             </div>
           </div>
+          </template>
         </li>
       </ul>
     </div>
