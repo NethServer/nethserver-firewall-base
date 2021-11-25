@@ -2423,7 +2423,7 @@ export default {
   background-color: #92d400;
 }
 .red-background {
-  background-color: #8b0000;
+  background-color: #cc0000c0;
 }
 .info-desc-local {
   min-width: 75px;
