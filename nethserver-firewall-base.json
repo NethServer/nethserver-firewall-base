@@ -5,7 +5,7 @@
     "description": "Firewall implementation based on Shorewall",
     "url": "",
     "homepage": "https://github.com/NethServer/nethserver-firewall-base",
-    "provides": ["nethserver-firewall-base"],
+    "provides": ["nethserver-firewall-base-ui"],
     "release": {
         "version": "_RELEASE_"
     },
