@@ -474,11 +474,10 @@ export default {
               chart.data[t][0] = new Date(chart.data[t][0]);
             }
 
-            const i18nLabels = chart.labels.map(
-              (label) =>
-                context.$i18n
-                  ? context.$i18n.t("troubleshooting." + label)
-                  : label
+            const i18nLabels = chart.labels.map((label) =>
+              context.$i18n
+                ? context.$i18n.t("troubleshooting." + label)
+                : label
             );
 
             var g = new Dygraph(

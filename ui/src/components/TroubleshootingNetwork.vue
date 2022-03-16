@@ -90,10 +90,7 @@
                       v-if="wanProviders.status[iface.provider.name] == 1"
                       class="pficon pficon-ok row-icon"
                     ></span>
-                    <span
-                      v-else
-                      class="pficon pficon-error-circle-o"
-                    ></span>
+                    <span v-else class="pficon pficon-error-circle-o"></span>
                   </div>
                   <div class="td">
                     <span v-if="wanProviders.status[iface.provider.name] == 1">
