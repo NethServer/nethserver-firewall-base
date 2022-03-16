@@ -306,6 +306,7 @@ export default {
       chartsInterval: null,
       currentHost: null,
       hostTraffic: null,
+      hostTrafficDygraph: null,
       knownHosts: [],
       topHostsColumns: [
         {
@@ -480,7 +481,14 @@ export default {
                 : label
             );
 
-            var g = new Dygraph(
+            let graph = context.hostTrafficDygraph;
+
+            if (graph) {
+              // destroy previous graph to avoid memory leakage
+              graph.destroy();
+            }
+
+            graph = new Dygraph(
               document.getElementById("host-traffic-chart"),
               chart.data,
               {
@@ -506,7 +514,8 @@ export default {
                 },
               }
             );
-            g.initialData = chart.data;
+            graph.initialData = chart.data;
+            context.hostTrafficDygraph = graph;
           });
         },
         function(error) {

@@ -342,14 +342,18 @@ export default {
       wanProviders: { configuration: {}, status: {} },
       redInterfaces: [],
       trafficCharts: {},
+      trafficDygraphs: {},
       ifacePingCharts: {},
+      ifacePingDygraphs: {},
       trafficChartsInterval: null,
       ifacePingChartsInterval: null,
       pingChartInterval: null,
       pingDroprateChartInterval: null,
       charts: {
         ping: {},
+        pingDygraphs: {},
         droprate: {},
+        droprateDygraphs: {},
       },
       isLoaded: {
         wanProviders: false,
@@ -466,7 +470,14 @@ export default {
               context.isLoaded.ifacePingCharts = true;
 
               setTimeout(() => {
-                var g = new Dygraph(
+                let graph = context.ifacePingDygraphs[ip];
+
+                if (graph) {
+                  // destroy previous graph to avoid memory leakage
+                  graph.destroy();
+                }
+
+                graph = new Dygraph(
                   document.getElementById(`ping-chart-${redName}-${ip}`),
                   chart.data,
                   {
@@ -494,7 +505,8 @@ export default {
                     },
                   }
                 );
-                g.initialData = chart.data;
+                graph.initialData = chart.data;
+                context.$set(context.ifacePingDygraphs, ip, graph);
               }, 1000);
             }
           }
@@ -533,7 +545,14 @@ export default {
                   : label
               );
 
-              var g = new Dygraph(
+              let graph = context.trafficDygraphs[iface.name];
+
+              if (graph) {
+                // destroy previous graph to avoid memory leakage
+                graph.destroy();
+              }
+
+              graph = new Dygraph(
                 document.getElementById("traffic-chart-" + iface.name),
                 chart.data,
                 {
@@ -562,7 +581,8 @@ export default {
                   },
                 }
               );
-              g.initialData = chart.data;
+              graph.initialData = chart.data;
+              context.$set(context.trafficDygraphs, iface.name, graph);
             });
           },
           function(error) {
@@ -599,7 +619,14 @@ export default {
                   : label
               );
 
-              var g = new Dygraph(
+              let graph = context.charts.pingDygraphs[ip];
+
+              if (graph) {
+                // destroy previous graph to avoid memory leakage
+                graph.destroy();
+              }
+
+              graph = new Dygraph(
                 document.getElementById("chart-ping-" + ip),
                 chart.data,
                 {
@@ -625,7 +652,8 @@ export default {
                   },
                 }
               );
-              g.initialData = chart.data;
+              graph.initialData = chart.data;
+              context.$set(context.charts.pingDygraphs, ip, graph);
             }
           });
         },
@@ -663,7 +691,14 @@ export default {
                   : label
               );
 
-              var g = new Dygraph(
+              let graph = context.charts.droprateDygraphs[ip];
+
+              if (graph) {
+                // destroy previous graph to avoid memory leakage
+                graph.destroy();
+              }
+
+              graph = new Dygraph(
                 document.getElementById("chart-ping-droprate-" + ip),
                 chart.data,
                 {
@@ -694,7 +729,8 @@ export default {
                   },
                 }
               );
-              g.initialData = chart.data;
+              graph.initialData = chart.data;
+              context.$set(context.charts.droprateDygraphs, ip, graph);
             }
           });
         },
