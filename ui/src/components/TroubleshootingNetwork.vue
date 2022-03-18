@@ -470,7 +470,7 @@ export default {
               context.isLoaded.ifacePingCharts = true;
 
               setTimeout(() => {
-                let graph = context.ifacePingDygraphs[ip];
+                let graph = context.ifacePingDygraphs[`${redName}-${ip}`];
 
                 if (graph) {
                   // destroy previous graph to avoid memory leakage
@@ -506,7 +506,11 @@ export default {
                   }
                 );
                 graph.initialData = chart.data;
-                context.$set(context.ifacePingDygraphs, ip, graph);
+                context.$set(
+                  context.ifacePingDygraphs,
+                  `${redName}-${ip}`,
+                  graph
+                );
               }, 1000);
             }
           }
