@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.18.1
+Version: 3.18.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -73,6 +73,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Mon Mar 21 2022 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.18.2-1
+- Firewall: memory leakage in Analysis page - Bug NethServer/dev#6648
+
 * Wed Jan 12 2022 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.18.1-1
 - Firewall: wrong label in traffic shaping bandwidth chart - Bug NethServer/dev#6623
 
