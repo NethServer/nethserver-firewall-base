@@ -1,3 +1,3 @@
 # 80qos_ndpi
-# save packet mark to connections mark
-SAVE:T       -                 -               -     -       -       -       !0x00/0xffff
+# save packet mark to connections mark, excluding IPS bypass mark 0x20
+SAVE(0xffdf):T       -                 -               -     -       -       -       !0x00/0xffff
