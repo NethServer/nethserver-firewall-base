@@ -24,7 +24,7 @@
         if ($action =~ /^class;(.*)/) {
             my $class = $tdb->get($1);
             my $mark = $class->prop('Mark') || next;
-            $mask = "0x$mark/0xff";
+            $mask = "0x$mark/0x3f";
         } else {
             # skip non-priority rules
             next;
