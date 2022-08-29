@@ -67,7 +67,7 @@ if($cmd eq 'classes') {
         my $name = $provider->key;
         $ret->{$name} = undef;
         foreach my $direction (qw(in out)) {
-            my $txt = read_netdata("/api/v1/data?chart=tc.".$name."_$direction&format=csv&before=0&after=-$time&options=abs,seconds");
+            my $txt = read_netdata("/api/v1/data?chart=tc.".$name."-$direction&format=csv&before=0&after=-$time&options=abs,seconds");
             if ($txt && index($txt, "Chart is not found") < 0) {
                 my @lines = split("\r\n",$txt);
                 my @labels = split(",",shift @lines);
