@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.18.3
+Version: 3.19.0
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -73,6 +73,10 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Tue Aug 30 2022 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.19.0-1
+- Netdata 1.35.1-3 breaks traffic shaping chart - Bug NethServer/dev#6695
+- QoS class #16 is not respected - Bug NethServer/dev#6690
+
 * Tue May 24 2022 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.18.3-1
 - Suricata 5 - NethServer/dev#6661
 
