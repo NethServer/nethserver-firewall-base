@@ -30,9 +30,11 @@ my $hostKey = shift || die("Missing host key argument");
 my $hdb = esmith::HostsDB->open();
 
 my @groups = ();
+my @members = ();
 
 foreach my $record ($hdb->get_all_by_prop('type' => 'host-group')) {
-    if(($record->prop('Members') || '') eq $hostKey) {
+    @members = split ',', $record->prop('Members');
+    if (grep(/^$hostKey$/, @members)) {
 	push @groups, $record->key;
     }
 }
