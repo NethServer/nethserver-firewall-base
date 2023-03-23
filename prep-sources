@@ -1,9 +1,13 @@
 #!/bin/bash
 
-# Prepare source for RPM build
+# Build UI
+set -e
 
-# download langs from transifex
-
-# tar directory
-pushd ui && npm install && npm run build && cd dist && tar cvzf ../../nethserver-firewall-base.tar.gz *
+NODE_OPTIONS="--openssl-legacy-provider"
+export NODE_OPTIONS
+pushd ui
+npm install
+npm run build
 popd
+
+tar -C ui/dist -c -z -f nethserver-firewall-base.tar.gz .
