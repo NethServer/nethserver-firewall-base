@@ -774,7 +774,8 @@ sub getProviders
         # skip providers associated to non-existing red interfaces
         next if (!exists($reds{$interface_name}));
         my $weight = $provider->prop('weight') || "1";
-        my $mask = "0x" . $number . "0000";
+        my $hex = sprintf("%X", $number);
+        my $mask = "0x" . $hex . "0000";
         my @mask_array = ('mask', $mask);
         my %props = $provider->props;
         $props{'mask'} = $mask;
