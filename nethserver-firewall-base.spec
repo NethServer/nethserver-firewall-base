@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.19.1
+Version: 3.19.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -73,6 +73,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Tue Jun 06 2023 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.19.2-1
+- Multi-WAN limited to 9 connections - Bug NethServer/dev#6752
+
 * Mon Mar 27 2023 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.19.1-1
 - Cockpit: you can delete an host used into host-group - Bug NethServer/dev#6735
 
