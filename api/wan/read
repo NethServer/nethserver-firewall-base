@@ -81,11 +81,11 @@ if($cmd eq 'providers') {
     $NotifyWanTo  =~ s/,/ /g;
     $ret->{'configuration'}{'multiwan'}{'EmailAddress'} = $NotifyWanTo;
 
-	if ($ret->{'configuration'}{'multiwan'}{'WanMode'} eq 'backup') {
-		my $externalip = `dig +short myip.opendns.com \@resolver1.opendns.com`;
-		chomp $externalip;
-		$ret->{'configuration'}{'multiwan'}{'CurrentIp'} = $externalip;
-	}
+    if ($ret->{'configuration'}{'multiwan'}{'WanMode'} eq 'backup') {
+        my $externalip = `dig -4 +short myip.opendns.com \@resolver1.opendns.com`;
+        chomp $externalip;
+        $ret->{'configuration'}{'multiwan'}{'CurrentIp'} = $externalip;
+    }
 	
     print encode_json($ret);
 
