@@ -1,6 +1,6 @@
 Summary: NethServer firewall implementation based on Shorewall
 Name: nethserver-firewall-base
-Version: 3.19.2
+Version: 3.19.3
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -73,6 +73,9 @@ grep -v -e /usr/share/nethesis/NethServer -e cockpit %{name}-%{version}-%{releas
 
 
 %changelog
+* Thu Aug 03 2023 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.19.3-1
+- Cockpit: the active IP address is not displayed if you are on a network that supports IPv6 - Bug NethServer/dev#6761
+
 * Tue Jun 06 2023 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 3.19.2-1
 - Multi-WAN limited to 9 connections - Bug NethServer/dev#6752
 
